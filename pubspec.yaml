@@ -28,6 +28,7 @@ dev_dependencies:
 
   get: ^4.6.6 # getX, 상태 관리 플러그인
   flutter_screenutil: ^5.9.3 # screenutil, 화면에 따라 크기 조정
+  easy_localization: ^3.0.7 # localization 사용 쉽게
 
   # Firebase
   firebase_ui_auth: ^1.14.0
