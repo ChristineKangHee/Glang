@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "335914399889",
+    "project_id": "readventure-d8d78",
+    "storage_bucket": "readventure-d8d78.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335914399889:android:c3f1555dc1c85f287a2730",
+        "android_client_info": {
+          "package_name": "com.zero.readventure"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCY7v7vJsLTudBL-O5fUTtZvcPk-rFNy_o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
