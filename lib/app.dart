@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
             theme: themeController.lightTheme, // 라이트 테마
             darkTheme: themeController.darkTheme, // 다크 테마
             themeMode: themeController.themeMode, // 테마 모드
-            initialRoute: '/login', // 초기 경로 설정 (스플래시 페이지로 변경 예정)
+            initialRoute: '/', // 초기 경로 설정 (스플래시 페이지로 변경 예정)
             getPages: [
               GetPage(
                 name: '/',
