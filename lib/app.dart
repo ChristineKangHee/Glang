@@ -7,8 +7,7 @@ import 'package:readventure/view/course/course_main.dart';
 import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/mypage/mypage_main.dart';
 import 'viewmodel/theme_controller.dart';
-import 'localization/app_localizations.dart';
-import 'localization/app_localizations_delegate.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -38,7 +37,7 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return Obx(() {
           return GetMaterialApp(
-            title: 'Readventure',
+            title: tr('app_title'),
             theme: themeController.lightTheme, // 라이트 테마
             darkTheme: themeController.darkTheme, // 다크 테마
             themeMode: themeController.themeMode, // 테마 모드
@@ -61,40 +60,17 @@ class MyApp extends StatelessWidget {
                 page: () => const MyPageMain(),
               ),
             ],
-            supportedLocales: const [
-              Locale('en'), // 영어
-              Locale('ko'), // 한국어
-            ],
-            /*
-            Localization 사용법
+            localizationsDelegates: context.localizationDelegates, // Localization 설정
+            supportedLocales: context.supportedLocales, // 지원 언어
+            locale: context.locale, // 현재 언어
 
-            @override
-              Widget build(BuildContext context) {
-              밑에
-              final localizations = AppLocalizations.of(context);
-              선언 (locale 사용 위함)
+            //fallbackLocale supportedLocales에 설정한 언어가 없는 경우 설정되는 언어
+            // fallbackLocale: Locale('en', 'US'),
 
-              실제 사용 예시
-              Text(localizations!.translate('app_title')), // 앱 제목
+            // startLocale을 지정하면 초기 언어가 설정한 언어로 변경됨
+            // 만일 이 설정을 하지 않으면 OS 언어를 따라 기본 언어가 설정됨
+            // startLocale: Locale('ko', 'KR')
 
-              localization/l10n/ 의 en.json, ko.json 에 text 추가 후 사용.
-
-            */
-            localizationsDelegates: const [
-              AppLocalizationsDelegate(),
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            localeResolutionCallback: (locale, supportedLocales) {
-              // 사용자 장치 언어 설정에 따라 Locale 결정
-              for (var supportedLocale in supportedLocales) {
-                if (supportedLocale.languageCode == locale?.languageCode) {
-                  return supportedLocale;
-                }
-              }
-              return supportedLocales.first;
-            },
           );
         });
       },
