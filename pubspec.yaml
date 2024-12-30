@@ -27,12 +27,15 @@ dev_dependencies:
   flutter_lints: ^3.0.0
 
   # 상태관리
-#  get: ^4.6.6 # getX, 상태 관리 플러그인
-#  provider: ^6.1.2 # provider, 상태 관리 플러그인
+  #  get: ^4.6.6 # getX, 상태 관리 플러그인
+  #  provider: ^6.1.2 # provider, 상태 관리 플러그인
   flutter_riverpod: ^2.6.1 # riverpod, 상태 관리 플러그인 / provider의 상위버전
 
   flutter_screenutil: ^5.9.3 # screenutil, 화면에 따라 크기 조정
   easy_localization: ^3.0.7 # localization 사용 쉽게
+  flutter_dotenv: ^5.2.1 # 환경 변수 처리
+  http: ^1.2.1
+  dart_openai: ^5.1.0
 
   # Firebase
   firebase_ui_auth: ^1.14.0
@@ -54,10 +57,9 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/
     - lib/localization/l10n/ko.json
     - lib/localization/l10n/en.json
-
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

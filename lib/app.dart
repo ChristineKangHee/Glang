@@ -4,7 +4,6 @@
 /// Created: 2024-12-28
 /// Last Modified: 2024-12-30 by 박민준
 
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:readventure/view/community/community_main.dart';
