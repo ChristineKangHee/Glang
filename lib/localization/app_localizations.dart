@@ -1,3 +1,9 @@
+/// File: app_localizations.dart
+/// Purpose: 실제 번역된 문자열을 저장, 앱의 각 부분에서 사용할 수 있도록 제공
+/// Author: 박민준
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-30 by 박민준
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

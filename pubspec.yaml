@@ -26,7 +26,11 @@ dev_dependencies:
 
   flutter_lints: ^3.0.0
 
-  get: ^4.6.6 # getX, 상태 관리 플러그인
+  # 상태관리
+#  get: ^4.6.6 # getX, 상태 관리 플러그인
+#  provider: ^6.1.2 # provider, 상태 관리 플러그인
+  flutter_riverpod: ^2.6.1 # riverpod, 상태 관리 플러그인 / provider의 상위버전
+
   flutter_screenutil: ^5.9.3 # screenutil, 화면에 따라 크기 조정
   easy_localization: ^3.0.7 # localization 사용 쉽게
 
@@ -36,6 +40,13 @@ dev_dependencies:
   firebase_auth: ^4.19.5
   firebase_storage: ^11.7.7
   cloud_firestore: ^4.17.3
+
+  # KaKaoTalk Login
+  kakao_flutter_sdk_user: ^1.9.5
+
+  # Google Sign In
+  google_sign_in: ^6.2.1
+  google_sign_in_web: ^0.12.4
 
 flutter:
 

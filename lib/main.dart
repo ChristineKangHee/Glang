@@ -1,8 +1,14 @@
+/// File: main.dart
+/// Purpose: 앱의 진입점으로 Firebase 초기화, Localization 설정, 테마 및 상태 관리를 초기화하고 앱을 실행
+/// Author: 박민준
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-30 by 박민준
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:readventure/viewmodel/app_state_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app.dart';
-import 'package:get/get.dart';
+import 'viewmodel/app_state_controller.dart';
 import 'viewmodel/theme_controller.dart';
 import 'viewmodel/navigation_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -35,18 +41,15 @@ void main() async {
   //   javaScriptAppKey: 'b6a12ba6c8d0fda7a0ecec4569921a1d',
   // );
 
-  //////////////////// GetX 컨트롤러 초기화 ////////////////////
-  Get.put(ThemeController());
-  Get.put(NavigationController());
-  Get.put(AppStateController());
-
   //////////////////// 앱 실행 ////////////////////
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('ko')], // 지원 언어
       path: 'lib/localization/l10n', // JSON 파일 경로
       fallbackLocale: const Locale('ko'), // 기본 언어
-      child: const MyApp(),
+      child: ProviderScope(
+        child: MyApp(),
+      ),
     ),
   );
 }
