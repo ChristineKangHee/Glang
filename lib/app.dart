@@ -1,6 +1,11 @@
+/// File: app.dart
+/// Purpose: 앱의 전체 구조를 설정하고 테마, 다국어, 네비게이션 경로 및 화면 크기 조정을 관리
+/// Author: 박민준
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-30 by 박민준
+
+
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:readventure/view/community/community_main.dart';
 import 'package:readventure/view/course/course_main.dart';
@@ -8,13 +13,15 @@ import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/mypage/mypage_main.dart';
 import 'viewmodel/theme_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final themeController = Get.find<ThemeController>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isLightTheme = ref.watch(themeProvider); // 테마 상태를 읽음
+    final themeController = ref.read(themeProvider.notifier); // 테마 컨트롤러
 
     return ScreenUtilInit(
       // ScreenUtil 사용법
@@ -35,44 +42,30 @@ class MyApp extends StatelessWidget {
          */
       designSize: const Size(390, 844), // 기본 디자인 사이즈 설정
       builder: (context, child) {
-        return Obx(() {
-          return GetMaterialApp(
-            title: tr('app_title'),
-            theme: themeController.lightTheme, // 라이트 테마
-            darkTheme: themeController.darkTheme, // 다크 테마
-            themeMode: themeController.themeMode, // 테마 모드
-            initialRoute: '/', // 초기 경로 설정 (스플래시 페이지로 변경 예정)
-            getPages: [
-              GetPage(
-                name: '/',
-                page: () => const MyHomePage(),
-              ),
-              GetPage(
-                name: '/course',
-                page: () => const CourseMain(),
-              ),
-              GetPage(
-                name: '/community',
-                page: () => const CommunityMain(),
-              ),
-              GetPage(
-                name: '/mypage',
-                page: () => const MyPageMain(),
-              ),
-            ],
-            localizationsDelegates: context.localizationDelegates, // Localization 설정
-            supportedLocales: context.supportedLocales, // 지원 언어
-            locale: context.locale, // 현재 언어
+        return MaterialApp(
+          title: tr('app_title'), // Localization을 통해 앱 제목 가져오기
+          theme: isLightTheme ? themeController.lightTheme : themeController.darkTheme, // 라이트/다크 테마
+          darkTheme: themeController.darkTheme, // 다크 테마
+          themeMode: isLightTheme ? ThemeMode.light : ThemeMode.dark, // 테마 모드
+          initialRoute: '/', // 초기 경로 설정 (스플래시 페이지로 변경 예정)
+          routes: {
+            '/': (context) => const MyHomePage(),
+            '/course': (context) => const CourseMain(),
+            '/community': (context) => const CommunityMain(),
+            '/mypage': (context) => const MyPageMain(),
+          },
+          localizationsDelegates: context.localizationDelegates, // Localization 설정
+          supportedLocales: context.supportedLocales, // 지원 언어
+          locale: context.locale, // 현재 언어
 
-            //fallbackLocale supportedLocales에 설정한 언어가 없는 경우 설정되는 언어
-            // fallbackLocale: Locale('en', 'US'),
+          // fallbackLocale supportedLocales에 설정한 언어가 없는 경우 설정되는 언어
+          // fallbackLocale: Locale('en', 'US'),
 
-            // startLocale을 지정하면 초기 언어가 설정한 언어로 변경됨
-            // 만일 이 설정을 하지 않으면 OS 언어를 따라 기본 언어가 설정됨
-            // startLocale: Locale('ko', 'KR')
+          // startLocale을 지정하면 초기 언어가 설정한 언어로 변경됨
+          // 만일 이 설정을 하지 않으면 OS 언어를 따라 기본 언어가 설정됨
+          // startLocale: Locale('ko', 'KR')
 
-          );
-        });
+        );
       },
     );
   }

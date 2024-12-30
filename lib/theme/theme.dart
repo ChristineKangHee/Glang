@@ -1,3 +1,9 @@
+/// File: font.dart
+/// Purpose: Project의 전체 theme 관리
+/// Author: 박민준
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-30 by 박민준
+
 import "package:flutter/material.dart";
 
 /*
