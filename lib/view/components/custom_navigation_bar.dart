@@ -39,12 +39,12 @@ class CustomNavigationBar extends ConsumerWidget {
           label: '홈',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.people_alt_rounded),
-          label: '친구',
+          icon: Icon(Icons.my_library_books_rounded),
+          label: '코스',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.library_books_rounded),
-          label: '독서',
+          icon: Icon(Icons.bar_chart),
+          label: '커뮤니티',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person_rounded),
