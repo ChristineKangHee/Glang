@@ -1,3 +1,9 @@
+/// File: custom_button.dart
+/// Purpose: 앱에서 커스터마이즈된 버튼 위젯을 제공하여 타이틀, 검색 버튼 등을 설정 가능하게 함
+/// Author: 박민준
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-31 by 박민준
+
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 
@@ -90,7 +96,7 @@ class Button extends StatelessWidget { //
           height: 52,
           decoration: BoxDecoration(
               color: condition.contains("not null") ? Theme.of(context).colorScheme.primary : Colors.grey,
-              borderRadius: BorderRadius.circular(12)), // Button Edge 둥글게
+              borderRadius: BorderRadius.circular(10)), // Button Edge 둥글게
           child: Padding(
             padding: const EdgeInsets.all(13.0),
             child: Text(
@@ -133,7 +139,7 @@ class ButtonNatural extends StatelessWidget { //
           height: 52,
           decoration: BoxDecoration(
               color: condition.contains("not null") ? Theme.of(context).colorScheme.outline : Colors.grey,
-              borderRadius: BorderRadius.circular(12)), // Button Edge 둥글게
+              borderRadius: BorderRadius.circular(10)), // Button Edge 둥글게
           child: Padding(
             padding: const EdgeInsets.all(13.0),
             child: Text(
@@ -178,7 +184,7 @@ class ButtonIcon extends StatelessWidget { //
           height: 52,
           decoration: BoxDecoration(
               color: condition.contains("not null") ? Theme.of(context).colorScheme.surface : Colors.grey,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: Theme.of(context).colorScheme.outline
               )
@@ -230,23 +236,12 @@ class ButtonImage extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16,0,16,0),
         child: Container(
-          width: MediaQuery
-              .of(context)
-              .size
-              .width, //MediaQuery 를 통해서 버튼 넓이 설정해놓음.
+          width: MediaQuery.of(context).size.width, //MediaQuery 를 통해서 버튼 넓이 설정해놓음.
           height: 52,
           decoration: BoxDecoration(
-              color: condition.contains("not null") ? Theme
-                  .of(context)
-                  .colorScheme
-                  .surface : Colors.grey,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                  color: Theme
-                      .of(context)
-                      .colorScheme
-                      .outline
-              )
+              color: condition.contains("not null") ? Theme.of(context).colorScheme.surface : Colors.grey,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
           ), // Button Edge 둥글게
           child: Padding(
             padding: const EdgeInsets.all(13.0),

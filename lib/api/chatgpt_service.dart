@@ -1,3 +1,9 @@
+/// File: chatgpt_service.dart
+/// Purpose: OpenAI API와의 통신을 통해 주어진 프롬프트에 대한 ChatGPT 응답을 가져오는 서비스 클래스
+/// Author: 박민준
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-31 by 박민준
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';

@@ -1,5 +1,12 @@
+/// File: chat_screen.dart
+/// Purpose: ChatGPT와 사용자 간의 채팅 인터페이스를 제공하여 메시지를 주고받을 수 있는 화면 구현
+/// Author: 박민준
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-31 by 박민준
+
 import 'package:flutter/material.dart';
 import '../../api/chatgpt_service.dart';
+import '../components/message_bubble.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -51,24 +58,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 final isUser = message['role'] == 'user';
                 final isError = message['role'] == 'error';
 
-                return Align(
-                  alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: isUser
-                          ? Colors.blue[200]
-                          : isError
-                          ? Colors.red[200]
-                          : Colors.grey[300],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      message['content'] ?? '',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ),
+                return MessageBubble(
+                  content: message['content'] ?? '',
+                  isUser: isUser,
+                  isError: isError,
                 );
               },
             ),
