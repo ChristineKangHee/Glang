@@ -16,3 +16,17 @@ release : 버전 릴리즈
 merge : 병합  
   
 git pull origin master
+
+---
+
+# 🧰 Getting Started
+--
+1. Make sure Git and NodeJS is installed.
+2. Clone this repository to your local computer.
+3. Create .env file in root directory.
+4. Contents of .env:
+<pre>
+<code>
+OPENAI_API_KEY=sk-proj-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+</code>
+</pre>>

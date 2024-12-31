@@ -49,7 +49,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
           initialRoute: '/', // 초기 경로 설정 (스플래시 페이지로 변경 예정)
           routes: {
             '/': (context) => const MyHomePage(),
-            '/course': (context) => const CourseMain(),
+            '/course': (context) => CourseMain(),
             '/community': (context) => const CommunityMain(),
             '/mypage': (context) => const MyPageMain(),
           },

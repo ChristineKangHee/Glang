@@ -57,7 +57,7 @@ class NavigationController extends StateNotifier<int> {
       case '/':
         return const MyHomePage();
       case '/course':
-        return const CourseMain();
+        return CourseMain();
       case '/community':
         return const CommunityMain();
       case '/mypage':
