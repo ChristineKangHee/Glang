@@ -36,6 +36,8 @@ dev_dependencies:
   flutter_dotenv: ^5.2.1 # 환경 변수 처리
   http: ^1.2.1
   dart_openai: ^5.1.0
+  permission_handler: ^11.1.0 # 권한 처리
+  flutter_local_notifications: ^16.3.0 # local 알림 설정
 
   # Firebase
   firebase_ui_auth: ^1.14.0
