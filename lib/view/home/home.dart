@@ -5,6 +5,8 @@ import 'package:readventure/view/components/custom_navigation_bar.dart';
 import 'package:readventure/viewmodel/app_state_controller.dart';
 import 'package:readventure/viewmodel/theme_controller.dart';
 
+import '../../viewmodel/notification_controller.dart';
+
 class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
   const MyHomePage({super.key});
 
@@ -51,6 +53,10 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
                 context.setLocale(const Locale('en')); // 영어로 전환
               },
               child: const Text('Switch to English'),
+            ),
+            ElevatedButton(
+              onPressed: showNotification,
+              child: Text('Show Notification'),
             ),
           ],
         ),

@@ -5,7 +5,6 @@
 /// Last Modified: 2024-12-30 by 박민준
 
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +13,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:readventure/viewmodel/notification_controller.dart';
 // import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 void main() async {
@@ -31,6 +31,10 @@ void main() async {
     print("⚠️ Failed to load .env file: $e");
     // 기본 설정으로 동작하도록 설정 가능
   }
+
+  // local notification
+  await requestNotificationPermission();
+  await initializeNotifications();
 
   // Easy Localization 초기화
   await EasyLocalization.ensureInitialized();
