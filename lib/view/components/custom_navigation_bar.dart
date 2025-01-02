@@ -31,7 +31,7 @@ class CustomNavigationBar extends ConsumerWidget {
       type: BottomNavigationBarType.fixed,
       currentIndex: selectedIndex,
       selectedItemColor: customColors.primary,
-      unselectedItemColor: customColors.secondary,
+      unselectedItemColor: customColors.accent,
       onTap: (index) => navigationController.navigateToIndex(context, index), // 페이지 전환
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(

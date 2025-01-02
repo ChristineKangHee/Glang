@@ -6,14 +6,42 @@
 
 import 'package:flutter/material.dart';
 
-// Text(
-//   '예제 텍스트',
-//   style: pretendardBlack(context).copyWith(fontSize: 20), // 폰트 크기만 20으로 변경
-// )
+
+/*
+    Font 사용 예제
+
+    < 기본 사용법 >
+    Text(
+      '헤드라인 XL',
+      style: heading_xlarge(context),
+    ),
+    Text(
+      '본문 텍스트 Small',
+      style: body_small(context),
+    ),
+
+    <폰트 크기, 색상 커스터마이징>
+    Text(
+      '커스텀 폰트 크기',
+      style: heading_large(context).copyWith(fontSize: 28),
+    ),
+    Text(
+      '커스텀 폰트 색상',
+      style: body_medium(context).copyWith(color: Colors.red),
+    ),
+
+    ❄︎ 주의 사항 ❄︎
+    Text() 위젯 사용할때 const 붙이면 안됩니다. 오류나요.
+
+    커스텀 폰트 크기는 거의 사용할 일 없을 것으로 사료됩니다.
+    커스텀 폰트 색상은 사용 시 추후 해당 부분만 수정해야 할 듯 해서...
+        우선 이렇게 사용하되 다른 방법을 고안해 보겠습니다.
+ */
 
 //////////////////////////////////////////////////////////////////////
 ///////                      기본 폰트들                          ///////
 //////////////////////////////////////////////////////////////////////
+
 
 TextStyle pretendardBlack(BuildContext context) {
     return TextStyle(
@@ -97,6 +125,179 @@ TextStyle pretendardThin(BuildContext context) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////    Design Team 정의 Heading    //////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TextStyle heading_xlarge(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w700,
+        fontSize: 32,
+        height: 1.5,
+        letterSpacing: 1.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
+TextStyle heading_large(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w700,
+        fontSize: 24,
+        height: 1.5,
+        letterSpacing: 1.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
+TextStyle heading_medium(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w700,
+        fontSize: 22,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
+TextStyle heading_small(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w700,
+        fontSize: 20,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
+TextStyle heading_xsmall(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w700,
+        fontSize: 18,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
+TextStyle heading_xxsmall(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w700,
+        fontSize: 16,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////      Design Team 정의 Body     //////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TextStyle body_large_semi(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w600,
+        fontSize: 20,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
+TextStyle body_medium_semi(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w600,
+        fontSize: 18,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
+TextStyle body_small_semi(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w600,
+        fontSize: 16,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
+TextStyle body_xsmall_semi(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w600,
+        fontSize: 14,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
+TextStyle body_large(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w400,
+        fontSize: 20,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
+TextStyle body_medium(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w400,
+        fontSize: 18,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
+TextStyle body_small(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w400,
+        fontSize: 16,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
+TextStyle body_xsmall(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w400,
+        fontSize: 14,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
+TextStyle body_xxsmall(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w400,
+        fontSize: 12,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////      폰트 색, 사이즈 등 개별 사용   //////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -106,41 +307,5 @@ TextStyle pretendardBoldPrimary(BuildContext context) {
         fontWeight: FontWeight.w700,
         fontSize: 36,
         color: Theme.of(context).colorScheme.primary, // Light: 검 Dark: 흰
-    );
-}
-
-TextStyle pretendardLightLast(BuildContext context) {
-    return TextStyle(
-        fontFamily: 'Pretendard',
-        fontWeight: FontWeight.w300,
-        fontSize: 16,
-        color: Theme.of(context).colorScheme.shadow, // Light: 검 Dark: 흰
-    );
-}
-
-TextStyle pretendardSemiBoldPrimary(BuildContext context) {
-    return TextStyle(
-        fontFamily: 'Pretendard',
-        fontWeight: FontWeight.w600,
-        fontSize: 16,
-        color: Theme.of(context).colorScheme.primary, // Light: 흰 Dark: 검
-    );
-}
-
-TextStyle pretendardSemiBoldSecond(BuildContext context) {
-    return TextStyle(
-        fontFamily: 'Pretendard',
-        fontWeight: FontWeight.w600,
-        fontSize: 16,
-        color: Theme.of(context).colorScheme.secondary, // Light: 흰 Dark: 검
-    );
-}
-
-TextStyle pretendardRegularSecond(BuildContext context) {
-    return TextStyle(
-        fontFamily: 'Pretendard',
-        fontWeight: FontWeight.w400,
-        fontSize: 16,
-        color: Theme.of(context).colorScheme.secondary, // Light: 검 Dark: 흰
     );
 }
