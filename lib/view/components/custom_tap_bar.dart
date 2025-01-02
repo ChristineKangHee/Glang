@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-class MyTapBar extends StatelessWidget{
+class CustomTapBar extends StatelessWidget{
   final TabController tablController;
-  const MyTapBar({
+  const CustomTapBar({
     super.key,
     required this.tablController
   });
@@ -13,9 +13,11 @@ class MyTapBar extends StatelessWidget{
       child: TabBar(
         controller: tablController,
         tabs: [
-          Tab(text: '메뉴',),
-          Tab(text: '정보',),
-          Tab(text: '리뷰',),
+          Tab(text: '전체',),
+          Tab(text: '안읽음',),
+          Tab(text: '학습',),
+          Tab(text: '보상',),
+          Tab(text: '시스템',),
         ],
       ),
     );

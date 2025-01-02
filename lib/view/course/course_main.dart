@@ -71,7 +71,7 @@ class _CourseMainState extends State<CourseMain> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: CustomAppBar(title: 'App Title'),
+        appBar: CustomAppBar_Course(),
         body: Stack(
           children: [
             ListView.separated(

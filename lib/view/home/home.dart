@@ -5,7 +5,9 @@ import 'package:readventure/view/components/custom_navigation_bar.dart';
 import 'package:readventure/viewmodel/app_state_controller.dart';
 import 'package:readventure/viewmodel/theme_controller.dart';
 
+import '../../viewmodel/custom_colors_provider.dart';
 import '../../viewmodel/notification_controller.dart';
+import '../components/custom_app_bar.dart';
 
 class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
   const MyHomePage({super.key});
@@ -15,19 +17,22 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
     final appState = ref.watch(appStateProvider); // 사용자 상태
     final themeController = ref.read(themeProvider.notifier); // 테마 컨트롤러
     final isLightTheme = ref.watch(themeProvider); // 현재 테마 상태
+    final customColors = ref.watch(customColorsProvider); // CustomColors 가져오기
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('app_title').tr(),
-        actions: [
-          IconButton(
-            icon: Icon(isLightTheme ? Icons.dark_mode : Icons.light_mode),
-            onPressed: () {
-              themeController.toggleTheme(); // 테마 변경
-            },
-          ),
-        ],
-      ),
+      backgroundColor: customColors.neutral90,
+      appBar: CustomAppBar_Logo(),
+      // AppBar(
+      //   title: const Text('app_title').tr(),
+      //   actions: [
+      //     IconButton(
+      //       icon: Icon(isLightTheme ? Icons.dark_mode : Icons.light_mode),
+      //       onPressed: () {
+      //         themeController.toggleTheme(); // 테마 변경
+      //       },
+      //     ),
+      //   ],
+      // ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

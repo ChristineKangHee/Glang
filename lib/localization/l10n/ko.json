@@ -2,5 +2,8 @@
   "app_title": "리드벤처",
   "welcome_message": "리드벤처에 오신 것을 환영합니다!",
   "login": "로그인",
-  "signup": "회원가입"
+  "signup": "회원가입",
+  "course_title": "코스",
+  "community_title": "커뮤니티",
+  "mypage_title": "마이페이지"
 }
