@@ -45,12 +45,9 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('ChatGPT Chat'),
-      ),
       body: Column(
         children: [
-          Expanded(
+          Center(
             child: ListView.builder(
               itemCount: _messages.length,
               itemBuilder: (context, index) {

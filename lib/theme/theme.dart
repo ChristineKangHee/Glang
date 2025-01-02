@@ -7,7 +7,7 @@
 import "package:flutter/material.dart";
 
 /*
-* 아래와 같이 사용
+* 기존 방식
   class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -16,11 +16,15 @@ import "package:flutter/material.dart";
 
   color: customColors.primary,
   이런 식으로 사용.
+* Riverpod 이용 방식
+  class MyHomePage extends ConsumerWidget {
+    @override
+    Widget build(BuildContext context, WidgetRef ref) {
+      final customColors = ref.watch(customColorsProvider); // CustomColors 가져오기
 
-  context가 없는 곳에서는
+  backgroundColor: customColors.primary, // Custom Primary Color 사용
 
-  color = ThemeManager.customColors.primary
-  이런식으로 사용
+*
 */
 
 // CustomColors 클래스 정의

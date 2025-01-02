@@ -4,22 +4,7 @@
 /// Created: 2024-12-28
 /// Last Modified: 2024-12-30 by 박민준
 
-import 'package:flutter/material.dart';
-import 'package:easy_localization/easy_localization.dart';
-import '../../theme/theme.dart';
-
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
-  final Color backgroundColor;
-  final Function()? onSearchPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
-
-  const CustomAppBar({
-    Key? key,
-    required this.title,
-    this.backgroundColor = Colors.white, // 기본값을 흰색으로 설정
-    this.onSearchPressed,
-  }) : super(key: key);
-  /*
+/*
     사용 방법
     Scaffold 에서 아래와 같이 사용
 
@@ -30,24 +15,45 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       },
     ),
 
-   */
+    1. CustomAppBar_Logo
+
+
+*/
+
+import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
+import '../../theme/theme.dart';
+import '../../theme/font.dart';
+import '../../viewmodel/custom_colors_provider.dart';
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////        1 Depth App Bar        //////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// 기본 형식 앱바
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final Color? backgroundColor; // null 가능하도록 수정
+  final Function()? onSearchPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
+
+  const CustomAppBar({
+    Key? key,
+    required this.title,
+    this.backgroundColor, // null이면 default로 설정
+    this.onSearchPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return AppBar(
-      // leading: IconButton(
-      //   icon: Icon(Icons.arrow_back, color: Colors.orange),
-      //   onPressed: () {
-      //     // Navigator.pop(context); //뒷 페이지로 돌아가는 기능. 상황에 맞게 수정.
-      //   },
-      // ),
+      leading: Container(child: Image.asset('assets/images/appleicon.png')),// logo 부분. 추후 진짜 로고로 바꿀 것
       title: Text(
         title,
-        style: const TextStyle(
-          color: Colors.black,
-          // fontWeight: FontWeight.bold,
+        style: TextStyle(
+          color: customColors.black,
+          fontWeight: FontWeight.bold,
         ),
       ).tr(),
       centerTitle: true,
@@ -57,11 +63,280 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: onSearchPressed,
         ),
       ],
-      backgroundColor: backgroundColor,
+      backgroundColor: backgroundColor ?? customColors.white,
       elevation: 0,
     );
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+// 앱바_로고
+class CustomAppBar_Logo extends StatelessWidget implements PreferredSizeWidget {
+  final Color? backgroundColor; // null 가능하도록 수정
+  final Function()? onSearchPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
+
+  const CustomAppBar_Logo({
+    Key? key,
+    this.backgroundColor, // null이면 default로 설정
+    this.onSearchPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      leading: Container(child: Image.asset('assets/images/appleicon.png')),// logo 부분. 추후 진짜 로고로 바꿀 것
+      actions: [// 이 부분에 아이콘 버튼을 추가
+        IconButton(
+          icon: Icon(Icons.notifications, color: customColors.neutral30, size: 28,),
+          onPressed: onSearchPressed,
+        ),
+      ],
+      backgroundColor: backgroundColor ?? customColors.white,
+      elevation: 0,
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+// 앱바_코스
+class CustomAppBar_Course extends StatelessWidget implements PreferredSizeWidget {
+  final Color? backgroundColor; // null 가능하도록 수정
+  final Function()? onSearchPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
+
+  const CustomAppBar_Course({
+    Key? key,
+    this.backgroundColor, // null이면 default로 설정
+    this.onSearchPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      title: Text(
+        "course_title",
+        style: heading_small(context).copyWith(color: customColors.neutral30),
+      ).tr(),
+      centerTitle: true,
+      backgroundColor: backgroundColor ?? customColors.white,
+      elevation: 0,
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+// 앱바_커뮤니티
+class CustomAppBar_Community extends StatelessWidget implements PreferredSizeWidget {
+  final Color? backgroundColor; // null 가능하도록 수정
+  final Function()? onSearchPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
+
+  const CustomAppBar_Community({
+    Key? key,
+    this.backgroundColor, // null이면 default로 설정
+    this.onSearchPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      title: Text(
+        "community_title",
+        style: heading_small(context).copyWith(color: customColors.neutral30),
+      ).tr(),
+      centerTitle: true,
+      actions: [// 이 부분에 아이콘 버튼을 추가
+        IconButton(
+          icon: Icon(Icons.search, color: customColors.neutral30, size: 28,),
+          onPressed: onSearchPressed,
+        ),
+      ],
+      backgroundColor: backgroundColor ?? customColors.white,
+      elevation: 0,
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+// 앱바_마이페이지
+class CustomAppBar_MyPage extends StatelessWidget implements PreferredSizeWidget {
+  final Color? backgroundColor; // null 가능하도록 수정
+  final Function()? onSettingPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
+
+  const CustomAppBar_MyPage({
+    Key? key,
+    this.backgroundColor, // null이면 default로 설정
+    this.onSettingPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      title: Text(
+        "mypage_title",
+        style: heading_small(context).copyWith(color: customColors.neutral30),
+      ).tr(),
+      centerTitle: true,
+      actions: [// 이 부분에 아이콘 버튼을 추가
+        IconButton(
+          icon: Icon(Icons.settings, color: customColors.neutral30, size: 28,),
+          onPressed: onSettingPressed ?? () {
+            Navigator.pushNamed(context, '/mypage/settings');
+          },
+        ),
+      ],
+      backgroundColor: backgroundColor ?? customColors.white,
+      elevation: 0,
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////        2 Depth App Bar        //////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CustomAppBar_2depth_1 extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final Color? backgroundColor; // null 가능하도록 수정
+  final Function()? onSearchPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
+
+  const CustomAppBar_2depth_1({
+    Key? key,
+    required this.title,
+    this.backgroundColor, // null이면 default로 설정
+    this.onSearchPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      leading: IconButton(
+        icon: Icon(Icons.navigate_before, color: customColors.neutral30),
+        onPressed: () {
+          Navigator.pop(context); //뒷 페이지로 돌아가는 기능. 상황에 맞게 수정.
+        },
+      ),
+      title: Text(
+        title,
+        style: heading_xsmall(context).copyWith(color: customColors.neutral30)
+      ).tr(),
+      centerTitle: true,
+      actions: [// 이 부분에 아이콘 버튼을 추가
+        IconButton(
+          icon: Icon(Icons.close, color: customColors.neutral30, size: 28,),
+          onPressed: onSearchPressed,
+        ),
+      ],
+      backgroundColor: backgroundColor ?? customColors.white,
+      elevation: 0,
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class CustomAppBar_2depth_2 extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final Color? backgroundColor; // null 가능하도록 수정
+  final Function()? onSearchPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
+
+  const CustomAppBar_2depth_2({
+    Key? key,
+    required this.title,
+    this.backgroundColor, // null이면 default로 설정
+    this.onSearchPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      leading: IconButton(
+        icon: Icon(Icons.navigate_before, color: customColors.neutral30),
+        onPressed: () {
+          Navigator.pop(context); //뒷 페이지로 돌아가는 기능. 상황에 맞게 수정.
+        },
+      ),
+      title: Text(
+        title,
+        style: heading_xsmall(context).copyWith(color: customColors.neutral30)
+      ).tr(),
+      centerTitle: true,
+      actions: [// 이 부분에 아이콘 버튼을 추가
+        IconButton(
+          icon: Icon(Icons.more_vert, color: customColors.neutral30, size: 28,),
+          onPressed: onSearchPressed,
+        ),
+      ],
+      backgroundColor: backgroundColor ?? customColors.white,
+      elevation: 0,
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class CustomAppBar_2depth_3 extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final Color? backgroundColor; // null 가능하도록 수정
+  final Function()? onSearchPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
+
+  const CustomAppBar_2depth_3({
+    Key? key,
+    required this.title,
+    this.backgroundColor, // null이면 default로 설정
+    this.onSearchPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      leading: IconButton(
+        icon: Icon(Icons.navigate_before, color: customColors.neutral30),
+        onPressed: () {
+          Navigator.pop(context); //뒷 페이지로 돌아가는 기능. 상황에 맞게 수정.
+        },
+      ),
+      title: Text(
+        title,
+        style: heading_xsmall(context).copyWith(color: customColors.neutral30)
+      ).tr(),
+      centerTitle: true,
+      actions: [// 이 부분에 아이콘 버튼을 추가
+        IconButton(
+          icon: Icon(Icons.settings, color: customColors.neutral30, size: 28,),
+          onPressed: onSearchPressed,
+        ),
+      ],
+      backgroundColor: backgroundColor ?? customColors.white,
+      elevation: 0,
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

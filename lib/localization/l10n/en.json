@@ -2,5 +2,8 @@
   "app_title": "Readventure",
   "welcome_message": "Welcome to Readventure!",
   "login": "Login",
-  "signup": "Sign Up"
+  "signup": "Sign Up",
+  "course_title": "Course",
+  "community_title": "Community",
+  "mypage_title": "MyPage"
 }

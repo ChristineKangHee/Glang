@@ -10,6 +10,7 @@ import 'package:readventure/view/community/community_main.dart';
 import 'package:readventure/view/course/course_main.dart';
 import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/mypage/mypage_main.dart';
+import 'package:readventure/view/mypage/settings_page.dart';
 import 'viewmodel/theme_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -52,6 +53,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
             '/course': (context) => CourseMain(),
             '/community': (context) => const CommunityMain(),
             '/mypage': (context) => const MyPageMain(),
+            '/mypage/settings' : (context) => const SettingsPage(),
           },
           localizationsDelegates: context.localizationDelegates, // Localization 설정
           supportedLocales: context.supportedLocales, // 지원 언어

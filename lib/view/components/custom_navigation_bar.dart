@@ -27,30 +27,36 @@ class CustomNavigationBar extends ConsumerWidget {
     final navigationController = ref.read(navigationProvider.notifier);
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      currentIndex: selectedIndex,
-      selectedItemColor: customColors.primary,
-      unselectedItemColor: customColors.accent,
-      onTap: (index) => navigationController.navigateToIndex(context, index), // 페이지 전환
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home_rounded),
-          label: '홈',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.my_library_books_rounded),
-          label: '코스',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.bar_chart),
-          label: '커뮤니티',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_rounded),
-          label: '마이페이지',
-        ),
-      ],
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(16.0),
+        topRight: Radius.circular(16.0),
+      ),
+      child: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: selectedIndex,
+        selectedItemColor: customColors.neutral30,
+        unselectedItemColor: customColors.neutral60,
+        onTap: (index) => navigationController.navigateToIndex(context, index), // 페이지 전환
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_rounded),
+            label: '홈',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.article_rounded),
+            label: '코스',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.leaderboard),
+            label: '커뮤니티',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_rounded),
+            label: '마이페이지',
+          ),
+        ],
+      ),
     );
   }
 }
