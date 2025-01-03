@@ -1,3 +1,9 @@
+/// File: custom_colors_provider.dart
+/// Purpose: 앱의 테마에 따라 CustomColors를 제공하여 UI 색상 관리
+/// Author: 박민준
+/// Created: 2025-01-02
+/// Last Modified: 2025-01-03 by 박민준
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:readventure/viewmodel/theme_controller.dart';
