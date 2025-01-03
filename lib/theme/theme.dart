@@ -16,6 +16,7 @@ import "package:flutter/material.dart";
 
   color: customColors.primary,
   이런 식으로 사용.
+  *
 * Riverpod 이용 방식
   class MyHomePage extends ConsumerWidget {
     @override
@@ -30,10 +31,15 @@ import "package:flutter/material.dart";
 // CustomColors 클래스 정의
 class CustomColors extends ThemeExtension<CustomColors> {
   final Color? primary;
+  final Color? primary60;
+  final Color? primary40;
+  final Color? primary20;
+  final Color? primary10;
   final Color? accent;
   final Color? success;
   final Color? neutral100;
   final Color? neutral90;
+  final Color? neutral80;
   final Color? neutral60;
   final Color? neutral30;
   final Color? neutral0;
@@ -43,10 +49,15 @@ class CustomColors extends ThemeExtension<CustomColors> {
 
   CustomColors({
     required this.primary,
+    required this.primary60,
+    required this.primary40,
+    required this.primary20,
+    required this.primary10,
     required this.accent,
     required this.success,
     required this.neutral100,
     required this.neutral90,
+    required this.neutral80,
     required this.neutral60,
     required this.neutral30,
     required this.neutral0,
@@ -57,10 +68,15 @@ class CustomColors extends ThemeExtension<CustomColors> {
   @override
   CustomColors copyWith({
     Color? primary,
+    Color? primary60,
+    Color? primary40,
+    Color? primary20,
+    Color? primary10,
     Color? accent,
     Color? success,
     Color? neutral100,
     Color? neutral90,
+    Color? neutral80,
     Color? neutral60,
     Color? neutral30,
     Color? neutral0,
@@ -69,10 +85,15 @@ class CustomColors extends ThemeExtension<CustomColors> {
   }) {
     return CustomColors(
       primary: primary ?? this.primary,
+      primary60: primary ?? this.primary60,
+      primary40: primary ?? this.primary40,
+      primary20: primary ?? this.primary20,
+      primary10: primary ?? this.primary10,
       accent: accent ?? this.accent,
       success: success ?? this.success,
       neutral100: neutral100 ?? this.neutral100,
       neutral90: neutral90 ?? this.neutral90,
+      neutral80: neutral80 ?? this.neutral80,
       neutral60: neutral60 ?? this.neutral60,
       neutral30: neutral30 ?? this.neutral30,
       neutral0: neutral0 ?? this.neutral0,
@@ -88,10 +109,15 @@ class CustomColors extends ThemeExtension<CustomColors> {
     }
     return CustomColors(
       primary: Color.lerp(primary, other.primary, t),
+      primary60: Color.lerp(primary60, other.primary60, t),
+      primary40: Color.lerp(primary40, other.primary40, t),
+      primary20: Color.lerp(primary20, other.primary20, t),
+      primary10: Color.lerp(primary10, other.primary10, t),
       accent: Color.lerp(accent, other.accent, t),
       success: Color.lerp(success, other.success, t),
       neutral100: Color.lerp(neutral100, other.neutral100, t),
       neutral90: Color.lerp(neutral90, other.neutral90, t),
+      neutral80: Color.lerp(neutral80, other.neutral80, t),
       neutral60: Color.lerp(neutral60, other.neutral60, t),
       neutral30: Color.lerp(neutral30, other.neutral30, t),
       neutral0: Color.lerp(neutral0, other.neutral0, t),
@@ -123,10 +149,15 @@ final ThemeData lightThemeGlobal = ThemeData(
   extensions: <ThemeExtension>[
     CustomColors(
       primary: Color(0xFF514FFF),
+      primary60: Color(0xFF8886FF),
+      primary40: Color(0xFFB9B9FF),
+      primary20: Color(0xFFD6D6FF),
+      primary10: Color(0xFFE7E7FD),
       accent: Color(0xFFFFC95C),
       success: Color(0xFF3FA654),
       neutral100: Color(0xFFFFFFFF),
       neutral90: Color(0xFFEEEFF3),
+      neutral80: Color(0xFFCDCED3),
       neutral60: Color(0xFF9099A0),
       neutral30: Color(0xFF434343),
       neutral0: Color(0xFF0A0A0A),
@@ -155,10 +186,15 @@ final ThemeData darkThemeGlobal = ThemeData(
   extensions: <ThemeExtension>[
     CustomColors(
       primary: Color(0xFF514FFF),
+      primary60: Color(0xFF8886FF),
+      primary40: Color(0xFFB9B9FF),
+      primary20: Color(0xFFD6D6FF),
+      primary10: Color(0xFFE7E7FD),
       accent: Color(0xFFFFC95C),
       success: Color(0xFF3FA654),
       neutral100: Color(0xFFFFFFFF),
       neutral90: Color(0xFFEEEFF3),
+      neutral80: Color(0xFFCDCED3),
       neutral60: Color(0xFF9099A0),
       neutral30: Color(0xFF434343),
       neutral0: Color(0xFF0A0A0A),
