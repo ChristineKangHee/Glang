@@ -2,7 +2,7 @@
 /// Purpose: 앱의 전체 구조를 설정하고 테마, 다국어, 네비게이션 경로 및 화면 크기 조정을 관리
 /// Author: 박민준
 /// Created: 2024-12-28
-/// Last Modified: 2024-12-30 by 박민준
+/// Last Modified: 2025-01-03 by 박민준
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +11,9 @@ import 'package:readventure/view/course/course_main.dart';
 import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/home/notification/notification_page.dart';
 import 'package:readventure/view/mypage/mypage_main.dart';
+import 'package:readventure/view/mypage/settings/settings_language.dart';
+import 'package:readventure/view/mypage/settings/settings_notification.dart';
+import 'package:readventure/view/mypage/settings/settings_profile.dart';
 import 'viewmodel/theme_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,7 +60,10 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
             '/community': (context) => const CommunityMain(),
             '/mypage': (context) => const MyPageMain(),
             '/mypage/settings' : (context) => const SettingsPage(),
+            '/mypage/settings/profile' : (context) => const SettingsProfile(),
+            '/mypage/settings/notification' : (context) => const SettingsNotification(),
             '/mypage/settings/theme' : (context) => const SettingsTheme(),
+            '/mypage/settings/language' : (context) => const SettingsLanguage(),
           },
           localizationsDelegates: context.localizationDelegates, // Localization 설정
           supportedLocales: context.supportedLocales, // 지원 언어
