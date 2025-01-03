@@ -35,24 +35,6 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
               style: const TextStyle(fontSize: 20),
             ),
             ElevatedButton(
-              onPressed: () {
-                ref.read(appStateProvider.notifier).clearUser(); // 사용자 로그아웃
-              },
-              child: const Text('Logout'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                context.setLocale(const Locale('ko')); // 한국어로 전환
-              },
-              child: const Text('Switch to Korean'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                context.setLocale(const Locale('en')); // 영어로 전환
-              },
-              child: const Text('Switch to English'),
-            ),
-            ElevatedButton(
               onPressed: showNotification,
               child: Text('Show Notification'),
             ),

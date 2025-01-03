@@ -5,12 +5,16 @@
 /// Last Modified: 2025-01-03 by 박민준
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../viewmodel/app_state_controller.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends ConsumerWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appState = ref.watch(appStateProvider); // 사용자 상태
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('설정'),
@@ -22,6 +26,7 @@ class SettingsPage extends StatelessWidget {
             title: const Text('프로필 설정'),
             onTap: () {
               // TODO: 프로필 설정 페이지로 이동
+              Navigator.pushNamed(context, '/mypage/settings/profile');
             },
           ),
           ListTile(
@@ -29,6 +34,7 @@ class SettingsPage extends StatelessWidget {
             title: const Text('알림 설정'),
             onTap: () {
               // TODO: 알림 설정 페이지로 이동
+              Navigator.pushNamed(context, '/mypage/settings/notification');
             },
           ),
           ListTile(
@@ -36,7 +42,7 @@ class SettingsPage extends StatelessWidget {
             title: const Text('언어 설정'),
             onTap: () {
               // TODO: 언어 설정 페이지로 이동
-
+              Navigator.pushNamed(context, '/mypage/settings/language');
             },
           ),
           ListTile(
@@ -52,6 +58,8 @@ class SettingsPage extends StatelessWidget {
             title: const Text('로그아웃'),
             onTap: () {
               // TODO: 로그아웃 기능 구현
+              ref.read(appStateProvider.notifier).clearUser(); // 사용자 로그아웃
+              Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
             },
           ),
         ],
