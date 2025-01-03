@@ -15,7 +15,41 @@
       },
     ),
 
+    ////// 1 Depth //////
+
     1. CustomAppBar_Logo
+      appBar: CustomAppBar_Logo(),
+
+    2. CustomAppBar_Course
+      appBar: CustomAppBar_Course(),
+
+    3. CustomAppBar_Community
+      appBar: CustomAppBar_Community()
+      // 현재 Search Button 부분 함수 구현되어 있지 않음. 추후 Search 기능 연결 필요.
+
+    4. CustomAppBar_MyPage
+      appBar: CustomAppBar_MyPage()
+
+    ////// 2 Depth //////
+
+    1. CustomAppBar_2depth_1
+      appBar: CustomAppBar_2depth_1(
+        title: "앱바 제목",
+        onIconPressed: 함수 기능 정의
+      )
+
+    2. CustomAppBar_2depth_2
+      appBar: CustomAppBar_2depth_2(
+        title: "앱바 제목",
+        onIconPressed: 함수 기능 정의
+
+      )
+
+    3. CustomAppBar_2depth_3
+      appBar: CustomAppBar_2depth_3(
+        title: "앱바 제목",
+        onIconPressed : 함수 기능 정의
+      )
 
 
 */
@@ -217,13 +251,13 @@ class CustomAppBar_MyPage extends StatelessWidget implements PreferredSizeWidget
 class CustomAppBar_2depth_1 extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Color? backgroundColor; // null 가능하도록 수정
-  final Function()? onSearchPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
+  final Function()? onIconPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
 
   const CustomAppBar_2depth_1({
     Key? key,
     required this.title,
     this.backgroundColor, // null이면 default로 설정
-    this.onSearchPressed,
+    this.onIconPressed,
   }) : super(key: key);
 
   @override
@@ -245,7 +279,7 @@ class CustomAppBar_2depth_1 extends StatelessWidget implements PreferredSizeWidg
       actions: [// 이 부분에 아이콘 버튼을 추가
         IconButton(
           icon: Icon(Icons.close, color: customColors.neutral30, size: 28,),
-          onPressed: onSearchPressed,
+          onPressed: onIconPressed,
         ),
       ],
       backgroundColor: backgroundColor ?? customColors.white,
@@ -260,13 +294,13 @@ class CustomAppBar_2depth_1 extends StatelessWidget implements PreferredSizeWidg
 class CustomAppBar_2depth_2 extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Color? backgroundColor; // null 가능하도록 수정
-  final Function()? onSearchPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
+  final Function()? onIconPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
 
   const CustomAppBar_2depth_2({
     Key? key,
     required this.title,
     this.backgroundColor, // null이면 default로 설정
-    this.onSearchPressed,
+    this.onIconPressed,
   }) : super(key: key);
 
   @override
@@ -288,7 +322,7 @@ class CustomAppBar_2depth_2 extends StatelessWidget implements PreferredSizeWidg
       actions: [// 이 부분에 아이콘 버튼을 추가
         IconButton(
           icon: Icon(Icons.more_vert, color: customColors.neutral30, size: 28,),
-          onPressed: onSearchPressed,
+          onPressed: onIconPressed,
         ),
       ],
       backgroundColor: backgroundColor ?? customColors.white,
@@ -303,14 +337,14 @@ class CustomAppBar_2depth_2 extends StatelessWidget implements PreferredSizeWidg
 class CustomAppBar_2depth_3 extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Color? backgroundColor; // null 가능하도록 수정
-  final Function()? onSearchPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
+  final Function()? onIconPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
   final PreferredSizeWidget? bottom; // bottom 파라미터 추가
 
   const CustomAppBar_2depth_3({
     Key? key,
     required this.title,
     this.backgroundColor, // null이면 default로 설정
-    this.onSearchPressed,
+    this.onIconPressed,
     this.bottom,
   }) : super(key: key);
 
@@ -334,7 +368,7 @@ class CustomAppBar_2depth_3 extends StatelessWidget implements PreferredSizeWidg
       actions: [// 이 부분에 아이콘 버튼을 추가
         IconButton(
           icon: Icon(Icons.settings, color: customColors.neutral30, size: 28,),
-          onPressed: onSearchPressed,
+          onPressed: onIconPressed,
         ),
       ],
       backgroundColor: backgroundColor ?? customColors.white,
