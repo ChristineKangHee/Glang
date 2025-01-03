@@ -1,3 +1,9 @@
+/// File: home.dart
+/// Purpose: 메인 화면
+/// Author: 박민준
+/// Created: 2025-01-02
+/// Last Modified: 2025-01-03 by 박민준
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,24 +21,11 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appState = ref.watch(appStateProvider); // 사용자 상태
-    final themeController = ref.read(themeProvider.notifier); // 테마 컨트롤러
-    final isLightTheme = ref.watch(themeProvider); // 현재 테마 상태
     final customColors = ref.watch(customColorsProvider); // CustomColors 가져오기
 
     return Scaffold(
       backgroundColor: customColors.neutral90,
       appBar: CustomAppBar_Logo(),
-      // AppBar(
-      //   title: const Text('app_title').tr(),
-      //   actions: [
-      //     IconButton(
-      //       icon: Icon(isLightTheme ? Icons.dark_mode : Icons.light_mode),
-      //       onPressed: () {
-      //         themeController.toggleTheme(); // 테마 변경
-      //       },
-      //     ),
-      //   ],
-      // ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

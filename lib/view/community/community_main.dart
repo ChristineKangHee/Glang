@@ -1,3 +1,10 @@
+/// File: community_main.dart
+/// Purpose: 커뮤니티 메인 화면을 구현하여 ChatScreen 및 커스터마이즈된 네비게이션 바를 포함
+/// Author: 박민준
+/// Created: 2024-12-28
+/// Last Modified: 2025-01-03 by 박민준
+
+
 import 'package:flutter/material.dart';
 import '../chat/chat_screen.dart';
 import '../components/custom_app_bar.dart';
@@ -15,13 +22,7 @@ class CommunityMain extends ConsumerWidget {
     return SafeArea(
         child: Scaffold(
           appBar: const CustomAppBar_Community(),
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                ChatScreen(),
-              ],
-            ),
-          ),
+          body: ChatScreen(),
           bottomNavigationBar: const CustomNavigationBar(),
         )
     );

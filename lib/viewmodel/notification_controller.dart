@@ -1,3 +1,9 @@
+/// File: notification_controller.dart
+/// Purpose: 로컬 알림 초기화, 표시 및 권한 요청을 처리하는 서비스 구현
+/// Author: 박민준
+/// Created: 2025-01-02
+/// Last Modified: 2025-01-03 by 박민준
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 

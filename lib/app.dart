@@ -9,11 +9,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:readventure/view/community/community_main.dart';
 import 'package:readventure/view/course/course_main.dart';
 import 'package:readventure/view/home/home.dart';
+import 'package:readventure/view/home/notification/notification_page.dart';
 import 'package:readventure/view/mypage/mypage_main.dart';
-import 'package:readventure/view/mypage/settings_page.dart';
 import 'viewmodel/theme_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:readventure/view/mypage/settings/settings_page.dart';
+import 'package:readventure/view/mypage/settings/settings_theme.dart';
 
 class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
   const MyApp({super.key});
@@ -50,10 +52,12 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
           initialRoute: '/', // 초기 경로 설정 (스플래시 페이지로 변경 예정)
           routes: {
             '/': (context) => const MyHomePage(),
+            '/notification': (context) => const NotificationPage(),
             '/course': (context) => CourseMain(),
             '/community': (context) => const CommunityMain(),
             '/mypage': (context) => const MyPageMain(),
             '/mypage/settings' : (context) => const SettingsPage(),
+            '/mypage/settings/theme' : (context) => const SettingsTheme(),
           },
           localizationsDelegates: context.localizationDelegates, // Localization 설정
           supportedLocales: context.supportedLocales, // 지원 언어

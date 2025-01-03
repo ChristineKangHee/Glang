@@ -1,0 +1,17 @@
+/// File: notification_util.dart
+/// Purpose: 알림 데이터를 포맷팅하고 읽지 않은 알림을 필터링하는 유틸리티 클래스
+/// Author: 박민준
+/// Created: 2025-01-02
+/// Last Modified: 2025-01-03 by 박민준
+
+import '../model/notification_item.dart';
+
+class NotificationUtil {
+  static String formatDate(DateTime date) {
+    return '${date.year}-${date.month}-${date.day}';
+  }
+
+  static List<NotificationItem> filterUnread(List<NotificationItem> items) {
+    return items.where((item) => !item.isRead).toList();
+  }
+}
