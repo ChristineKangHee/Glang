@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../util/box_shadow_styles.dart';
+import 'course_subdetail.dart';
+import '../../../../theme/font.dart';
+import '../../../../theme/theme.dart';
 
 class SectionData {
   final Color color;
@@ -6,6 +10,8 @@ class SectionData {
   final int etapa;
   final int section;
   final String title;
+  final String sectionDetail;
+  final List<String> buttonPopupContents;
 
   const SectionData({
     required this.color,
@@ -13,6 +19,8 @@ class SectionData {
     required this.etapa,
     required this.section,
     required this.title,
+    required this.sectionDetail,
+    required this.buttonPopupContents,
   });
 }
 
@@ -21,112 +29,162 @@ class Section extends StatelessWidget {
 
   const Section({super.key, required this.data});
 
-  double getLeft(int indice) {
+  double _getMargin(int index, {bool isLeft = true}) {
     const margin = 72.0;
-    int pos = indice % 9;
-
-    if (pos == 1) {
-      return margin;
+    int pos = index % 9;
+    if (isLeft) {
+      return (pos == 1 || pos == 3) ? margin : (pos == 2 ? margin * 2 : 0.0);
+    } else {
+      return (pos == 5 || pos == 7) ? margin : (pos == 6 ? margin * 2 : 0.0);
     }
-    if (pos == 2) {
-      return margin * 2;
-    }
-    if (pos == 3) {
-      return margin;
-    }
-    return 0.0;
   }
 
-  double getRight(int indice) {
-    const margin = 72.0;
-    int pos = indice % 9;
+  void _showPopup(BuildContext context, int index, CustomColors customColors) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Transform.translate(
+          offset: const Offset(0, -70),
+          child: Container(
+            decoration: BoxDecoration(
+              color: customColors.primary,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: BoxShadowStyles.shadow1(context),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '초급 코스 3',
+                            style: body_xsmall_semi(context).copyWith(color: customColors.neutral100),
+                          ),
+                          Text(
+                            '주제가 들어감',
+                            style: body_large_semi(context).copyWith(color: customColors.neutral100),
+                          ),
+                        ],
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CourseDetailPage(
+                                title: data.buttonPopupContents[index],
+                              ),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: customColors.neutral100,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        ),
+                        child: Text(
+                          '학습하기',
+                          style: body_xsmall_semi(context),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      _buildIconWithText(context, Icons.check_circle, '25%', customColors),
+                      const SizedBox(width: 8), // Spacing between items
+                      _buildIconWithText(context, Icons.timer, '25분', customColors),
+                      const SizedBox(width: 8), // Spacing between items
+                      _buildIconWithText(context, Icons.bookmark, '300단어', customColors),
+                      const SizedBox(width: 8), // Spacing between items
+                      _buildIconWithText(context, Icons.star, '쉬움', customColors),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-    if (pos == 5) {
-      return margin;
-    }
-    if (pos == 6) {
-      return margin * 2;
-    }
-    if (pos == 7) {
-      return margin;
-    }
-    return 0.0;
+  Widget _buildIconWithText(BuildContext context, IconData icon, String text, CustomColors customColors) {
+    return Row(
+      children: [
+        Icon(icon, color: customColors.neutral90, size: 16),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: body_xsmall_semi(context).copyWith(color: customColors.neutral90),
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            const Expanded(
-              child: Divider(
-                color: Color(0xFF2D3D41),
-              ),
+        Container(
+          decoration: BoxDecoration(color: data.color),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(data.title, style: body_large_semi(context)),
+                Text(data.sectionDetail, style: body_small(context)),
+              ],
             ),
-            const SizedBox(width: 16,),
-            Text(
-              data.title,
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 18.0,
-              ),
-            ),
-            const SizedBox(width: 16,),
-            const Expanded(
-              child: Divider(
-                color: Color(0xFF2D3D41),
-              ),
-            ),
-          ],
+          ),
         ),
-        const SizedBox(
-          height: 24.0,
-        ),
+        const SizedBox(height: 24.0),
         ...List.generate(
-            9, (i) => i % 9 != 4? Container(
-              margin: EdgeInsets.only(
-                bottom: i != 8 ? 24.0 : 0,
-                left: getLeft(i),
-                right: getRight(i),
-              ),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: data.colorOscuro,
-                    width: 6.0,
-                  )
-                ),
-                borderRadius: BorderRadius.circular(36.0)
-              ),
-              child: ElevatedButton(
-                onPressed: (){},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: data.color,
-                  fixedSize: const Size(56, 48),
-                  elevation: 0,
-                  padding: EdgeInsets.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  minimumSize: Size.zero,
-                ),
-                child: Icon(Icons.star, color: Colors.white, size: 30,)
-              ),
-            ) : Container(
-          child: ElevatedButton(
-              onPressed: (){},
+          data.buttonPopupContents.length,
+              (i) => Container(
+            margin: EdgeInsets.only(
+              bottom: i != data.buttonPopupContents.length - 1 ? 24.0 : 0,
+              left: _getMargin(i),
+              right: _getMargin(i, isLeft: false),
+            ),
+            child: ElevatedButton(
+              onPressed: () => _showPopup(context, i, customColors),
               style: ElevatedButton.styleFrom(
-                backgroundColor: data.color,
-                fixedSize: const Size(56, 48),
+                backgroundColor: customColors.primary40,
+                fixedSize: const Size(80, 80),
                 elevation: 0,
                 padding: EdgeInsets.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 minimumSize: Size.zero,
               ),
-              child: Icon(Icons.star, color: Colors.red, size: 30,)
+              child: Icon(
+                Icons.check_rounded,
+                color: customColors.neutral100,
+                size: 30,
+              ),
+            ),
           ),
-        )
         ),
       ],
     );
