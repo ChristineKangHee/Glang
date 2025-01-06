@@ -11,16 +11,32 @@ class SectionData {
   final int section;
   final String title;
   final String sectionDetail;
-  final List<String> buttonPopupContents;
+  final List<String> subdetailTitle;
+  final List<String> totalTime;
+  final List<String> achievement;
+  final List<String> difficultyLevel;
+  final List<String> textContents;
+  final List<String> imageUrls;
+  final List<List<String>> missions;
+  final List<List<String>> effects;
+  final List<String> status; // New status list to track button state
 
-  const SectionData({
+  SectionData({
     required this.color,
     required this.colorOscuro,
     required this.etapa,
     required this.section,
     required this.title,
+    required this.totalTime,
+    required this.achievement,
+    required this.difficultyLevel,
     required this.sectionDetail,
-    required this.buttonPopupContents,
+    required this.subdetailTitle,
+    required this.textContents,
+    required this.imageUrls,
+    required this.missions,
+    required this.effects,
+    required this.status, // Initialize status
   });
 }
 
@@ -48,89 +64,106 @@ class Section extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 70.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: customColors.primary,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: BoxShadowStyles.shadow1(context),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      builder: (_) =>
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 70.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: customColors.primary,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: BoxShadowStyles.shadow1(context),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 20, horizontal: 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          data.title,
-                          style: body_xsmall_semi(context).copyWith(color: customColors.neutral100),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              data.title,
+                              style: body_xsmall_semi(context).copyWith(
+                                  color: customColors.neutral100),
+                            ),
+                            Text(
+                              data.subdetailTitle[index],
+                              style: body_large_semi(context).copyWith(
+                                  color: customColors.neutral100),
+                            ),
+                          ],
                         ),
-                        Text(
-                          data.buttonPopupContents[index],
-                          style: body_large_semi(context).copyWith(color: customColors.neutral100),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    CourseDetailPage(
+                                      title: data.subdetailTitle[index],
+                                      time: data.totalTime[index].toString(),
+                                      level: data.difficultyLevel[index],
+                                      description: data.textContents[index],
+                                      imageUrl: data.imageUrls[index],
+                                      mission: data.missions[index],
+                                      effect: data.effects[index],
+                                    ),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: customColors.neutral100,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                          ),
+                          child: Text(
+                            '시작하기',
+                            style: body_xsmall_semi(context),
+                          ),
                         ),
                       ],
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CourseDetailPage(
-                              title: data.buttonPopupContents[index],
-                            ),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: customColors.neutral100,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      ),
-                      child: Text(
-                        '학습하기',
-                        style: body_xsmall_semi(context),
-                      ),
+                    const SizedBox(height: 32),
+                    Row(
+                      children: [
+                        _buildIconWithText(context, Icons.check_circle,
+                            data.achievement[index] + '%', customColors),
+                        const SizedBox(width: 8), // Spacing between items
+                        _buildIconWithText(
+                            context, Icons.timer, data.totalTime[index] + '분',
+                            customColors),
+                        const SizedBox(width: 8), // Spacing between items
+                        _buildIconWithText(
+                            context, Icons.star, data.difficultyLevel[index],
+                            customColors),
+                      ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 32),
-                Row(
-                  children: [
-                    _buildIconWithText(context, Icons.check_circle, '25%', customColors),
-                    const SizedBox(width: 8), // Spacing between items
-                    _buildIconWithText(context, Icons.timer, '25분', customColors),
-                    const SizedBox(width: 8), // Spacing between items
-                    _buildIconWithText(context, Icons.bookmark, '300단어', customColors),
-                    const SizedBox(width: 8), // Spacing between items
-                    _buildIconWithText(context, Icons.star, '쉬움', customColors),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
     );
   }
 
-  Widget _buildIconWithText(BuildContext context, IconData icon, String text, CustomColors customColors) {
+  Widget _buildIconWithText(BuildContext context, IconData icon, String text,
+      CustomColors customColors) {
     return Row(
       children: [
         Icon(icon, color: customColors.neutral90, size: 16),
         const SizedBox(width: 4),
         Text(
           text,
-          style: body_xsmall_semi(context).copyWith(color: customColors.neutral90),
+          style: body_xsmall_semi(context).copyWith(
+              color: customColors.neutral90),
         ),
       ],
     );
@@ -159,32 +192,77 @@ class Section extends StatelessWidget {
         ),
         const SizedBox(height: 24.0),
         ...List.generate(
-          data.buttonPopupContents.length,
-              (i) => Container(
-            margin: EdgeInsets.only(
-              bottom: i != data.buttonPopupContents.length - 1 ? 24.0 : 0,
-              left: _getMargin(i),
-              right: _getMargin(i, isLeft: false),
-            ),
-            child: ElevatedButton(
-              onPressed: () => _showPopup(context, i, customColors),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: customColors.primary40,
-                fixedSize: const Size(80, 80),
-                elevation: 0,
-                padding: EdgeInsets.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                minimumSize: Size.zero,
+          data.subdetailTitle.length,
+              (i) =>
+              Container(
+                margin: EdgeInsets.only(
+                  bottom: i != data.subdetailTitle.length - 1 ? 24.0 : 0,
+                  left: _getMargin(i),
+                  right: _getMargin(i, isLeft: false),
+                ),
+                child: ElevatedButton(
+                  onPressed: () => _showPopup(context, i, customColors),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _getButtonState(i, customColors).backgroundColor,
+                    fixedSize: const Size(80, 80), // Keep size fixed
+                    elevation: 0,
+                    padding: EdgeInsets.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    minimumSize: Size.zero,
+                  ),
+                  child: _getButtonState(i, customColors).icon,
+                ),
               ),
-              child: Icon(
-                Icons.check_rounded,
-                color: customColors.neutral100,
-                size: 30,
-              ),
-            ),
-          ),
         ),
       ],
     );
   }
+
+  // Combined function that returns both icon and background color
+  _ButtonState _getButtonState(int index, CustomColors customColors) {
+    String status = data.status[index];
+    IconData icon;
+    Color? backgroundColor;
+
+    switch (status) {
+      case 'completed':
+        icon = Icons.check;
+        backgroundColor = customColors.primary40;
+        break;
+      case 'before_completion':
+        icon = Icons.lock;
+        backgroundColor = customColors.neutral80;
+        break;
+      default:
+        icon = Icons.play_arrow_rounded;
+        backgroundColor = customColors.primary;
+    }
+
+    // Check if the icon is play_arrow_rounded and set its size to 50
+    double iconSize = (icon == Icons.play_arrow_rounded) ? 50.0 : 30.0;
+
+    return _ButtonState(
+      icon: Container(
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          icon,
+          color: (status == 'before_completion')
+              ? customColors.neutral30
+              : customColors.neutral100,
+          size: iconSize,
+        ),
+      ),
+      backgroundColor: backgroundColor,
+    );
+  }
+}
+
+class _ButtonState {
+  final Widget icon;
+  final Color? backgroundColor;
+
+  _ButtonState({required this.icon, required this.backgroundColor});
 }

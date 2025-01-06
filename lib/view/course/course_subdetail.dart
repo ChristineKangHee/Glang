@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:readventure/view/course/section.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../../util/box_shadow_styles.dart';
 import '../components/custom_app_bar.dart';
 
 class CourseDetailPage extends StatelessWidget {
-  final String title; // 섹션 제목 전달
+  final String title;
+  final String time;
+  final String level;
+  final String description;
+  final String imageUrl;
+  final List<String> mission;
+  final List<String> effect;
 
-  const CourseDetailPage({super.key, required this.title});
+  const CourseDetailPage({super.key, required this.title,required this.description, required this.imageUrl, required this.mission, required this.effect, required this.time, required this.level, });
 
   @override
   Widget build(BuildContext context) {
@@ -34,18 +41,18 @@ class CourseDetailPage extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('주제가 들어감', style: body_large_semi(context)),
+                                Text(title, style: body_large_semi(context)),
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    IconTextRow(icon: Icons.timer, text: '30분'),
+                                    IconTextRow(icon: Icons.timer, text: time+'분'),
                                     const SizedBox(width: 12),
-                                    IconTextRow(icon: Icons.star, text: '쉬움'),
+                                    IconTextRow(icon: Icons.star, text: level,),
                                   ],
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  '숲에서 다양한 미션을 수행하고 고향에 대한 깊은 이해를 얻어야 해요. 각 활동을 완료할 때마다 힌트를 얻고, 최종적으로 고향 이야기를 완성하세요.',
+                                  description,
                                   style: body_small(context),
                                 ),
                               ],
@@ -53,7 +60,7 @@ class CourseDetailPage extends StatelessWidget {
                           ),
                           const SizedBox(width: 36),
                           Image.network(
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF8Akju0ZLzK2NUAJp0jai5DB_Ut3EkGDkww&s",
+                            imageUrl,
                             width: 106,
                             height: 98,
                             fit: BoxFit.cover,
@@ -61,18 +68,9 @@ class CourseDetailPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 20),
-
-                      // Learning Mission Section
                       MissionSection(
                         title: '학습 미션',
-                        missions: [
-                          '제목 유추',
-                          '내용 요약',
-                          '추가 학습',
-                          '질문 작성하기',
-                          '핵심 내용 질문',
-                          '추가 학습',
-                        ],
+                        missions: mission,
                       ),
 
                       const SizedBox(height: 20),
@@ -80,13 +78,8 @@ class CourseDetailPage extends StatelessWidget {
                       // Learning Effect Section
                       EffectSection(
                         title: '학습 효과',
-                        effects: [
-                          '핵심 정보를 파악하는 능력향상',
-                          '텍스트를 깊이 이해하고 개인적인 관점을 형성',
-                          '정보를 체계적으로 정리하는 능력 배양',
-                        ],
+                        effects: effect,
                       ),
-
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -117,6 +110,7 @@ class CourseDetailPage extends StatelessWidget {
     );
   }
 }
+
 
 class IconTextRow extends StatelessWidget {
   final IconData icon;
