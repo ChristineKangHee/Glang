@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';
 
+import '../../util/box_shadow_styles.dart';
+
 /*
     사용 방법
 
@@ -26,7 +28,7 @@ import 'package:readventure/theme/theme.dart';
       ),
     ),
 
-    2. Primary Color 버튼
+    2. Primary20 Color 버튼
     Container(
       width: MediaQuery.of(context).size.width,
       child: ButtonPrimary20(
@@ -38,7 +40,7 @@ import 'package:readventure/theme/theme.dart';
         // 버튼 안에 들어갈 텍스트.
       ),
     ),
-
+    ------------------------- 이전 버전 코드 -------------------------
     3. 아이콘 있는 버튼
     Container(
       width: MediaQuery.of(context).size.width,
@@ -97,8 +99,10 @@ class ButtonPrimary extends StatelessWidget { //
           width: MediaQuery.of(context).size.width, //MediaQuery 를 통해서 버튼 넓이 설정해놓음.
           height: 56, // 버튼 높이
           decoration: BoxDecoration(
-              color: condition.contains("not null") ? Theme.of(context).colorScheme.primary : Colors.grey,
-              borderRadius: BorderRadius.circular(16)), // Button Edge 둥글게
+            color: condition.contains("not null") ? Theme.of(context).colorScheme.primary : Colors.grey,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: BoxShadowStyles.shadow1(context),
+          ), // Button Edge 둥글게
           child: Center(
             child: Padding(
               padding: const EdgeInsets.all(12.0),
@@ -143,8 +147,9 @@ class ButtonPrimary20 extends StatelessWidget { //
           width: MediaQuery.of(context).size.width, //MediaQuery 를 통해서 버튼 넓이 설정해놓음.
           height: 56, // 버튼 높이
           decoration: BoxDecoration(
-              color: condition.contains("not null") ? Theme.of(context).colorScheme.primary : Colors.grey,
-              borderRadius: BorderRadius.circular(16)), // Button Edge 둥글게
+            color: condition.contains("not null") ? Theme.of(context).colorScheme.primary : Colors.grey,
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Center(
             child: Padding(
               padding: const EdgeInsets.all(12.0),
