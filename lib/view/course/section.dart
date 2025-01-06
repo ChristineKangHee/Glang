@@ -203,6 +203,7 @@ class Section extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () => _showPopup(context, i, customColors),
                   style: ElevatedButton.styleFrom(
+                    overlayColor: _getButtonState(i, customColors).backgroundColor,
                     backgroundColor: _getButtonState(i, customColors).backgroundColor,
                     fixedSize: const Size(80, 80), // Keep size fixed
                     elevation: 0,

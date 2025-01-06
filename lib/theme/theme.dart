@@ -136,7 +136,7 @@ final ThemeData lightThemeGlobal = ThemeData(
   scaffoldBackgroundColor: Colors.white, // 바탕화면을 흰색으로 설정
   colorScheme: ColorScheme.light(
     primary: Color(0xFF514FFF), // 기본 Primary 색상
-    secondary: Color(0xFFFFC95C), // 기본 Secondary 색상
+    secondary: Color(0xFFFFD95C), // 기본 Secondary 색상
     background: Colors.white, // 배경 색상
     surface: Colors.white, // 서피스(카드 등) 색상
     onPrimary: Colors.white, // Primary 색상 위에 올려질 텍스트/아이콘 색상
@@ -153,7 +153,7 @@ final ThemeData lightThemeGlobal = ThemeData(
       primary40: Color(0xFFB9B9FF),
       primary20: Color(0xFFD6D6FF),
       primary10: Color(0xFFE7E7FD),
-      accent: Color(0xFFFFC95C),
+      accent: Color(0xFFFFD95C),
       success: Color(0xFF3FA654),
       neutral100: Color(0xFFFFFFFF),
       neutral90: Color(0xFFF6F6F6),
@@ -173,7 +173,7 @@ final ThemeData darkThemeGlobal = ThemeData(
   scaffoldBackgroundColor: Color(0xFF121212), // 다크 모드 배경 설정
   colorScheme: ColorScheme.dark(
     primary: Color(0xFF514FFF), // 기본 Primary 색상
-    secondary: Color(0xFFFFC95C), // 기본 Secondary 색상
+    secondary: Color(0xFFFFD95C), // 기본 Secondary 색상
     background: Color(0xFF121212), // 배경 색상
     surface: Color(0xFF1E1E1E), // 서피스(카드 등) 색상
     onPrimary: Colors.black, // Primary 색상 위에 올려질 텍스트/아이콘 색상
@@ -190,7 +190,7 @@ final ThemeData darkThemeGlobal = ThemeData(
       primary40: Color(0xFFB9B9FF),
       primary20: Color(0xFFD6D6FF),
       primary10: Color(0xFFE7E7FD),
-      accent: Color(0xFFFFC95C),
+      accent: Color(0xFFFFD95C),
       success: Color(0xFF3FA654),
       neutral100: Color(0xFFFFFFFF),
       neutral90: Color(0xFFF6F6F6),

@@ -10,12 +10,12 @@ import '../../../../theme/theme.dart'; // theme.dart가 올바르게 임포트�
 
 /*
 사용법:
-- boxShadow: BoxShadowStyles.style1(context), // 이렇게 정의된 그림자 스타일을 위젯에 적용할 수 있습니다.
+- boxShadow: BoxShadowStyles.shadow1(context), // 이렇게 정의된 그림자 스타일을 위젯에 적용할 수 있습니다.
 
 - 위젯의 decoration에서 사용 예시:
 decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.primary, // 현재 테마의 primary 색상을 사용
-            boxShadow: BoxShadowStyles.style1(context), // 첫 번째 그림자 스타일을 적용
+            boxShadow: BoxShadowStyles.shadow1(context), // 첫 번째 그림자 스타일을 적용
           ),
  */
 
