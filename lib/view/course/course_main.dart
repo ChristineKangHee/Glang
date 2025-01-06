@@ -101,7 +101,7 @@ class _CourseMainState extends State<CourseMain> {
 
   /// UI 요소들의 고정된 높이.
   final heightFirstBox = 56.0;
-  final heightSection = 764.0;
+  final heightSection = 1020.0;
 
   /// 스크롤 동작을 관리하는 컨트롤러.
   final scrollCtrl = ScrollController();
@@ -154,8 +154,8 @@ class _CourseMainState extends State<CourseMain> {
               ),
               padding: const EdgeInsets.only(
                 bottom: 24.0,
-                left: 16.0,
-                right: 16.0,
+                // left: 16.0,
+                // right: 16.0,
               ),
               itemCount: data.length + 1,
             ),

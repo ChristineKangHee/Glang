@@ -49,76 +49,73 @@ class Section extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) => Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Transform.translate(
-          offset: const Offset(0, -70),
-          child: Container(
-            decoration: BoxDecoration(
-              color: customColors.primary,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: BoxShadowStyles.shadow1(context),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '초급 코스 3',
-                            style: body_xsmall_semi(context).copyWith(color: customColors.neutral100),
-                          ),
-                          Text(
-                            '주제가 들어감',
-                            style: body_large_semi(context).copyWith(color: customColors.neutral100),
-                          ),
-                        ],
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CourseDetailPage(
-                                title: data.buttonPopupContents[index],
-                              ),
+        padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 70.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: customColors.primary,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: BoxShadowStyles.shadow1(context),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          data.title,
+                          style: body_xsmall_semi(context).copyWith(color: customColors.neutral100),
+                        ),
+                        Text(
+                          data.buttonPopupContents[index],
+                          style: body_large_semi(context).copyWith(color: customColors.neutral100),
+                        ),
+                      ],
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CourseDetailPage(
+                              title: data.buttonPopupContents[index],
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: customColors.neutral100,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: customColors.neutral100,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
-                          '학습하기',
-                          style: body_xsmall_semi(context),
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      _buildIconWithText(context, Icons.check_circle, '25%', customColors),
-                      const SizedBox(width: 8), // Spacing between items
-                      _buildIconWithText(context, Icons.timer, '25분', customColors),
-                      const SizedBox(width: 8), // Spacing between items
-                      _buildIconWithText(context, Icons.bookmark, '300단어', customColors),
-                      const SizedBox(width: 8), // Spacing between items
-                      _buildIconWithText(context, Icons.star, '쉬움', customColors),
-                    ],
-                  ),
-                ],
-              ),
+                      child: Text(
+                        '학습하기',
+                        style: body_xsmall_semi(context),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 32),
+                Row(
+                  children: [
+                    _buildIconWithText(context, Icons.check_circle, '25%', customColors),
+                    const SizedBox(width: 8), // Spacing between items
+                    _buildIconWithText(context, Icons.timer, '25분', customColors),
+                    const SizedBox(width: 8), // Spacing between items
+                    _buildIconWithText(context, Icons.bookmark, '300단어', customColors),
+                    const SizedBox(width: 8), // Spacing between items
+                    _buildIconWithText(context, Icons.star, '쉬움', customColors),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
@@ -146,6 +143,7 @@ class Section extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
+          width: double.infinity,
           decoration: BoxDecoration(color: data.color),
           child: Padding(
             padding: const EdgeInsets.all(12.0),

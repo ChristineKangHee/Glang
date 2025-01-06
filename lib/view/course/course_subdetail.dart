@@ -17,10 +17,9 @@ class CourseDetailPage extends StatelessWidget {
       appBar: CustomAppBar_2depth_1(title: '코스 상세'),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Scrollable content
               Expanded(
@@ -29,8 +28,7 @@ class CourseDetailPage extends StatelessWidget {
                     children: [
                       // Course title and details
                       Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
                             child: Column(
@@ -48,44 +46,46 @@ class CourseDetailPage extends StatelessWidget {
                                 const SizedBox(height: 16),
                                 Text(
                                   '숲에서 다양한 미션을 수행하고 고향에 대한 깊은 이해를 얻어야 해요. 각 활동을 완료할 때마다 힌트를 얻고, 최종적으로 고향 이야기를 완성하세요.',
-                                  style: body_xsmall(context),
+                                  style: body_small(context),
                                 ),
                               ],
                             ),
                           ),
                           const SizedBox(width: 36),
-                          Container(
+                          Image.network(
+                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF8Akju0ZLzK2NUAJp0jai5DB_Ut3EkGDkww&s",
                             width: 106,
                             height: 98,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF8Akju0ZLzK2NUAJp0jai5DB_Ut3EkGDkww&s"),
-                                fit: BoxFit.fitWidth,
-                              ),
-                            ),
+                            fit: BoxFit.cover,
                           ),
                         ],
                       ),
                       const SizedBox(height: 20),
 
                       // Learning Mission Section
-                      MissionSection(title: '학습 미션', missions: [
-                        '제목 유추',
-                        '내용 요약',
-                        '추가 학습',
-                        '질문 작성하기',
-                        '핵심 내용 질문',
-                        '추가 학습',
-                      ]),
+                      MissionSection(
+                        title: '학습 미션',
+                        missions: [
+                          '제목 유추',
+                          '내용 요약',
+                          '추가 학습',
+                          '질문 작성하기',
+                          '핵심 내용 질문',
+                          '추가 학습',
+                        ],
+                      ),
 
                       const SizedBox(height: 20),
 
                       // Learning Effect Section
-                      EffectSection(title: '학습 효과', effects: [
-                        '핵심 정보를 파악하는 능력향상',
-                        '텍스트를 깊이 이해하고 개인적인 관점을 형성',
-                        '정보를 체계적으로 정리하는 능력 배양',
-                      ]),
+                      EffectSection(
+                        title: '학습 효과',
+                        effects: [
+                          '핵심 정보를 파악하는 능력향상',
+                          '텍스트를 깊이 이해하고 개인적인 관점을 형성',
+                          '정보를 체계적으로 정리하는 능력 배양',
+                        ],
+                      ),
 
                       const SizedBox(height: 20),
                     ],
@@ -159,32 +159,16 @@ class MissionSection extends StatelessWidget {
         children: [
           Text(title, style: body_xsmall_semi(context)),
           const SizedBox(height: 10),
-          // Wrap widget for the missions list
           Wrap(
             spacing: 12, // Horizontal space between items
             runSpacing: 12, // Vertical space between lines of items
-            children: List.generate((missions.length / 2).ceil(), (index) {
-              final firstMissionIndex = index * 2;
-              final secondMissionIndex = firstMissionIndex + 1;
-              return Row(
-                children: [
-                  // Make each MissionItem take half the space using Expanded
-                  Expanded(child: MissionItem(mission: missions[firstMissionIndex])),
-                  if (secondMissionIndex < missions.length)
-                    const SizedBox(width: 12), // Adding some space between the items
-                  if (secondMissionIndex < missions.length)
-                    Expanded(child: MissionItem(mission: missions[secondMissionIndex])),
-                ],
-              );
-            }),
+            children: missions.map((mission) => MissionItem(mission: mission)).toList(),
           ),
         ],
       ),
     );
   }
 }
-
-
 
 class MissionItem extends StatelessWidget {
   final String mission;
@@ -194,6 +178,7 @@ class MissionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Icon(Icons.circle, size: 6),
         const SizedBox(width: 8),
@@ -225,7 +210,10 @@ class EffectSection extends StatelessWidget {
         children: [
           Text(title, style: body_xsmall_semi(context)),
           const SizedBox(height: 10),
-          for (var effect in effects) EffectItem(effect: effect),
+          ...effects.map((effect) => Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: EffectItem(effect: effect),
+          )),
         ],
       ),
     );
