@@ -34,7 +34,7 @@ class NotificationItemWidget extends StatelessWidget {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(category, style: body_xxsmall(context).copyWith(color: customColors.neutral60),), // 날짜 포맷팅 적용
+          Text(category, style: body_xxsmall_semi(context).copyWith(color: customColors.neutral60),), // 날짜 포맷팅 적용
           Text(NotificationUtil.formatDate(date), style: body_xxsmall(context).copyWith(color: customColors.neutral60),), // 날짜 포맷팅 적용
           // if (!isRead)
           //   const Icon(Icons.circle, size: 8, color: Colors.red), // 읽지 않은 알림 표시
@@ -43,7 +43,9 @@ class NotificationItemWidget extends StatelessWidget {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 4),
           Text(title, style: isRead ? body_small(context) : body_small_semi(context),),
+          const SizedBox(height: 4,),
           Text(description, style: body_small(context)),
         ],
       ),
