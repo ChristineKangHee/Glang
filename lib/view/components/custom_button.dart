@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
+import 'package:readventure/theme/theme.dart';
 
 /*
     사용 방법
@@ -25,10 +26,10 @@ import 'package:readventure/theme/font.dart';
       ),
     ),
 
-    2. Natural Color 버튼
+    2. Primary Color 버튼
     Container(
       width: MediaQuery.of(context).size.width,
-      child: ButtonNatural(
+      child: ButtonPrimary20(
         function: () {
           print("Button pressed");
           //function 은 상황에 맞게 재 정의 할 것.
@@ -68,8 +69,8 @@ import 'package:readventure/theme/font.dart';
 
  */
 
-class Button extends StatelessWidget { //
-  const Button( //파라미터
+class ButtonPrimary extends StatelessWidget { //
+  const ButtonPrimary( //파라미터
           {Key? key,
         required this.function,
         required this.title,
@@ -83,6 +84,7 @@ class Button extends StatelessWidget { //
 
   @override
   Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
     return GestureDetector(
       onTap: condition.contains("not null")
           ? () {
@@ -90,19 +92,21 @@ class Button extends StatelessWidget { //
       }
           : null,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16,0,16,0),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0), // 좌 우 패딩
         child: Container(
           width: MediaQuery.of(context).size.width, //MediaQuery 를 통해서 버튼 넓이 설정해놓음.
-          height: 52,
+          height: 56, // 버튼 높이
           decoration: BoxDecoration(
               color: condition.contains("not null") ? Theme.of(context).colorScheme.primary : Colors.grey,
-              borderRadius: BorderRadius.circular(10)), // Button Edge 둥글게
-          child: Padding(
-            padding: const EdgeInsets.all(13.0),
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: pretendardSemiBold(context).copyWith(color: Theme.of(context).colorScheme.surface) // SemiBold에 색상 흰색으로 설정. 설정 관련은 font.dart
+              borderRadius: BorderRadius.circular(16)), // Button Edge 둥글게
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                style: body_medium_semi(context).copyWith(color: customColors.neutral100) // SemiBold에 색상 흰색으로 설정. 설정 관련은 font.dart
+              ),
             ),
           ),
         ),
@@ -111,8 +115,8 @@ class Button extends StatelessWidget { //
   }
 }
 
-class ButtonNatural extends StatelessWidget { //
-  const ButtonNatural( // 파라미터
+class ButtonPrimary20 extends StatelessWidget { //
+  const ButtonPrimary20( //파라미터
           {Key? key,
         required this.function,
         required this.title,
@@ -126,6 +130,7 @@ class ButtonNatural extends StatelessWidget { //
 
   @override
   Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
     return GestureDetector(
       onTap: condition.contains("not null")
           ? () {
@@ -133,19 +138,21 @@ class ButtonNatural extends StatelessWidget { //
       }
           : null,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16,0,16,0),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0), // 좌 우 패딩
         child: Container(
           width: MediaQuery.of(context).size.width, //MediaQuery 를 통해서 버튼 넓이 설정해놓음.
-          height: 52,
+          height: 56, // 버튼 높이
           decoration: BoxDecoration(
-              color: condition.contains("not null") ? Theme.of(context).colorScheme.outline : Colors.grey,
-              borderRadius: BorderRadius.circular(10)), // Button Edge 둥글게
-          child: Padding(
-            padding: const EdgeInsets.all(13.0),
-            child: Text(
-                title,
-                textAlign: TextAlign.center,
-                style: pretendardSemiBold(context).copyWith(color: Theme.of(context).colorScheme.surface) // SemiBold에 색상 흰색으로 설정. 설정 관련은 font.dart
+              color: condition.contains("not null") ? Theme.of(context).colorScheme.primary : Colors.grey,
+              borderRadius: BorderRadius.circular(16)), // Button Edge 둥글게
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: body_medium_semi(context).copyWith(color: customColors.neutral100) // SemiBold에 색상 흰색으로 설정. 설정 관련은 font.dart
+              ),
             ),
           ),
         ),

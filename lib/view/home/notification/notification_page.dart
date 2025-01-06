@@ -22,7 +22,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage> with Single
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this); // 5개의 탭
+    _tabController = TabController(length: 5, vsync: this, animationDuration: Duration.zero); // 5개의 탭
   }
 
   @override
@@ -51,6 +51,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage> with Single
       ),
       body: SafeArea(
         child: TabBarView(
+          physics: NeverScrollableScrollPhysics(),
           controller: _tabController,
           children: [
             _buildRefreshableList(allNotifications, textStyle), // 전체 알림
