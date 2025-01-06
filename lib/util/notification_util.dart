@@ -4,14 +4,21 @@
 /// Created: 2025-01-02
 /// Last Modified: 2025-01-03 by 박민준
 
+import 'package:intl/intl.dart';
 import '../model/notification_item.dart';
 
 class NotificationUtil {
   static String formatDate(DateTime date) {
-    return '${date.year}-${date.month}-${date.day}';
+    final DateFormat formatter = DateFormat('yyyy-MM-dd'); // 다국어 포맷 지원
+    return formatter.format(date);
   }
 
   static List<NotificationItem> filterUnread(List<NotificationItem> items) {
     return items.where((item) => !item.isRead).toList();
+  }
+
+  static List<NotificationItem> sortByDate(List<NotificationItem> items) {
+    items.sort((a, b) => b.date.compareTo(a.date)); // 최신순 정렬
+    return items;
   }
 }

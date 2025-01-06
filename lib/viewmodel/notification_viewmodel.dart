@@ -12,10 +12,49 @@ final notificationProvider = StateNotifierProvider<NotificationNotifier, List<No
 });
 
 class NotificationNotifier extends StateNotifier<List<NotificationItem>> {
-  NotificationNotifier() : super([]);
+  NotificationNotifier() : super(_initialNotifications); // 초기 데이터 설정
 
-  void addNotification(NotificationItem item) {
-    state = [...state, item];
+  static final _initialNotifications = [
+    NotificationItem(
+      title: '새로운 업데이트',
+      description: '앱이 버전 1.1로 업데이트되었습니다.',
+      date: DateTime.now().subtract(Duration(days: 1)),
+      category: '시스템',
+      isRead: false,
+    ),
+    NotificationItem(
+      title: '학습 알림',
+      description: '오늘 학습 목표를 완료하세요!',
+      date: DateTime.now().subtract(Duration(days: 2)),
+      category: '학습',
+      isRead: true,
+    ),
+    NotificationItem(
+      title: '보상 지급',
+      description: '로그인 보상을 받으세요!',
+      date: DateTime.now(),
+      category: '보상',
+      isRead: false,
+    ),
+  ];
+
+  void addNotification({
+    required String title,
+    required String description,
+    required DateTime date,
+    required String category,
+    bool isRead = false,
+  }) {
+    state = [
+      ...state,
+      NotificationItem(
+        title: title,
+        description: description,
+        date: date,
+        category: category,
+        isRead: isRead,
+      ),
+    ];
   }
 
   void markAsRead(int index) {
@@ -26,6 +65,7 @@ class NotificationNotifier extends StateNotifier<List<NotificationItem>> {
             title: state[i].title,
             description: state[i].description,
             date: state[i].date,
+            category: state[i].category,
             isRead: true,
           )
         else
@@ -33,3 +73,6 @@ class NotificationNotifier extends StateNotifier<List<NotificationItem>> {
     ];
   }
 }
+
+
+
