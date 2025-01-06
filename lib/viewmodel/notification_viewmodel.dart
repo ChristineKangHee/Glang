@@ -1,9 +1,3 @@
-/// File: notification_viewmodel.dart
-/// Purpose: 알림 상태를 관리하며 알림 추가 및 읽음 상태 업데이트 기능을 제공
-/// Author: 박민준
-/// Created: 2025-01-02
-/// Last Modified: 2025-01-03 by 박민준
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../model/notification_item.dart';
 
@@ -38,6 +32,7 @@ class NotificationNotifier extends StateNotifier<List<NotificationItem>> {
     ),
   ];
 
+  /// 알림 추가 메서드
   void addNotification({
     required String title,
     required String description,
@@ -57,6 +52,7 @@ class NotificationNotifier extends StateNotifier<List<NotificationItem>> {
     ];
   }
 
+  /// 알림 읽음 상태 업데이트 메서드
   void markAsRead(int index) {
     state = [
       for (int i = 0; i < state.length; i++)
@@ -72,7 +68,30 @@ class NotificationNotifier extends StateNotifier<List<NotificationItem>> {
           state[i],
     ];
   }
+
+  /// 새로고침 시 알림 데이터를 업데이트하는 메서드
+  Future<void> fetchNotifications() async {
+    print("123");
+    // 서버에서 데이터를 가져오거나 로컬에서 새로운 데이터를 추가하는 로직 작성
+    await Future.delayed(const Duration(seconds: 2)); // 로딩 시간 시뮬레이션
+    final newNotifications = [
+      NotificationItem(
+        title: '새로운 공지',
+        description: '앱 기능이 추가되었습니다.',
+        date: DateTime.now(),
+        category: '시스템',
+        isRead: false,
+      ),
+      NotificationItem(
+        title: '오늘의 학습 알림',
+        description: '학습 목표를 달성해 보세요!',
+        date: DateTime.now().subtract(const Duration(hours: 3)),
+        category: '학습',
+        isRead: false,
+      ),
+    ];
+
+    // 기존 데이터에 새로운 알림 추가
+    state = [...newNotifications, ...state];
+  }
 }
-
-
-

@@ -20,27 +20,32 @@ class NotificationTabBar extends StatelessWidget implements PreferredSizeWidget 
     return AnimatedBuilder(
       animation: tabController,
       builder: (context, _) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),// 탭 전체의 패딩
-          child: TabBar(
-            labelPadding: EdgeInsets.only(right: 8), // 탭 간의 패딩!!!!
-            dividerColor: Colors.transparent, // Divider 제거
-            controller: tabController,
-            isScrollable: true,
-            indicator: BoxDecoration(
-              color: customColors.primary, // 선택된 탭의 배경색
-              borderRadius: BorderRadius.circular(12), // 선택된 탭의 둥근 모서리
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),// 탭 전체의 패딩
+              child: TabBar(
+                labelPadding: EdgeInsets.only(right: 8), // 탭 간의 패딩!!!!
+                dividerColor: Colors.transparent, // Divider 제거
+                controller: tabController,
+                isScrollable: true,
+                indicator: BoxDecoration(
+                  color: customColors.primary, // 선택된 탭의 배경색
+                  borderRadius: BorderRadius.circular(12), // 선택된 탭의 둥근 모서리
+                ),
+                tabAlignment: TabAlignment.start,
+                tabs: List.generate(tabController.length, (index) {
+                  final isSelected = tabController.index == index;
+                  return _buildTab(
+                    context,
+                    text: ['전체', '안읽음', '학습', '보상', '시스템'][index],
+                    isSelected: isSelected,
+                  );
+                }),
+              ),
             ),
-            tabAlignment: TabAlignment.start,
-            tabs: List.generate(tabController.length, (index) {
-              final isSelected = tabController.index == index;
-              return _buildTab(
-                context,
-                text: ['전체', '안읽음', '학습', '보상', '시스템'][index],
-                isSelected: isSelected,
-              );
-            }),
-          ),
+            const SizedBox(height: 16), // TabBar 아래 16픽셀 공간 추가
+          ],
         );
       },
     );
@@ -72,5 +77,5 @@ class NotificationTabBar extends StatelessWidget implements PreferredSizeWidget 
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(48); // TabBar 높이 설정
+  Size get preferredSize => const Size.fromHeight(68); // TabBar 높이 설정
 }
