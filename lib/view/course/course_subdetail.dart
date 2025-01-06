@@ -159,16 +159,31 @@ class MissionSection extends StatelessWidget {
         children: [
           Text(title, style: body_xsmall_semi(context)),
           const SizedBox(height: 10),
+          // Wrap widget for the missions list
           Wrap(
             spacing: 12, // Horizontal space between items
             runSpacing: 12, // Vertical space between lines of items
-            children: missions.map((mission) => MissionItem(mission: mission)).toList(),
+            children: List.generate((missions.length / 2).ceil(), (index) {
+              final firstMissionIndex = index * 2;
+              final secondMissionIndex = firstMissionIndex + 1;
+              return Row(
+                children: [
+                  // Make each MissionItem take half the space using Expanded
+                  Expanded(child: MissionItem(mission: missions[firstMissionIndex])),
+                  if (secondMissionIndex < missions.length)
+                    const SizedBox(width: 12), // Adding some space between the items
+                  if (secondMissionIndex < missions.length)
+                    Expanded(child: MissionItem(mission: missions[secondMissionIndex])),
+                ],
+              );
+            }),
           ),
         ],
       ),
     );
   }
 }
+
 
 class MissionItem extends StatelessWidget {
   final String mission;
