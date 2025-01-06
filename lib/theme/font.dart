@@ -242,6 +242,17 @@ TextStyle body_xsmall_semi(BuildContext context) {
     );
 }
 
+TextStyle body_xxsmall_semi(BuildContext context) {
+    return TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.w600,
+        fontSize: 12,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
+    );
+}
+
 TextStyle body_large(BuildContext context) {
     return TextStyle(
         fontFamily: 'Pretendard',
