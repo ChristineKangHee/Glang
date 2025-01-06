@@ -14,6 +14,7 @@ import 'package:readventure/viewmodel/theme_controller.dart';
 import '../../viewmodel/custom_colors_provider.dart';
 import '../../viewmodel/notification_controller.dart';
 import '../components/custom_app_bar.dart';
+import '../components/custom_button.dart';
 
 class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
   const MyHomePage({super.key});
@@ -37,6 +38,17 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
             ElevatedButton(
               onPressed: showNotification,
               child: Text('Show Notification'),
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              child: ButtonPrimary(
+                function: () {
+                  print("Button pressed");
+                  //function 은 상황에 맞게 재 정의 할 것.
+                },
+                title: '완료',
+                // 버튼 안에 들어갈 텍스트.
+              ),
             ),
           ],
         ),

@@ -71,7 +71,6 @@ class NotificationNotifier extends StateNotifier<List<NotificationItem>> {
 
   /// 새로고침 시 알림 데이터를 업데이트하는 메서드
   Future<void> fetchNotifications() async {
-    print("123");
     // 서버에서 데이터를 가져오거나 로컬에서 새로운 데이터를 추가하는 로직 작성
     await Future.delayed(const Duration(seconds: 2)); // 로딩 시간 시뮬레이션
     final newNotifications = [
