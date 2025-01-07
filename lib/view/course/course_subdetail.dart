@@ -1,39 +1,55 @@
+/// 파일: course_subdetail.dart
+/// 목적: 사용자에게 각 학습에 대한 코스 상세 정보를 보여줌
+/// 작성자: 강희
+/// 생성일: 2024-01-04
+/// 마지막 수정: 2025-01-06 by 강희
+
 import 'package:flutter/material.dart';
 import 'package:readventure/view/course/section.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../../util/box_shadow_styles.dart';
 import '../components/custom_app_bar.dart';
+import '../components/custom_button.dart';
 
 class CourseDetailPage extends StatelessWidget {
-  final String title;
-  final String time;
-  final String level;
-  final String description;
-  final String imageUrl;
-  final List<String> mission;
-  final List<String> effect;
+  final String title; // 코스 제목
+  final String time; // 소요 시간
+  final String level; // 난이도
+  final String description; // 코스 설명
+  final String imageUrl; // 이미지 URL
+  final List<String> mission; // 학습 미션 리스트
+  final List<String> effect; // 학습 효과 리스트
 
-  const CourseDetailPage({super.key, required this.title,required this.description, required this.imageUrl, required this.mission, required this.effect, required this.time, required this.level, });
+  const CourseDetailPage({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.imageUrl,
+    required this.mission,
+    required this.effect,
+    required this.time,
+    required this.level,
+  });
 
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_1(title: '코스 상세'),
+      appBar: CustomAppBar_2depth_1(title: '코스 상세'), // 사용자 정의 앱바
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16), // 외부 여백
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Scrollable content
+              // 스크롤 가능한 콘텐츠
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      // Course title and details
+                      // 코스 제목 및 상세 정보
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -41,26 +57,26 @@ class CourseDetailPage extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(title, style: body_large_semi(context)),
+                                Text(title, style: body_large_semi(context)), // 코스 제목
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    IconTextRow(icon: Icons.timer, text: time+'분'),
+                                    IconTextRow(icon: Icons.timer, text: time + '분'), // 시간 아이콘과 텍스트
                                     const SizedBox(width: 12),
-                                    IconTextRow(icon: Icons.star, text: level,),
+                                    IconTextRow(icon: Icons.star, text: level), // 난이도 아이콘과 텍스트
                                   ],
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
                                   description,
-                                  style: body_small(context),
+                                  style: body_small(context), // 설명 텍스트 스타일
                                 ),
                               ],
                             ),
                           ),
                           const SizedBox(width: 36),
                           Image.network(
-                            imageUrl,
+                            imageUrl, // 네트워크 이미지
                             width: 106,
                             height: 98,
                             fit: BoxFit.cover,
@@ -69,16 +85,13 @@ class CourseDetailPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 20),
                       MissionSection(
-                        title: '학습 미션',
-                        missions: mission,
+                        title: '학습 미션', // 미션 섹션 제목
+                        missions: mission, // 미션 리스트
                       ),
-
                       const SizedBox(height: 20),
-
-                      // Learning Effect Section
                       EffectSection(
-                        title: '학습 효과',
-                        effects: effect,
+                        title: '학습 효과', // 학습 효과 섹션 제목
+                        effects: effect, // 학습 효과 리스트
                       ),
                       const SizedBox(height: 20),
                     ],
@@ -86,21 +99,16 @@ class CourseDetailPage extends StatelessWidget {
                 ),
               ),
 
-              // Start button
+              // 시작 버튼
               Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(
-                  color: customColors.primary,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: BoxShadowStyles.shadow1(context),
-                ),
-                child: Center(
-                  child: Text(
-                    '시작하기',
-                    style: body_medium_semi(context).copyWith(color: customColors.neutral100),
-                  ),
+                width: MediaQuery.of(context).size.width,
+                child: ButtonPrimary(
+                  function: () {
+                    print("시작하기");
+                    //function 은 상황에 맞게 재 정의 할 것.
+                  },
+                  title: '시작하기',
+                  // 버튼 안에 들어갈 텍스트.
                 ),
               ),
             ],
@@ -113,8 +121,8 @@ class CourseDetailPage extends StatelessWidget {
 
 
 class IconTextRow extends StatelessWidget {
-  final IconData icon;
-  final String text;
+  final IconData icon; // 아이콘 데이터
+  final String text; // 텍스트
 
   const IconTextRow({super.key, required this.icon, required this.text});
 
@@ -123,17 +131,17 @@ class IconTextRow extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon),
+        Icon(icon), // 아이콘 표시
         const SizedBox(width: 4),
-        Text(text, style: body_xsmall_semi(context)),
+        Text(text, style: body_xsmall_semi(context)), // 텍스트 표시
       ],
     );
   }
 }
 
 class MissionSection extends StatelessWidget {
-  final String title;
-  final List<String> missions;
+  final String title; // 섹션 제목
+  final List<String> missions; // 미션 리스트
 
   const MissionSection({super.key, required this.title, required this.missions});
 
@@ -141,33 +149,31 @@ class MissionSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16), // 섹션 여백
       decoration: ShapeDecoration(
-        color: Theme.of(context).extension<CustomColors>()!.neutral90,
+        color: Theme.of(context).extension<CustomColors>()!.neutral90, // 배경 색상
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20), // 모서리 둥글기
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: body_xsmall_semi(context)),
+          Text(title, style: body_xsmall_semi(context)), // 섹션 제목
           const SizedBox(height: 10),
-          // Wrap widget for the missions list
           Wrap(
-            spacing: 12, // Horizontal space between items
-            runSpacing: 12, // Vertical space between lines of items
+            spacing: 12, // 항목 간 가로 간격
+            runSpacing: 12, // 줄 간 세로 간격
             children: List.generate((missions.length / 2).ceil(), (index) {
-              final firstMissionIndex = index * 2;
-              final secondMissionIndex = firstMissionIndex + 1;
+              final firstMissionIndex = index * 2; // 첫 번째 미션 인덱스
+              final secondMissionIndex = firstMissionIndex + 1; // 두 번째 미션 인덱스
               return Row(
                 children: [
-                  // Make each MissionItem take half the space using Expanded
-                  Expanded(child: MissionItem(mission: missions[firstMissionIndex])),
+                  Expanded(child: MissionItem(mission: missions[firstMissionIndex])), // 첫 번째 미션
                   if (secondMissionIndex < missions.length)
-                    const SizedBox(width: 12), // Adding some space between the items
+                    const SizedBox(width: 12), // 항목 간 간격
                   if (secondMissionIndex < missions.length)
-                    Expanded(child: MissionItem(mission: missions[secondMissionIndex])),
+                    Expanded(child: MissionItem(mission: missions[secondMissionIndex])), // 두 번째 미션
                 ],
               );
             }),
@@ -178,9 +184,8 @@ class MissionSection extends StatelessWidget {
   }
 }
 
-
 class MissionItem extends StatelessWidget {
-  final String mission;
+  final String mission; // 개별 미션 내용
 
   const MissionItem({super.key, required this.mission});
 
@@ -189,17 +194,17 @@ class MissionItem extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.circle, size: 6),
+        Icon(Icons.circle, size: 6), // 작은 원 아이콘
         const SizedBox(width: 8),
-        Text(mission, style: body_xsmall(context)),
+        Text(mission, style: body_xsmall(context)), // 미션 텍스트
       ],
     );
   }
 }
 
 class EffectSection extends StatelessWidget {
-  final String title;
-  final List<String> effects;
+  final String title; // 섹션 제목
+  final List<String> effects; // 학습 효과 리스트
 
   const EffectSection({super.key, required this.title, required this.effects});
 
@@ -207,21 +212,21 @@ class EffectSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16), // 섹션 여백
       decoration: ShapeDecoration(
-        color: Theme.of(context).extension<CustomColors>()!.neutral90,
+        color: Theme.of(context).extension<CustomColors>()!.neutral90, // 배경 색상
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20), // 모서리 둥글기
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: body_xsmall_semi(context)),
+          Text(title, style: body_xsmall_semi(context)), // 섹션 제목
           const SizedBox(height: 10),
           ...effects.map((effect) => Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: EffectItem(effect: effect),
+            padding: const EdgeInsets.only(bottom: 10), // 항목 간 간격
+            child: EffectItem(effect: effect), // 개별 학습 효과 항목
           )),
         ],
       ),
@@ -230,7 +235,7 @@ class EffectSection extends StatelessWidget {
 }
 
 class EffectItem extends StatelessWidget {
-  final String effect;
+  final String effect; // 개별 학습 효과 내용
 
   const EffectItem({super.key, required this.effect});
 
@@ -238,9 +243,9 @@ class EffectItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(Icons.circle, size: 6),
+        Icon(Icons.circle, size: 6), // 작은 원 아이콘
         const SizedBox(width: 8),
-        Text(effect, style: body_xsmall(context)),
+        Text(effect, style: body_xsmall(context)), // 학습 효과 텍스트
       ],
     );
   }
