@@ -16,6 +16,7 @@ import '../../viewmodel/custom_colors_provider.dart';
 import '../../viewmodel/notification_controller.dart';
 import '../components/custom_app_bar.dart';
 import '../components/custom_button.dart';
+import 'example.dart';
 
 class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
   const MyHomePage({super.key});
@@ -85,6 +86,7 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
                   child: ButtonPrimary(
                     function: () {
                       print("Button pressed");
+                      Navigator.pushNamed(context, "/example");
                       //function 은 상황에 맞게 재 정의 할 것.
                     },
                     title: '완료',
