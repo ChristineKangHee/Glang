@@ -1,9 +1,3 @@
-/// File: nickname_input.dart
-/// Purpose: 별명 입력 화면 구현
-/// Author: 강희
-/// Created: 2025-01-02
-/// Last Modified: 2025-01-03 by 박민준
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../components/custom_app_bar.dart';
@@ -19,6 +13,8 @@ class NicknameInput extends ConsumerStatefulWidget {
 }
 
 class _NicknameInputState extends ConsumerState<NicknameInput> {
+  // Controller to manage TextField input
+  final TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -26,36 +22,78 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
     return SafeArea(
       child: Scaffold(
         appBar: CustomAppBar_Logo(),
-        body: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '별명을 입력해주세요',
-                style: heading_medium(context),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                '별명',
-                style: body_xsmall(context).copyWith(color: customColors.primary),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                style: body_large_semi(context),  // Set the text style for the input text
-                decoration: InputDecoration(
-                  hintText: '별명을 입력하세요',
-                  hintStyle: body_large_semi(context).copyWith(color: customColors.neutral60),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: customColors.primary ?? Colors.blue, width: 2),
-                  ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: customColors.neutral60 ?? Colors.grey, width: 2),
+        resizeToAvoidBottomInset: false,  // Disable resizing of the body when keyboard shows
+        body: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: SingleChildScrollView(  // Allow scrolling if content is larger than screen
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '별명을 입력해주세요',
+                        style: heading_medium(context),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        '별명',
+                        style: body_xsmall(context).copyWith(color: customColors.primary),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _controller,  // Attach the controller to the TextField
+                        style: body_large_semi(context),  // Set the text style for the input text
+                        cursorColor: customColors.primary ?? Colors.purple,  // Set cursor color
+                        cursorWidth: 2,  // Customize cursor width
+                        cursorRadius: Radius.circular(5),  // Customize cursor radius (rounded edges)
+                        decoration: InputDecoration(
+                          hintText: '별명을 입력하세요',
+                          hintStyle: body_large_semi(context).copyWith(color: customColors.neutral60),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: customColors.primary ?? Colors.purple, width: 2),
+                          ),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: customColors.neutral60 ?? Colors.grey, width: 2),
+                          ),
+                          // Add delete icon when text is not empty
+                          suffixIcon: _controller.text.isNotEmpty
+                              ? IconButton(
+                            icon: Icon(Icons.cancel_rounded, color: customColors.neutral60 ?? Colors.purple),
+                            onPressed: () {
+                              _controller.clear();  // Clear the text when the delete icon is clicked
+                              setState(() {
+                                // Trigger rebuild to hide the delete icon after clearing text
+                              });
+                            },
+                          )
+                              : null,
+                        ),
+                        onChanged: (text) {
+                          setState(() {
+                            // Trigger rebuild to show/hide the delete icon based on the text input
+                          });
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+            // Button Container - Fixed at the bottom
+            Container(
+              width: MediaQuery.of(context).size.width,
+              padding: const EdgeInsets.all(20),
+              child: ButtonPrimary(
+                function: () {
+                  print("완료");
+                  // function 은 상황에 맞게 재 정의 할 것.
+                },
+                title: '완료',
+              ),
+            ),
+          ],
         ),
       ),
     );
