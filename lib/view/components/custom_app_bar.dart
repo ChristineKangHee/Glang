@@ -97,7 +97,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: onSearchPressed,
         ),
       ],
-      backgroundColor: backgroundColor ?? customColors.neutral90,
+      backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
   }
@@ -131,7 +131,7 @@ class CustomAppBar_Logo extends StatelessWidget implements PreferredSizeWidget {
           },
         ),
       ],
-      backgroundColor: backgroundColor ?? customColors.neutral90,
+      backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
   }
@@ -161,7 +161,7 @@ class CustomAppBar_Course extends StatelessWidget implements PreferredSizeWidget
         style: heading_small(context).copyWith(color: customColors.neutral30),
       ).tr(),
       centerTitle: true,
-      backgroundColor: backgroundColor ?? customColors.neutral90,
+      backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
   }
@@ -235,7 +235,7 @@ class CustomAppBar_MyPage extends StatelessWidget implements PreferredSizeWidget
           },
         ),
       ],
-      backgroundColor: backgroundColor ?? customColors.neutral90,
+      backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
   }
@@ -282,7 +282,7 @@ class CustomAppBar_2depth_1 extends StatelessWidget implements PreferredSizeWidg
           onPressed: onIconPressed,
         ),
       ],
-      backgroundColor: backgroundColor ?? customColors.neutral90,
+      backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
   }
@@ -325,7 +325,7 @@ class CustomAppBar_2depth_2 extends StatelessWidget implements PreferredSizeWidg
           onPressed: onIconPressed,
         ),
       ],
-      backgroundColor: backgroundColor ?? customColors.neutral90,
+      backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
   }
@@ -371,7 +371,7 @@ class CustomAppBar_2depth_3 extends StatelessWidget implements PreferredSizeWidg
           onPressed: onIconPressed,
         ),
       ],
-      backgroundColor: backgroundColor ?? customColors.neutral90,
+      backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
   }
