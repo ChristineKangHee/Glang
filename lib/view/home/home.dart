@@ -58,34 +58,103 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Column( // 나중에 섹션 분리할 것
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("안녕하세요, $name님!", style: heading_medium(context),),
                     Text("오늘의 학습 목표를 달성해 보세요!", style: body_xsmall(context),),
                   ],
                 ),
                 SizedBox(height: 24,),
+                //TODO: 진행 중인 학습 위젯
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("진행 중인 학습", style: body_small_semi(context),),
+                    SectionPopup(
+                      title: data.title,
+                      subTitle: data.subdetailTitle[0],
+                      time: data.totalTime[0],
+                      level: data.difficultyLevel[0],
+                      description: data.textContents[0],
+                      imageUrl: data.imageUrls[0],
+                      missions: data.missions[0],
+                      effects: data.effects[0],
+                      achievement: data.achievement[0],
+                      status: data.status[0],
+                    ),
+                  ],
+                ),
 
-                SectionPopup(
-                  title: data.title,
-                  subTitle: data.subdetailTitle[0],
-                  time: data.totalTime[0],
-                  level: data.difficultyLevel[0],
-                  description: data.textContents[0],
-                  imageUrl: data.imageUrls[0],
-                  missions: data.missions[0],
-                  effects: data.effects[0],
-                  achievement: data.achievement[0],
-                  status: data.status[0],
+                SizedBox(height: 24,),
+                //TODO: 인기 게시물 위젯
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("인기 게시물", style: body_small_semi(context),),
+                        Row(
+                          children: [
+                            Text("더보기", style: body_xxsmall_semi(context),),
+                            Icon(Icons.keyboard_arrow_right),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12,),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          Card(
+                            child: Container(
+                                width: 262,
+                                height: 109,
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text("data", style: body_xsmall_semi(context),)
+                                  ],
+                                ),
+                                ),
+                          ),
+                          Card(
+                            child: SizedBox(width: 262, height: 109,),
+                          ),
+                          Card(
+                            child: SizedBox(width: 262, height: 109,),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
 
                 SizedBox(height: 24,),
 
-
-                SizedBox(height: 24,),
-
-
-
-
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("이번달 학습 기록", style: body_small_semi(context),),
+                    SizedBox(height: 12,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Card(
+                          child: SizedBox(width: 170, height: 142,),
+                        ),
+                        Card(
+                          child: SizedBox(width: 170, height: 142,),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
 
                 ElevatedButton(
                   onPressed: showNotification,

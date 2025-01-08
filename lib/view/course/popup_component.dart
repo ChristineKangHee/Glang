@@ -86,7 +86,7 @@ class SectionPopup extends StatelessWidget {
                     onPressed: status == 'locked'
                         ? null
                         : () {
-                      Navigator.pop(context);
+                      // Navigator.pop(context);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
