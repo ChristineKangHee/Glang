@@ -11,7 +11,6 @@ import 'package:readventure/view/course/course_main.dart';
 import 'package:readventure/view/home/example.dart';
 import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/home/notification/notification_page.dart';
-import 'package:readventure/view/login/nickname_input.dart';
 import 'package:readventure/view/mypage/mypage_main.dart';
 import 'package:readventure/view/mypage/settings/settings_language.dart';
 import 'package:readventure/view/mypage/settings/settings_notification.dart';
@@ -62,7 +61,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
             '/community': (context) => const CommunityMain(),
             '/mypage': (context) => const MyPageMain(),
             '/mypage/settings' : (context) => const SettingsPage(),
-            '/mypage/settings/profile' : (context) => const NicknameInput(),
+            '/mypage/settings/profile' : (context) => const SettingsProfile(),
             '/mypage/settings/notification' : (context) => const SettingsNotification(),
             '/mypage/settings/theme' : (context) => const SettingsTheme(),
             '/mypage/settings/language' : (context) => const SettingsLanguage(),
