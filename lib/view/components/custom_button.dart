@@ -147,7 +147,7 @@ class ButtonPrimary20 extends StatelessWidget { //
           width: MediaQuery.of(context).size.width, //MediaQuery 를 통해서 버튼 넓이 설정해놓음.
           height: 56, // 버튼 높이
           decoration: BoxDecoration(
-            color: condition.contains("not null") ? Theme.of(context).colorScheme.primary : Colors.grey,
+            color: condition.contains("not null") ? customColors.primary20 : Colors.grey,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Center(

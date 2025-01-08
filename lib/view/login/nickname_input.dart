@@ -13,22 +13,26 @@ class NicknameInput extends ConsumerStatefulWidget {
 }
 
 class _NicknameInputState extends ConsumerState<NicknameInput> {
-  // Controller to manage TextField input
   final TextEditingController _controller = TextEditingController();
+  String? errorMessage; // To store the error message
+  final List<String> existingNicknames = ['user1', 'user2', 'admin']; // Example existing nicknames
 
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
+    final hasError = errorMessage != null;
+    final isInputNotEmpty = _controller.text.isNotEmpty;
+
     return SafeArea(
       child: Scaffold(
         appBar: CustomAppBar_Logo(),
-        resizeToAvoidBottomInset: false,  // Disable resizing of the body when keyboard shows
+        resizeToAvoidBottomInset: false,
         body: Column(
           children: [
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(20),
-                child: SingleChildScrollView(  // Allow scrolling if content is larger than screen
+                child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -43,28 +47,35 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
                       ),
                       const SizedBox(height: 8),
                       TextField(
-                        controller: _controller,  // Attach the controller to the TextField
-                        style: body_large_semi(context),  // Set the text style for the input text
-                        cursorColor: customColors.primary ?? Colors.purple,  // Set cursor color
-                        cursorWidth: 2,  // Customize cursor width
-                        cursorRadius: Radius.circular(5),  // Customize cursor radius (rounded edges)
+                        controller: _controller,
+                        style: body_large_semi(context),
+                        cursorColor: customColors.primary ?? Colors.purple,
+                        cursorWidth: 2,
+                        cursorRadius: Radius.circular(5),
                         decoration: InputDecoration(
                           hintText: '별명을 입력하세요',
                           hintStyle: body_large_semi(context).copyWith(color: customColors.neutral60),
                           focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: customColors.primary ?? Colors.purple, width: 2),
+                            borderSide: BorderSide(
+                                color: hasError
+                                    ? customColors.error ?? Colors.red
+                                    : customColors.primary ?? Colors.purple,
+                                width: 2),
                           ),
                           enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: customColors.neutral60 ?? Colors.grey, width: 2),
+                            borderSide: BorderSide(
+                                color: hasError
+                                    ? customColors.error ?? Colors.red
+                                    : customColors.neutral60 ?? Colors.grey,
+                                width: 2),
                           ),
-                          // Add delete icon when text is not empty
-                          suffixIcon: _controller.text.isNotEmpty
+                          suffixIcon: isInputNotEmpty
                               ? IconButton(
                             icon: Icon(Icons.cancel_rounded, color: customColors.neutral60 ?? Colors.purple),
                             onPressed: () {
-                              _controller.clear();  // Clear the text when the delete icon is clicked
+                              _controller.clear();
                               setState(() {
-                                // Trigger rebuild to hide the delete icon after clearing text
+                                errorMessage = null; // Clear the error message
                               });
                             },
                           )
@@ -72,23 +83,40 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
                         ),
                         onChanged: (text) {
                           setState(() {
-                            // Trigger rebuild to show/hide the delete icon based on the text input
+                            if (existingNicknames.contains(text)) {
+                              errorMessage = '이미 사용 중인 닉네임이에요';
+                            } else {
+                              errorMessage = null;
+                            }
                           });
                         },
                       ),
+                      if (hasError)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            errorMessage!,
+                            style: body_xsmall(context).copyWith(color: customColors.error),
+                          ),
+                        ),
                     ],
                   ),
                 ),
               ),
             ),
-            // Button Container - Fixed at the bottom
             Container(
               width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.all(20),
-              child: ButtonPrimary(
+              child: hasError || !isInputNotEmpty
+                  ? ButtonPrimary20(
                 function: () {
                   print("완료");
-                  // function 은 상황에 맞게 재 정의 할 것.
+                },
+                title: '완료',
+              )
+                  : ButtonPrimary(
+                function: () {
+                  print("완료");
                 },
                 title: '완료',
               ),
