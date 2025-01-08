@@ -10,10 +10,15 @@ import 'package:readventure/view/community/community_main.dart';
 import 'package:readventure/view/course/course_main.dart';
 import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/home/notification/notification_page.dart';
+import 'package:readventure/view/mypage/badge.dart';
+import 'package:readventure/view/mypage/edit_profile.dart';
+import 'package:readventure/view/mypage/history.dart';
 import 'package:readventure/view/mypage/mypage_main.dart';
+import 'package:readventure/view/mypage/saved.dart';
 import 'package:readventure/view/mypage/settings/settings_language.dart';
 import 'package:readventure/view/mypage/settings/settings_notification.dart';
 import 'package:readventure/view/mypage/settings/settings_profile.dart';
+import 'package:readventure/view/mypage/statistics.dart';
 import 'viewmodel/theme_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -64,6 +69,12 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
             '/mypage/settings/notification' : (context) => const SettingsNotification(),
             '/mypage/settings/theme' : (context) => const SettingsTheme(),
             '/mypage/settings/language' : (context) => const SettingsLanguage(),
+            '/mypage/edit_profile' : (context) => const EditProfile(),
+            '/mypage/statistics' : (context) => const MyPageStatistics(),
+            '/mypage/badge' : (context) => const MyPageBadge(),
+            '/mypage/saved' : (context) => const MyPageSaved(),
+            '/mypage/history' : (context) => const MyPageHistory(),
+
           },
           localizationsDelegates: context.localizationDelegates, // Localization 설정
           supportedLocales: context.supportedLocales, // 지원 언어
