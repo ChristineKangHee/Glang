@@ -30,6 +30,9 @@
     4. CustomAppBar_MyPage
       appBar: CustomAppBar_MyPage()
 
+    5. CustomAppBar_Logo_only
+      appBar: CustomAppBar_Logo_only()
+
     ////// 2 Depth //////
 
     1. CustomAppBar_2depth_1
@@ -245,6 +248,31 @@ class CustomAppBar_MyPage extends StatelessWidget implements PreferredSizeWidget
           },
         ),
       ],
+      backgroundColor: backgroundColor ?? customColors.neutral100,
+      elevation: 0,
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class CustomAppBar_Logo_only extends StatelessWidget implements PreferredSizeWidget {
+  final Color? backgroundColor; // null 가능하도록 수정
+  final Function()? onNotificationPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
+
+  const CustomAppBar_Logo_only({
+    Key? key,
+    this.backgroundColor, // null이면 default로 설정
+    this.onNotificationPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      leading: Container(child: Image.asset('assets/images/appleicon.png')),// logo 부분. 추후 진짜 로고로 바꿀 것
       backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
