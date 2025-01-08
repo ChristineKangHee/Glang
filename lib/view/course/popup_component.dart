@@ -277,7 +277,7 @@ class _PulsatingPlayButtonState extends State<PulsatingPlayButton>
           //     );
           //   },
           // ),
-          GestureDetector(
+          InkWell(
             onTap: widget.onPressed,
             child: Container(
               width: 80,
