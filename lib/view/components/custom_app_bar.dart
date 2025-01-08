@@ -42,11 +42,21 @@
       appBar: CustomAppBar_2depth_2(
         title: "앱바 제목",
         onIconPressed: 함수 기능 정의
-
       )
 
     3. CustomAppBar_2depth_3
       appBar: CustomAppBar_2depth_3(
+        title: "앱바 제목",
+        onIconPressed : 함수 기능 정의
+      )
+
+    4. CustomAppBar_2depth_4
+      appBar: CustomAppBar_2depth_4(
+        title: "앱바 제목",
+      )
+
+    5. CustomAppBar_2depth_5
+      appBar: CustomAppBar_2depth_5(
         title: "앱바 제목",
         onIconPressed : 함수 기능 정의
       )
@@ -321,7 +331,7 @@ class CustomAppBar_2depth_2 extends StatelessWidget implements PreferredSizeWidg
       centerTitle: true,
       actions: [// 이 부분에 아이콘 버튼을 추가
         IconButton(
-          icon: Icon(Icons.more_vert, color: customColors.neutral30, size: 28,),
+          icon: Icon(Icons.calendar_today_outlined, color: customColors.neutral30, size: 28,),
           onPressed: onIconPressed,
         ),
       ],
@@ -368,6 +378,98 @@ class CustomAppBar_2depth_3 extends StatelessWidget implements PreferredSizeWidg
       actions: [// 이 부분에 아이콘 버튼을 추가
         IconButton(
           icon: Icon(Icons.settings, color: customColors.neutral30, size: 28,),
+          onPressed: onIconPressed,
+        ),
+      ],
+      backgroundColor: backgroundColor ?? customColors.neutral100,
+      elevation: 0,
+    );
+  }
+
+  @override
+  Size get preferredSize {
+    // bottom의 높이를 고려하여 AppBar의 총 높이를 반환
+    final bottomHeight = bottom?.preferredSize.height ?? 0.0;
+    return Size.fromHeight(kToolbarHeight + bottomHeight);
+  }
+}
+
+class CustomAppBar_2depth_4 extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final Color? backgroundColor; // null 가능하도록 수정
+  final PreferredSizeWidget? bottom; // bottom 파라미터 추가
+
+  const CustomAppBar_2depth_4({
+    Key? key,
+    required this.title,
+    this.backgroundColor, // null이면 default로 설정
+    this.bottom,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      bottom: bottom,
+      leading: IconButton(
+        icon: Icon(Icons.navigate_before, color: customColors.neutral30),
+        onPressed: () {
+          Navigator.pop(context); //뒷 페이지로 돌아가는 기능. 상황에 맞게 수정.
+        },
+      ),
+      title: Text(
+          title,
+          style: heading_xsmall(context).copyWith(color: customColors.neutral30)
+      ).tr(),
+      centerTitle: true,
+      backgroundColor: backgroundColor ?? customColors.neutral100,
+      elevation: 0,
+    );
+  }
+
+  @override
+  Size get preferredSize {
+    // bottom의 높이를 고려하여 AppBar의 총 높이를 반환
+    final bottomHeight = bottom?.preferredSize.height ?? 0.0;
+    return Size.fromHeight(kToolbarHeight + bottomHeight);
+  }
+}
+
+class CustomAppBar_2depth_5 extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final Color? backgroundColor; // null 가능하도록 수정
+  final Function()? onIconPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
+  final PreferredSizeWidget? bottom; // bottom 파라미터 추가
+
+  const CustomAppBar_2depth_5({
+    Key? key,
+    required this.title,
+    this.backgroundColor, // null이면 default로 설정
+    this.onIconPressed,
+    this.bottom,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      bottom: bottom,
+      leading: IconButton(
+        icon: Icon(Icons.navigate_before, color: customColors.neutral30),
+        onPressed: () {
+          Navigator.pop(context); //뒷 페이지로 돌아가는 기능. 상황에 맞게 수정.
+        },
+      ),
+      title: Text(
+          title,
+          style: heading_xsmall(context).copyWith(color: customColors.neutral30)
+      ).tr(),
+      centerTitle: true,
+      actions: [// 이 부분에 아이콘 버튼을 추가
+        IconButton(
+          icon: Icon(Icons.search, color: customColors.neutral30, size: 28,),
           onPressed: onIconPressed,
         ),
       ],
