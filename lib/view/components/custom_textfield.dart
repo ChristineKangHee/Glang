@@ -41,10 +41,6 @@ class NicknameTextField extends StatelessWidget {
           cursorColor: customColors.primary ?? Colors.purple,
           cursorWidth: 2,
           cursorRadius: const Radius.circular(5),
-          inputFormatters: [
-            FilteringTextInputFormatter.deny(RegExp(r'\s')),
-            LengthLimitingTextInputFormatter(8),
-          ],
           decoration: InputDecoration(
             hintText: '별명을 입력하세요',
             hintStyle: body_large_semi(context).copyWith(color: customColors.neutral60),
@@ -70,20 +66,22 @@ class NicknameTextField extends StatelessWidget {
             )
                 : null,
           ),
+          inputFormatters: [
+            FilteringTextInputFormatter.deny(RegExp(r'\s')),
+          ],
           onChanged: (text) {
             String? error;
-            if (text.isEmpty) {
-              error = null;
-            } else if (text.length < 1) {
-              error = '별명은 최소 1자 이상이어야 해요.';
-            } else if (text.length > 8) {
-              error = '별명은 최대 8자까지만 가능해요.';
+            if (text.length > 8) {
+              controller.text = text.substring(0, 8);
+              controller.selection = TextSelection.fromPosition(
+                TextPosition(offset: controller.text.length),
+              );
             } else if (text.contains(' ')) {
               error = '공백은 사용할 수 없어요.';
             } else if (existingNicknames.contains(text)) {
               error = '이미 사용 중인 닉네임이에요.';
             }
-            onChanged(text, error);
+            onChanged(controller.text, error);
           },
         ),
       ],
