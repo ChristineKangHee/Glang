@@ -5,6 +5,7 @@
 /// 마지막 수정: 2025-01-03 by 강희
 
 import 'package:flutter/material.dart';
+import '../../model/section_data.dart';
 import '../components/custom_app_bar.dart';
 import '../components/custom_navigation_bar.dart';
 import 'section.dart';
@@ -16,18 +17,6 @@ import '../../../../theme/theme.dart';
 class CourseMain extends StatefulWidget {
   CourseMain({super.key}); // 'const' 제거하여 커스터마이징 가능하도록 설정.
 
-  /// 주어진 색상을 지정된 비율로 어둡게 변환.
-  ///
-  /// - [color]: 원래 색상.
-  /// - [factor]: 어둡게 적용할 비율 (0.0 ~ 1.0).
-  static Color _darkenColor(Color color, double factor) {
-    return HSLColor.fromColor(color)
-        .withLightness(
-      (HSLColor.fromColor(color).lightness - factor).clamp(0.0, 1.0),
-    )
-        .toColor();
-  }
-
   @override
   State<CourseMain> createState() => _CourseMainState();
 }
@@ -38,9 +27,6 @@ class _CourseMainState extends State<CourseMain> {
   /// 화면에 표시할 섹션 데이터 리스트.
   final data = <SectionData>[
     SectionData(
-      color: Colors.blue,
-      colorOscuro: CourseMain._darkenColor(Colors.blue, 0.1),
-      etapa: 1,
       section: 1,
       title: '초급 코스',
       sectionDetail: '초급 코스의 설명 내용입니다.',
@@ -100,9 +86,9 @@ class _CourseMainState extends State<CourseMain> {
         '어려움',
       ],
       imageUrls: [
-        'https://example.com/image1.jpg',
-        'https://example.com/image2.jpg',
-        'https://example.com/image3.jpg',
+        'https://www.google.com/url?sa=i&url=https%3A%2F%2Fm.health.chosun.com%2Fsvc%2Fnews_view.html%3Fcontid%3D2023071701758&psig=AOvVaw15uCYdRE77x_VcSo5nt8IE&ust=1736318472714000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMjLv8CA44oDFQAAAAAdAAAAABAE',
+        'https://www.google.com/url?sa=i&url=https%3A%2F%2Fm.health.chosun.com%2Fsvc%2Fnews_view.html%3Fcontid%3D2023071701758&psig=AOvVaw15uCYdRE77x_VcSo5nt8IE&ust=1736318472714000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMjLv8CA44oDFQAAAAAdAAAAABAE',
+        'https://www.google.com/url?sa=i&url=https%3A%2F%2Fm.health.chosun.com%2Fsvc%2Fnews_view.html%3Fcontid%3D2023071701758&psig=AOvVaw15uCYdRE77x_VcSo5nt8IE&ust=1736318472714000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMjLv8CA44oDFQAAAAAdAAAAABAE',
         'https://example.com/image4.jpg',
         'https://example.com/image5.jpg',
         'https://example.com/image6.jpg',
@@ -138,16 +124,13 @@ class _CourseMainState extends State<CourseMain> {
         'completed',
         'completed',
         'start',
-        'before_completion',
+        'in_progress',
         'before_completion',
         'before_completion',
         'before_completion',
       ],
     ),
     SectionData(
-      color: Colors.green,
-      colorOscuro: CourseMain._darkenColor(Colors.green, 0.1),
-      etapa: 1,
       section: 2,
       title: '중급 코스',
       sectionDetail: '중급 코스의 설명 내용입니다.',
@@ -252,9 +235,6 @@ class _CourseMainState extends State<CourseMain> {
       ],
     ),
     SectionData(
-      color: Colors.orange,
-      colorOscuro: CourseMain._darkenColor(Colors.orange, 0.1),
-      etapa: 1,
       section: 3,
       title: '고급 코스',
       sectionDetail: '고급 코스의 설명 내용입니다.',
@@ -443,8 +423,8 @@ class CurrentSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: data.color,
+      decoration: const BoxDecoration(
+        color: Colors.white
       ),
       child: Row(
         children: [

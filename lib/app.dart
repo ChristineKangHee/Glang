@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:readventure/view/community/community_main.dart';
 import 'package:readventure/view/course/course_main.dart';
+import 'package:readventure/view/home/example.dart';
 import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/home/notification/notification_page.dart';
 import 'package:readventure/view/mypage/badge.dart';
