@@ -167,38 +167,42 @@ class StatusButton extends StatelessWidget {
     IconData buttonIcon;
     double iconSize;
     Color? iconColor;
+    double iconWeight;
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     // 상태에 따른 색상, 아이콘 및 아이콘 크기 설정
     switch (status) {
       case 'start':
-        buttonColor = customColors.primary;
-        buttonIcon = Icons.play_arrow;
-        iconSize = 36.0;
-        iconColor = customColors.neutral100;
-        break;
       case 'in_progress':
         buttonColor = customColors.primary;
-        buttonIcon = Icons.pause;
-        iconSize = 36.0;
+        buttonIcon = Icons.play_arrow_rounded;
+        iconSize = 40.0;
         iconColor = customColors.neutral100;
         break;
       case 'completed':
         buttonColor = customColors.primary40;
         buttonIcon = Icons.check_rounded;
-        iconSize = 32.0;
+        iconSize = 40.0;
         iconColor = customColors.neutral100;
         break;
       case 'locked':
       default:
         buttonColor = customColors.neutral80;
-        buttonIcon = Icons.lock;
+        buttonIcon = Icons.lock_rounded;
         iconSize = 24.0;
         iconColor = customColors.neutral30;
         break;
     }
 
-    return ElevatedButton(
+    return status == 'start' || status == 'in_progress'
+        ? PulsatingPlayButton(
+            onPressed: onPressed,
+            buttonColor: buttonColor,
+            buttonIcon: buttonIcon,
+            iconSize: iconSize,
+            iconColor: iconColor,
+          )
+        : ElevatedButton(
       onPressed: status == 'locked' ? null : onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: buttonColor,
@@ -208,7 +212,92 @@ class StatusButton extends StatelessWidget {
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         minimumSize: Size.zero,
       ),
-      child: Icon(buttonIcon, size: iconSize, color: Colors.white,),
+      child: Icon(buttonIcon, size: iconSize, color: Colors.white),
+    );
+  }
+}
+
+class PulsatingPlayButton extends StatefulWidget {
+  final VoidCallback onPressed;
+  final buttonColor;
+  final buttonIcon;
+  final iconSize;
+  final iconColor;
+
+  const PulsatingPlayButton({Key? key, required this.onPressed, required this.buttonColor, this.buttonIcon, this.iconSize, this.iconColor})
+      : super(key: key);
+
+  @override
+  _PulsatingPlayButtonState createState() => _PulsatingPlayButtonState();
+}
+
+class _PulsatingPlayButtonState extends State<PulsatingPlayButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _opacityAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
+
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+
+    _opacityAnimation = Tween<double>(begin: 0.5, end: 0.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+    return Center(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // AnimatedBuilder(
+          //   animation: _controller,
+          //   builder: (context, child) {
+          //     return Container(
+          //       width: 100 * _scaleAnimation.value,
+          //       height: 100 * _scaleAnimation.value,
+          //       decoration: BoxDecoration(
+          //         shape: BoxShape.circle,
+          //         color: customColors.accent?.withOpacity(_opacityAnimation.value),
+          //       ),
+          //     );
+          //   },
+          // ),
+          GestureDetector(
+            onTap: widget.onPressed,
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: widget.buttonColor,
+              ),
+              child: Icon(
+                widget.buttonIcon,
+                color: widget.iconColor,
+                size: widget.iconSize,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
