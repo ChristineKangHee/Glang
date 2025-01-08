@@ -31,17 +31,20 @@ class Section extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => SectionPopup(
-        title: data.title,
-        subTitle: data.subdetailTitle[index],
-        time: data.totalTime[index],
-        level: data.difficultyLevel[index],
-        description: data.textContents[index],
-        imageUrl: data.imageUrls[index],
-        missions: data.missions[index],
-        effects: data.effects[index],
-        achievement: data.achievement[index],
-        status: data.status[index],
+      builder: (_) => Padding(
+        padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 95.0),
+        child: SectionPopup(
+          title: data.title,
+          subTitle: data.subdetailTitle[index],
+          time: data.totalTime[index],
+          level: data.difficultyLevel[index],
+          description: data.textContents[index],
+          imageUrl: data.imageUrls[index],
+          missions: data.missions[index],
+          effects: data.effects[index],
+          achievement: data.achievement[index],
+          status: data.status[index],
+        ),
       ),
     );
   }

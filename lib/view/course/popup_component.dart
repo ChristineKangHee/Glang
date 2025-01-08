@@ -51,86 +51,83 @@ class SectionPopup extends StatelessWidget {
         break;
     }
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 70.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: BoxShadowStyles.shadow1(context),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: body_xsmall_semi(context)
-                            .copyWith(color: customColors.neutral100),
-                      ),
-                      Text(
-                        subTitle,
-                        style: body_large_semi(context)
-                            .copyWith(color: customColors.neutral100),
-                      ),
-                    ],
-                  ),
-                  ElevatedButton(
-                    onPressed: status == 'locked'
-                        ? null
-                        : () {
-                      // Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CourseDetailPage(
-                            title: subTitle,
-                            time: time,
-                            level: level,
-                            description: description,
-                            imageUrl: imageUrl,
-                            mission: missions,
-                            effect: effects,
-                          ),
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: BoxShadowStyles.shadow1(context),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: body_xsmall_semi(context)
+                          .copyWith(color: customColors.neutral100),
+                    ),
+                    Text(
+                      subTitle,
+                      style: body_large_semi(context)
+                          .copyWith(color: customColors.neutral100),
+                    ),
+                  ],
+                ),
+                ElevatedButton(
+                  onPressed: status == 'locked'
+                      ? null
+                      : () {
+                    // Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CourseDetailPage(
+                          title: subTitle,
+                          time: time,
+                          level: level,
+                          description: description,
+                          imageUrl: imageUrl,
+                          mission: missions,
+                          effect: effects,
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: customColors.neutral100,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: customColors.neutral100,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(
-                      status == 'locked' ? '잠김' : '시작하기',
-                      style: body_xsmall_semi(context),
-                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 6),
                   ),
-                ],
-              ),
-              const SizedBox(height: 32),
-              Row(
-                children: [
-                  _buildIconWithText(context, Icons.check_circle,
-                      '$achievement%', customColors),
-                  const SizedBox(width: 8),
-                  _buildIconWithText(
-                      context, Icons.timer, '$time 분', customColors),
-                  const SizedBox(width: 8),
-                  _buildIconWithText(context, Icons.star, level, customColors),
-                ],
-              ),
-            ],
-          ),
+                  child: Text(
+                    status == 'locked' ? '잠김' : '시작하기',
+                    style: body_xsmall_semi(context),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            Row(
+              children: [
+                _buildIconWithText(context, Icons.check_circle,
+                    '$achievement%', customColors),
+                const SizedBox(width: 8),
+                _buildIconWithText(
+                    context, Icons.timer, '$time 분', customColors),
+                const SizedBox(width: 8),
+                _buildIconWithText(context, Icons.star, level, customColors),
+              ],
+            ),
+          ],
         ),
       ),
     );

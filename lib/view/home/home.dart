@@ -19,6 +19,7 @@ import '../components/custom_app_bar.dart';
 import '../components/custom_button.dart';
 import '../course/popup_component.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
   const MyHomePage({super.key});
@@ -52,7 +53,7 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0.r),
             decoration: BoxDecoration(gradient: AppGradients.whiteToGrey(customColors)),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -60,35 +61,24 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
               children: [
                 //TODO: 인사말 위젯
                 GreetingSection(name: name),
-                SizedBox(height: 24,),
+                SizedBox(height: 24.h,),
 
                 //TODO: 진행 중인 학습 위젯
                 ProgressSection(data: data),
-                SizedBox(height: 24,),
+                SizedBox(height: 24.h,),
 
                 //TODO: 인기 게시물 위젯
-                HotPost(customColors: customColors),
-                SizedBox(height: 24,),
+                HotPostSection(customColors: customColors),
+                SizedBox(height: 24.h,),
 
                 //TODO: 이번달 학습 기록 위젯
                 LearningSection(customColors: customColors),
 
-                ElevatedButton(
-                  onPressed: showNotification,
-                  child: Text('Show Notification'),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: ButtonPrimary(
-                    function: () {
-                      print("Button pressed");
-                      Navigator.pushNamed(context, "/example");
-                      //function 은 상황에 맞게 재 정의 할 것.
-                    },
-                    title: '완료',
-                    // 버튼 안에 들어갈 텍스트.
-                  ),
-                ),
+                // ElevatedButton(
+                //   onPressed: showNotification,
+                //   child: Text('Show Notification'),
+                // ),
+
               ],
             ),
           ),
@@ -115,11 +105,12 @@ class LearningSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("이번달 학습 기록", style: body_small_semi(context),),
-        SizedBox(height: 12,),
+        SizedBox(height: 12.h,),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             LearningSection_Card(customColors: customColors, imageLink: imageLink_1, title: "4시간 30분", subtitle: "학습 시간",),
+            // SizedBox(width: 20,),
             LearningSection_Card(customColors: customColors, imageLink: imageLink_2, title: "32개", subtitle: "완료한 미션",),
           ],
         ),
@@ -146,9 +137,9 @@ class LearningSection_Card extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Container(
-        width: 170,
-        height: 142,
-        padding: EdgeInsets.all(20),
+        width: 170.5.w,
+        height: 142.h,
+        padding: EdgeInsets.all(20.r),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -157,7 +148,7 @@ class LearningSection_Card extends StatelessWidget {
                 '$imageLink',
               ),
             ),
-            SizedBox(height: 8,),
+            SizedBox(height: 8.h,),
             Text("$title", style: heading_medium(context).copyWith(color: customColors.neutral30),),
             Text("$subtitle", style: body_xsmall_semi(context).copyWith(color: customColors.neutral60),),
           ],
@@ -182,6 +173,7 @@ class ProgressSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("진행 중인 학습", style: body_small_semi(context),),
+        SizedBox(height: 12.h,),
         SectionPopup(
           title: data.title,
           subTitle: data.subdetailTitle[0],
@@ -213,14 +205,15 @@ class GreetingSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("안녕하세요, $name님!", style: heading_medium(context),),
+        SizedBox(height: 4.h,),
         Text("오늘의 학습 목표를 달성해 보세요!", style: body_xsmall(context),),
       ],
     );
   }
 }
 
-class HotPost extends StatelessWidget {
-  const HotPost({
+class HotPostSection extends StatelessWidget {
+  const HotPostSection({
     super.key,
     required this.customColors,
   });
@@ -248,7 +241,7 @@ class HotPost extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 12,),
+        SizedBox(height: 12.h,),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -276,34 +269,34 @@ class CustomCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Container(
-          width: 262,
-          height: 109,
-          padding: EdgeInsets.all(10),
+          width: 262.w,
+          height: 109.h,
+          padding: EdgeInsets.all(10.r),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center, //텍스트 세로 중앙 정렬
             crossAxisAlignment: CrossAxisAlignment.start, //텍스트 가로 시작점
             children: [
               Text("TOPIC 시험 준비", style: body_xsmall_semi(context), overflow: TextOverflow.ellipsis,),
-              SizedBox(height: 4,),
+              SizedBox(height: 4.h,),
               Text("엄청나게 긴 텍스트", style: body_xxsmall(context), overflow: TextOverflow.ellipsis,),
-              SizedBox(height: 8,),
+              SizedBox(height: 8.h,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.favorite, size: 16, color: customColors.neutral60,),
-                      SizedBox(width: 4,),
+                      Icon(Icons.favorite, size: 16.sp, color: customColors.neutral60,),
+                      SizedBox(width: 4.w,),
                       Text("67", style: body_xsmall_semi(context).copyWith(color: customColors.neutral60),),
-                      SizedBox(width: 8,),
+                      SizedBox(width: 8.w,),
                     ],
                   ),
                   Row(
                     children: [
-                      Icon(Icons.visibility, size: 16, color: customColors.neutral60,),
-                      SizedBox(width: 4,),
+                      Icon(Icons.visibility, size: 16.sp, color: customColors.neutral60,),
+                      SizedBox(width: 4.w,),
                       Text("203", style: body_xsmall_semi(context).copyWith(color: customColors.neutral60),),
-                      SizedBox(width: 8,),
+                      SizedBox(width: 8.w,),
                     ],
                   ),
                 ],
