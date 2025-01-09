@@ -12,7 +12,20 @@
           "package_name": "com.zero.readventure"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "335914399889-it23lqb50j8b977h0c74ftenrmog95nk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zero.readventure",
+            "certificate_hash": "fbb595a6ffdc09ad444ddf6055f2f23309bbf849"
+          }
+        },
+        {
+          "client_id": "335914399889-1e8gjapuk2vhhf6igmtvira7pal89fmh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCY7v7vJsLTudBL-O5fUTtZvcPk-rFNy_o"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "335914399889-1e8gjapuk2vhhf6igmtvira7pal89fmh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "335914399889-7f486slrge0rli5qvueknjs8go87ed2e.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.readventure"
+              }
+            }
+          ]
         }
       }
     }

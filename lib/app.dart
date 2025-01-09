@@ -2,7 +2,7 @@
 /// Purpose: 앱의 전체 구조를 설정하고 테마, 다국어, 네비게이션 경로 및 화면 크기 조정을 관리
 /// Author: 박민준
 /// Created: 2024-12-28
-/// Last Modified: 2025-01-03 by 박민준
+/// Last Modified: 2025-01-09 by 박민준
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +11,8 @@ import 'package:readventure/view/course/course_main.dart';
 import 'package:readventure/view/home/example.dart';
 import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/home/notification/notification_page.dart';
+import 'package:readventure/view/login/login_main.dart';
+import 'package:readventure/view/login/nickname_input.dart';
 import 'package:readventure/view/mypage/edit_nick_input.dart';
 import 'package:readventure/view/mypage/info/info_badge.dart';
 import 'package:readventure/view/mypage/edit_profile.dart';
@@ -59,9 +61,11 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
           theme: isLightTheme ? themeController.lightTheme : themeController.darkTheme, // 라이트/다크 테마
           darkTheme: themeController.darkTheme, // 다크 테마
           themeMode: isLightTheme ? ThemeMode.light : ThemeMode.dark, // 테마 모드
-          initialRoute: '/', // 초기 경로 설정 (스플래시 페이지로 변경 예정)
+          initialRoute: '/login', // 초기 경로 설정 (스플래시 페이지로 변경 예정)
           routes: {
             '/': (context) => const MyHomePage(),
+            '/login': (context) => const LoginPage(),
+            '/nickname': (context) => const NicknameInput(),
             '/notification': (context) => const NotificationPage(),
             '/course': (context) => CourseMain(),
             '/community': (context) => const CommunityMain(),
