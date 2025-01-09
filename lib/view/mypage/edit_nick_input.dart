@@ -1,17 +1,19 @@
-/// 파일: edit_nick.dart
-/// 목적: 내 정보 수정 안에서 별명을 수정할 수 있다.
-/// 작성자: 윤은서
-/// 생성일: 2024-01-08
-/// 마지막 수정: 2025-01-08 by 윤은서
+/// File: edit_nick.dart
+/// Purpose: 사용자의 별명를 수정할 수 있다.
+/// Author: 윤은서
+/// Created: 2025-01-08
+/// Last Modified: 2025-01-09 by 윤은서
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../viewmodel/custom_colors_provider.dart';
 import '../components/custom_app_bar.dart';
 import '../components/custom_button.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../components/custom_textfield.dart';
+import 'edit_profile.dart';
 
 class EditNickInput extends ConsumerStatefulWidget {
   const EditNickInput({super.key});
@@ -21,23 +23,34 @@ class EditNickInput extends ConsumerStatefulWidget {
 }
 
 class _EditNickInputState extends ConsumerState<EditNickInput> {
-  final TextEditingController _controller = TextEditingController();
+  late TextEditingController _controller; // Controller 선언
+
+  @override
+  void initState() {
+    super.initState();
+    // nicknameProvider의 초기 값으로 TextEditingController 설정
+    final initialNickname = ref.read(nicknameProvider);
+    _controller = TextEditingController(text: initialNickname);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // Controller 해제
+    super.dispose();
+  }
+
   String? errorMessage;
-  final List<String> existingNicknames = ['user1', 'user2', 'admin'];
 
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    final isInputValid = _controller.text.isNotEmpty &&
-        _controller.text.length >= 1 &&
-        _controller.text.length <= 8 &&
-        !existingNicknames.contains(_controller.text) &&
-        !_controller.text.contains(' ');
+    final existingNicknames = ['user1', 'user2', 'admin']; // 중복된 별명 체크용
 
     return SafeArea(
       child: Scaffold(
-        appBar: CustomAppBar_Logo(),
-        resizeToAvoidBottomInset: false,
+        appBar: CustomAppBar_2depth_4(
+          title: "내 정보 수정",
+        ),
         body: Column(
           children: [
             Expanded(
@@ -54,6 +67,10 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
                       const SizedBox(height: 24),
                       NicknameTextField(
                         controller: _controller,
+                        decoration: const InputDecoration(
+                          labelText: '별명',
+                          border: OutlineInputBorder(),
+                        ),
                         existingNicknames: existingNicknames,
                         onChanged: (text, error) {
                           setState(() {
@@ -74,19 +91,21 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
                 ),
               ),
             ),
-            Container(
-              width: MediaQuery.of(context).size.width,
+            Padding(
               padding: const EdgeInsets.all(20),
-              child: isInputValid
-                  ? ButtonPrimary(
+              child: ButtonPrimary(
                 function: () {
-                  print("별명 완료: ${_controller.text}");
-                },
-                title: '완료',
-              )
-                  : ButtonPrimary20(
-                function: () {
-                  print("완료되지 않음");
+                  if (_controller.text.isNotEmpty &&
+                      _controller.text.length <= 8 &&
+                      !_controller.text.contains(' ') &&
+                      !existingNicknames.contains(_controller.text)) {
+                    ref.read(nicknameProvider.notifier).state = _controller.text;
+                    Navigator.pop(context, _controller.text);
+                  } else {
+                    setState(() {
+                      errorMessage = '별명은 1-8자 이내로 공백 없이 입력해주세요.';
+                    });
+                  }
                 },
                 title: '완료',
               ),

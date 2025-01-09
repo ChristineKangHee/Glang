@@ -6,19 +6,20 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../viewmodel/theme_controller.dart';
+import '../../../../viewmodel/theme_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
 
-class MyPageBadge extends ConsumerWidget {
-  const MyPageBadge({super.key});
+import '../../components/custom_app_bar.dart';
+
+class InfoBadge extends ConsumerWidget {
+  const InfoBadge({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
     return Scaffold(
-      appBar:
-      AppBar(
-        title: const Text('app_title').tr(),
+      appBar: CustomAppBar_2depth_4(
+        title: "획득한 배지",
       ),
       body: Column(
         children: [
