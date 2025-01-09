@@ -37,21 +37,36 @@ class EditInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const ProfileImage(),
-            const SizedBox(height: 40),
-            const EditNick(),
-            const SizedBox(height: 24),
-            Divider(height: 16, color: Theme.of(context).extension<CustomColors>()?.neutral90, thickness: 16),
-            const SizedBox(height: 24),
-            const MyInfo(),
-          ],
-        ),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const ProfileImage(),
+                const SizedBox(height: 40),
+                const EditNick(),
+              ],
+            ),
+          ),
+          Divider(
+            height: 16,
+            color: Theme.of(context).extension<CustomColors>()?.neutral90,
+            thickness: 16,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: const [
+                SizedBox(height: 24),
+                MyInfo(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
