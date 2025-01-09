@@ -177,15 +177,18 @@ class UserStatsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(child: StatBox(value: '1100', label: '경험치')),
-        VerticalDivider(),
-        Expanded(child: StatBox(value: '중급', label: '코스')),
-        VerticalDivider(),
-        Expanded(child: StatBox(value: '2위', label: '랭킹')),
-      ],
+    return SizedBox(
+      height: 50,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(child: StatBox(value: '1100', label: '경험치')),
+          VerticalDivider(color: Theme.of(context).extension<CustomColors>()?.neutral80),
+          Expanded(child: StatBox(value: '중급', label: '코스')),
+          VerticalDivider(color: Theme.of(context).extension<CustomColors>()?.neutral80),
+          Expanded(child: StatBox(value: '2위', label: '랭킹')),
+        ],
+      ),
     );
   }
 }
@@ -206,41 +209,48 @@ class ProgressChart extends StatelessWidget {
       TimeData(domain: DateTime(2025, 1, 12), measure: 8),
     ];
 
-    return SizedBox(
-      height: 200,
-      child: DChartBarT(
-        fillColor: (group, timeData, index) {
-          String day = DateFormat.E('ko').format(timeData.domain).substring(0, 1);
-          return Theme.of(context).extension<CustomColors>()?.primary;
-        },
-        configRenderBar: ConfigRenderBar(
-          barGroupInnerPaddingPx: 10,
-          radius: 12,  // 막대 모서리 라운드 처리
-        ),
-        domainAxis: DomainAxis(
-          showLine: true,
-          tickLength: 0,
-          gapAxisToLabel: 12,
-          labelStyle: LabelStyle(
-            color: Theme.of(context).colorScheme.onSurface,
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, '/mypage/info/statistics');
+      },
+      child: AbsorbPointer( // 내부 그래프 터치 이벤트를 무시하고 InfoCard의 onTap 동작
+        child: SizedBox(
+          height: 200,
+          child: DChartBarT(
+            fillColor: (group, timeData, index) {
+              String day = DateFormat.E('ko').format(timeData.domain).substring(0, 1);
+              return Theme.of(context).extension<CustomColors>()?.primary;
+            },
+            configRenderBar: ConfigRenderBar(
+              barGroupInnerPaddingPx: 10,
+              radius: 12,
+            ),
+            domainAxis: DomainAxis(
+              showLine: true,
+              tickLength: 0,
+              gapAxisToLabel: 12,
+              labelStyle: LabelStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              tickLabelFormatterT: (domain) {
+                return DateFormat.E('ko').format(domain).substring(0, 1);
+              },
+            ),
+            measureAxis: const MeasureAxis(
+              showLine: true,
+            ),
+            groupList: [
+              TimeGroup(
+                id: '1',
+                data: series1.map((e) => TimeData(
+                  domain: e.domain,
+                  measure: e.measure,
+                )).toList(),
+                color: Colors.transparent,
+              ),
+            ],
           ),
-          tickLabelFormatterT: (domain) {
-            return DateFormat.E('ko').format(domain).substring(0, 1);
-          },
         ),
-        measureAxis: const MeasureAxis(
-          showLine: true,
-        ),
-        groupList: [
-          TimeGroup(
-            id: '1',
-            data: series1.map((e) => TimeData(
-              domain: e.domain,
-              measure: e.measure, // 0~1 사이 값 -> 0~10으로 변환
-            )).toList(),
-            color: Colors.transparent,
-          ),
-        ],
       ),
     );
   }
