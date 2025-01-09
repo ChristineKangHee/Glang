@@ -2,7 +2,7 @@
 /// Purpose: 메인 화면
 /// Author: 박민준
 /// Created: 2025-01-02
-/// Last Modified: 2025-01-03 by 박민준
+/// Last Modified: 2025-01-09 by 박민준
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +72,10 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
                 SizedBox(height: 24.h,),
 
                 //TODO: 이번달 학습 기록 위젯
-                LearningSection(customColors: customColors),
+                InkWell(
+                  onTap: () => Navigator.pushNamed(context, "/mypage/statistics"),
+                  child: LearningSection(customColors: customColors),
+                ),
 
                 // ElevatedButton(
                 //   onPressed: showNotification,

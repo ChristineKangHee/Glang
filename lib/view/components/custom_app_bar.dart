@@ -95,6 +95,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return AppBar(
+      scrolledUnderElevation: 0,
       leading: Container(child: Image.asset('assets/images/appleicon.png')),// logo 부분. 추후 진짜 로고로 바꿀 것
       title: Text(
         title,
@@ -135,6 +136,7 @@ class CustomAppBar_Logo extends StatelessWidget implements PreferredSizeWidget {
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return AppBar(
+      scrolledUnderElevation: 0,
       leading: Container(child: Image.asset('assets/images/appleicon.png')),// logo 부분. 추후 진짜 로고로 바꿀 것
       actions: [// 이 부분에 아이콘 버튼을 추가
         IconButton(
@@ -169,6 +171,7 @@ class CustomAppBar_Course extends StatelessWidget implements PreferredSizeWidget
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return AppBar(
+      scrolledUnderElevation: 0,
       title: Text(
         "course_title",
         style: heading_small(context).copyWith(color: customColors.neutral30),
@@ -199,6 +202,7 @@ class CustomAppBar_Community extends StatelessWidget implements PreferredSizeWid
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return AppBar(
+      scrolledUnderElevation: 0,
       title: Text(
         "community_title",
         style: heading_small(context).copyWith(color: customColors.neutral30),
@@ -235,6 +239,7 @@ class CustomAppBar_MyPage extends StatelessWidget implements PreferredSizeWidget
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return AppBar(
+      scrolledUnderElevation: 0,
       title: Text(
         "mypage_title",
         style: heading_small(context).copyWith(color: customColors.neutral30),
@@ -272,6 +277,7 @@ class CustomAppBar_Logo_only extends StatelessWidget implements PreferredSizeWid
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return AppBar(
+      scrolledUnderElevation: 0,
       leading: Container(child: Image.asset('assets/images/appleicon.png')),// logo 부분. 추후 진짜 로고로 바꿀 것
       backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
@@ -303,6 +309,7 @@ class CustomAppBar_2depth_1 extends StatelessWidget implements PreferredSizeWidg
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return AppBar(
+      scrolledUnderElevation: 0,
       leading: IconButton(
         icon: Icon(Icons.navigate_before, color: customColors.neutral30),
         onPressed: () {
@@ -346,6 +353,7 @@ class CustomAppBar_2depth_2 extends StatelessWidget implements PreferredSizeWidg
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return AppBar(
+      scrolledUnderElevation: 0,
       leading: IconButton(
         icon: Icon(Icons.navigate_before, color: customColors.neutral30),
         onPressed: () {
@@ -391,6 +399,7 @@ class CustomAppBar_2depth_3 extends StatelessWidget implements PreferredSizeWidg
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return AppBar(
+      scrolledUnderElevation: 0,
       bottom: bottom,
       leading: IconButton(
         icon: Icon(Icons.navigate_before, color: customColors.neutral30),
@@ -439,6 +448,7 @@ class CustomAppBar_2depth_4 extends StatelessWidget implements PreferredSizeWidg
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return AppBar(
+      scrolledUnderElevation: 0,
       bottom: bottom,
       leading: IconButton(
         icon: Icon(Icons.navigate_before, color: customColors.neutral30),
@@ -483,6 +493,7 @@ class CustomAppBar_2depth_5 extends StatelessWidget implements PreferredSizeWidg
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return AppBar(
+      scrolledUnderElevation: 0,
       bottom: bottom,
       leading: IconButton(
         icon: Icon(Icons.navigate_before, color: customColors.neutral30),

@@ -25,6 +25,7 @@
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize"
             android:showWhenLocked="true"
+            android:enableOnBackInvokedCallback="true"
             android:turnScreenOn="true">
 
             <!-- Specifies an Android theme to apply to this Activity as soon as

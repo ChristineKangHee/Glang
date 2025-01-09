@@ -1,17 +1,20 @@
-/// 파일: nickname_input.dart
-/// 목적: 별명 입력 textfield 포함된 페이지
-/// 작성자: 강희
-/// 생성일: 2024-01-07
-/// 마지막 수정: 2025-01-08 by 강희
+/// File: nickname_input.dart
+/// Purpose: 별명 입력 및 검증을 위한 UI 구현, Firestore를 통해 닉네임 중복 확인 및 저장 처리
+/// Author: 박민준
+/// Created: 2025-01-06
+/// Last Modified: 2025-01-07 by 박민준
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../components/custom_app_bar.dart';
 import '../components/custom_button.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../components/custom_textfield.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+//TODO: Error Message 출력(닉네임 겹칠)시 버튼 색 바뀌게하기
 
 class NicknameInput extends ConsumerStatefulWidget {
   const NicknameInput({super.key});
@@ -23,7 +26,7 @@ class NicknameInput extends ConsumerStatefulWidget {
 class _NicknameInputState extends ConsumerState<NicknameInput> {
   final TextEditingController _controller = TextEditingController();
   String? errorMessage;
-  final List<String> existingNicknames = ['user1', 'user2', 'admin'];
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -31,14 +34,63 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
     final isInputValid = _controller.text.isNotEmpty &&
         _controller.text.length >= 1 &&
         _controller.text.length <= 8 &&
-        !existingNicknames.contains(_controller.text) &&
         !_controller.text.contains(' ');
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: CustomAppBar_Logo(),
-        resizeToAvoidBottomInset: false,
-        body: Column(
+    Future<void> _saveNickname() async {
+      setState(() {
+        isLoading = true; // 로딩 상태 활성화
+      });
+
+      final nickname = _controller.text.trim();
+      final user = FirebaseAuth.instance.currentUser; // 현재 로그인한 사용자 가져오기
+
+      if (user != null) {
+        try {
+          // Firestore에서 기존 닉네임 확인
+          final nicknameDoc = FirebaseFirestore.instance.collection('nicknames').doc(nickname);
+          final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
+
+          final snapshot = await nicknameDoc.get();
+          if (snapshot.exists) {
+            // 닉네임이 이미 존재하는 경우
+            setState(() {
+              errorMessage = '이미 사용 중인 별명입니다.';
+            });
+          } else {
+            // Firestore에 닉네임 저장 및 사용자 상태 업데이트
+            await nicknameDoc.set({'uid': user.uid, 'created_at': FieldValue.serverTimestamp()});
+            await userDoc.update({
+              'nickname': nickname,
+              'nicknameSet': true, // 닉네임 설정 완료 상태 업데이트
+            });
+
+            // 성공 시 홈 화면으로 이동
+            if (context.mounted) {
+              Navigator.pushReplacementNamed(context, '/');
+            }
+          }
+        } catch (e) {
+          setState(() {
+            errorMessage = '별명을 저장하는 중 문제가 발생했습니다. 다시 시도해주세요.';
+          });
+          print('별명 저장 오류: $e');
+        } finally {
+          setState(() {
+            isLoading = false; // 로딩 상태 비활성화
+          });
+        }
+      } else {
+        setState(() {
+          errorMessage = '사용자 인증 정보를 확인할 수 없습니다.';
+        });
+      }
+    }
+
+    return Scaffold(
+      appBar: CustomAppBar_Logo(),
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: Column(
           children: [
             Expanded(
               child: Padding(
@@ -54,10 +106,10 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
                       const SizedBox(height: 24),
                       NicknameTextField(
                         controller: _controller,
-                        existingNicknames: existingNicknames,
+                        existingNicknames: [], // Firestore에서 가져오기 때문에 불필요
                         onChanged: (text, error) {
                           setState(() {
-                            errorMessage = error;
+                            errorMessage = null; // 입력 중 에러 메시지 초기화
                           });
                         },
                       ),
@@ -77,16 +129,16 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
             Container(
               width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.all(20),
-              child: isInputValid
+              child: isInputValid && !isLoading
                   ? ButtonPrimary(
-                function: () {
-                  print("별명 완료: ${_controller.text}");
-                },
+                function: _saveNickname,
                 title: '완료',
               )
                   : ButtonPrimary20(
                 function: () {
-                  print("완료되지 않음");
+                  setState(() {
+                    errorMessage = '별명을 올바르게 입력해주세요.';
+                  });
                 },
                 title: '완료',
               ),
