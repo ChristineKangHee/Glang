@@ -197,27 +197,25 @@ class ProgressChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<TimeData> series1 = [
-      TimeData(domain: DateTime(2025, 1, 1), measure: 0.7),
-      TimeData(domain: DateTime(2025, 1, 2), measure: 0.5),
-      TimeData(domain: DateTime(2025, 1, 3), measure: 0.9),
-      TimeData(domain: DateTime(2025, 1, 4), measure: 1.0),
-      TimeData(domain: DateTime(2025, 1, 5), measure: 0.6),
-      TimeData(domain: DateTime(2025, 1, 6), measure: 0.1),
-      TimeData(domain: DateTime(2025, 1, 7), measure: 0.8),
+      TimeData(domain: DateTime(2025, 1, 6), measure: 7),
+      TimeData(domain: DateTime(2025, 1, 7), measure: 5),
+      TimeData(domain: DateTime(2025, 1, 8), measure: 9),
+      TimeData(domain: DateTime(2025, 1, 9), measure: 10),
+      TimeData(domain: DateTime(2025, 1, 10), measure: 6),
+      TimeData(domain: DateTime(2025, 1, 11), measure: 1),
+      TimeData(domain: DateTime(2025, 1, 12), measure: 8),
     ];
 
     return SizedBox(
-      height: 270,
+      height: 200,
       child: DChartBarT(
         fillColor: (group, timeData, index) {
           String day = DateFormat.E('ko').format(timeData.domain).substring(0, 1);
-          return (day == '토' || day == '일')
-              ? Theme.of(context).extension<CustomColors>()?.primary40
-              : Theme.of(context).extension<CustomColors>()?.primary;
+          return Theme.of(context).extension<CustomColors>()?.primary;
         },
         configRenderBar: ConfigRenderBar(
-          barGroupInnerPaddingPx: 8,
-          radius: 20,  // 막대 모서리 라운드 처리
+          barGroupInnerPaddingPx: 10,
+          radius: 12,  // 막대 모서리 라운드 처리
         ),
         domainAxis: DomainAxis(
           showLine: true,
@@ -227,7 +225,7 @@ class ProgressChart extends StatelessWidget {
             color: Theme.of(context).colorScheme.onSurface,
           ),
           tickLabelFormatterT: (domain) {
-            return DateFormat.E('ko').format(domain).substring(0, 1);  // '월', '화' 등
+            return DateFormat.E('ko').format(domain).substring(0, 1);
           },
         ),
         measureAxis: const MeasureAxis(
@@ -236,7 +234,10 @@ class ProgressChart extends StatelessWidget {
         groupList: [
           TimeGroup(
             id: '1',
-            data: series1,
+            data: series1.map((e) => TimeData(
+              domain: e.domain,
+              measure: e.measure, // 0~1 사이 값 -> 0~10으로 변환
+            )).toList(),
             color: Colors.transparent,
           ),
         ],
@@ -245,20 +246,30 @@ class ProgressChart extends StatelessWidget {
   }
 }
 
-/// 배지 리스트를 표시 위젯
+/// 배지 리스트를 표시하는 위젯
 class BadgeRow extends StatelessWidget {
   const BadgeRow({super.key});
 
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
+
     return Row(
       children: [
-        BadgeBox(label: '첫학습', color: customColors.primary ?? Colors.indigoAccent),
+        BadgeBox(
+          label: '첫학습',
+          isUnlocked: true, // 획득한 배지
+        ),
         const SizedBox(width: 16),
-        BadgeBox(label: '7일 연속', color: customColors.primary ?? Colors.indigoAccent),
+        BadgeBox(
+          label: '7일 연속',
+          isUnlocked: true, // 획득한 배지
+        ),
         const SizedBox(width: 16),
-        BadgeBox(label: '미획득', color: customColors.primary ?? Colors.indigoAccent),
+        BadgeBox(
+          label: '미획득',
+          isUnlocked: false, // 미획득 배지
+        ),
       ],
     );
   }
@@ -267,16 +278,17 @@ class BadgeRow extends StatelessWidget {
 /// 배지 박스 위젯
 class BadgeBox extends StatelessWidget {
   final String label;
-  final Color color;
+  final bool isUnlocked;
 
   const BadgeBox({
     required this.label,
-    required this.color,
+    required this.isUnlocked,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
     return Column(
       children: [
         Container(
@@ -284,13 +296,21 @@ class BadgeBox extends StatelessWidget {
           height: 62,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: color,
+            color: isUnlocked ? (customColors.primary ?? Colors.indigoAccent) : (customColors.neutral80 ?? Colors.grey),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: const Center(child: Icon(Icons.star, color: Colors.white)),
+          child: Center(
+            child: Icon(
+              isUnlocked ? Icons.check : Icons.lock,
+              color: isUnlocked ? (customColors.neutral100 ?? Colors.white) : (customColors.neutral30 ?? Colors.black26)
+            ),
+          ),
         ),
         const SizedBox(height: 8),
-        Text(label, style: pretendardRegular(context).copyWith(fontSize: 12)),
+        Text(
+          label,
+          style: pretendardRegular(context).copyWith(fontSize: 12),
+        ),
       ],
     );
   }
@@ -351,37 +371,45 @@ class InfoCard extends StatelessWidget {
             BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 2, offset: const Offset(0, 1)),
           ],
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (leadingIcon != null) ...[
-                  Icon(leadingIcon, size: 24, color: Colors.black),
-                  const SizedBox(width: 12),
-                ],
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      title,
-                      style: pretendardSemiBold(context).copyWith(fontSize: 18),
-                    ),
-                    if (description != null) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        description!,
-                        style: pretendardRegular(context).copyWith(fontSize: 18, color: Colors.black),
-                      ),
+                    if (leadingIcon != null) ...[
+                      Icon(leadingIcon, size: 24, color: Colors.black),
+                      const SizedBox(width: 12),
                     ],
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: pretendardSemiBold(context).copyWith(fontSize: 18),
+                        ),
+                        if (description != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            description!,
+                            style: pretendardRegular(context).copyWith(fontSize: 16, color: Colors.black),
+                          ),
+                        ],
+                      ],
+                    ),
                   ],
                 ),
+                if (trailingIcon != null)
+                  Icon(trailingIcon, size: 20, color: Colors.black54),
               ],
             ),
-            if (trailingIcon != null)
-              Icon(trailingIcon, size: 20, color: Colors.black54),
+            if (child != null) ...[
+              const SizedBox(height: 16), // child와 상단 텍스트 간격
+              child!,
+            ],
           ],
         ),
       ),
