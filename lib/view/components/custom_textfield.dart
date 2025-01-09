@@ -21,6 +21,7 @@ class NicknameTextField extends StatelessWidget {
     required this.controller,
     required this.existingNicknames,
     required this.onChanged,
+    InputDecoration? decoration,
   }) : super(key: key);
 
   @override

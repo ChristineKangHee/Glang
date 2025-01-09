@@ -74,7 +74,7 @@ class MyPageContent extends StatelessWidget {
               child: const ProgressChart(),
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
-                Navigator.pushNamed(context, '/mypage/statistics');
+                Navigator.pushNamed(context, '/mypage/info/statistics');
               },
             ),
             const SizedBox(height: 16),
@@ -84,7 +84,7 @@ class MyPageContent extends StatelessWidget {
               child: const BadgeRow(),
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
-                Navigator.pushNamed(context, '/mypage/badge');
+                Navigator.pushNamed(context, '/mypage/info/badge');
               },
             ),
             const SizedBox(height: 16),
@@ -94,7 +94,7 @@ class MyPageContent extends StatelessWidget {
               title: '저장',
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
-                Navigator.pushNamed(context, '/mypage/saved');
+                Navigator.pushNamed(context, '/mypage/info/saved');
               },
             ),
             const SizedBox(height: 16),
@@ -104,7 +104,7 @@ class MyPageContent extends StatelessWidget {
               title: '학습 기록',
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
-                Navigator.pushNamed(context, '/mypage/history');
+                Navigator.pushNamed(context, '/mypage/info/history');
               },
             ),
           ],
@@ -144,12 +144,12 @@ class UserProfileSection extends StatelessWidget {
             children: [
               Text('하나둘셋제로', style: heading_small(context)),
               const SizedBox(height: 12),
-              GestureDetector(
+              InkWell(
                 onTap: () {
                   Navigator.pushNamed(context, '/mypage/edit_profile');
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                   decoration: BoxDecoration(
                     color: customColors.neutral90,
                     borderRadius: BorderRadius.circular(12),
@@ -180,11 +180,11 @@ class UserStatsSection extends StatelessWidget {
     return const Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        StatBox(value: '1100', label: '경험치'),
+        Expanded(child: StatBox(value: '1100', label: '경험치')),
         VerticalDivider(),
-        StatBox(value: '중급', label: '코스'),
+        Expanded(child: StatBox(value: '중급', label: '코스')),
         VerticalDivider(),
-        StatBox(value: '2위', label: '랭킹'),
+        Expanded(child: StatBox(value: '2위', label: '랭킹')),
       ],
     );
   }
@@ -309,15 +309,12 @@ class StatBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 67,
-      child: Column(
-        children: [
-          Text(value, style: pretendardSemiBold(context).copyWith(fontSize: 20)),
-          const SizedBox(height: 4),
-          Text(label, style: pretendardRegular(context).copyWith(fontSize: 12)),
-        ],
-      ),
+    return Column(
+      children: [
+        Text(value, style: pretendardSemiBold(context).copyWith(fontSize: 20)),
+        const SizedBox(height: 4),
+        Text(label, style: pretendardRegular(context).copyWith(fontSize: 12)),
+      ],
     );
   }
 }
@@ -343,7 +340,7 @@ class InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(20),
