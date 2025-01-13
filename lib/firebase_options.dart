@@ -41,48 +41,50 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBieru0BI0uAS6xViG97DJVjB7Dc7JkI_Y',
-    appId: '1:335914399889:web:8b66082074564a237a2730',
-    messagingSenderId: '335914399889',
-    projectId: 'readventure-d8d78',
-    authDomain: 'readventure-d8d78.firebaseapp.com',
-    storageBucket: 'readventure-d8d78.firebasestorage.app',
-    measurementId: 'G-N51BB8B6B1',
+    apiKey: 'AIzaSyAxLCd3CWWLgU32pcwTvOKpDZPwA9PVen8',
+    appId: '1:194910563832:web:716469d5001f73d4c5fa0d',
+    messagingSenderId: '194910563832',
+    projectId: 'glang-98622',
+    authDomain: 'glang-98622.firebaseapp.com',
+    storageBucket: 'glang-98622.firebasestorage.app',
+    measurementId: 'G-2CKZ7NSNCS',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCY7v7vJsLTudBL-O5fUTtZvcPk-rFNy_o',
-    appId: '1:335914399889:android:c3f1555dc1c85f287a2730',
-    messagingSenderId: '335914399889',
-    projectId: 'readventure-d8d78',
-    storageBucket: 'readventure-d8d78.firebasestorage.app',
+    apiKey: 'AIzaSyC5HC3E_yewyCSEel9WIw16RsG8eAR9Nc8',
+    appId: '1:194910563832:android:42afafeded30a1fbc5fa0d',
+    messagingSenderId: '194910563832',
+    projectId: 'glang-98622',
+    storageBucket: 'glang-98622.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCyLILDA0KINjGFinCJWr2OP2ZskqTci98',
-    appId: '1:335914399889:ios:787f700231de158b7a2730',
-    messagingSenderId: '335914399889',
-    projectId: 'readventure-d8d78',
-    storageBucket: 'readventure-d8d78.firebasestorage.app',
-    iosBundleId: 'com.example.readventure',
+    apiKey: 'AIzaSyBHY6zKwK70eyWNIMh9Db11QWMJDv5qv5I',
+    appId: '1:194910563832:ios:facfee0cfdcde896c5fa0d',
+    messagingSenderId: '194910563832',
+    projectId: 'glang-98622',
+    storageBucket: 'glang-98622.firebasestorage.app',
+    iosClientId: '194910563832-epg4uecivnmc7fl219fqjep0r9stsc8u.apps.googleusercontent.com',
+    iosBundleId: 'com.zero.glang',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCyLILDA0KINjGFinCJWr2OP2ZskqTci98',
-    appId: '1:335914399889:ios:787f700231de158b7a2730',
-    messagingSenderId: '335914399889',
-    projectId: 'readventure-d8d78',
-    storageBucket: 'readventure-d8d78.firebasestorage.app',
+    apiKey: 'AIzaSyBHY6zKwK70eyWNIMh9Db11QWMJDv5qv5I',
+    appId: '1:194910563832:ios:86359fe9f0d2daa0c5fa0d',
+    messagingSenderId: '194910563832',
+    projectId: 'glang-98622',
+    storageBucket: 'glang-98622.firebasestorage.app',
+    iosClientId: '194910563832-l41ru5t3vakp4c9fpkk6u40pg7vh5uat.apps.googleusercontent.com',
     iosBundleId: 'com.example.readventure',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBieru0BI0uAS6xViG97DJVjB7Dc7JkI_Y',
-    appId: '1:335914399889:web:b02ae0742e885e0c7a2730',
-    messagingSenderId: '335914399889',
-    projectId: 'readventure-d8d78',
-    authDomain: 'readventure-d8d78.firebaseapp.com',
-    storageBucket: 'readventure-d8d78.firebasestorage.app',
-    measurementId: 'G-L712P6D0PV',
+    apiKey: 'AIzaSyAxLCd3CWWLgU32pcwTvOKpDZPwA9PVen8',
+    appId: '1:194910563832:web:becc5f13082af544c5fa0d',
+    messagingSenderId: '194910563832',
+    projectId: 'glang-98622',
+    authDomain: 'glang-98622.firebaseapp.com',
+    storageBucket: 'glang-98622.firebasestorage.app',
+    measurementId: 'G-MN60G45PYP',
   );
 }

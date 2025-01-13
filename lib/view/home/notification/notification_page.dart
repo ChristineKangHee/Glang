@@ -1,3 +1,9 @@
+/// File: notification_page.dart
+/// Purpose: 알림 탭별 내용을 표시하고, 데이터 필터링 및 새로고침 기능을 제공하는 화면 구현
+/// Author: 박민준
+/// Created: 2025-01-03
+/// Last Modified: 2025-01-07 by 박민준
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';

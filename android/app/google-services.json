@@ -1,49 +1,34 @@
 {
   "project_info": {
-    "project_number": "335914399889",
-    "project_id": "readventure-d8d78",
-    "storage_bucket": "readventure-d8d78.firebasestorage.app"
+    "project_number": "194910563832",
+    "project_id": "glang-98622",
+    "storage_bucket": "glang-98622.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:335914399889:android:c3f1555dc1c85f287a2730",
+        "mobilesdk_app_id": "1:194910563832:android:42afafeded30a1fbc5fa0d",
         "android_client_info": {
-          "package_name": "com.zero.readventure"
+          "package_name": "com.zero.glang"
         }
       },
       "oauth_client": [
         {
-          "client_id": "335914399889-it23lqb50j8b977h0c74ftenrmog95nk.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.zero.readventure",
-            "certificate_hash": "fbb595a6ffdc09ad444ddf6055f2f23309bbf849"
-          }
-        },
-        {
-          "client_id": "335914399889-1e8gjapuk2vhhf6igmtvira7pal89fmh.apps.googleusercontent.com",
+          "client_id": "194910563832-rcd51ljo4ou93l4ooiinu7mmt41o64in.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCY7v7vJsLTudBL-O5fUTtZvcPk-rFNy_o"
+          "current_key": "AIzaSyC5HC3E_yewyCSEel9WIw16RsG8eAR9Nc8"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "335914399889-1e8gjapuk2vhhf6igmtvira7pal89fmh.apps.googleusercontent.com",
+              "client_id": "194910563832-rcd51ljo4ou93l4ooiinu7mmt41o64in.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "335914399889-7f486slrge0rli5qvueknjs8go87ed2e.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.readventure"
-              }
             }
           ]
         }

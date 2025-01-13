@@ -1,4 +1,4 @@
-package com.example.readventure
+package com.zero.glang
 
 import io.flutter.embedding.android.FlutterActivity
 
