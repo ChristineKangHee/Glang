@@ -15,6 +15,7 @@
         android:label="readventure"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+<!--        android:icon="@mipmap/ic_launcher">-->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -39,6 +40,19 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+                android:name="com.kakao.sdk.flutter.AuthCodeCustomTabsActivity"
+                android:exported="true">
+            <intent-filter android:label="flutter_web_auth">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- Redirect URI, "kakao${YOUR_NATIVE_APP_KEY}://oauth" 형식 -->
+                <data android:scheme="kakao5fc90edd56a963389d62ce93012c0c80" android:host="oauth"/>
             </intent-filter>
         </activity>
 
