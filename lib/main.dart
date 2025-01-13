@@ -14,7 +14,7 @@ import 'firebase_options.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:readventure/viewmodel/notification_controller.dart';
-// import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 void main() async {
   //////////////////// 세로 모드 고정 ////////////////////
@@ -50,10 +50,10 @@ void main() async {
   }
 
   // 카카오 로그인 (이전 코드)
-  // KakaoSdk.init(
-  //   nativeAppKey: '61dfe0fe1e4375a76b5c97938749086c',
-  //   javaScriptAppKey: 'b6a12ba6c8d0fda7a0ecec4569921a1d',
-  // );
+  KakaoSdk.init(
+    nativeAppKey: '5fc90edd56a963389d62ce93012c0c80',
+    javaScriptAppKey: '0e94fd00949264ca099b7626f5138e5a',
+  );
 
   //////////////////// 앱 실행 ////////////////////
   runApp(

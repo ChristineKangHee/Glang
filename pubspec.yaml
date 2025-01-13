@@ -53,6 +53,7 @@ dev_dependencies:
 
   # KaKaoTalk Login
   kakao_flutter_sdk_user: ^1.9.5
+#  kakao_flutter_sdk: ^1.9.6
 
   # Google Sign In
   google_sign_in: ^6.2.1

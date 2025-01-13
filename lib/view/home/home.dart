@@ -140,9 +140,9 @@ class LearningSection_Card extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Container(
-        width: 170.5.w,
-        height: 142.h,
-        padding: EdgeInsets.all(20.r),
+        width: 170.5,
+        height: 142,
+        padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -151,7 +151,7 @@ class LearningSection_Card extends StatelessWidget {
                 '$imageLink',
               ),
             ),
-            SizedBox(height: 8.h,),
+            SizedBox(height: 8,),
             Text("$title", style: heading_medium(context).copyWith(color: customColors.neutral30),),
             Text("$subtitle", style: body_xsmall_semi(context).copyWith(color: customColors.neutral60),),
           ],

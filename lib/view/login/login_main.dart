@@ -17,18 +17,36 @@ class LoginPage extends ConsumerWidget {
 
     return Scaffold(
       body: Center(
-        child: GestureDetector(
-          onTap: () {
-            authController.signInWithGoogle(
-              onNicknameRequired: () {
-                Navigator.pushReplacementNamed(context, '/nickname');
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: () {
+                authController.signInWithGoogle(
+                  onNicknameRequired: () {
+                    Navigator.pushReplacementNamed(context, '/nickname');
+                  },
+                  onHome: () {
+                    Navigator.pushReplacementNamed(context, '/');
+                  },
+                );
               },
-              onHome: () {
-                Navigator.pushReplacementNamed(context, '/');
+              child: const Text('Google 로그인'),
+            ),
+            GestureDetector(
+              onTap: () {
+                authController.signInWithKakao(
+                  onNicknameRequired: () {
+                    Navigator.pushReplacementNamed(context, '/nickname');
+                  },
+                  onHome: () {
+                    Navigator.pushReplacementNamed(context, '/');
+                  },
+                );
               },
-            );
-          },
-          child: const Text('Google 로그인'),
+              child: const Text('카카오 로그인'),
+            ),
+          ],
         ),
       ),
     );
