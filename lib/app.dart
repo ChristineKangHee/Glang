@@ -8,6 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:readventure/view/community/community_main.dart';
 import 'package:readventure/view/course/course_main.dart';
+import 'package:readventure/view/feature/after_read/AR_main.dart';
+import 'package:readventure/view/feature/before_read/BR_main.dart';
+import 'package:readventure/view/feature/reading/RD_main.dart';
 import 'package:readventure/view/home/example.dart';
 import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/home/notification/notification_page.dart';
@@ -64,6 +67,9 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
           initialRoute: '/login', // 초기 경로 설정 (스플래시 페이지로 변경 예정)
           routes: {
             '/': (context) => const MyHomePage(),
+            '/armain': (context) => const ArMain(),
+            '/brmain': (context) => const BrMain(),
+            '/rdmain': (context) => const RdMain(),
             '/login': (context) => const LoginPage(),
             '/nickname': (context) => const NicknameInput(),
             '/notification': (context) => const NotificationPage(),
