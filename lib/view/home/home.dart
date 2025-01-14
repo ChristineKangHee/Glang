@@ -82,6 +82,19 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
                 //   child: Text('Show Notification'),
                 // ),
 
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, "/brmain"),
+                  child: Text('읽기 전 코스 이동'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, "/rdmain"),
+                  child: Text('읽기 중 코스 이동'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, "/armain"),
+                  child: Text('읽기 후 코스 이동'),
+                ),
+
               ],
             ),
           ),
@@ -112,9 +125,9 @@ class LearningSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            LearningSection_Card(customColors: customColors, imageLink: imageLink_1, title: "4시간 30분", subtitle: "학습 시간",),
-            // SizedBox(width: 20,),
-            LearningSection_Card(customColors: customColors, imageLink: imageLink_2, title: "32개", subtitle: "완료한 미션",),
+            Expanded(child: LearningSection_Card(customColors: customColors, imageLink: imageLink_1, title: "4시간 30분", subtitle: "학습 시간",)),
+            SizedBox(width: 20,),
+            Expanded(child: LearningSection_Card(customColors: customColors, imageLink: imageLink_2, title: "32개", subtitle: "완료한 미션",)),
           ],
         ),
       ],
@@ -140,7 +153,7 @@ class LearningSection_Card extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Container(
-        width: 170.5,
+        // width: 170.5.w,
         height: 142,
         padding: EdgeInsets.all(20),
         child: Column(
@@ -288,7 +301,7 @@ class CustomCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.favorite, size: 16.sp, color: customColors.neutral60,),
+                      Icon(Icons.favorite, size: 16, color: customColors.neutral60,),
                       SizedBox(width: 4.w,),
                       Text("67", style: body_xsmall_semi(context).copyWith(color: customColors.neutral60),),
                       SizedBox(width: 8.w,),
@@ -296,7 +309,7 @@ class CustomCard extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      Icon(Icons.visibility, size: 16.sp, color: customColors.neutral60,),
+                      Icon(Icons.visibility, size: 16, color: customColors.neutral60,),
                       SizedBox(width: 4.w,),
                       Text("203", style: body_xsmall_semi(context).copyWith(color: customColors.neutral60),),
                       SizedBox(width: 8.w,),
