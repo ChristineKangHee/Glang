@@ -72,6 +72,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../theme/theme.dart';
 import '../../theme/font.dart';
 import '../../viewmodel/custom_colors_provider.dart';
+import 'dart:async';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////        1 Depth App Bar        //////////////////////////////////////
@@ -612,5 +613,92 @@ class CustomAppBar_2depth_7 extends StatelessWidget implements PreferredSizeWidg
     // bottom의 높이를 고려하여 AppBar의 총 높이를 반환
     final bottomHeight = bottom?.preferredSize.height ?? 0.0;
     return Size.fromHeight(kToolbarHeight + bottomHeight);
+  }
+}
+
+class CustomAppBar_2depth_8 extends StatefulWidget implements PreferredSizeWidget {
+  final String title;
+  final Color? backgroundColor;
+  // final Function()? onIconPressed;
+
+  const CustomAppBar_2depth_8({
+    Key? key,
+    required this.title,
+    this.backgroundColor,
+    // this.onIconPressed,
+  }) : super(key: key);
+
+  @override
+  _CustomAppBar_2depth_8State createState() => _CustomAppBar_2depth_8State();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class _CustomAppBar_2depth_8State extends State<CustomAppBar_2depth_8> {
+  late Timer _timer;
+  int _elapsedSeconds = 0; // 학습 시간 초기화
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _elapsedSeconds++;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel(); // 타이머 정리
+    super.dispose();
+  }
+
+  String _formatTime(int seconds) {
+    final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
+    final secs = (seconds % 60).toString().padLeft(2, '0');
+    return "$minutes:$secs";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      scrolledUnderElevation: 0,
+      leading: Container(
+        width: 59,
+        height: 32,
+        decoration: BoxDecoration(
+          color: customColors.neutral90, borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          _formatTime(_elapsedSeconds), // 타이머 표시
+          style: TextStyle(
+            color: customColors.neutral30,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
+      ),
+      title: Text(
+        widget.title,
+        style: heading_xsmall(context).copyWith(color: customColors.neutral30),
+      ).tr(),
+      centerTitle: true,
+      actions: [
+        IconButton(
+          icon: Icon(Icons.close, color: customColors.neutral30, size: 28),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ],
+      backgroundColor: widget.backgroundColor ?? customColors.neutral100,
+      elevation: 0,
+    );
   }
 }

@@ -18,7 +18,7 @@ import '../../util/box_shadow_styles.dart';
     1. 앱 기본 사용 버튼 (앱 Primary 컬러)
     Container(
       width: MediaQuery.of(context).size.width,
-      child: Button(
+      child: ButtonPrimary(
         function: () {
           print("Button pressed");
           //function 은 상황에 맞게 재 정의 할 것.
