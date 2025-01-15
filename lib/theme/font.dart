@@ -315,7 +315,7 @@ TextStyle body_xxsmall(BuildContext context) {
 
 TextStyle reading_exercise(BuildContext context) {
     return GoogleFonts.notoSerif(
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w400,
         fontSize: 16,
         height: 1.8, // 줄 간격
         letterSpacing: 0.0, // 자간
