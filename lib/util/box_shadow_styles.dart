@@ -23,25 +23,29 @@ class BoxShadowStyles {
   // 첫 번째 그림자 스타일을 제공하는 함수입니다. BuildContext를 받아 현재 테마를 접근합니다.
   static List<BoxShadow> shadow1(BuildContext context) {
     // 현재 테마에서 CustomColors 확장을 가져옵니다.
-    final customColors = Theme.of(context).extension<CustomColors>()!;
+    final customColors = Theme.of(context).extension<CustomColors>();
+
+    // customColors가 null일 경우 기본값을 제공
+    final neutral80 = customColors?.neutral80 ?? Colors.grey;
 
     return [
       // 첫 번째 BoxShadow 정의
       BoxShadow(
-        color: customColors.neutral80!, // 테마에서 정의한 그림자 색상
+        color: neutral80, // 그림자 색상 (기본값 사용)
         blurRadius: 2, // 그림자의 흐림 정도
         offset: Offset(0, 0), // 오프셋 없음 (그림자가 요소 바로 아래에 위치)
         spreadRadius: 0, // 확산 없음 (그림자 크기 변화 없음)
       ),
       // 두 번째 BoxShadow 정의 (약간의 오프셋 추가)
       BoxShadow(
-        color: customColors.neutral80!, // 테마에서 정의한 그림자 색상
+        color: neutral80, // 그림자 색상 (기본값 사용)
         blurRadius: 2, // 그림자의 흐림 정도
         offset: Offset(0, 1), // 세로로 살짝 내려간 오프셋
         spreadRadius: 0, // 확산 없음
       ),
     ];
   }
+
 
   // 두 번째 그림자 스타일을 제공하는 함수입니다. 더 강렬한 효과를 가집니다.
   static List<BoxShadow> shadow2(BuildContext context) {
