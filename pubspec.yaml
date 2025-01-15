@@ -41,7 +41,7 @@ dev_dependencies:
   http: ^1.2.1
   dart_openai: ^5.1.0
   permission_handler: ^11.1.0 # 권한 처리
-  flutter_local_notifications: ^18.0.1  # local 알림 설정
+#  flutter_local_notifications: ^18.0.1  # local 알림 설정
   flutter_svg: ^2.0.16 # svg 파일 사용 위함
 
 

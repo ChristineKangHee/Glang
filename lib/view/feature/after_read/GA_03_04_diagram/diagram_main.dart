@@ -123,38 +123,42 @@ class RootedTreeScreen extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         if (label.isNotEmpty) {
-          // 원래 위치로 단어 반환
+          // Return the word to the word list if the node has a label
           ref.read(wordListProvider.notifier).state = [
             ...ref.read(wordListProvider),
             label
           ];
 
-          // 노드 라벨 초기화
+          // Clear the node label
           ref.read(nodeLabelProvider.notifier).updateNodeLabel(nodeId, "");
         }
       },
       child: DragTarget<String>(
         onAccept: (droppedWord) {
-          // Update node label and remove word from list
+          // Update the node label and remove the word from the list
           ref.read(nodeLabelProvider.notifier).updateNodeLabel(nodeId, droppedWord);
           ref.read(wordListProvider.notifier).removeWord(droppedWord);
         },
-        onWillAccept: (data) => true,
+        onWillAccept: (data) {
+          // Prevent accepting the word if the node already has a label
+          return label.isEmpty; // Allow if the node is empty
+        },
         builder: (context, candidateData, rejectedData) {
           return Container(
-            width: 100, // 고정 너비
-            height: 50, // 고정 높이
+            width: 100, // Fixed width
+            height: 50, // Fixed height
             alignment: Alignment.center,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               color: candidateData.isNotEmpty ? Colors.green.shade100 : customColors.primary60,
             ),
-            child: Text(label.isEmpty ? " " : label), // 빈 문자열 처리
+            child: Text(label.isEmpty ? " " : label), // Display the label or empty space
           );
         },
       ),
     );
   }
+
 }
 
 class WordListWidget extends ConsumerWidget {
@@ -164,16 +168,17 @@ class WordListWidget extends ConsumerWidget {
     final wordList = ref.watch(wordListProvider);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), // Padding of 16 on all sides
-      width: double.infinity, // Make the widget take up the full screen width
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      width: double.infinity,
       decoration: ShapeDecoration(
         color: customColors.neutral100,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min, // Make the height hug the content
+      child: Wrap(
+        spacing: 8.0, // Horizontal space between items
+        runSpacing: 8.0, // Vertical space between rows
         children: wordList
             .map((word) => Padding(
           padding: const EdgeInsets.only(right: 8.0),
