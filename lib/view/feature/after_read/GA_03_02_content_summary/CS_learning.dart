@@ -8,14 +8,14 @@ import '../widget/CustomAlertDialog.dart';
 import '../widget/text_section.dart';
 import '../widget/title_section_recycle.dart';
 
-class CELearning extends StatefulWidget {
-  const CELearning({super.key});
+class CSLearning extends StatefulWidget {
+  const CSLearning({super.key});
 
   @override
-  State<CELearning> createState() => _CELearningState();
+  State<CSLearning> createState() => _CELearningState();
 }
 
-class _CELearningState extends State<CELearning> {
+class _CELearningState extends State<CSLearning> {
   final TextEditingController _controller = TextEditingController();
   bool _isButtonEnabled = false;
 
