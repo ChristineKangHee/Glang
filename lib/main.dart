@@ -33,8 +33,8 @@ void main() async {
   }
 
   // local notification
-  await requestNotificationPermission();
-  await initializeNotifications();
+  // await requestNotificationPermission();
+  // await initializeNotifications();
 
   // Easy Localization 초기화
   await EasyLocalization.ensureInitialized();
