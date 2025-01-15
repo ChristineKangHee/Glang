@@ -619,7 +619,7 @@ class CustomAppBar_2depth_7 extends StatelessWidget implements PreferredSizeWidg
     return Size.fromHeight(kToolbarHeight + bottomHeight);
   }
 }
-
+////////////////////// 타이머 존재하는 앱바 //////////////////////
 class CustomAppBar_2depth_8 extends StatefulWidget implements PreferredSizeWidget {
   final String title;
   final Color? backgroundColor;
@@ -675,19 +675,32 @@ class _CustomAppBar_2depth_8State extends State<CustomAppBar_2depth_8> {
 
     return AppBar(
       scrolledUnderElevation: 0,
-      leading: Container(
-        width: 59,
-        height: 32,
-        decoration: BoxDecoration(
-          color: customColors.neutral90, borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          _formatTime(_elapsedSeconds), // 타이머 표시
-          style: TextStyle(
-            color: customColors.neutral30,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
+      leadingWidth: 100,
+      leading: Center(
+        // Center를 사용해 leading 영역 내에서 위젯을 가운데 정렬
+        child: Row(
+          children: [
+            SizedBox(width: 16,),
+            SizedBox(
+              width: 59, // 원하는 너비
+              height: 32, // 원하는 높이
+              child: Container(
+                decoration: BoxDecoration(
+                  color: customColors.neutral90,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.center, // 텍스트 중앙 정렬
+                child: Text(
+                  _formatTime(_elapsedSeconds), // 타이머 표시
+                  style: TextStyle(
+                    color: customColors.neutral30,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
       title: Text(

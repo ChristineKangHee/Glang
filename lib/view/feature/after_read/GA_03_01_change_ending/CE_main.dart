@@ -15,77 +15,163 @@ class ChangeEndingMain extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar_2depth_6(title: "결말 바꾸기"),
       body: SafeArea(
-          child: SingleChildScrollView(
-            child: Container(
-              height: 1.sh,
-              color: customColors.neutral90,
-              // padding: EdgeInsets.fromLTRB(16, 16, 16, 16),
-              child: Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(height: 117,),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("글의 결말을 읽고", style: body_medium_semi(context),),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text("나만의 결말", style: body_medium_semi(context).copyWith(color: customColors.primary)),
-                            Text("을 만들어볼까요?", style: body_medium_semi(context),),
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 51,),
-                    Container(
-                      width: 150,
-                      height: 150,
-                      decoration: ShapeDecoration(
-                        color: Color(0xFF514FFF),
-                        shape: OvalBorder(),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight, // 화면의 전체 높이에 맞추기
+                ),
+                child: Container(
+                  padding: EdgeInsets.fromLTRB(0, 16, 0, 16),
+                  color: customColors.neutral90,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: [
+                          SizedBox(height: 117.h),
+                          Title_Section(customColors: customColors),
+                          SizedBox(height: 51.h),
+                          Icon_Section(customColors: customColors),
+                        ],
                       ),
-                      child: Icon(Icons.import_contacts, color: customColors.neutral100, size: 80,),
-                    ),
-                    SizedBox(height: 173.h,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        SizedBox(width: 31,),
-                        Icon(Icons.import_contacts, color: customColors.primary40, size: 28,),
-                        SizedBox(width: 12,),
-                        Text("원문을 보려면 책 아이콘을 클릭하세요!", style: body_small(context),),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        SizedBox(width: 31,),
-                        Icon(Icons.access_time_filled, color: customColors.primary40, size: 28,),
-                        SizedBox(width: 12,),
-                        Text("학습을 시작하면 타이머가 작동해요!", style: body_small(context),),
-                      ],
-                    ),
-                    SizedBox(height: 50,),
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      child: ButtonPrimary(
-                        function: () {
-                          print("Button pressed");
-                          //function 은 상황에 맞게 재 정의 할 것.
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => CELearning()));
-                        },
-                        title: '시작하기',
-                        // 버튼 안에 들어갈 텍스트.
+                      Column(
+                        children: [
+                          SizedBox(height: 30.h),
+                          Description_Section(customColors: customColors),
+                          SizedBox(height: 50.h),
+                          Button_Section(),
+                        ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class Button_Section extends StatelessWidget {
+  const Button_Section({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ButtonPrimary(
+        function: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CELearning(),
             ),
-          )
-      )
+          );
+        },
+        title: '시작하기',
+      ),
+    );
+  }
+}
+
+class Description_Section extends StatelessWidget {
+  const Description_Section({
+    super.key,
+    required this.customColors,
+  });
+
+  final CustomColors customColors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(48.w,0,0,0),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(Icons.import_contacts,
+                  color: customColors.primary40, size: 28),
+              SizedBox(width: 12.w),
+              Text("원문을 보려면 책 아이콘을 클릭하세요!",
+                  style: body_small(context)),
+            ],
+          ),
+          SizedBox(height: 16.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(Icons.access_time_filled,
+                  color: customColors.primary40, size: 28),
+              SizedBox(width: 12.w),
+              Text("학습을 시작하면 타이머가 작동해요!",
+                  style: body_small(context)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class Icon_Section extends StatelessWidget {
+  const Icon_Section({
+    super.key,
+    required this.customColors,
+  });
+
+  final CustomColors customColors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 150,
+      height: 150,
+      decoration: const ShapeDecoration(
+        color: Color(0xFF514FFF),
+        shape: OvalBorder(),
+      ),
+      child: Icon(
+        Icons.import_contacts,
+        color: customColors.neutral100,
+        size: 80,
+      ),
+    );
+  }
+}
+
+class Title_Section extends StatelessWidget {
+  const Title_Section({
+    super.key,
+    required this.customColors,
+  });
+
+  final CustomColors customColors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text("글의 결말을 읽고", style: body_medium_semi(context)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "나만의 결말",
+              style: body_medium_semi(context)
+                  .copyWith(color: customColors.primary),
+            ),
+            Text("을 만들어볼까요?", style: body_medium_semi(context)),
+          ],
+        ),
+      ],
     );
   }
 }
