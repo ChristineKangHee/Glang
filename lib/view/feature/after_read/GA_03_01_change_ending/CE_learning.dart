@@ -6,7 +6,7 @@ import '../../../../theme/theme.dart';
 import '../widget/answer_section.dart';
 import '../widget/CustomAlertDialog.dart';
 import '../widget/text_section.dart';
-import '../widget/title_section_recycle.dart';
+import '../widget/title_section_learning.dart';
 
 class CELearning extends StatefulWidget {
   const CELearning({super.key});
