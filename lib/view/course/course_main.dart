@@ -378,10 +378,10 @@ class _CourseMainState extends State<CourseMain> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: CustomAppBar_Course(), // 코스 화면을 위한 커스텀 앱바.
-        body: Stack(
+    return Scaffold(
+      appBar: CustomAppBar_Course(), // 코스 화면을 위한 커스텀 앱바.
+      body: SafeArea(
+        child: Stack(
           children: [
             /// 섹션을 표시하고 스크롤을 처리하는 ListView.
             ListView.separated(
@@ -407,8 +407,8 @@ class _CourseMainState extends State<CourseMain> {
             CurrentSection(data: data[iCurrentSection]),
           ],
         ),
-        bottomNavigationBar: CustomNavigationBar(), // 커스텀 네비게이션 바.
       ),
+      bottomNavigationBar: CustomNavigationBar(), // 커스텀 네비게이션 바.
     );
   }
 }

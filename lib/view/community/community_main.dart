@@ -19,12 +19,10 @@ class CommunityMain extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider); // CustomColors 가져오기
 
-    return SafeArea(
-        child: Scaffold(
-          appBar: const CustomAppBar_Community(),
-          body: ChatScreen(),
-          bottomNavigationBar: const CustomNavigationBar(),
-        )
+    return const Scaffold(
+      appBar: CustomAppBar_Community(),
+      body: SafeArea(child: ChatScreen()),
+      bottomNavigationBar: CustomNavigationBar(),
     );
   }
 }

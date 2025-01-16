@@ -28,10 +28,10 @@ class _MyPageMainState extends ConsumerState<MyPageMain> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    return SafeArea(
-      child: Scaffold(
-        appBar: CustomAppBar_MyPage(),
-        body: Container(
+    return Scaffold(
+      appBar: CustomAppBar_MyPage(),
+      body: SafeArea(
+        child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -44,8 +44,8 @@ class _MyPageMainState extends ConsumerState<MyPageMain> with SingleTickerProvid
           ),
           child: const MyPageContent(), // 실제 화면 컨텐츠
         ),
-        bottomNavigationBar: CustomNavigationBar(),
       ),
+      bottomNavigationBar: CustomNavigationBar(),
     );
   }
 }
