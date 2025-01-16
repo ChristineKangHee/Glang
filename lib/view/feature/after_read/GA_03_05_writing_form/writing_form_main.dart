@@ -45,9 +45,7 @@ class _SentencePracticeState extends ConsumerState<SentencePractice> {
     final controllers = ref.watch(controllersProvider);
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_6(
-        title: '문장 구조 연습',
-      ),
+      appBar: CustomAppBar_2depth_8(title: '문장 구조 연습',),
       body: Column(
           children: [
             ExampleForm(context, customColors),
@@ -64,6 +62,7 @@ class _SentencePracticeState extends ConsumerState<SentencePractice> {
             Spacer(),
             // 제출하기 버튼 추가
             SubmitButton(context),
+            SizedBox(height: 24),
           ],
         ),
     );
