@@ -69,8 +69,8 @@ class _CELearningState extends State<WELearning> {
                       padding: const EdgeInsets.all(16.0),
                       child: TitleSection_withIcon(
                         customColors: Theme.of(context).extension<CustomColors>()!, // CustomColors 가져오기
-                        title: "글을 읽고 나만의 결말을 작성해보세요!",               // 제목
-                        subtitle: "<토끼 가족 이야기>",                           // 부제목
+                        title: "자신의 경험과 의견을 작성해 주세요!",               // 제목
+                        subtitle: "<토끼 가족 이야기 중>",                           // 부제목
                         author: "김댕댕",                                         // 작성자                         // 아이콘 (기본값: Icons.import_contacts)
                       ),
                     ),

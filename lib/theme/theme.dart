@@ -37,7 +37,9 @@ class CustomColors extends ThemeExtension<CustomColors> {
   final Color? primary10;
   final Color? accent;
   final Color? success;
+  final Color? success40;
   final Color? error;
+  final Color? error40;
   final Color? neutral100;
   final Color? neutral90;
   final Color? neutral80;
@@ -56,7 +58,9 @@ class CustomColors extends ThemeExtension<CustomColors> {
     required this.primary10,
     required this.accent,
     required this.success,
+    required this.success40,
     required this.error,
+    required this.error40,
     required this.neutral100,
     required this.neutral90,
     required this.neutral80,
@@ -76,6 +80,8 @@ class CustomColors extends ThemeExtension<CustomColors> {
     Color? primary10,
     Color? accent,
     Color? success,
+    Color? success40,
+    Color? error40,
     Color? error,
     Color? neutral100,
     Color? neutral90,
@@ -94,7 +100,9 @@ class CustomColors extends ThemeExtension<CustomColors> {
       primary10: primary ?? this.primary10,
       accent: accent ?? this.accent,
       success: success ?? this.success,
+      success40: success ?? this.success40,
       error: success ?? this.error,
+      error40: success ?? this.error40,
       neutral100: neutral100 ?? this.neutral100,
       neutral90: neutral90 ?? this.neutral90,
       neutral80: neutral80 ?? this.neutral80,
@@ -119,7 +127,9 @@ class CustomColors extends ThemeExtension<CustomColors> {
       primary10: Color.lerp(primary10, other.primary10, t),
       accent: Color.lerp(accent, other.accent, t),
       success: Color.lerp(success, other.success, t),
+      success40: Color.lerp(success40, other.success40, t),
       error: Color.lerp(error, other.error, t),
+      error40: Color.lerp(error40, other.error40, t),
       neutral100: Color.lerp(neutral100, other.neutral100, t),
       neutral90: Color.lerp(neutral90, other.neutral90, t),
       neutral80: Color.lerp(neutral80, other.neutral80, t),
@@ -160,7 +170,9 @@ final ThemeData lightThemeGlobal = ThemeData(
       primary10: Color(0xFFE7E7FD),
       accent: Color(0xFFFFD95C),
       success: Color(0xFF3FA654),
+      success40: Color(0xFFB2DBBB),
       error: Color(0xFFF05F42),
+      error40: Color(0xFFF9BFB3),
       neutral100: Color(0xFFFFFFFF),
       neutral90: Color(0xFFF6F6F6),
       neutral80: Color(0xFFCDCED3),
@@ -198,7 +210,9 @@ final ThemeData darkThemeGlobal = ThemeData(
       primary10: Color(0xFFE7E7FD),
       accent: Color(0xFFFFD95C),
       success: Color(0xFF3FA654),
+      success40: Color(0xFFB2DBBB),
       error: Color(0xFFF05F42),
+      error40: Color(0xFFF9BFB3),
       neutral100: Color(0xFFFFFFFF),
       neutral90: Color(0xFFF6F6F6),
       neutral80: Color(0xFFCDCED3),
