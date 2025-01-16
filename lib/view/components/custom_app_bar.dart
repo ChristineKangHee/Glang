@@ -73,6 +73,7 @@ import '../../theme/theme.dart';
 import '../../theme/font.dart';
 import '../../viewmodel/custom_colors_provider.dart';
 import 'dart:async';
+import 'package:flutter_svg/flutter_svg.dart';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////        1 Depth App Bar        //////////////////////////////////////
@@ -138,7 +139,10 @@ class CustomAppBar_Logo extends StatelessWidget implements PreferredSizeWidget {
 
     return AppBar(
       scrolledUnderElevation: 0,
-      leading: Container(child: Image.asset('assets/images/appleicon.png')),// logo 부분. 추후 진짜 로고로 바꿀 것
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 16.0),
+        child: Container(child: SvgPicture.asset('assets/icons/app_logo_without_background.svg')),
+      ),// logo 부분
       actions: [// 이 부분에 아이콘 버튼을 추가
         IconButton(
           icon: Icon(Icons.notifications, color: customColors.neutral30, size: 28,),
@@ -279,7 +283,10 @@ class CustomAppBar_Logo_only extends StatelessWidget implements PreferredSizeWid
 
     return AppBar(
       scrolledUnderElevation: 0,
-      leading: Container(child: Image.asset('assets/images/appleicon.png')),// logo 부분. 추후 진짜 로고로 바꿀 것
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 16.0),
+        child: Container(child: SvgPicture.asset('assets/icons/app_logo_without_background.svg')),
+      ),// logo 부분. 추후 진짜 로고로 바꿀 것
       backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
