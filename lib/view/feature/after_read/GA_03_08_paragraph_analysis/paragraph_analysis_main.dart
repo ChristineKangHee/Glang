@@ -4,13 +4,13 @@ import 'package:readventure/theme/theme.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/view/components/custom_button.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:readventure/view/feature/after_read/GA_03_05_writing_form/writing_form_learning.dart';
+import 'package:readventure/view/feature/after_read/GA_03_08_paragraph_analysis/paragraph_analysis.dart';
 import '../widget/start_page/description_section_main.dart';
 import '../widget/start_page/icon_section_main.dart';
 import '../widget/start_page/title_section_main.dart';
 
-class WritingFormMain extends StatelessWidget {
-  const WritingFormMain({super.key});
+class ParagraphAnalysisMain extends StatelessWidget {
+  const ParagraphAnalysisMain({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class WritingFormMain extends StatelessWidget {
                       Column(
                         children: [
                           SizedBox(height: 117.h),
-                          TitleSectionMain(title: "문장 구조를 따라", subtitle: "", subtitle2: "빈칸에 직접 적용해보세요", customColors: customColors,),
+                          TitleSectionMain(title: "문단별로 주제를", subtitle: "", subtitle2: "알아보세요", customColors: customColors,),
                           SizedBox(height: 51.h),
                           IconSection(customColors: customColors, icon: Icons.edit,),
                         ],
@@ -47,7 +47,7 @@ class WritingFormMain extends StatelessWidget {
                             items: [
                               {
                                 "icon": Icons.comment_outlined, // 사용자 지정 아이콘
-                                "text": "빈칸에 알맞는 단어를 작성해주세요!",
+                                "text": "여러 선택지 중 주제를 골라주세요",
                               },
                               {
                                 "icon": Icons.access_time_filled, // 사용자 지정 아이콘
@@ -85,7 +85,7 @@ class Button_Section extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => SentencePractice(),
+              builder: (context) => QuizScreen(),
             ),
           );
         },

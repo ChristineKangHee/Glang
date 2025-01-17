@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:readventure/view/feature/after_read/GA_03_04_diagram/diagram_main.dart';
 import '../../../theme/font.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/custom_app_bar.dart';
@@ -9,11 +10,14 @@ import 'package:readventure/theme/theme.dart';
 import '../../components/custom_button.dart';
 import 'GA_03_01_change_ending/CE_main.dart';
 import 'GA_03_02_content_summary/CS_main.dart';
-import 'GA_03_04_diagram/diagram_main.dart';
+import 'GA_03_04_diagram/diagram_learning.dart';
+import 'GA_03_05_writing_form/writing_form_main.dart';
 import 'GA_03_06_writing_essay/WE_main.dart';
 import 'GA_03_07_format_conversion/FC_main.dart';
 import 'GA_03_08_paragraph_analysis/paragraph_analysis.dart';
+import 'GA_03_08_paragraph_analysis/paragraph_analysis_main.dart';
 import 'GA_03_09_review_writing/review_writing.dart';
+import 'GA_03_09_review_writing/review_writing_main.dart';
 
 // 학습 활동 데이터 모델
 class LearningActivity {
@@ -207,8 +211,6 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     );
   }
 
-
-
   Widget LearningProgress(int completedCount, CustomColors customColors, BuildContext context) {
     int totalXP = activities
         .where((activity) => activity.isCompleted)
@@ -280,6 +282,9 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
   }
 
   Widget ActivityList(BuildContext context, CustomColors customColors) {
+    // 완료된 항목은 리스트 하단으로 정렬
+    final sortedActivities = activities..sort((a, b) => a.isCompleted ? 1 : -1);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: ShapeDecoration(
@@ -297,7 +302,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
           ),
           const SizedBox(height: 20),
           Column(
-            children: activities.map((activity) {
+            children: sortedActivities.map((activity) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Container(
@@ -387,13 +392,13 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
                                 case '토론':
                                   return ContentSummaryMain();
                                 case '다이어그램':
-                                  return RootedTreeScreen();
+                                  return DiagramMain();
                                 case '문장 구조':
-                                  return FormatConversionMain();
+                                  return WritingFormMain();
                                 case '주제 추출':
-                                  return QuizScreen();
+                                  return ParagraphAnalysisMain();
                                 case '자유 소감':
-                                  return ReflectionScreen();
+                                  return ReviewWritingMain();
                                 default:
                                   return LearningActivitiesPage(); // 기본 페이지
                               }
@@ -417,7 +422,6 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
                           ),
                         ),
                       ),
-
                     ],
                   ),
                 ),
