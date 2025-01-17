@@ -78,7 +78,7 @@ class BadgeWidget extends StatelessWidget {
                   final badge = _badges[index];
                   final isObtained = badge['obtained'] as bool;
                   final backgroundColor = isObtained ? customColors.primary : customColors.neutral60;
-                  final starColor = isObtained ? customColors.accent : customColors.neutral80;
+                  final starColor = isObtained ? customColors.secondary : customColors.neutral80;
 
                   return Container(
                     height: 160, // 세로 길이 고정
