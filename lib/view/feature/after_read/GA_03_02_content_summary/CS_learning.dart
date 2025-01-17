@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/view/components/custom_app_bar.dart';
+import 'package:readventure/view/components/custom_button.dart';
 import 'package:readventure/view/components/my_divider.dart';
 import '../../../../theme/theme.dart';
 import '../widget/answer_section.dart';
 import '../widget/CustomAlertDialog.dart';
 import '../widget/text_section.dart';
 import '../widget/title_section_learning.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CSLearning extends StatefulWidget {
   const CSLearning({super.key});
@@ -18,6 +20,8 @@ class CSLearning extends StatefulWidget {
 class _CELearningState extends State<CSLearning> {
   final TextEditingController _controller = TextEditingController();
   bool _isButtonEnabled = false;
+  // 키워드 상태 추가
+  List<String> _keywords = [];
 
   @override
   void initState() {
@@ -48,6 +52,25 @@ class _CELearningState extends State<CSLearning> {
     );
   }
 
+  // 텍스트 필드에 단어 추가
+  void _updateTextField(String newWord) {
+    setState(() {
+      final currentText = _controller.text;
+      _controller.text = currentText.isEmpty
+          ? newWord
+          : '$currentText $newWord'; // 기존 텍스트에 단어 추가
+      _controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: _controller.text.length), // 커서를 맨 끝으로 이동
+      );
+    });
+  }
+
+  // 키워드 업데이트 함수
+  void _updateKeywords(List<String> keywords) {
+    setState(() {
+      _keywords = keywords;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +86,7 @@ class _CELearningState extends State<CSLearning> {
         child: FloatingActionButton(
           onPressed: () {
             // 버튼 동작
+            _showHintDialog();
           },
           backgroundColor: Colors.yellow,
           shape: const CircleBorder(),
@@ -95,7 +119,14 @@ class _CELearningState extends State<CSLearning> {
                     // 본문 텍스트
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Text_Section(text: data,),
+                      child: Container(
+                        height: 200,
+                          child:SingleChildScrollView(
+                            child: Text_Section(
+                              text: data,
+                            ),
+                          )
+                      ),
                     ),
                     SizedBox(height: 8,),
                     BigDivider(),
@@ -103,12 +134,33 @@ class _CELearningState extends State<CSLearning> {
                     SizedBox(height: 8,),
                     // 사용자 입력 영역
                     Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.fromLTRB(16,16,16,0),
                       child: Answer_Section(
                         controller: _controller,
                         customColors: customColors,
                       ),
                     ),
+                    if (_keywords.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Wrap(
+                          spacing: 8.0,
+                          runSpacing: 8.0,
+                          children: _keywords
+                              .map((keyword) => Chip(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14.0),
+                              side: BorderSide(color: customColors.secondary60 ?? Colors.yellow),
+                            ),
+                            label: Text(
+                              keyword,
+                              style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                            ),
+                            backgroundColor: customColors.secondary60,
+                          ))
+                              .toList(),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -143,4 +195,140 @@ class _CELearningState extends State<CSLearning> {
       ),
     );
   }
+
+  void _showHintDialog() {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+    int? selectedOption; // 선택된 옵션을 저장
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              insetPadding: EdgeInsets.all(16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              content: Container(
+                width: MediaQuery.of(context).size.width * 0.95,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "힌트 2가지 중 하나를 선택해주세요",
+                          style: body_large_semi(context).copyWith(color: customColors.neutral30),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16.0),
+                    Row(
+                      children: [
+                        // 첫 번째 버튼
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectedOption = 1; // 첫 번째 버튼 선택
+                              });
+                            },
+                            child: Container(
+                              height: 120,
+                              decoration: BoxDecoration(
+                                color: selectedOption == 1
+                                    ? customColors.primary10 // 선택된 경우 색상 변경
+                                    : customColors.neutral90,
+                                borderRadius: BorderRadius.circular(16.0),
+                                border: selectedOption == 1
+                                    ? Border.all(color: customColors.primary ?? Colors.blue) // 선택된 경우 색상 변경
+                                    : null
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "키워드 3개",
+                                  style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16.0),
+                        // 두 번째 버튼
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectedOption = 2; // 두 번째 버튼 선택
+                              });
+                            },
+                            child: Container(
+                              height: 120,
+                              decoration: BoxDecoration(
+                                  color: selectedOption == 2
+                                      ? customColors.primary10 // 선택된 경우 색상 변경
+                                      : customColors.neutral90,
+                                  borderRadius: BorderRadius.circular(16.0),
+                                  border: selectedOption == 2
+                                      ? Border.all(color: customColors.primary ?? Colors.blue) // 선택된 경우 색상 변경
+                                      : null
+                              ),
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "맥락에 맞는 글",
+                                      style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                                    ),
+                                    Text(
+                                      "자동 추가",
+                                      style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16.0),
+                    // 선택 완료 버튼
+                    ButtonPrimary_noPadding(
+                      function: () {
+                        Navigator.of(context).pop();
+                        if (selectedOption == 1) {
+                          // 첫 번째 옵션 동작
+                          print("키워드 3개 선택");
+                          _updateKeywords(["#키워드1", "#키워드2", "#키워드3"]); // 키워드 업데이트
+                        } else if (selectedOption == 2) {
+                          // 두 번째 옵션 동작
+                          print("맥락에 맞는 글 자동 추가 선택");
+                          _updateTextField("자동 추가된 단어"); // 텍스트 필드에 단어 추가
+                        }
+                      },
+                      title: '선택 완료',
+                      condition: selectedOption != null ? "not null" : "null", // 선택된 옵션에 따라 상태 결정
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+
+
 }

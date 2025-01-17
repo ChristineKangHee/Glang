@@ -35,7 +35,8 @@ class CustomColors extends ThemeExtension<CustomColors> {
   final Color? primary40;
   final Color? primary20;
   final Color? primary10;
-  final Color? accent;
+  final Color? secondary;
+  final Color? secondary60;
   final Color? success;
   final Color? success40;
   final Color? error;
@@ -56,7 +57,8 @@ class CustomColors extends ThemeExtension<CustomColors> {
     required this.primary40,
     required this.primary20,
     required this.primary10,
-    required this.accent,
+    required this.secondary,
+    required this.secondary60,
     required this.success,
     required this.success40,
     required this.error,
@@ -78,7 +80,8 @@ class CustomColors extends ThemeExtension<CustomColors> {
     Color? primary40,
     Color? primary20,
     Color? primary10,
-    Color? accent,
+    Color? secondary,
+    Color? secondary60,
     Color? success,
     Color? success40,
     Color? error40,
@@ -98,7 +101,8 @@ class CustomColors extends ThemeExtension<CustomColors> {
       primary40: primary ?? this.primary40,
       primary20: primary ?? this.primary20,
       primary10: primary ?? this.primary10,
-      accent: accent ?? this.accent,
+      secondary: secondary ?? this.secondary,
+      secondary60: secondary60 ?? this.secondary60,
       success: success ?? this.success,
       success40: success ?? this.success40,
       error: success ?? this.error,
@@ -125,7 +129,8 @@ class CustomColors extends ThemeExtension<CustomColors> {
       primary40: Color.lerp(primary40, other.primary40, t),
       primary20: Color.lerp(primary20, other.primary20, t),
       primary10: Color.lerp(primary10, other.primary10, t),
-      accent: Color.lerp(accent, other.accent, t),
+      secondary: Color.lerp(secondary, other.secondary, t),
+      secondary60: Color.lerp(secondary60, other.secondary60, t),
       success: Color.lerp(success, other.success, t),
       success40: Color.lerp(success40, other.success40, t),
       error: Color.lerp(error, other.error, t),
@@ -168,7 +173,8 @@ final ThemeData lightThemeGlobal = ThemeData(
       primary40: Color(0xFFB9B9FF),
       primary20: Color(0xFFD6D6FF),
       primary10: Color(0xFFE7E7FD),
-      accent: Color(0xFFFFD95C),
+      secondary: Color(0xFFFFD95C),
+      secondary60: Color(0xFFFDE186),
       success: Color(0xFF3FA654),
       success40: Color(0xFFB2DBBB),
       error: Color(0xFFF05F42),
@@ -208,7 +214,8 @@ final ThemeData darkThemeGlobal = ThemeData(
       primary40: Color(0xFFB9B9FF),
       primary20: Color(0xFFD6D6FF),
       primary10: Color(0xFFE7E7FD),
-      accent: Color(0xFFFFD95C),
+      secondary: Color(0xFFFFD95C),
+      secondary60: Color(0xFFFDE186),
       success: Color(0xFF3FA654),
       success40: Color(0xFFB2DBBB),
       error: Color(0xFFF05F42),
