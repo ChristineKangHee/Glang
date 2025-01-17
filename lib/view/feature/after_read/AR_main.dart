@@ -8,6 +8,8 @@ import 'GA_03_05_writing_form/writing_form_main.dart';
 import 'GA_03_06_writing_essay/WE_main.dart';
 import 'GA_03_07_format_conversion/FC_main.dart';
 import 'GA_03_08_paragraph_analysis/paragraph_analysis.dart';
+import 'GA_03_09_review_writing/review_writing.dart';
+import 'choose_activities.dart';
 
 class ArMain extends StatelessWidget {
   const ArMain({super.key});
@@ -46,6 +48,14 @@ class ArMain extends StatelessWidget {
             ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
               builder: (context) => QuizScreen(),
             )), child: Text("문단주제추출")),
+            SizedBox(height: 30,),
+            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
+              builder: (context) => ReflectionScreen(),
+            )), child: Text("자유 소감")),
+            SizedBox(height: 30,),
+            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
+              builder: (context) => LearningActivitiesPage(),
+            )), child: Text("학습 선택")),
             SizedBox(height: 30,),
           ],
         ),

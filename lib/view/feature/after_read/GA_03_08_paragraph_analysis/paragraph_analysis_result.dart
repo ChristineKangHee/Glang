@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:readventure/view/feature/after_read/AR_main.dart';
 import 'package:readventure/view/feature/after_read/GA_03_08_paragraph_analysis/paragraph_analysis.dart';
 import '../../../../theme/font.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
@@ -162,9 +163,12 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {
-                      // Add your action for finishing the test
-                    },
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ArMain(),
+                      ),
+                    ), // Correctly close the Navigator.push here
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: ShapeDecoration(

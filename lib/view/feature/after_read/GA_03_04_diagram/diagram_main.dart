@@ -77,7 +77,7 @@ class RootedTreeScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: customColors.neutral90,
-      appBar: CustomAppBar_2depth_6(
+      appBar: CustomAppBar_2depth_8(
         title: '다이어그램',
       ),
       body: Padding( // Apply padding to the body
@@ -85,35 +85,39 @@ class RootedTreeScreen extends ConsumerWidget {
         child: Column(
           children: [
             // Rooted tree view
-            Expanded(
-              flex: 1,
-              child: Center(
-                child: InteractiveViewer(
-                  constrained: false,
-                  boundaryMargin: const EdgeInsets.all(8),
-                  minScale: 0.01,
-                  maxScale: 5.0,
-                  child: GraphView(
-                    graph: graph,
-                    algorithm: BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder)),
-                    paint: Paint()
-                      ..color = customColors.neutral80!
-                      ..strokeWidth = 1.5
-                      ..style = PaintingStyle.stroke,
-                    builder: (Node node) {
-                      String nodeId = node.key!.value as String;
-                      return nodeWidget(nodeId, ref); // Pass ref to the widget
-                    },
-                  ),
-                ),
-              ),
-            ),
+            RootedTree(customColors, ref),
             // Word list widget directly below the tree
             WordListWidget(), // No Expanded here
           ],
         ),
       ),
     );
+  }
+
+  Expanded RootedTree(CustomColors customColors, WidgetRef ref) {
+    return Expanded(
+            flex: 1,
+            child: Center(
+              child: InteractiveViewer(
+                constrained: false,
+                boundaryMargin: const EdgeInsets.all(8),
+                minScale: 0.01,
+                maxScale: 5.0,
+                child: GraphView(
+                  graph: graph,
+                  algorithm: BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder)),
+                  paint: Paint()
+                    ..color = customColors.neutral80!
+                    ..strokeWidth = 1.5
+                    ..style = PaintingStyle.stroke,
+                  builder: (Node node) {
+                    String nodeId = node.key!.value as String;
+                    return nodeWidget(nodeId, ref); // Pass ref to the widget
+                  },
+                ),
+              ),
+            ),
+          );
   }
 
   Widget nodeWidget(String nodeId, WidgetRef ref) {
