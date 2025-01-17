@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:readventure/view/components/custom_app_bar.dart';
 import 'package:readventure/view/feature/after_read/GA_03_01_change_ending/CE_main.dart';
-import 'package:readventure/view/feature/after_read/GA_03_04_diagram/diagram_main.dart';
+import 'package:readventure/view/feature/after_read/GA_03_04_diagram/diagram_learning.dart';
 
+import '../reading/RD_exercise.dart';
 import 'GA_03_02_content_summary/CS_main.dart';
-import 'GA_03_05_writing_form/writing_form_main.dart';
+import 'GA_03_05_writing_form/writing_form_learning.dart';
 import 'GA_03_06_writing_essay/WE_main.dart';
 import 'GA_03_07_format_conversion/FC_main.dart';
 import 'GA_03_08_paragraph_analysis/paragraph_analysis.dart';
@@ -56,6 +57,10 @@ class ArMain extends StatelessWidget {
             ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
               builder: (context) => LearningActivitiesPage(),
             )), child: Text("학습 선택")),
+            SizedBox(height: 30,),
+            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
+              builder: (context) => CustomSelectableText(),
+            )), child: Text("읽기 중")),
             SizedBox(height: 30,),
           ],
         ),
