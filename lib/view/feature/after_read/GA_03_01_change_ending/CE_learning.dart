@@ -79,8 +79,10 @@ class _CELearningState extends State<CELearning> {
                       padding: const EdgeInsets.all(16.0),
                       child: Text_Section(),
                     ),
+                    SizedBox(height: 8,),
                     BigDivider(),
                     BigDivider(),
+                    SizedBox(height: 8,),
                     // 사용자 입력 영역
                     Padding(
                       padding: const EdgeInsets.all(16.0),

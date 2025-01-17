@@ -52,9 +52,11 @@ class _CELearningState extends State<WELearning> {
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
+    final data = "깊은 숲 속 작은 오두막에 살던 토끼 가족 중 가장 작은 토끼가 숲에서 길을 잃었어요. 작은 토끼는 용기를 내어 큰 나무 옆에 있던 다람쥐에게 도움을 요청했고, 다람쥐의 도움으로 무사히 집으로 돌아갈 수 있었답니다.";
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: CustomAppBar_2depth_8(title: "결말바꾸기"),
+      appBar: CustomAppBar_2depth_8(title: "에세이 작성"),
       body: SafeArea(
         child: Column(
           children: [
@@ -77,10 +79,12 @@ class _CELearningState extends State<WELearning> {
                     // 본문 텍스트
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Text_Section(),
+                      child: Text_Section(text: data,),
                     ),
+                    SizedBox(height: 8,),
                     BigDivider(),
                     BigDivider(),
+                    SizedBox(height: 8,),
                     // 사용자 입력 영역
                     Padding(
                       padding: const EdgeInsets.all(16.0),
