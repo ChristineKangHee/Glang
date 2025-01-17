@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:readventure/theme/font.dart';
+import 'package:readventure/theme/theme.dart';
+import 'alert_section_button.dart';
 
 class CustomAlertDialog extends StatelessWidget {
   const CustomAlertDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
@@ -38,7 +43,7 @@ class CustomAlertDialog extends StatelessWidget {
                   child: Center(
                     child: Text(
                       "Radar Chart",
-                      style: TextStyle(color: Colors.grey),
+                      style: body_small(context)
                     ),
                   ),
                 ),
@@ -56,19 +61,12 @@ class CustomAlertDialog extends StatelessWidget {
                     children: [
                       Text(
                         "AI 피드백",
-                        style: const TextStyle(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
+                        style: body_small_semi(context)
                       ),
                       const SizedBox(height: 8),
                       Text(
                         "단어 선택이 매우 정확해요! 핵심 단어 2가지를 모두 포함시켰어요. 하지만 단어의 순서가 달라요. 그래도 잘 하셨어요!",
-                        style: const TextStyle(
-                          fontSize: 14.0,
-                          color: Colors.black54,
-                        ),
+                        style: body_small(context)
                       ),
                     ],
                   ),
@@ -87,19 +85,12 @@ class CustomAlertDialog extends StatelessWidget {
                     children: [
                       Text(
                         "다른 유저의 글",
-                        style: const TextStyle(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
+                        style: body_small_semi(context)
                       ),
                       const SizedBox(height: 8),
                       Text(
                         "다람쥐는 작은 토끼를 보고 미소 지으며 말했어요. ‘내가 집까지 데려다줄게!’ 작은 토끼는 다람쥐의 도움으로 무사히 집으로 돌아왔어요.",
-                        style: const TextStyle(
-                          fontSize: 14.0,
-                          color: Colors.black54,
-                        ),
+                        style: body_small(context)
                       ),
                     ],
                   ),
@@ -107,45 +98,7 @@ class CustomAlertDialog extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 // 버튼 섹션
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 12.0,
-                          horizontal: 32.0,
-                        ),
-                        backgroundColor: Colors.grey.shade200,
-                        foregroundColor: Colors.black87,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      child: const Text("다시 쓰기"),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 12.0,
-                          horizontal: 32.0,
-                        ),
-                        backgroundColor: Colors.blueAccent,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      child: const Text("완료"),
-                    ),
-                  ],
-                ),
+                AlertSectionButton(customColors: customColors),
               ],
             ),
           ),

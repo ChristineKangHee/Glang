@@ -52,9 +52,27 @@ class _CELearningState extends State<CSLearning> {
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
+    final data= "깊은 숲 속 작은 오두막에는 토끼 가족이 살고 있었어요. 어느 날, 토끼 엄마는 아기 토끼들에게 말했어요. ‘오늘은 숲 속에 숨어 있는 가장 달콤한 당근을 찾아보자.’ 아기 토끼들은 신이 나서 숲으로 달려갔어요. 그런데, 가장 작은 토끼가 길을 잃고 말았답니다. 작은 토끼는 용기를 내어 큰 나무 옆에 숨은 다람쥐에게 도움을 요청했어요. 작은 토끼는 용기를 내어 큰 나무 옆에 숨은 다람쥐에게 도움을 요청했어요.깊은 숲 속 작은 오두막에는 토끼 가족이 살고 있었어요. 어느 날, 토끼 엄마는 아기 토끼들에게 말했어요. ‘오늘은 숲 속에 숨어 있는 가장 달콤한 당근을 찾아보자.’ 아기 토끼들은 신이 나서 숲으로 달려갔어요. 그런데, 가장 작은 토끼가 길을 잃고 말았답니다. 작은 토끼는 용기를 내어 큰 나무 옆에 숨은 다람쥐에게 도움을 요청했어요. 작은 토끼는 용기를 내어 큰 나무 옆에 숨은 다람쥐에게 도움을 요청했어요.";
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: CustomAppBar_2depth_8(title: "결말바꾸기"),
+      appBar: CustomAppBar_2depth_8(title: "내용 요약 게임"),
+      // floatingActionButtonLocation: ,
+      floatingActionButton: Container(
+        margin: const EdgeInsets.only(bottom: 70), // 하단에서 50px 위로 이동
+        child: FloatingActionButton(
+          onPressed: () {
+            // 버튼 동작
+          },
+          backgroundColor: Colors.yellow,
+          shape: const CircleBorder(),
+          child: const Icon(
+            Icons.emoji_objects_outlined,
+            color: Colors.black,
+            size: 28,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -67,9 +85,9 @@ class _CELearningState extends State<CSLearning> {
                     // 타이머와 제목 섹션
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: TitleSection_withIcon(
+                      child: TitleSection_withoutIcon(
                         customColors: Theme.of(context).extension<CustomColors>()!, // CustomColors 가져오기
-                        title: "글을 읽고 나만의 결말을 작성해보세요!",               // 제목
+                        title: "글을 3문장으로 요약해주세요!",               // 제목
                         subtitle: "<토끼 가족 이야기>",                           // 부제목
                         author: "김댕댕",                                         // 작성자                         // 아이콘 (기본값: Icons.import_contacts)
                       ),
@@ -77,10 +95,12 @@ class _CELearningState extends State<CSLearning> {
                     // 본문 텍스트
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Text_Section(),
+                      child: Text_Section(text: data,),
                     ),
+                    SizedBox(height: 8,),
                     BigDivider(),
                     BigDivider(),
+                    SizedBox(height: 8,),
                     // 사용자 입력 영역
                     Padding(
                       padding: const EdgeInsets.all(16.0),

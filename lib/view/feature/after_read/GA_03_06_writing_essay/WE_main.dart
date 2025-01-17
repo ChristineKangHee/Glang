@@ -36,7 +36,7 @@ class WritingEssayMain extends StatelessWidget {
                           SizedBox(height: 117.h),
                           TitleSectionMain(title: "자신의 경험을", subtitle: "", subtitle2: "글로 표현해볼까요?", customColors: customColors,),
                           SizedBox(height: 51.h),
-                          IconSection(customColors: customColors),
+                          IconSection(customColors: customColors, icon: Icons.edit,),
                         ],
                       ),
                       Column(
