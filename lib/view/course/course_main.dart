@@ -86,15 +86,15 @@ class _CourseMainState extends State<CourseMain> {
         '어려움',
       ],
       imageUrls: [
-        'https://www.google.com/url?sa=i&url=https%3A%2F%2Fm.health.chosun.com%2Fsvc%2Fnews_view.html%3Fcontid%3D2023071701758&psig=AOvVaw15uCYdRE77x_VcSo5nt8IE&ust=1736318472714000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMjLv8CA44oDFQAAAAAdAAAAABAE',
-        'https://www.google.com/url?sa=i&url=https%3A%2F%2Fm.health.chosun.com%2Fsvc%2Fnews_view.html%3Fcontid%3D2023071701758&psig=AOvVaw15uCYdRE77x_VcSo5nt8IE&ust=1736318472714000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMjLv8CA44oDFQAAAAAdAAAAABAE',
-        'https://www.google.com/url?sa=i&url=https%3A%2F%2Fm.health.chosun.com%2Fsvc%2Fnews_view.html%3Fcontid%3D2023071701758&psig=AOvVaw15uCYdRE77x_VcSo5nt8IE&ust=1736318472714000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMjLv8CA44oDFQAAAAAdAAAAABAE',
-        'https://example.com/image4.jpg',
-        'https://example.com/image5.jpg',
-        'https://example.com/image6.jpg',
-        'https://example.com/image7.jpg',
-        'https://example.com/image8.jpg',
-        'https://example.com/image9.jpg',
+        'https://picsum.photos/250?image=9',
+        'https://picsum.photos/250?image=9',
+        'https://picsum.photos/250?image=9',
+        'https://picsum.photos/250?image=9',
+        'https://picsum.photos/250?image=9',
+        'https://picsum.photos/250?image=9',
+        'https://picsum.photos/250?image=9',
+        'https://picsum.photos/250?image=9',
+        'https://picsum.photos/250?image=9',
       ],
       missions: [
         ['미션 1-1', '미션 1-2', '미션 1-3', '미션 1-4', '미션 1-5', '미션 1-6'],
@@ -378,10 +378,10 @@ class _CourseMainState extends State<CourseMain> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: CustomAppBar_Course(), // 코스 화면을 위한 커스텀 앱바.
-        body: Stack(
+    return Scaffold(
+      appBar: CustomAppBar_Course(), // 코스 화면을 위한 커스텀 앱바.
+      body: SafeArea(
+        child: Stack(
           children: [
             /// 섹션을 표시하고 스크롤을 처리하는 ListView.
             ListView.separated(
@@ -407,8 +407,8 @@ class _CourseMainState extends State<CourseMain> {
             CurrentSection(data: data[iCurrentSection]),
           ],
         ),
-        bottomNavigationBar: CustomNavigationBar(), // 커스텀 네비게이션 바.
       ),
+      bottomNavigationBar: CustomNavigationBar(), // 커스텀 네비게이션 바.
     );
   }
 }

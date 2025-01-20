@@ -4,7 +4,6 @@
 /// Created: 2024-12-28
 /// Last Modified: 2024-12-30 by 박민준
 
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,8 +32,8 @@ void main() async {
   }
 
   // local notification
-  await requestNotificationPermission();
-  await initializeNotifications();
+  // await requestNotificationPermission();
+  // await initializeNotifications();
 
   // Easy Localization 초기화
   await EasyLocalization.ensureInitialized();

@@ -28,7 +28,7 @@ class AppGradients {
     return LinearGradient(
       colors: [
         customColors.primary ?? Colors.blue,    // Primary 색상
-        customColors.accent ?? Colors.orange,   // Accent 색상
+        customColors.secondary ?? Colors.orange,   // Accent 색상
       ],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,

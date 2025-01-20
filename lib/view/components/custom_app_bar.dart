@@ -72,6 +72,8 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../theme/theme.dart';
 import '../../theme/font.dart';
 import '../../viewmodel/custom_colors_provider.dart';
+import 'dart:async';
+import 'package:flutter_svg/flutter_svg.dart';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////        1 Depth App Bar        //////////////////////////////////////
@@ -137,7 +139,10 @@ class CustomAppBar_Logo extends StatelessWidget implements PreferredSizeWidget {
 
     return AppBar(
       scrolledUnderElevation: 0,
-      leading: Container(child: Image.asset('assets/images/appleicon.png')),// logo 부분. 추후 진짜 로고로 바꿀 것
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 16.0),
+        child: Container(child: SvgPicture.asset('assets/icons/app_logo_without_background.svg')),
+      ),// logo 부분
       actions: [// 이 부분에 아이콘 버튼을 추가
         IconButton(
           icon: Icon(Icons.notifications, color: customColors.neutral30, size: 28,),
@@ -278,7 +283,10 @@ class CustomAppBar_Logo_only extends StatelessWidget implements PreferredSizeWid
 
     return AppBar(
       scrolledUnderElevation: 0,
-      leading: Container(child: Image.asset('assets/images/appleicon.png')),// logo 부분. 추후 진짜 로고로 바꿀 것
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 16.0),
+        child: Container(child: SvgPicture.asset('assets/icons/app_logo_without_background.svg')),
+      ),// logo 부분. 추후 진짜 로고로 바꿀 것
       backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
@@ -522,5 +530,199 @@ class CustomAppBar_2depth_5 extends StatelessWidget implements PreferredSizeWidg
     // bottom의 높이를 고려하여 AppBar의 총 높이를 반환
     final bottomHeight = bottom?.preferredSize.height ?? 0.0;
     return Size.fromHeight(kToolbarHeight + bottomHeight);
+  }
+}
+
+class CustomAppBar_2depth_6 extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final Color? backgroundColor;
+  final Function()? onIconPressed;
+  final PreferredSizeWidget? bottom;
+
+  const CustomAppBar_2depth_6({
+    Key? key,
+    required this.title,
+    this.backgroundColor,
+    this.onIconPressed,
+    this.bottom,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>();
+
+    return AppBar(
+      scrolledUnderElevation: 0,
+      bottom: bottom,
+      title: Text(
+        title,
+        style: heading_xsmall(context).copyWith(color: customColors?.neutral30 ?? Colors.black),
+      ).tr(),
+      centerTitle: true,
+      actions: [
+        IconButton(
+          icon: Icon(
+            Icons.close,
+            color: customColors?.neutral30 ?? Colors.black,
+            size: 28,
+          ),
+          onPressed: onIconPressed,
+        ),
+      ],
+      backgroundColor: backgroundColor ?? customColors?.neutral100 ?? Colors.white,
+      elevation: 0,
+    );
+  }
+
+  @override
+  Size get preferredSize {
+    final bottomHeight = bottom?.preferredSize.height ?? 0.0;
+    return Size.fromHeight(kToolbarHeight + bottomHeight);
+  }
+}
+
+
+class CustomAppBar_2depth_7 extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final Color? backgroundColor; // null 가능하도록 수정
+  final Function()? onIconPressed; //action 함수를 호출하는 곳에서 설정할 수 있도록 함
+  final PreferredSizeWidget? bottom; // bottom 파라미터 추가
+
+  const CustomAppBar_2depth_7({
+    Key? key,
+    required this.title,
+    this.backgroundColor, // null이면 default로 설정
+    this.onIconPressed,
+    this.bottom,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      scrolledUnderElevation: 0,
+      bottom: bottom,
+      leading: IconButton(
+        icon: Icon(Icons.navigate_before, color: customColors.neutral30),
+        onPressed: () {
+          Navigator.pop(context); //뒷 페이지로 돌아가는 기능. 상황에 맞게 수정.
+        },
+      ),
+      title: Text(
+          title,
+          style: heading_xsmall(context).copyWith(color: customColors.neutral30)
+      ).tr(),
+      centerTitle: true,
+      backgroundColor: backgroundColor ?? customColors.neutral100,
+      elevation: 0,
+    );
+  }
+
+  @override
+  Size get preferredSize {
+    // bottom의 높이를 고려하여 AppBar의 총 높이를 반환
+    final bottomHeight = bottom?.preferredSize.height ?? 0.0;
+    return Size.fromHeight(kToolbarHeight + bottomHeight);
+  }
+}
+////////////////////// 타이머 존재하는 앱바 //////////////////////
+class CustomAppBar_2depth_8 extends StatefulWidget implements PreferredSizeWidget {
+  final String title;
+  final Color? backgroundColor;
+  // final Function()? onIconPressed;
+
+  const CustomAppBar_2depth_8({
+    Key? key,
+    required this.title,
+    this.backgroundColor,
+    // this.onIconPressed,
+  }) : super(key: key);
+
+  @override
+  _CustomAppBar_2depth_8State createState() => _CustomAppBar_2depth_8State();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class _CustomAppBar_2depth_8State extends State<CustomAppBar_2depth_8> {
+  late Timer _timer;
+  int _elapsedSeconds = 0; // 학습 시간 초기화
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _elapsedSeconds++;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel(); // 타이머 정리
+    super.dispose();
+  }
+
+  String _formatTime(int seconds) {
+    final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
+    final secs = (seconds % 60).toString().padLeft(2, '0');
+    return "$minutes:$secs";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      scrolledUnderElevation: 0,
+      leadingWidth: 100,
+      leading: Center(
+        // Center를 사용해 leading 영역 내에서 위젯을 가운데 정렬
+        child: Row(
+          children: [
+            SizedBox(width: 16,),
+            SizedBox(
+              width: 59, // 원하는 너비
+              height: 32, // 원하는 높이
+              child: Container(
+                decoration: BoxDecoration(
+                  color: customColors.neutral90,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.center, // 텍스트 중앙 정렬
+                child: Text(
+                  _formatTime(_elapsedSeconds), // 타이머 표시
+                  style: TextStyle(
+                    color: customColors.neutral30,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      title: Text(
+        widget.title,
+        style: heading_xsmall(context).copyWith(color: customColors.neutral30),
+      ).tr(),
+      centerTitle: true,
+      actions: [
+        IconButton(
+          icon: Icon(Icons.close, color: customColors.neutral30, size: 28),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ],
+      backgroundColor: widget.backgroundColor ?? customColors.neutral100,
+      elevation: 0,
+    );
   }
 }

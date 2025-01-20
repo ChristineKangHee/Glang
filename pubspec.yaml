@@ -20,6 +20,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   d_chart: ^2.10.2 #세로 막대그래프 차트
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
@@ -40,7 +41,7 @@ dev_dependencies:
   http: ^1.2.1
   dart_openai: ^5.1.0
   permission_handler: ^11.1.0 # 권한 처리
-  flutter_local_notifications: ^18.0.1  # local 알림 설정
+#  flutter_local_notifications: ^18.0.1  # local 알림 설정
   flutter_svg: ^2.0.16 # svg 파일 사용 위함
 
 
@@ -59,6 +60,11 @@ dev_dependencies:
   google_sign_in: ^6.2.1
   google_sign_in_web: ^0.12.4
   change_app_package_name: ^1.4.0
+
+  # graph
+  graphview: ^1.2.0
+  percent_indicator: ^4.2.2
+  highlight_text: ^1.8.0
 
 # 앱 아이콘 변경 (사용 모르겟어)
 #flutter_launcher_icons:
