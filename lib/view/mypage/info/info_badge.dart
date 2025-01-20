@@ -1,3 +1,9 @@
+/// File: info_badge.dart
+/// Purpose: 사용자가 획득한 배지를 확인할 수 있다.
+/// Author: 윤은서
+/// Created: 2025-01-08
+/// Last Modified: 2025-01-13 by 윤은서
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../viewmodel/theme_controller.dart';
