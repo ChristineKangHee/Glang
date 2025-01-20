@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:readventure/view/feature/before_read/GA_01_01_cover_research/CR_main.dart';
 import '../../components/custom_app_bar.dart';
 
 class BrMain extends StatelessWidget {
@@ -12,9 +12,9 @@ class BrMain extends StatelessWidget {
       body: SafeArea(child: SingleChildScrollView(
         child: Column(
           children: [
-            // ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
-            //   builder: (context) => ChangeEndingMain(),
-            // )), child: Text("결말바꾸기")),
+            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
+              builder: (context) => CoverResearchMain(),
+            )), child: Text("표지 탐구하기")),
           ],
         ),
       )),
