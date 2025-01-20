@@ -6,19 +6,18 @@ import 'package:readventure/view/components/my_divider.dart';
 import '../../../../theme/theme.dart';
 import '../widget/answer_section.dart';
 import '../widget/CustomAlertDialog.dart';
-import '../widget/custom_chip.dart';
 import '../widget/text_section.dart';
 import '../widget/title_section_learning.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class CSLearning extends StatefulWidget {
-  const CSLearning({super.key});
+class DALearning extends StatefulWidget {
+  const DALearning({super.key});
 
   @override
-  State<CSLearning> createState() => _CELearningState();
+  State<DALearning> createState() => _CELearningState();
 }
 
-class _CELearningState extends State<CSLearning> {
+class _CELearningState extends State<DALearning> {
   final TextEditingController _controller = TextEditingController();
   bool _isButtonEnabled = false;
   // 키워드 상태 추가
@@ -121,7 +120,7 @@ class _CELearningState extends State<CSLearning> {
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Container(
-                        height: 200,
+                          height: 200,
                           child:SingleChildScrollView(
                             child: Text_Section(
                               text: data,
@@ -148,17 +147,20 @@ class _CELearningState extends State<CSLearning> {
                           spacing: 8.0,
                           runSpacing: 8.0,
                           children: _keywords
-                              .map(
-                                (keyword) => CustomChip(
-                              label: keyword,
-                              customColors: customColors, // CustomColors를 전달
-                              borderRadius: 14.0, // 원하는 Radius 값 설정 가능
+                              .map((keyword) => Chip(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14.0),
+                              side: BorderSide(color: customColors.secondary60 ?? Colors.yellow),
                             ),
-                          )
+                            label: Text(
+                              keyword,
+                              style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                            ),
+                            backgroundColor: customColors.secondary60,
+                          ))
                               .toList(),
                         ),
                       ),
-
                   ],
                 ),
               ),
@@ -242,13 +244,13 @@ class _CELearningState extends State<CSLearning> {
                             child: Container(
                               height: 120,
                               decoration: BoxDecoration(
-                                color: selectedOption == 1
-                                    ? customColors.primary10 // 선택된 경우 색상 변경
-                                    : customColors.neutral90,
-                                borderRadius: BorderRadius.circular(16.0),
-                                border: selectedOption == 1
-                                    ? Border.all(color: customColors.primary ?? Colors.blue) // 선택된 경우 색상 변경
-                                    : null
+                                  color: selectedOption == 1
+                                      ? customColors.primary10 // 선택된 경우 색상 변경
+                                      : customColors.neutral90,
+                                  borderRadius: BorderRadius.circular(16.0),
+                                  border: selectedOption == 1
+                                      ? Border.all(color: customColors.primary ?? Colors.blue) // 선택된 경우 색상 변경
+                                      : null
                               ),
                               child: Center(
                                 child: Text(
