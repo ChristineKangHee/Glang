@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:readventure/view/components/custom_app_bar.dart';
 import 'package:readventure/view/feature/after_read/GA_03_01_change_ending/CE_main.dart';
 import 'package:readventure/view/feature/after_read/GA_03_04_diagram/diagram_learning.dart';
+import 'package:readventure/view/feature/reading/GA_02_04_reading_Quiz/Reading_Quiz_main.dart';
+import 'package:readventure/view/feature/reading/GA_02_04_reading_Quiz_ox/Reading_Quiz_ox_main.dart';
 
+import '../reading/GA_02_02_Question/Question_main.dart';
 import '../reading/RD_exercise.dart';
 import 'GA_03_02_content_summary/CS_main.dart';
 import 'GA_03_05_writing_form/writing_form_learning.dart';
@@ -61,6 +64,18 @@ class ArMain extends StatelessWidget {
             ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
               builder: (context) => CustomSelectableText(),
             )), child: Text("읽기 중")),
+            SizedBox(height: 30,),
+            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
+              builder: (context) => QuestionMain(),
+            )), child: Text("핵심 내용 질문")),
+            SizedBox(height: 30,),
+            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
+              builder: (context) => ReadingQuizMain(),
+            )), child: Text("읽기 중 퀴즈")),
+            SizedBox(height: 30,),
+            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
+              builder: (context) => ReadingQuizOxMain(),
+            )), child: Text("읽기 중 ox퀴즈")),
             SizedBox(height: 30,),
           ],
         ),
