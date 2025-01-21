@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
+import '../../../../util/box_shadow_styles.dart';
 import '../../../components/custom_button.dart';
 
 class ReadingQuizOxMain extends StatefulWidget {
@@ -111,6 +112,7 @@ class _ReadingQuizOxMainState extends State<ReadingQuizOxMain> with SingleTicker
               style: body_small(context).copyWith(
                 color: customColors.neutral30,
               ),
+              textAlign: TextAlign.left,
             ),
             const SizedBox(height: 20),
             ButtonPrimary(
@@ -156,7 +158,7 @@ class _ReadingQuizOxMainState extends State<ReadingQuizOxMain> with SingleTicker
                 ),
                 children: [
                   TextSpan(
-                    text: '“이게 뭐지?” 코코는 머리를 갸웃거리며 열쇠를 물었어요. ',
+                    text: '코코는 열쇠가 무엇을 여는지 알아내고 싶었어요...',
                     style: TextStyle(
                       color: _isTextHighlighted
                           ? customColors.primary
@@ -186,96 +188,131 @@ class _ReadingQuizOxMainState extends State<ReadingQuizOxMain> with SingleTicker
               sizeFactor: _animation,
               axisAlignment: -1.0,
               child: _showQuiz
-                  ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    question.paragraph,
-                    style: body_large(context),
+                  ? Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 27),
+                decoration: ShapeDecoration(
+                  color: customColors.neutral100,
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(width: 2, color: customColors.neutral90 ?? Colors.grey),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            if (userAnswers.length <= currentQuestionIndex) {
-                              checkAnswer(true);
-                            }
-                          },
-                          child: AspectRatio(
-                            aspectRatio: 1, // 1:1 비율 유지
-                            child: Container(
-                              margin: const EdgeInsets.only(right: 8),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: userAnswers.length > currentQuestionIndex &&
-                                    userAnswers[currentQuestionIndex] == true
-                                    ? (question.correctAnswer
-                                    ? customColors.success40
-                                    : customColors.error40)
-                                    : customColors.neutral100,
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                  color: userAnswers.length > currentQuestionIndex &&
-                                      userAnswers[currentQuestionIndex] == true
-                                      ? (question.correctAnswer
-                                      ? customColors.success ?? Colors.green
-                                      : customColors.error ?? Colors.red)
-                                      : customColors.neutral80 ?? Colors.grey,
-                                  width: 2,
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'O',
-                                  style: body_large(context),
-                                ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center, // Centered the quiz title
+                  children: [
+                    Text(
+                      '퀴즈',
+                      textAlign: TextAlign.center, // This keeps the quiz title centered
+                      style: body_small_semi(context).copyWith(
+                        color: customColors.neutral30,
+                      ),
+                    ),
+                    SizedBox(height: 24),
+                    Align(
+                      alignment: Alignment.centerLeft, // Aligns the paragraph to the left
+                      child: Text(
+                        question.paragraph,
+                        style: body_small_semi(context).copyWith(
+                          color: customColors.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              if (userAnswers.length <= currentQuestionIndex) {
+                                checkAnswer(true);
+                              }
+                            },
+                            child: AspectRatio(
+                              aspectRatio: 1, // 1:1 비율 유지
+                              child: AnimatedBuilder(
+                                animation: _animation,
+                                builder: (context, child) {
+                                  final double iconSize = 40 + (_animation.value * 40); // Start at 40, expand by 40
+                                  final double padding = 30 - (_animation.value * 10); // Start at 30, reduce by 10
+                                  return Container(
+                                    margin: const EdgeInsets.only(right: 8),
+                                    padding: EdgeInsets.all(padding),
+                                    decoration: BoxDecoration(
+                                      color: userAnswers.length > currentQuestionIndex &&
+                                          userAnswers[currentQuestionIndex] == true
+                                          ? (question.correctAnswer
+                                          ? customColors.success40
+                                          : customColors.error40)
+                                          : customColors.neutral100,
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                        color: userAnswers.length > currentQuestionIndex &&
+                                            userAnswers[currentQuestionIndex] == true
+                                            ? (question.correctAnswer
+                                            ? customColors.success ?? Colors.green
+                                            : customColors.error ?? Colors.red)
+                                            : customColors.neutral80 ?? Colors.grey,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Icon(Icons.circle_outlined, color: customColors.success, size: iconSize),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            if (userAnswers.length <= currentQuestionIndex) {
-                              checkAnswer(false);
-                            }
-                          },
-                          child: AspectRatio(
-                            aspectRatio: 1, // 1:1 비율 유지
-                            child: Container(
-                              margin: const EdgeInsets.only(left: 8),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: userAnswers.length > currentQuestionIndex &&
-                                    userAnswers[currentQuestionIndex] == false
-                                    ? (!question.correctAnswer
-                                    ? customColors.success40
-                                    : customColors.error40)
-                                    : customColors.neutral100,
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                  color: userAnswers.length > currentQuestionIndex &&
-                                      userAnswers[currentQuestionIndex] == false
-                                      ? (!question.correctAnswer
-                                      ? customColors.success ?? Colors.green
-                                      : customColors.error ?? Colors.red)
-                                      : customColors.neutral80 ?? Colors.grey,
-                                  width: 2,
-                                ),
-                              ),
-                              child: Center(
-                                child: Icon(Icons.close_rounded, color:customColors.error),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              if (userAnswers.length <= currentQuestionIndex) {
+                                checkAnswer(false);
+                              }
+                            },
+                            child: AspectRatio(
+                              aspectRatio: 1, // 1:1 비율 유지
+                              child: AnimatedBuilder(
+                                animation: _animation,
+                                builder: (context, child) {
+                                  final double iconSize = 40 + (_animation.value * 40); // Start at 40, expand by 40
+                                  final double padding = 30 - (_animation.value * 10); // Start at 30, reduce by 10
+                                  return Container(
+                                    margin: const EdgeInsets.only(left: 8),
+                                    padding: EdgeInsets.all(padding),
+                                    decoration: BoxDecoration(
+                                      color: userAnswers.length > currentQuestionIndex &&
+                                          userAnswers[currentQuestionIndex] == false
+                                          ? (!question.correctAnswer
+                                          ? customColors.success40
+                                          : customColors.error40)
+                                          : customColors.neutral100,
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                        color: userAnswers.length > currentQuestionIndex &&
+                                            userAnswers[currentQuestionIndex] == false
+                                            ? (!question.correctAnswer
+                                            ? customColors.success ?? Colors.green
+                                            : customColors.error ?? Colors.red)
+                                            : customColors.neutral80 ?? Colors.grey,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Icon(Icons.close_rounded, color: customColors.error, size: iconSize),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               )
                   : SizedBox.shrink(),
             ),
