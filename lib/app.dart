@@ -11,6 +11,7 @@ import 'package:readventure/view/course/course_main.dart';
 import 'package:readventure/view/feature/after_read/AR_main.dart';
 import 'package:readventure/view/feature/before_read/BR_main.dart';
 import 'package:readventure/view/feature/reading/RD_main.dart';
+import 'package:readventure/view/feature/reading/quiz_data.dart';
 import 'package:readventure/view/home/example.dart';
 import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/home/notification/notification_page.dart';
@@ -69,7 +70,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
             '/': (context) => const MyHomePage(),
             '/armain': (context) => const ArMain(),
             '/brmain': (context) => const BrMain(),
-            '/rdmain': (context) => RdMain(),
+            '/rdmain': (context) => RdMain(oxQuestions: oxQuestions, mcqQuestions: mcqQuestions,),
             '/login': (context) => const LoginPage(),
             '/nickname': (context) => const NicknameInput(),
             '/notification': (context) => const NotificationPage(),

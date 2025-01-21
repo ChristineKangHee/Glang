@@ -7,7 +7,6 @@ import 'package:readventure/view/feature/reading/GA_02_04_reading_Quiz/Reading_Q
 import 'package:readventure/view/feature/reading/GA_02_04_reading_Quiz_ox/Reading_Quiz_ox_main.dart';
 
 import '../reading/GA_02_02_Question/Question_main.dart';
-import '../reading/GA_02_04_reading_Quiz/Quiz_combine.dart';
 import '../reading/RD_exercise.dart';
 import '../reading/quiz_data.dart';
 import 'GA_03_02_content_summary/CS_main.dart';
@@ -65,17 +64,9 @@ class ArMain extends StatelessWidget {
             )), child: Text("학습 선택")),
             SizedBox(height: 30,),
             ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
-              builder: (context) => ReadingQuizUnifiedMain(
-                oxQuestions: oxQuestions,
-                mcqQuestions: mcqQuestions,
-              )              ,
-            )), child: Text("읽기 중 퀴즈")),
-            SizedBox(height: 30,),
-            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
               builder: (context) => DebateActivityMain(),
             )), child: Text("토론 활동")),
             SizedBox(height: 30,),
-
           ],
         ),
       )),
