@@ -156,6 +156,10 @@ class _ReflectionScreenState extends ConsumerState<ReflectionScreen> {
         function: () {
           print("제출하기");
           // 상황에 맞는 함수 호출
+          Navigator.popUntil(
+            context,
+                (route) => route.settings.name == 'LearningActivitiesPage',
+          );
         },
         title: '제출하기',
       )

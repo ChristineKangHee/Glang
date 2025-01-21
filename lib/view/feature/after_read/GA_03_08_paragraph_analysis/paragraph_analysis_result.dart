@@ -163,12 +163,10 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ArMain(),
+                    onTap: () =>
+                      Navigator.popUntil(
+                        context, (route) => route.settings.name == 'LearningActivitiesPage',
                       ),
-                    ), // Correctly close the Navigator.push here
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: ShapeDecoration(

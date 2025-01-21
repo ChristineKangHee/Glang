@@ -204,6 +204,10 @@ class WordListWidget extends ConsumerWidget {
       child: ButtonPrimary(
         function: () {
           print("제출하기");
+          Navigator.popUntil(
+            context,
+                (route) => route.settings.name == 'LearningActivitiesPage',
+          );
         },
         title: '제출하기',
       ),

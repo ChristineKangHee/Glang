@@ -109,18 +109,18 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
                 //   child: Text('Show Notification'),
                 // ),
 
-                // ElevatedButton(
-                //   onPressed: () => Navigator.pushNamed(context, "/brmain"),
-                //   child: Text('읽기 전 코스 이동'),
-                // ),
-                // ElevatedButton(
-                //   onPressed: () => Navigator.pushNamed(context, "/rdmain"),
-                //   child: Text('읽기 중 코스 이동'),
-                // ),
-                // ElevatedButton(
-                //   onPressed: () => Navigator.pushNamed(context, "/armain"),
-                //   child: Text('읽기 후 코스 이동'),
-                // ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, "/brmain"),
+                  child: Text('읽기 전 코스 이동'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, "/rdmain"),
+                  child: Text('읽기 중 코스 이동'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, "/armain"),
+                  child: Text('읽기 후 코스 이동'),
+                ),
 
               ],
             ),
