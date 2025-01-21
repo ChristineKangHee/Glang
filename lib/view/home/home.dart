@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/util/gradients.dart';
 import 'package:readventure/view/components/custom_navigation_bar.dart';
+import 'package:readventure/view/home/user_service.dart';
 import 'package:readventure/viewmodel/app_state_controller.dart';
 import 'package:readventure/theme/theme.dart';
 import 'package:readventure/theme/font.dart';
@@ -20,6 +21,7 @@ import '../components/custom_button.dart';
 import '../course/popup_component.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
   const MyHomePage({super.key});
@@ -30,16 +32,24 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
     final customColors = ref.watch(customColorsProvider); // CustomColors 가져오기
     var screenWidth = MediaQuery.of(context).size.width;
     var screenHeight = MediaQuery.of(context).size.height;
-    final name = "제로";
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    final String? userId = _auth.currentUser?.uid;
+    final userName = ref.watch(userNameProvider); // 사용자 이름 상태 구독
+
+    if (userId != null) {
+      ref.read(userNameProvider.notifier).fetchUserName(userId);
+    }
+
+
     final data = SectionData(
       section: 1,
-      title: "예제 섹션",
-      subdetailTitle: ["소제목 1"],
+      title: "초급 코스",
+      subdetailTitle: ["읽기 도구의 필요성"],
       textContents: ["이 섹션에서는 학습 목표를 달성하는 방법을 배웁니다."],
-      achievement: ['10'],
+      achievement: ['0'],
       totalTime: ['30'],
       difficultyLevel: ["쉬움"],
-      imageUrls: ['https://www.google.com/url?sa=i&url=https%3A%2F%2Fm.health.chosun.com%2Fsvc%2Fnews_view.html%3Fcontid%3D2023071701758&psig=AOvVaw15uCYdRE77x_VcSo5nt8IE&ust=1736318472714000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMjLv8CA44oDFQAAAAAdAAAAABAE',],
+      imageUrls: ['https://picsum.photos/250?image=9',],
       missions: [['미션 1-1', '미션 1-2', '미션 1-3', '미션 1-4', '미션 1-5', '미션 1-6'],],
       effects: [['미션 1-1', '미션 1-2', '미션 1-3',],],
       status: ["start",],
@@ -60,16 +70,33 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 //TODO: 인사말 위젯
-                GreetingSection(name: name),
+                GreetingSection(name: userName),
                 SizedBox(height: 24.h,),
 
                 //TODO: 진행 중인 학습 위젯
                 ProgressSection(data: data),
                 SizedBox(height: 24.h,),
 
-                //TODO: 인기 게시물 위젯
-                HotPostSection(customColors: customColors),
+                // //TODO: 인기 게시물 위젯
+                // HotPostSection(customColors: customColors),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("출석 체크", style: body_small_semi(context),),
+                    Container(
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: customColors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                        child: AttendanceWidget()
+                    ),
+                  ],
+                ),
                 SizedBox(height: 24.h,),
+
+                //TODO: 출석체크 위젯
+
 
                 //TODO: 이번달 학습 기록 위젯
                 InkWell(
@@ -104,6 +131,101 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
     );
   }
 }
+
+class AttendanceWidget extends StatelessWidget {
+  final List<AttendanceDay> attendanceDays = [
+    AttendanceDay(date: '1/19', status: AttendanceStatus.missed, xp: 0),
+    AttendanceDay(date: '1/20', status: AttendanceStatus.missed, xp: 0),
+    AttendanceDay(date: '1/21', status: AttendanceStatus.completed, xp: 10),
+    AttendanceDay(date: '1/22', status: AttendanceStatus.upcoming, xp: 10),
+    AttendanceDay(date: '1/23', status: AttendanceStatus.upcoming, xp: 10),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: attendanceDays.map((day) => AttendanceDayWidget(day)).toList(),
+    );
+  }
+}
+
+class AttendanceDay {
+  final String date;
+  final AttendanceStatus status;
+  final int xp;
+
+  AttendanceDay({required this.date, required this.status, required this.xp});
+}
+
+enum AttendanceStatus { missed, completed, upcoming }
+
+class AttendanceDayWidget extends StatelessWidget {
+  final AttendanceDay day;
+
+  const AttendanceDayWidget(this.day);
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+    Color? iconColor;
+    Color? textColor;
+    Color? backgroundColor;
+    String iconText;
+
+    switch (day.status) {
+      case AttendanceStatus.missed:
+        iconColor = customColors.neutral60;
+        textColor = customColors.neutral60;
+        backgroundColor = customColors.neutral80;
+        iconText = 'X';
+        break;
+      case AttendanceStatus.completed:
+        iconColor = customColors.primary;
+        textColor = customColors.primary;
+        backgroundColor = Colors.blue.shade100;
+        iconText = '♥';
+        break;
+      case AttendanceStatus.upcoming:
+        iconColor = customColors.neutral60;
+        textColor = customColors.neutral60;
+        backgroundColor = Colors.grey.shade100;
+        iconText = '♥';
+        break;
+    }
+
+    return Column(
+      children: [
+        Text(
+          day.date,
+          style: TextStyle(color: Colors.black, fontSize: 12),
+        ),
+        SizedBox(height: 4),
+        CircleAvatar(
+          radius: 20,
+          backgroundColor: backgroundColor,
+          child: Text(
+            iconText,
+            style: TextStyle(
+              color: iconColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+        ),
+        SizedBox(height: 4),
+        Text(
+          day.status == AttendanceStatus.missed ? '미출석' : '+${day.xp}xp',
+          style: TextStyle(
+            color: textColor,
+            fontSize: 12,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 
 class LearningSection extends StatelessWidget {
   LearningSection({
@@ -213,7 +335,7 @@ class GreetingSection extends StatelessWidget {
     required this.name,
   });
 
-  final String name;
+  final String? name;
 
   @override
   Widget build(BuildContext context) {
