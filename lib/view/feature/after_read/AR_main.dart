@@ -65,10 +65,6 @@ class ArMain extends StatelessWidget {
             )), child: Text("학습 선택")),
             SizedBox(height: 30,),
             ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
-              builder: (context) => CustomSelectableText(),
-            )), child: Text("읽기 중")),
-            SizedBox(height: 30,),
-            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
               builder: (context) => ReadingQuizUnifiedMain(
                 oxQuestions: oxQuestions,
                 mcqQuestions: mcqQuestions,
@@ -76,13 +72,10 @@ class ArMain extends StatelessWidget {
             )), child: Text("읽기 중 퀴즈")),
             SizedBox(height: 30,),
             ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
-              builder: (context) => ReadingQuizOxMain(),
-            )), child: Text("읽기 중 ox퀴즈")),
-            SizedBox(height: 30,),
-            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
               builder: (context) => DebateActivityMain(),
             )), child: Text("토론 활동")),
             SizedBox(height: 30,),
+
           ],
         ),
       )),
