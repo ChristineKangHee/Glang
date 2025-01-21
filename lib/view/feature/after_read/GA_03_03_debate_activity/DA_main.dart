@@ -16,7 +16,7 @@ class DebateActivityMain extends StatelessWidget {
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     return Scaffold(
-      appBar: CustomAppBar_2depth_6(title: "내용 요약 게임"),
+      appBar: CustomAppBar_2depth_6(title: "토론"),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -41,7 +41,8 @@ class DebateActivityMain extends StatelessWidget {
                             customColors: customColors,
                           ),
                           SizedBox(height: 51.h),
-                          // SVGSection(customColors: customColors)
+                          SVGSection(customColors: customColors)
+
                         ],
                       ),
                       Column(

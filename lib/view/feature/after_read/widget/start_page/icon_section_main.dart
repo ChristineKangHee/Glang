@@ -9,6 +9,7 @@ IconSection(
  */
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/theme.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class IconSection extends StatelessWidget {
   const IconSection({
@@ -35,6 +36,35 @@ class IconSection extends StatelessWidget {
         icon,
         color: customColors.neutral100,
         size: size,
+      ),
+    );
+  }
+}
+
+class SVGSection extends StatelessWidget {
+  const SVGSection({
+    super.key,
+    required this.customColors,
+    this.assetPath = 'assets/icons/debate.svg', // 기본 SVG 경로
+    this.size = 80.0,                                // 기본 아이콘 크기
+  });
+
+  final CustomColors customColors;
+  final String assetPath; // SVG 파일 경로
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size * 1.875, // 배경 크기는 아이콘 크기 기준으로 설정
+      height: size * 1.875,
+      child: SvgPicture.asset(
+        assetPath,
+        width: size,
+        height: size,
+        placeholderBuilder: (context) => Center(
+          child: CircularProgressIndicator(), // SVG 로드 중 표시할 위젯
+        ),
       ),
     );
   }
