@@ -1,21 +1,3 @@
-/*
-
-  TitleSection_withIcon(
-    customColors: Theme.of(context).extension<CustomColors>()!, // CustomColors 가져오기
-    title: "글을 읽고 나만의 결말을 작성해보세요!",               // 제목
-    subtitle: "<토끼 가족 이야기>",                           // 부제목
-    author: "김댕댕",                                         // 작성자
-    icon: Icons.book_outlined,                               // 아이콘 (기본값: Icons.import_contacts)
-  ),
-
-  TitleSection_withoutIcon(
-    customColors: Theme.of(context).extension<CustomColors>()!, // CustomColors 가져오기
-    title: "글을 읽고 나만의 결말을 작성해보세요!",               // 제목
-    subtitle: "<토끼 가족 이야기>",                           // 부제목
-    author: "김댕댕",                                         // 작성자
-  ),
-*/
-
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';
@@ -39,38 +21,41 @@ class TitleSection_withIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start, // 아이콘과 텍스트의 수직 정렬
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: body_small_semi(context).copyWith(
-                color: customColors.primary,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: body_small_semi(context).copyWith(
+                  color: customColors.primary,
+                ),
               ),
-            ),
-            Row(
-              children: [
-                Text(
-                  subtitle,
-                  style: body_small(context)
-                      .copyWith(color: customColors.neutral60),
+              const SizedBox(height: 4),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: subtitle,
+                      style: body_small(context).copyWith(color: customColors.neutral60),
+                    ),
+                    TextSpan(
+                      text: " | ",
+                      style: body_small(context).copyWith(color: customColors.neutral60),
+                    ),
+                    TextSpan(
+                      text: author,
+                      style: body_small(context).copyWith(color: customColors.neutral60),
+                    ),
+                  ],
                 ),
-                Text(
-                  " | ",
-                  style: body_small(context)
-                      .copyWith(color: customColors.neutral60),
-                ),
-                Text(
-                  author,
-                  style: body_small(context)
-                      .copyWith(color: customColors.neutral60),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
+        const SizedBox(width: 16), // 텍스트와 아이콘 간 간격
         _buildIcon(customColors),
       ],
     );
@@ -110,37 +95,39 @@ class TitleSection_withoutIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start, // 텍스트의 수직 정렬
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: body_small_semi(context).copyWith(
-                color: customColors.primary,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: body_small_semi(context).copyWith(
+                  color: customColors.primary,
+                ),
               ),
-            ),
-            Row(
-              children: [
-                Text(
-                  subtitle,
-                  style: body_small(context)
-                      .copyWith(color: customColors.neutral60),
+              const SizedBox(height: 4),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: subtitle,
+                      style: body_small(context).copyWith(color: customColors.neutral60),
+                    ),
+                    TextSpan(
+                      text: " | ",
+                      style: body_small(context).copyWith(color: customColors.neutral60),
+                    ),
+                    TextSpan(
+                      text: author,
+                      style: body_small(context).copyWith(color: customColors.neutral60),
+                    ),
+                  ],
                 ),
-                Text(
-                  " | ",
-                  style: body_small(context)
-                      .copyWith(color: customColors.neutral60),
-                ),
-                Text(
-                  author,
-                  style: body_small(context)
-                      .copyWith(color: customColors.neutral60),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ],
     );

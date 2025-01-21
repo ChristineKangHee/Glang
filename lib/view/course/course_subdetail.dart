@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:readventure/view/course/section.dart';
+import 'package:readventure/view/feature/before_read/GA_01_01_cover_research/CR_main.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../../util/box_shadow_styles.dart';
@@ -106,6 +107,14 @@ class CourseDetailPage extends StatelessWidget {
                   function: () {
                     print("시작하기");
                     //function 은 상황에 맞게 재 정의 할 것.
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CoverResearchMain(
+                          
+                        ), // BrMain으로 이동
+                      ),
+                    );
                   },
                   title: '시작하기',
                   // 버튼 안에 들어갈 텍스트.

@@ -25,7 +25,7 @@ class DebateGPTService {
             {
               'role': 'system',
               'content':
-              'You are participating in a debate. Stay focused on the topic and provide clear and logical arguments.'
+              'You are participating in a debate. Stay focused on the topic and provide clear and logical arguments. say in 200 token'
             },
             {'role': 'user', 'content': 'Debate topic: $topic'},
             {'role': 'user', 'content': userInput},

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/theme.dart';
 
-import '../choose_activities.dart';
+import '../../reading/RD_before.dart';
 
-class AlertSectionButton extends StatelessWidget {
-  const AlertSectionButton({
+class AlertSectionButtonBr extends StatelessWidget {
+  const AlertSectionButtonBr({
     super.key,
     required this.customColors,
   });
@@ -35,15 +35,14 @@ class AlertSectionButton extends StatelessWidget {
         ),
         TextButton(
           onPressed: () {
-            // Navigator.pushAndRemoveUntil(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => LearningActivitiesPage()),
-            //       (route) => false, // 이전 화면을 모두 제거
-            // );
-            Navigator.popUntil(
+            Navigator.push(
               context,
-                  (route) => route.settings.name == 'LearningActivitiesPage',
+              MaterialPageRoute(builder: (context) => RdBefore()),
             );
+            // Navigator.popUntil(
+            //   context,
+            //       (route) => route.settings.name == 'LearningActivitiesPage',
+            // );
           },
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(
@@ -56,7 +55,7 @@ class AlertSectionButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(8.0),
             ),
           ),
-          child: const Text("완료"),
+          child: const Text("글 읽기"),
         ),
       ],
     );

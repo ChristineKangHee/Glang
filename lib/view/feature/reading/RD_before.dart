@@ -9,6 +9,7 @@ import 'package:readventure/view/feature/after_read/GA_03_09_review_writing/revi
 import '../after_read/widget/start_page/description_section_main.dart';
 import '../after_read/widget/start_page/icon_section_main.dart';
 import '../after_read/widget/start_page/title_section_main.dart';
+import 'RD_exercise.dart';
 
 class RdBefore extends StatelessWidget {
   const RdBefore({super.key});
@@ -17,7 +18,7 @@ class RdBefore extends StatelessWidget {
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     return Scaffold(
-      appBar: CustomAppBar_2depth_6(title: "문장 구조 연습"),
+      appBar: CustomAppBar_2depth_6(title: "어른의 어휘력"),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -34,28 +35,29 @@ class RdBefore extends StatelessWidget {
                     children: [
                       Column(
                         children: [
-                          SizedBox(height: 117.h),
-                          TitleSectionMain(title: "자유롭게", subtitle: "", subtitle2: "느낀점을 작성해주세요", customColors: customColors,),
-                          SizedBox(height: 51.h),
-                          IconSection(customColors: customColors, icon: Icons.edit,),
+                          Text("오늘도 기대를 갖고 글을 읽어볼까요?", style: body_medium_semi(context),),
+                          SizedBox(height: 16),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Container(
+                              color: Colors.transparent,
+                              width: MediaQuery.of(context).size.width,
+                              height: 450.h,
+                              child: Image.asset("assets/images/cover.png"),
+                            ),
+                          ),
+                          // SizedBox(height: 117.h),
+                          // TitleSectionMain(title: "자유롭게", subtitle: "", subtitle2: "느낀점을 작성해주세요", customColors: customColors,),
+                          // SizedBox(height: 51.h),
+                          // IconSection(customColors: customColors, icon: Icons.edit,),
+                          SizedBox(height: 16,),
+                          Text("단어나 문장을 선택하면", style: body_small(context),),
+                          Text("메모, 밑줄, 해석, 챗봇 기능을 사용할 수 있어요!", style: body_small(context),),
                         ],
                       ),
                       Column(
                         children: [
                           SizedBox(height: 30.h),
-                          DescriptionSection(
-                            customColors: customColors, // 필수: CustomColors 전달
-                            items: [
-                              {
-                                "icon": Icons.comment_outlined, // 사용자 지정 아이콘
-                                "text": "최소 하나의 칸을 채워주세요",
-                              },
-                              {
-                                "icon": Icons.access_time_filled, // 사용자 지정 아이콘
-                                "text": "학습을 시작하면 타이머가 작동해요!",
-                              },
-                            ],
-                          ),
                           SizedBox(height: 50.h),
                           Button_Section(),
                         ],
@@ -83,14 +85,9 @@ class Button_Section extends StatelessWidget {
       width: double.infinity,
       child: ButtonPrimary(
         function: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ReflectionScreen(),
-            ),
-          );
+          Navigator.pushNamed(context, '/rdmain');
         },
-        title: '시작하기',
+        title: '준비완료',
       ),
     );
   }

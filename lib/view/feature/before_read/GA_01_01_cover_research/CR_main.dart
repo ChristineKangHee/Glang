@@ -43,7 +43,7 @@ class CoverResearchMain extends StatelessWidget {
                           SizedBox(height: 51.h),
                           IconSection(customColors: customColors),
                           SizedBox(height: 51.h),
-                          Text("하단에 제시딘 키워드를\n참고해보세요!", textAlign: TextAlign.center, style: body_small(context),),
+                          Text("하단에 제시된 키워드를\n참고해보세요!", textAlign: TextAlign.center, style: body_small(context),),
                         ],
                       ),
                       Column(
