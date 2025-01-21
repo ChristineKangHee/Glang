@@ -4,14 +4,14 @@ import 'package:graphview/GraphView.dart';
 
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
-import '../../../../viewmodel/custom_colors_provider.dart'; // Import custom colors
+import '../../../../viewmodel/custom_colors_provider.dart';
 import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_button.dart';
-import '../widget/title_section_learning.dart'; // Adjust import as needed
+import '../widget/title_section_learning.dart';
 
 // StateNotifier to manage the word list
 final wordListProvider = StateNotifierProvider<WordListNotifier, List<String>>((ref) {
-  return WordListNotifier(['apple', 'banana', 'cherry', 'date', 'elderberry']);
+  return WordListNotifier(['읽기 시스템', '문제점', '교육 시스템', '피드백 부족', '해결방안', '맞춤형 읽기 도구', '실시간 피드백', '기대효과', '읽기 능력 향상', '자기주도 학습 강화']);
 });
 
 class WordListNotifier extends StateNotifier<List<String>> {
@@ -21,6 +21,7 @@ class WordListNotifier extends StateNotifier<List<String>> {
     state = state.where((w) => w != word).toList();
   }
 }
+
 final nodeLabelProvider = StateNotifierProvider<NodeLabelNotifier, Map<String, String>>((ref) {
   return NodeLabelNotifier();
 });
@@ -36,11 +37,10 @@ class NodeLabelNotifier extends StateNotifier<Map<String, String>> {
   }
 
   String getNodeLabel(String nodeId) {
-    return state[nodeId] ?? ""; // 초기 label을 빈 문자열로 설정
+    return state[nodeId] ?? "";
   }
 
   void clearNodeLabels() {
-// 모든 노드의 label을 빈 문자열로 초기화
     state = state.map((key, value) => MapEntry(key, ""));
   }
 }
@@ -57,6 +57,10 @@ class RootedTreeScreen extends ConsumerWidget {
     final Node child3 = Node.Id('Child 3');
     final Node grandChild1 = Node.Id('Grandchild 1');
     final Node grandChild2 = Node.Id('Grandchild 2');
+    final Node grandChild3 = Node.Id('Grandchild 3');
+    final Node grandChild4 = Node.Id('Grandchild 4');
+    final Node grandChild5 = Node.Id('Grandchild 5');
+    final Node grandChild6 = Node.Id('Grandchild 6');
 
     // Add nodes to graph and connect them
     graph.addEdge(rootNode, child1);
@@ -64,12 +68,16 @@ class RootedTreeScreen extends ConsumerWidget {
     graph.addEdge(rootNode, child3);
     graph.addEdge(child1, grandChild1);
     graph.addEdge(child1, grandChild2);
+    graph.addEdge(child2, grandChild3);
+    graph.addEdge(child2, grandChild4);
+    graph.addEdge(child3, grandChild5);
+    graph.addEdge(child3, grandChild6);
 
-    // Configure layout
+    // Configure layout with optimized spacing
     builder
-      ..siblingSeparation = 50
-      ..levelSeparation = 100
-      ..subtreeSeparation = 75
+      ..siblingSeparation = 30
+      ..levelSeparation = 70
+      ..subtreeSeparation = 50
       ..orientation = BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM;
   }
 
@@ -94,47 +102,52 @@ class RootedTreeScreen extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: TitleSection_withIcon(
-                customColors: Theme.of(context).extension<CustomColors>()!, // CustomColors 가져오기
-                title: "자신의 경험과 의견을 작성해 주세요!",               // 제목
-                subtitle: "<토끼 가족 이야기 중>",                           // 부제목
-                author: "김댕댕",                                         // 작성자                         // 아이콘 (기본값: Icons.import_contacts)
+                customColors: Theme.of(context).extension<CustomColors>()!,
+                title: "트리 구조에 알맞는 단어를 넣어주세요!",
+                subtitle: "<읽기의 중요성>",
+                author: " ",
               ),
             ),
           ),
-          // Rooted tree view
-          RootedTree(customColors, ref),
-          // Word list widget directly below the tree
-          WordListWidget(), // No Expanded here
+          RootedTree(customColors, ref, context),
+          WordListWidget(),
           const SizedBox(height: 20),
         ],
       ),
     );
   }
 
-  Widget RootedTree(CustomColors customColors, WidgetRef ref) {
+  Widget RootedTree(CustomColors customColors, WidgetRef ref, BuildContext context) {
+    final nodeCount = graph.nodeCount();
+    final size = MediaQuery.of(context).size;
+
+    builder
+      ..siblingSeparation = (size.width / (nodeCount * 1.5)).clamp(20, 100).toInt()
+      ..levelSeparation = (size.height / (nodeCount * 2.5)).clamp(50, 200).toInt();
+
     return Expanded(
-            flex: 1,
-            child: Center(
-              child: InteractiveViewer(
-                constrained: false,
-                boundaryMargin: const EdgeInsets.all(8),
-                minScale: 0.01,
-                maxScale: 5.0,
-                child: GraphView(
-                  graph: graph,
-                  algorithm: BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder)),
-                  paint: Paint()
-                    ..color = customColors.neutral80!
-                    ..strokeWidth = 1.5
-                    ..style = PaintingStyle.stroke,
-                  builder: (Node node) {
-                    String nodeId = node.key!.value as String;
-                    return nodeWidget(nodeId, ref); // Pass ref to the widget
-                  },
-                ),
-              ),
-            ),
-          );
+      flex: 1,
+      child: Center(
+        child: InteractiveViewer(
+          constrained: false,
+          boundaryMargin: const EdgeInsets.all(4),
+          minScale: 0.1,
+          maxScale: 3.0,
+          child: GraphView(
+            graph: graph,
+            algorithm: BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder)),
+            paint: Paint()
+              ..color = customColors.neutral80!
+              ..strokeWidth = 1.5
+              ..style = PaintingStyle.stroke,
+            builder: (Node node) {
+              String nodeId = node.key!.value as String;
+              return nodeWidget(nodeId, ref);
+            },
+          ),
+        ),
+      ),
+    );
   }
 
   Widget nodeWidget(String nodeId, WidgetRef ref) {
@@ -144,45 +157,39 @@ class RootedTreeScreen extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         if (label.isNotEmpty) {
-          // Return the word to the word list if the node has a label
           ref.read(wordListProvider.notifier).state = [
             ...ref.read(wordListProvider),
             label
           ];
-
-          // Clear the node label
           ref.read(nodeLabelProvider.notifier).updateNodeLabel(nodeId, "");
         }
       },
       child: DragTarget<String>(
         onAccept: (droppedWord) {
-          // Update the node label and remove the word from the list
           ref.read(nodeLabelProvider.notifier).updateNodeLabel(nodeId, droppedWord);
           ref.read(wordListProvider.notifier).removeWord(droppedWord);
         },
         onWillAccept: (data) {
-          // Prevent accepting the word if the node already has a label
-          return label.isEmpty; // Allow if the node is empty
+          return label.isEmpty;
         },
         builder: (context, candidateData, rejectedData) {
           return Container(
-            width: 100, // Fixed width
-            height: 50, // Fixed height
+            width: 80,
+            height: 40,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8),
               color: candidateData.isNotEmpty ? Colors.green.shade100 : customColors.primary60,
             ),
             child: Text(
               label.isEmpty ? " " : label,
-              style: body_small_semi(context).copyWith(color: customColors.neutral100), // Apply custom text style here
+              style: body_small_semi(context).copyWith(fontSize: 12, color: customColors.neutral100),
             ),
           );
         },
       ),
     );
   }
-
 }
 
 class WordListWidget extends ConsumerWidget {
@@ -197,25 +204,24 @@ class WordListWidget extends ConsumerWidget {
       child: ButtonPrimary(
         function: () {
           print("제출하기");
-          // 제출하기 버튼 눌렀을 때 실행할 기능
         },
         title: '제출하기',
       ),
     )
         : Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                width: double.infinity,
-                decoration: ShapeDecoration(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        width: double.infinity,
+        decoration: ShapeDecoration(
           color: customColors.neutral100,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-                ),
-                child: Wrap(
-          spacing: 8.0, // Horizontal space between items
-          runSpacing: 8.0, // Vertical space between rows
+        ),
+        child: Wrap(
+          spacing: 8.0,
+          runSpacing: 8.0,
           children: wordList
               .map((word) => Padding(
             padding: const EdgeInsets.only(right: 8.0),
@@ -239,9 +245,9 @@ class WordListWidget extends ConsumerWidget {
             ),
           ))
               .toList(),
-                ),
-              ),
-        );
+        ),
+      ),
+    );
   }
 
   Widget _buildDraggableFeedback(String word, customColors, BuildContext context) {
@@ -257,5 +263,3 @@ class WordListWidget extends ConsumerWidget {
     );
   }
 }
-
-
