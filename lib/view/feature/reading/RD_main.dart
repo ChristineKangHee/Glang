@@ -1,35 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:readventure/view/feature/reading/quiz_data.dart';
+import 'package:readventure/view/feature/reading/result_dialog.dart';
+import 'package:readventure/view/feature/reading/subjective_quiz.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
-import 'GA_02_04_reading_Quiz/Reading_Quiz_component.dart' as MC; // Multiple Choice Quiz
-import 'GA_02_04_reading_Quiz_ox/Reading_ox_component.dart' as OX; // OX Quiz
+import 'mcq_quiz.dart';
+import 'ox_quiz.dart';
 
 class RdMain extends StatefulWidget {
+  final List<OxQuestion> oxQuestions;
+  final List<McqQuestion> mcqQuestions;
+
+  RdMain({required this.oxQuestions, required this.mcqQuestions});
+
   @override
   _RdMainState createState() => _RdMainState();
 }
 
-final List<dynamic> questions = [
-  MC.Question(
-    paragraph: '코코가 발견한 황금 열쇠는 무엇을 상징할까요?',
-    options: ['새로운 모험', '코코의 일상', '사라진 보물', '우연한 발견'],
-    correctAnswerIndex: 0,
-    explanation: '황금 열쇠는 새로운 모험의 시작을 상징합니다.',
-  ),
-  OX.OXQuestion(
-    paragraph: '코코는 열쇠가 무엇을 여는지 알아낼 수 있을까요?',
-    correctAnswer: true,
-    explanation: '코코의 열쇠는 새로운 발견으로 이어질 것입니다.',
-  ),
-];
 
-class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
-  bool _showQuiz = false;
-  bool _isTextHighlighted = false;
-  int currentQuestionIndex = 0;
-  List<Object> userAnswers = [];
+class _RdMainState extends State<RdMain>
+    with SingleTickerProviderStateMixin {
+  bool _showOxQuiz = false;
+  bool _showMcqQuiz = false;
+  bool _showSubjectiveQuiz = false;
+  int currentOxQuestionIndex = 0;
+  int currentMcqQuestionIndex = 0;
+  List<bool> oxUserAnswers = [];
+  List<int> mcqUserAnswers = [];
   late AnimationController _animationController;
   late Animation<double> _animation;
+  final TextEditingController _subjectiveController = TextEditingController();
 
   @override
   void initState() {
@@ -47,15 +47,26 @@ class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     _animationController.dispose();
+    _subjectiveController.dispose();
     super.dispose();
   }
 
-  // Toggle visibility of quiz and update the animation
-  void toggleQuizVisibility() {
+  void toggleQuizVisibility(String quizType) {
     setState(() {
-      _showQuiz = !_showQuiz;
-      _isTextHighlighted = !_isTextHighlighted;
-      if (_showQuiz) {
+      if (quizType == 'OX') {
+        _showOxQuiz = !_showOxQuiz;
+        _showMcqQuiz = false;
+        _showSubjectiveQuiz = false;
+      } else if (quizType == 'MCQ') {
+        _showMcqQuiz = !_showMcqQuiz;
+        _showOxQuiz = false;
+        _showSubjectiveQuiz = false;
+      } else {
+        _showSubjectiveQuiz = !_showSubjectiveQuiz;
+        _showOxQuiz = false;
+        _showMcqQuiz = false;
+      }
+      if (_showOxQuiz || _showMcqQuiz || _showSubjectiveQuiz) {
         _animationController.forward();
       } else {
         _animationController.reverse();
@@ -63,142 +74,169 @@ class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
     });
   }
 
-  // Check if the selected answer is correct
-  void checkAnswer(Object selectedAnswer) {
-    final currentQuestion = questions[currentQuestionIndex];
-    bool isCorrect = false;
-
-    if (currentQuestion is MC.Question) {
-      isCorrect = selectedAnswer == currentQuestion.correctAnswerIndex;
-    } else if (currentQuestion is OX.OXQuestion) {
-      isCorrect = selectedAnswer == currentQuestion.correctAnswer;
-    }
+  void checkOxAnswer(bool selectedAnswer) {
+    final question = oxQuestions[currentOxQuestionIndex];
+    bool isCorrect = selectedAnswer == question.correctAnswer;
 
     setState(() {
-      userAnswers.add(selectedAnswer);
+      oxUserAnswers.add(selectedAnswer);
+    });
+
+    showResultDialog(context, isCorrect, question.explanation, () {
+      setState(() {
+        _showOxQuiz = false;
+        _showMcqQuiz = false;
+        _showSubjectiveQuiz = false;
+        _animationController.reverse();
+      });
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final customColors = Theme.of(context).extension<CustomColors>()!;
-    final currentQuestion = questions[currentQuestionIndex];
+  void checkMcqAnswer(int selectedIndex) {
+    final question = mcqQuestions[currentMcqQuestionIndex];
+    bool isCorrect = selectedIndex == question.correctAnswerIndex;
 
-    return Scaffold(
-      appBar: AppBar(title: Text("텍스트 사이 문제 예시")),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Paragraph Text
-            Text(
-              '코코는 작은 시골 마을에 사는 강아지예요. 코코의 하루는 항상 비슷했어요...',
-              style: reading_textstyle(context).copyWith(color: customColors.neutral0),
-            ),
-            const SizedBox(height: 16),
+    setState(() {
+      mcqUserAnswers.add(selectedIndex);
+    });
 
-            // First RichText with OX Quiz Button
-            _buildTextWithQuizButton(
-              text: '코코는 열쇠가 무엇을 여는지 알아내고 싶었어요...',
-              isHighlighted: _isTextHighlighted,
-              onTap: () {
-                setState(() {
-                  currentQuestionIndex = 1; // OX quiz
-                  _showQuiz = !_showQuiz;
-                  _animationController.forward();
-                });
-              },
-              icon: Icons.check_circle_outline,
-              customColors: customColors,
-            ),
-
-            // OX Quiz Component with animation (only show if OX quiz is selected)
-            _buildQuizComponent(currentQuestion, currentQuestion is OX.OXQuestion
-                ? OX.OXQuizComponent(
-              question: currentQuestion,
-              userAnswers: userAnswers.cast<bool>(),
-              currentQuestionIndex: currentQuestionIndex,
-              onAnswerSelected: checkAnswer,
-            )
-                : Container()),
-
-            const SizedBox(height: 16),
-
-            // Second RichText with MC Quiz Button
-            _buildTextWithQuizButton(
-              text: '“이게 뭐지?” 코코는 머리를 갸웃거리며 열쇠를 물었어요...',
-              isHighlighted: _isTextHighlighted,
-              onTap: () {
-                setState(() {
-                  currentQuestionIndex = 0; // MC quiz
-                  _showQuiz = !_showQuiz;
-                  _animationController.forward();
-                });
-              },
-              icon: Icons.question_answer,
-              customColors: customColors,
-            ),
-
-            // Multiple Choice Quiz Component with animation (only show if MC quiz is selected)
-            _buildQuizComponent(currentQuestion, currentQuestion is MC.Question
-                ? MC.QuizComponent(
-              question: currentQuestion,
-              userAnswers: userAnswers.cast<int>(),
-              currentQuestionIndex: currentQuestionIndex,
-              onAnswerSelected: checkAnswer,
-            )
-                : Container()),
-          ],
-        ),
-      ),
-    );
+    showResultDialog(context, isCorrect, question.explanation, () {
+      setState(() {
+        _showOxQuiz = false;
+        _showMcqQuiz = false;
+        _showSubjectiveQuiz = false;
+        _animationController.reverse();
+      });
+    });
   }
 
-  // Helper function for RichText with a Quiz Button
-  Widget _buildTextWithQuizButton({
-    required String text,
-    required bool isHighlighted,
-    required VoidCallback onTap,
-    required IconData icon,
-    required CustomColors customColors,
-  }) {
-    return RichText(
-      text: TextSpan(
-        style: reading_textstyle(context).copyWith(color: customColors.neutral0),
-        children: [
-          TextSpan(
-            text: text,
-            style: TextStyle(
-              color: isHighlighted ? customColors.primary : customColors.neutral0,
-            ),
-          ),
-          WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: GestureDetector(
-              onTap: onTap,
-              child: Container(
-                margin: const EdgeInsets.only(left: 8),
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: customColors.primary,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, size: 16, color: customColors.secondary),
-              ),
-            ),
+  void submitSubjectiveAnswer() {
+    final answer = _subjectiveController.text.trim();
+    _subjectiveController.clear();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        title: Text('답변 제출 완료'),
+        content: Text('주관식 답변이 제출되었습니다.\n\n답변: $answer'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('확인'),
           ),
         ],
       ),
     );
   }
 
-  // Helper function for Quiz Components with animation
-  Widget _buildQuizComponent(dynamic currentQuestion, Widget quizComponent) {
-    return SizeTransition(
-      sizeFactor: _animation,
-      axisAlignment: -1.0,
-      child: quizComponent,
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("읽기 도구의 필요성"),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '현대 사회에서 읽기 능력은 지식 습득과 의사소통의 기본이지만, 학습자가 자신의 수준과 흥미에 맞는 텍스트를 접할 기회는 제한적이다. 기존의 교육 시스템은 주로 일률적인 교재와 평가 방식을 사용하며, 이는 학습 동기를 저하시킬 위험이 있다. ',
+              style: reading_textstyle(context).copyWith(color: customColors.neutral0),
+            ),
+            const SizedBox(height: 16),
+            RichText(
+              text: TextSpan(
+                style: reading_textstyle(context).copyWith(
+                  color: customColors.neutral0,
+                ),
+                children: [
+                  TextSpan(
+                    text: '또한, 읽기 과정에서 즉각적인 피드백을 제공하는 시스템이 부족하여 학습자는 자신의 약점이나 강점을 파악하기 어렵다. ',
+                  ),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: GestureDetector(
+                      onTap: () => toggleQuizVisibility('OX'),
+                      child: Column(
+                        children: [
+                          _buildQuizButton(customColors, 'OX'),
+                          SizeTransition(
+                            sizeFactor: _animation,
+                            child: _showOxQuiz
+                                ? OxQuiz(question: oxQuestions[currentOxQuestionIndex], onAnswerSelected: checkOxAnswer)
+                                : SizedBox.shrink(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  TextSpan(
+                    text: '맞춤형 읽기 도구와 실시간 피드백 시스템은 학습자가 적합한 자료를 통해 능동적으로 읽기 능력을 향상시키고, 스스로 학습 과정을 조율할 수 있는 환경을 제공할 잠재력이 있다.',
+                  ),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: GestureDetector(
+                      onTap: () => toggleQuizVisibility('MCQ'),
+                      child: Column(
+                        children: [
+                          _buildQuizButton(customColors, 'MCQ'),
+                          SizeTransition(
+                            sizeFactor: _animation,
+                            child: _showMcqQuiz
+                                ? McqQuiz(question: mcqQuestions[currentMcqQuestionIndex], onAnswerSelected: checkMcqAnswer)
+                                : SizedBox.shrink(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  TextSpan(
+                    text: '이러한 도구의 개발과 보급은 개인화된 학습의 미래를 열어갈 중요한 과제가 될 것이다.',
+                  ),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: GestureDetector(
+                      onTap: () => toggleQuizVisibility('SUBJECTIVE'),
+                      child: Column(
+                        children: [
+                          _buildQuizButton(customColors, 'SUBJECTIVE'),
+                          SizeTransition(
+                            sizeFactor: _animation,
+                            child: _showSubjectiveQuiz
+                                ? SubjectiveQuiz(controller: _subjectiveController, onSubmit: submitSubjectiveAnswer)
+                                : SizedBox.shrink(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuizButton(CustomColors customColors, String quizType) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+      decoration: BoxDecoration(
+        color: customColors.primary,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Text(
+        '$quizType 퀴즈',
+        style: reading_textstyle(context).copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 }
