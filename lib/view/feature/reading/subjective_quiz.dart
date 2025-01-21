@@ -55,7 +55,7 @@ class _SubjectiveQuizState extends State<SubjectiveQuiz> {
             ),
             SizedBox(height: 24),
             Text(
-              '코코가 발견한 황금 열쇠에 대해 어떻게 생각하나요? 자신의 의견을 작성해보세요.',
+              '실시간 피드백 시스템은 학습자에게 어떤 도움을 주나요?',
               style: body_small_semi(context).copyWith(
                 color: customColors.primary,
               ),
