@@ -82,12 +82,6 @@ class ArMain extends StatelessWidget {
               builder: (context) => DebateActivityMain(),
             )), child: Text("토론 활동")),
             SizedBox(height: 30,),
-            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
-              builder: (context) => ReadingQuizUnifiedMain(
-                oxQuestions: oxQuestions,
-                mcqQuestions: mcqQuestions,
-              )              ,
-            )), child: Text("읽기 중 퀴즈")),
           ],
         ),
       )),
