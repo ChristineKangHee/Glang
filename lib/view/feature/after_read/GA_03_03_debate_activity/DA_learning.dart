@@ -1,334 +1,318 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';
-import 'package:readventure/view/components/custom_app_bar.dart';
-import 'package:readventure/view/components/custom_button.dart';
-import 'package:readventure/view/components/my_divider.dart';
-import '../../../../theme/theme.dart';
-import '../widget/answer_section.dart';
-import '../widget/CustomAlertDialog.dart';
-import '../widget/text_section.dart';
-import '../widget/title_section_learning.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../viewmodel/custom_colors_provider.dart';
+import '../../../components/message_bubble.dart';
+import 'package:readventure/theme/theme.dart';
+import '../../../../api/debate_chatgpt_service.dart';
 
-class DALearning extends StatefulWidget {
-  const DALearning({super.key});
-
+class DebatePage extends ConsumerWidget {
   @override
-  State<DALearning> createState() => _CELearningState();
-}
-
-class _CELearningState extends State<DALearning> {
-  final TextEditingController _controller = TextEditingController();
-  bool _isButtonEnabled = false;
-  // 키워드 상태 추가
-  List<String> _keywords = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _controller.addListener(_updateButtonState);
-  }
-
-  @override
-  void dispose() {
-    _controller.removeListener(_updateButtonState);
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _updateButtonState() {
-    setState(() {
-      _isButtonEnabled = _controller.text.isNotEmpty;
-    });
-  }
-
-  // 결과창 띄우기
-  void _showAlertDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return const CustomAlertDialog();
-      },
-    );
-  }
-
-  // 텍스트 필드에 단어 추가
-  void _updateTextField(String newWord) {
-    setState(() {
-      final currentText = _controller.text;
-      _controller.text = currentText.isEmpty
-          ? newWord
-          : '$currentText $newWord'; // 기존 텍스트에 단어 추가
-      _controller.selection = TextSelection.fromPosition(
-        TextPosition(offset: _controller.text.length), // 커서를 맨 끝으로 이동
-      );
-    });
-  }
-
-  // 키워드 업데이트 함수
-  void _updateKeywords(List<String> keywords) {
-    setState(() {
-      _keywords = keywords;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final customColors = Theme.of(context).extension<CustomColors>()!;
-    final data= "깊은 숲 속 작은 오두막에는 토끼 가족이 살고 있었어요. 어느 날, 토끼 엄마는 아기 토끼들에게 말했어요. ‘오늘은 숲 속에 숨어 있는 가장 달콤한 당근을 찾아보자.’ 아기 토끼들은 신이 나서 숲으로 달려갔어요. 그런데, 가장 작은 토끼가 길을 잃고 말았답니다. 작은 토끼는 용기를 내어 큰 나무 옆에 숨은 다람쥐에게 도움을 요청했어요. 작은 토끼는 용기를 내어 큰 나무 옆에 숨은 다람쥐에게 도움을 요청했어요.깊은 숲 속 작은 오두막에는 토끼 가족이 살고 있었어요. 어느 날, 토끼 엄마는 아기 토끼들에게 말했어요. ‘오늘은 숲 속에 숨어 있는 가장 달콤한 당근을 찾아보자.’ 아기 토끼들은 신이 나서 숲으로 달려갔어요. 그런데, 가장 작은 토끼가 길을 잃고 말았답니다. 작은 토끼는 용기를 내어 큰 나무 옆에 숨은 다람쥐에게 도움을 요청했어요. 작은 토끼는 용기를 내어 큰 나무 옆에 숨은 다람쥐에게 도움을 요청했어요.";
+  Widget build(BuildContext context, WidgetRef ref) {
+    final customColors = ref.watch(customColorsProvider); // CustomColors 가져오기
 
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      appBar: CustomAppBar_2depth_8(title: "내용 요약 게임"),
-      // floatingActionButtonLocation: ,
-      floatingActionButton: Container(
-        margin: const EdgeInsets.only(bottom: 70), // 하단에서 50px 위로 이동
-        child: FloatingActionButton(
-          onPressed: () {
-            // 버튼 동작
-            _showHintDialog();
-          },
-          backgroundColor: Colors.yellow,
-          shape: const CircleBorder(),
-          child: const Icon(
-            Icons.emoji_objects_outlined,
-            color: Colors.black,
-            size: 28,
+      appBar: AppBar(
+        title: Text("토론"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.close),
+            onPressed: () {
+              Navigator.pop(context); // 닫기 버튼
+            },
           ),
-        ),
+        ],
       ),
-      body: SafeArea(
+      body: Container(
+        color: customColors.neutral90,
         child: Column(
           children: [
-            // 스크롤 가능한 콘텐츠
+            // 질문 영역
+            QuestionSection(),
+            // 라운드 정보 영역
+            RoundSection(customColors: customColors),
+            // AI와 대화 섹션
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 타이머와 제목 섹션
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: TitleSection_withoutIcon(
-                        customColors: Theme.of(context).extension<CustomColors>()!, // CustomColors 가져오기
-                        title: "글을 3문장으로 요약해주세요!",               // 제목
-                        subtitle: "<토끼 가족 이야기>",                           // 부제목
-                        author: "김댕댕",                                         // 작성자                         // 아이콘 (기본값: Icons.import_contacts)
-                      ),
-                    ),
-                    // 본문 텍스트
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Container(
-                          height: 200,
-                          child:SingleChildScrollView(
-                            child: Text_Section(
-                              text: data,
-                            ),
-                          )
-                      ),
-                    ),
-                    SizedBox(height: 8,),
-                    BigDivider(),
-                    BigDivider(),
-                    SizedBox(height: 8,),
-                    // 사용자 입력 영역
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16,16,16,0),
-                      child: Answer_Section(
-                        controller: _controller,
-                        customColors: customColors,
-                      ),
-                    ),
-                    if (_keywords.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Wrap(
-                          spacing: 8.0,
-                          runSpacing: 8.0,
-                          children: _keywords
-                              .map((keyword) => Chip(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14.0),
-                              side: BorderSide(color: customColors.secondary60 ?? Colors.yellow),
-                            ),
-                            label: Text(
-                              keyword,
-                              style: body_small_semi(context).copyWith(color: customColors.neutral30),
-                            ),
-                            backgroundColor: customColors.secondary60,
-                          ))
-                              .toList(),
-                        ),
-                      ),
-                  ],
-                ),
+              child: AIDiscussionSection(
+                customColors: customColors, topic: '인공 지능이 인간의 일자리를 대체하는 것에 대해 어떻게 생각하십니까?',
               ),
             ),
-            // 제출 버튼
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: buildButton(customColors),
-            ),
+            // 의견 입력 필
+            // InputSection(customColors: customColors),
           ],
         ),
       ),
     );
   }
 
-  SizedBox buildButton(CustomColors customColors) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _isButtonEnabled ? _showAlertDialog : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: customColors.primary,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
+  void _showPauseDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("일시 정지"),
+        content: Text("타이머가 일시 정지되었습니다."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("재개"),
           ),
-          disabledBackgroundColor: customColors.primary20,
-          disabledForegroundColor: Colors.white,
-        ),
-        child: const Text("제출하기", style: TextStyle(fontSize: 16)),
+        ],
       ),
     );
   }
+}
 
-  void _showHintDialog() {
-    final customColors = Theme.of(context).extension<CustomColors>()!;
-    int? selectedOption; // 선택된 옵션을 저장
+class AIDiscussionSection extends StatefulWidget {
+  final CustomColors customColors;
+  final String topic;
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              insetPadding: EdgeInsets.all(16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              content: Container(
-                width: MediaQuery.of(context).size.width * 0.95,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "힌트 2가지 중 하나를 선택해주세요",
-                          style: body_large_semi(context).copyWith(color: customColors.neutral30),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Icon(Icons.close),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16.0),
-                    Row(
-                      children: [
-                        // 첫 번째 버튼
-                        Expanded(
-                          child: InkWell(
-                            onTap: () {
-                              setState(() {
-                                selectedOption = 1; // 첫 번째 버튼 선택
-                              });
-                            },
-                            child: Container(
-                              height: 120,
-                              decoration: BoxDecoration(
-                                  color: selectedOption == 1
-                                      ? customColors.primary10 // 선택된 경우 색상 변경
-                                      : customColors.neutral90,
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  border: selectedOption == 1
-                                      ? Border.all(color: customColors.primary ?? Colors.blue) // 선택된 경우 색상 변경
-                                      : null
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "키워드 3개",
-                                  style: body_small_semi(context).copyWith(color: customColors.neutral30),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16.0),
-                        // 두 번째 버튼
-                        Expanded(
-                          child: InkWell(
-                            onTap: () {
-                              setState(() {
-                                selectedOption = 2; // 두 번째 버튼 선택
-                              });
-                            },
-                            child: Container(
-                              height: 120,
-                              decoration: BoxDecoration(
-                                  color: selectedOption == 2
-                                      ? customColors.primary10 // 선택된 경우 색상 변경
-                                      : customColors.neutral90,
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  border: selectedOption == 2
-                                      ? Border.all(color: customColors.primary ?? Colors.blue) // 선택된 경우 색상 변경
-                                      : null
-                              ),
-                              child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "맥락에 맞는 글",
-                                      style: body_small_semi(context).copyWith(color: customColors.neutral30),
-                                    ),
-                                    Text(
-                                      "자동 추가",
-                                      style: body_small_semi(context).copyWith(color: customColors.neutral30),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16.0),
-                    // 선택 완료 버튼
-                    ButtonPrimary_noPadding(
-                      function: () {
-                        Navigator.of(context).pop();
-                        if (selectedOption == 1) {
-                          // 첫 번째 옵션 동작
-                          print("키워드 3개 선택");
-                          _updateKeywords(["#키워드1", "#키워드2", "#키워드3"]); // 키워드 업데이트
-                        } else if (selectedOption == 2) {
-                          // 두 번째 옵션 동작
-                          print("맥락에 맞는 글 자동 추가 선택");
-                          _updateTextField("자동 추가된 단어"); // 텍스트 필드에 단어 추가
-                        }
-                      },
-                      title: '선택 완료',
-                      condition: selectedOption != null ? "not null" : "null", // 선택된 옵션에 따라 상태 결정
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
+  const AIDiscussionSection({
+    super.key,
+    required this.customColors,
+    required this.topic,
+  });
+
+  @override
+  State<AIDiscussionSection> createState() => _AIDiscussionSectionState();
+}
+
+class _AIDiscussionSectionState extends State<AIDiscussionSection> {
+  final DebateGPTService _debateService = DebateGPTService();
+  final TextEditingController _controller = TextEditingController();
+  final List<Map<String, String>> _messages = [];
+  int _currentRound = 1; // 현재 라운드
+  bool _isUserPro = true; // 사용자가 찬성인지 여부
+
+  Future<void> _sendMessage() async {
+    final userMessage = _controller.text.trim();
+    if (userMessage.isEmpty) return;
+
+    // 사용자 메시지 추가
+    setState(() {
+      _messages.add({
+        'role': 'user',
+        'content': "[${_isUserPro ? '찬성' : '반대'}] $userMessage",
+      });
+    });
+
+    _controller.clear();
+
+    try {
+      // AI 응답 요청
+      final aiRole = _isUserPro ? '반대' : '찬성'; // AI는 반대 역할
+      final response = await _debateService.getDebateResponse(
+        widget.topic,
+        "$aiRole 관점에서 대답해주세요: $userMessage",
+      );
+
+      // AI 메시지 추가
+      setState(() {
+        _messages.add({'role': 'assistant', 'content': "[${aiRole}] $response"});
+      });
+    } catch (e) {
+      setState(() {
+        _messages.add({'role': 'error', 'content': '응답을 가져오지 못했습니다.'});
+      });
+    }
   }
 
+  void _nextRound() {
+    setState(() {
+      _currentRound++;
+      _isUserPro = !_isUserPro; // 찬반 역할 전환
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // 현재 라운드 및 찬반 표시
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "ROUND $_currentRound | ${_isUserPro ? '찬성' : '반대'}",
+                style: body_small_semi(context).copyWith(
+                  color: widget.customColors.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              ElevatedButton(
+                onPressed: _nextRound, // 버튼 클릭 시 라운드 전환
+                child: Text("다음 라운드"),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _messages.length,
+            itemBuilder: (context, index) {
+              final message = _messages[index];
+              final isUser = message['role'] == 'user';
+              final isError = message['role'] == 'error';
+
+              return MessageBubble(
+                content: message['content'] ?? '',
+                isUser: isUser,
+                isError: isError,
+              );
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: widget.customColors.neutral100,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: InputDecoration(
+                      hintText: "시간 내에 의견을 입력해주세요",
+                      hintStyle: body_small(context).copyWith(
+                        color: widget.customColors.neutral60,
+                      ),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: Icon(Icons.send, color: widget.customColors.primary),
+                  onPressed: _sendMessage,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 
+/*
+** _AIDiscussionSectionState 에서 대체 **
+class InputSection extends StatelessWidget {
+  const InputSection({
+    super.key,
+    required this.customColors,
+  });
+
+  final CustomColors customColors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: customColors.neutral100,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                decoration: InputDecoration(
+                  hintStyle: body_small(context).copyWith(color: customColors.neutral60),
+                  hintText: "시간 내에 의견을 입력해주세요",
+                  border: OutlineInputBorder(
+                    // borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding:
+                  EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+              ),
+            ),
+            SizedBox(width: 8),
+            IconButton(
+              icon: Icon(Icons.send, color: customColors.primary),
+              onPressed: () {
+                // 의견 전송 처리
+              },
+            ),
+            SizedBox(width: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+*/
+
+class RoundSection extends StatelessWidget {
+  const RoundSection({
+    super.key,
+    required this.customColors,
+  });
+
+  final CustomColors customColors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: customColors.neutral90,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Divider(color: customColors.primary, thickness: 1),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                "ROUND 1 | 찬성",
+                style: body_xsmall(context).copyWith(color: customColors.primary)
+              ),
+            ),
+            Expanded(
+              child: Divider(color: customColors.primary, thickness: 1),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class QuestionSection extends StatelessWidget {
+  const QuestionSection({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      color: Colors.white,
+      child: Row(
+        children: [
+          Icon(Icons.message_rounded, size: 32),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              "인공 지능이 인간의 일자리를 대체하는 것에 대해 어떻게 생각하십니까?",
+              style: body_small_semi(context),
+              textAlign: TextAlign.left,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
