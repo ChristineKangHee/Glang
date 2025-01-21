@@ -6,9 +6,7 @@ import 'package:readventure/view/feature/reading/GA_02_04_reading_Quiz/Reading_Q
 import 'package:readventure/view/feature/reading/GA_02_04_reading_Quiz_ox/Reading_Quiz_ox_main.dart';
 
 import '../reading/GA_02_02_Question/Question_main.dart';
-import '../reading/GA_02_04_reading_Quiz/Quiz_combine.dart';
 import '../reading/RD_exercise.dart';
-import '../reading/quiz_data.dart';
 import 'GA_03_02_content_summary/CS_main.dart';
 import 'GA_03_05_writing_form/writing_form_learning.dart';
 import 'GA_03_06_writing_essay/WE_main.dart';
@@ -68,13 +66,13 @@ class ArMain extends StatelessWidget {
             )), child: Text("읽기 중")),
             SizedBox(height: 30,),
             ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
-              builder: (context) => ReadingQuizUnifiedMain(
-                oxQuestions: oxQuestions,
-                mcqQuestions: mcqQuestions,
-              )              ,
+              builder: (context) => QuestionMain(),
+            )), child: Text("핵심 내용 질문")),
+            SizedBox(height: 30,),
+            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
+              builder: (context) => ReadingQuizOxMain(),
             )), child: Text("읽기 중 퀴즈")),
             SizedBox(height: 30,),
-
           ],
         ),
       )),

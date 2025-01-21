@@ -136,7 +136,7 @@ class _ReadingQuizUnifiedMainState extends State<ReadingQuizUnifiedMain>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("텍스트 사이 문제 예시"),
+        title: Text("읽기 도구의 필요성"),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
@@ -144,7 +144,7 @@ class _ReadingQuizUnifiedMainState extends State<ReadingQuizUnifiedMain>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '코코는 작은 시골 마을에 사는 강아지예요. 코코의 하루는 항상 비슷했어요...',
+              '현대 사회에서 읽기 능력은 지식 습득과 의사소통의 기본이지만, 학습자가 자신의 수준과 흥미에 맞는 텍스트를 접할 기회는 제한적이다. 기존의 교육 시스템은 주로 일률적인 교재와 평가 방식을 사용하며, 이는 학습 동기를 저하시킬 위험이 있다. ',
               style: reading_textstyle(context).copyWith(color: customColors.neutral0),
             ),
             const SizedBox(height: 16),
@@ -155,42 +155,67 @@ class _ReadingQuizUnifiedMainState extends State<ReadingQuizUnifiedMain>
                 ),
                 children: [
                   TextSpan(
-                    text: '“이게 뭐지?” 코코는 머리를 갸웃거리며 열쇠를 물었어요. ',
+                    text: '또한, 읽기 과정에서 즉각적인 피드백을 제공하는 시스템이 부족하여 학습자는 자신의 약점이나 강점을 파악하기 어렵다. ',
                   ),
                   WidgetSpan(
                     alignment: PlaceholderAlignment.middle,
                     child: GestureDetector(
                       onTap: () => toggleQuizVisibility('OX'),
-                      child: _buildQuizButton(customColors, 'OX'),
+                      child: Column(
+                        children: [
+                          _buildQuizButton(customColors, 'OX'),
+                          SizeTransition(
+                            sizeFactor: _animation,
+                            child: _showOxQuiz
+                                ? OxQuiz(question: oxQuestions[currentOxQuestionIndex], onAnswerSelected: checkOxAnswer)
+                                : SizedBox.shrink(),
+                          ),
+                        ],
+                      ),
                     ),
+                  ),
+                  TextSpan(
+                    text: '맞춤형 읽기 도구와 실시간 피드백 시스템은 학습자가 적합한 자료를 통해 능동적으로 읽기 능력을 향상시키고, 스스로 학습 과정을 조율할 수 있는 환경을 제공할 잠재력이 있다.',
                   ),
                   WidgetSpan(
                     alignment: PlaceholderAlignment.middle,
                     child: GestureDetector(
                       onTap: () => toggleQuizVisibility('MCQ'),
-                      child: _buildQuizButton(customColors, 'MCQ'),
+                      child: Column(
+                        children: [
+                          _buildQuizButton(customColors, 'MCQ'),
+                          SizeTransition(
+                            sizeFactor: _animation,
+                            child: _showMcqQuiz
+                                ? McqQuiz(question: mcqQuestions[currentMcqQuestionIndex], onAnswerSelected: checkMcqAnswer)
+                                : SizedBox.shrink(),
+                          ),
+                        ],
+                      ),
                     ),
+                  ),
+                  TextSpan(
+                    text: '이러한 도구의 개발과 보급은 개인화된 학습의 미래를 열어갈 중요한 과제가 될 것이다.',
                   ),
                   WidgetSpan(
                     alignment: PlaceholderAlignment.middle,
                     child: GestureDetector(
                       onTap: () => toggleQuizVisibility('SUBJECTIVE'),
-                      child: _buildQuizButton(customColors, 'SUBJECTIVE'),
+                      child: Column(
+                        children: [
+                          _buildQuizButton(customColors, 'SUBJECTIVE'),
+                          SizeTransition(
+                            sizeFactor: _animation,
+                            child: _showSubjectiveQuiz
+                                ? SubjectiveQuiz(controller: _subjectiveController, onSubmit: submitSubjectiveAnswer)
+                                : SizedBox.shrink(),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 16),
-            SizeTransition(
-              sizeFactor: _animation,
-              child: _showOxQuiz
-                  ? OxQuiz(question: oxQuestions[currentOxQuestionIndex], onAnswerSelected: checkOxAnswer)
-                  : _showMcqQuiz
-                  ? McqQuiz(question: mcqQuestions[currentMcqQuestionIndex], onAnswerSelected: checkMcqAnswer)
-                  : _showSubjectiveQuiz
-                  ? SubjectiveQuiz(controller: _subjectiveController, onSubmit: submitSubjectiveAnswer)
-                  : SizedBox.shrink(),
             ),
           ],
         ),
