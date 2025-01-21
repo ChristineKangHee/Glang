@@ -6,6 +6,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:readventure/view/community/community_tmp.dart';
 import '../chat/chat_screen.dart';
 import '../components/custom_app_bar.dart';
 import '../components/custom_navigation_bar.dart';
@@ -21,7 +22,7 @@ class CommunityMain extends ConsumerWidget {
 
     return const Scaffold(
       appBar: CustomAppBar_Community(),
-      body: SafeArea(child: ChatScreen()),
+      body: SafeArea(child: CommunityTmp()),
       bottomNavigationBar: CustomNavigationBar(),
     );
   }

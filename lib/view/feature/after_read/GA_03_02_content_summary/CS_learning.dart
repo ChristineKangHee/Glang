@@ -15,10 +15,10 @@ class CSLearning extends StatefulWidget {
   const CSLearning({super.key});
 
   @override
-  State<CSLearning> createState() => _CELearningState();
+  State<CSLearning> createState() => _CSLearningState();
 }
 
-class _CELearningState extends State<CSLearning> {
+class _CSLearningState extends State<CSLearning> {
   final TextEditingController _controller = TextEditingController();
   bool _isButtonEnabled = false;
   // 키워드 상태 추가
