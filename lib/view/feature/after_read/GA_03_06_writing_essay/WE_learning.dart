@@ -52,7 +52,7 @@ class _CELearningState extends State<WELearning> {
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    final data = "깊은 숲 속 작은 오두막에 살던 토끼 가족 중 가장 작은 토끼가 숲에서 길을 잃었어요. 작은 토끼는 용기를 내어 큰 나무 옆에 있던 다람쥐에게 도움을 요청했고, 다람쥐의 도움으로 무사히 집으로 돌아갈 수 있었답니다.";
+    final data = "저는 학창 시절에 교과서 중심의 학습 방식이 재미없게 느껴졌습니다. 흥미를 느낄 수 있는 자료가 부족해 독서에 대한 의욕이 점점 줄었고, 성적도 좋지 않았습니다. 반면, 흥미로운 소설이나 관심 분야의 책을 읽을 때는 집중력이 높아졌습니다. 맞춤형 읽기 도구는 개인의 수준과 흥미를 고려해 자료를 제공하여 이런 문제를 해결할 수 있을 것입니다. 이는 학습 효율을 높이고, 읽기에 대한 자신감을 키우는 데 큰 도움이 될 것이라 생각합니다.";
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -72,8 +72,8 @@ class _CELearningState extends State<WELearning> {
                       child: TitleSection_withIcon(
                         customColors: Theme.of(context).extension<CustomColors>()!, // CustomColors 가져오기
                         title: "자신의 경험과 의견을 작성해 주세요!",               // 제목
-                        subtitle: "<토끼 가족 이야기 중>",                           // 부제목
-                        author: "김댕댕",                                         // 작성자                         // 아이콘 (기본값: Icons.import_contacts)
+                        subtitle: "개인의 수준과 흥미를 고려한 읽기 도구의 필요성",                           // 부제목
+                        author: "AI",                                         // 작성자                         // 아이콘 (기본값: Icons.import_contacts)
                       ),
                     ),
                     // 본문 텍스트

@@ -29,13 +29,13 @@ class DebatePage extends ConsumerWidget {
         child: Column(
           children: [
             // 질문 영역
-            QuestionSection(),
+            QuestionSection(data: "맞춤형 읽기 도구와 실시간 피드백 시스템이 전통적인 교육 방식을 대체할 수 있는가?",),
             // 라운드 정보 영역
             RoundSection(customColors: customColors),
             // AI와 대화 섹션
             Expanded(
               child: AIDiscussionSection(
-                customColors: customColors, topic: '인공 지능이 인간의 일자리를 대체하는 것에 대해 어떻게 생각하십니까?',
+                customColors: customColors, topic: '맞춤형 읽기 도구와 실시간 피드백 시스템이 전통적인 교육 방식을 대체할 수 있는가?',
               ),
             ),
             // 의견 입력 필
@@ -293,7 +293,9 @@ class RoundSection extends StatelessWidget {
 class QuestionSection extends StatelessWidget {
   const QuestionSection({
     super.key,
+    required this.data,
   });
+  final String data;
 
   @override
   Widget build(BuildContext context) {
@@ -306,7 +308,7 @@ class QuestionSection extends StatelessWidget {
           SizedBox(width: 8),
           Expanded(
             child: Text(
-              "인공 지능이 인간의 일자리를 대체하는 것에 대해 어떻게 생각하십니까?",
+              data,
               style: body_small_semi(context),
               textAlign: TextAlign.left,
             ),

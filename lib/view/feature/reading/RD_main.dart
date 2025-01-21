@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:readventure/view/components/custom_button.dart';
 import 'package:readventure/view/feature/reading/quiz_data.dart';
 import 'package:readventure/view/feature/reading/result_dialog.dart';
 import 'package:readventure/view/feature/reading/subjective_quiz.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../../components/custom_app_bar.dart';
+import '../after_read/choose_activities.dart';
 import 'mcq_quiz.dart';
 import 'ox_quiz.dart';
 
@@ -217,10 +219,23 @@ class _RdMainState extends State<RdMain>
                       ),
                     ),
                   ),
-
                 ],
               ),
             ),
+            SizedBox(height: 40,),
+            ButtonPrimary(
+              function: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    settings: RouteSettings(name: 'LearningActivitiesPage'),
+                    builder: (context) => LearningActivitiesPage(),
+                  ),
+                );
+              },
+              title: "읽기 완료",
+            ),
+            SizedBox(height: 40,),
           ],
         ),
       ),

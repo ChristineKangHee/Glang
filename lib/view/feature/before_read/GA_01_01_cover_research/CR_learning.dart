@@ -5,10 +5,9 @@ import 'package:readventure/view/components/my_divider.dart';
 import 'package:readventure/view/feature/after_read/widget/custom_chip.dart';
 import '../../../../theme/theme.dart';
 import '../../after_read/widget/answer_section.dart';
-import '../../after_read/widget/CustomAlertDialog.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../after_read/widget/text_section.dart';
-import '../../after_read/widget/title_section_learning.dart';
+
+import '../widget/AlertDialogBR.dart';
 
 class CRLearning extends StatefulWidget {
   const CRLearning({super.key});
@@ -20,8 +19,7 @@ class CRLearning extends StatefulWidget {
 class _CELearningState extends State<CRLearning> {
   final TextEditingController _controller = TextEditingController();
   bool _isButtonEnabled = false;
-  List<String> _keywords = ["#키워드1","#키워드2","#키워드3"];
-
+  List<String> _keywords = ["#읽기능력","#맞춤형도구","#피드백"];
   @override
   void initState() {
     super.initState();
@@ -46,7 +44,7 @@ class _CELearningState extends State<CRLearning> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return const CustomAlertDialog();
+        return const AlertDialogBR();
       },
     );
   }
@@ -76,10 +74,10 @@ class _CELearningState extends State<CRLearning> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Container(
-                        color: Colors.yellow,
+                        color: Colors.white,
                         width: MediaQuery.of(context).size.width,
                         height: 300.h,
-                        child: Text("data"),
+                        child: Image.asset("assets/images/cover.png"),
                       ),
                     ),
                     ///TODO CustomChip추가: 키워드 3개
