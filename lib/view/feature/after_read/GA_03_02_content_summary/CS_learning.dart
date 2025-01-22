@@ -15,10 +15,10 @@ class CSLearning extends StatefulWidget {
   const CSLearning({super.key});
 
   @override
-  State<CSLearning> createState() => _CELearningState();
+  State<CSLearning> createState() => _CSLearningState();
 }
 
-class _CELearningState extends State<CSLearning> {
+class _CSLearningState extends State<CSLearning> {
   final TextEditingController _controller = TextEditingController();
   bool _isButtonEnabled = false;
   // 키워드 상태 추가
@@ -76,7 +76,7 @@ class _CELearningState extends State<CSLearning> {
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    final data= "깊은 숲 속 작은 오두막에는 토끼 가족이 살고 있었어요. 어느 날, 토끼 엄마는 아기 토끼들에게 말했어요. ‘오늘은 숲 속에 숨어 있는 가장 달콤한 당근을 찾아보자.’ 아기 토끼들은 신이 나서 숲으로 달려갔어요. 그런데, 가장 작은 토끼가 길을 잃고 말았답니다. 작은 토끼는 용기를 내어 큰 나무 옆에 숨은 다람쥐에게 도움을 요청했어요. 작은 토끼는 용기를 내어 큰 나무 옆에 숨은 다람쥐에게 도움을 요청했어요.깊은 숲 속 작은 오두막에는 토끼 가족이 살고 있었어요. 어느 날, 토끼 엄마는 아기 토끼들에게 말했어요. ‘오늘은 숲 속에 숨어 있는 가장 달콤한 당근을 찾아보자.’ 아기 토끼들은 신이 나서 숲으로 달려갔어요. 그런데, 가장 작은 토끼가 길을 잃고 말았답니다. 작은 토끼는 용기를 내어 큰 나무 옆에 숨은 다람쥐에게 도움을 요청했어요. 작은 토끼는 용기를 내어 큰 나무 옆에 숨은 다람쥐에게 도움을 요청했어요.";
+    final data= "현대 사회에서 읽기 능력은 지식 습득과 의사소통의 기본이지만, 학습자가 자신의 수준과 흥미에 맞는 텍스트를 접할 기회는 제한적이다. 기존의 교육 시스템은 주로 일률적인 교재와 평가 방식을 사용하며, 이는 학습 동기를 저하시킬 위험이 있다. 또한, 읽기 과정에서 즉각적인 피드백을 제공하는 시스템이 부족하여 학습자는 자신의 약점이나 강점을 파악하기 어렵다. 맞춤형 읽기 도구와 실시간 피드백 시스템은 학습자가 적합한 자료를 통해 능동적으로 읽기 능력을 향상시키고, 스스로 학습 과정을 조율할 수 있는 환경을 제공할 잠재력이 있다. 또한, 맞춤형 읽기 도구는 학습자의 수준과 흥미를 고려하여 적합한 자료를 제공할 수 있다. 이러한 도구의 개발과 보급은 개인화된 학습의 미래를 열어갈 중요한 과제가 될 것이다.";
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -113,8 +113,8 @@ class _CELearningState extends State<CSLearning> {
                       child: TitleSection_withoutIcon(
                         customColors: Theme.of(context).extension<CustomColors>()!, // CustomColors 가져오기
                         title: "글을 3문장으로 요약해주세요!",               // 제목
-                        subtitle: "<토끼 가족 이야기>",                           // 부제목
-                        author: "김댕댕",                                         // 작성자                         // 아이콘 (기본값: Icons.import_contacts)
+                        subtitle: "개인의 수준과 흥미를 고려한 읽기 도구의 필요성",                           // 부제목
+                        author: "AI",                                     // 작성자                         // 아이콘 (기본값: Icons.import_contacts)
                       ),
                     ),
                     // 본문 텍스트
@@ -307,11 +307,11 @@ class _CELearningState extends State<CSLearning> {
                         if (selectedOption == 1) {
                           // 첫 번째 옵션 동작
                           print("키워드 3개 선택");
-                          _updateKeywords(["#키워드1", "#키워드2", "#키워드3"]); // 키워드 업데이트
+                          _updateKeywords(["#읽기 능력", "#맞춤형 도구", "#피드백"]); // 키워드 업데이트
                         } else if (selectedOption == 2) {
                           // 두 번째 옵션 동작
                           print("맥락에 맞는 글 자동 추가 선택");
-                          _updateTextField("자동 추가된 단어"); // 텍스트 필드에 단어 추가
+                          _updateTextField("추후 AI가 자동 생성합니다!"); // 텍스트 필드에 단어 추가
                         }
                       },
                       title: '선택 완료',

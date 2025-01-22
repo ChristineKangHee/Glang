@@ -50,8 +50,8 @@ void main() async {
 
   // 카카오 로그인 (이전 코드)
   KakaoSdk.init(
-    nativeAppKey: '5fc90edd56a963389d62ce93012c0c80',
-    javaScriptAppKey: '0e94fd00949264ca099b7626f5138e5a',
+    nativeAppKey: dotenv.env['KAKAO_NATIVE_KEY'] ?? '',
+    javaScriptAppKey: dotenv.env['KAKAO_JS_KEY'] ?? '',
   );
 
   //////////////////// 앱 실행 ////////////////////

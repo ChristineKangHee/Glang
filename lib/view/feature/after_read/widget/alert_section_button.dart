@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/theme.dart';
 
+import '../choose_activities.dart';
+
 class AlertSectionButton extends StatelessWidget {
   const AlertSectionButton({
     super.key,
@@ -33,7 +35,15 @@ class AlertSectionButton extends StatelessWidget {
         ),
         TextButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            // Navigator.pushAndRemoveUntil(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => LearningActivitiesPage()),
+            //       (route) => false, // 이전 화면을 모두 제거
+            // );
+            Navigator.popUntil(
+              context,
+                  (route) => route.settings.name == 'LearningActivitiesPage',
+            );
           },
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(

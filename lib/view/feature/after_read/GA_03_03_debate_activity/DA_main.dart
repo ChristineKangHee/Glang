@@ -9,14 +9,14 @@ import '../widget/start_page/icon_section_main.dart';
 import '../widget/start_page/title_section_main.dart';
 import 'DA_learning.dart';
 
-class ContentSummaryMain extends StatelessWidget {
-  const ContentSummaryMain({super.key});
+class DebateActivityMain extends StatelessWidget {
+  const DebateActivityMain({super.key});
 
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     return Scaffold(
-      appBar: CustomAppBar_2depth_6(title: "내용 요약 게임"),
+      appBar: CustomAppBar_2depth_6(title: "토론"),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -35,13 +35,14 @@ class ContentSummaryMain extends StatelessWidget {
                         children: [
                           SizedBox(height: 117.h),
                           TitleSectionMain(
-                            title: "내용 요약 게임을",
+                            title: "인공지능의 일자리 대체를",
                             subtitle: "",
-                            subtitle2: "시작합니다!",
+                            subtitle2: "주제로 토론해볼까요?",
                             customColors: customColors,
                           ),
                           SizedBox(height: 51.h),
-                          IconSection(customColors: customColors),
+                          SVGSection(customColors: customColors)
+
                         ],
                       ),
                       Column(
@@ -52,7 +53,7 @@ class ContentSummaryMain extends StatelessWidget {
                             items: [
                               {
                                 "icon": Icons.message_outlined, // 사용자 지정 아이콘
-                                "text": "학습에 대한 부가 설명이 들어갑니다",
+                                "text": "찬성/반대 총 4번을 반복해요!",
                               },
                               {
                                 "icon": Icons.access_time_filled, // 사용자 지정 아이콘
@@ -90,7 +91,7 @@ class Button_Section extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => DALearning(),
+              builder: (context) => DebatePage(),
             ),
           );
         },

@@ -46,72 +46,70 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     final existingNicknames = ['user1', 'user2', 'admin']; // 중복된 별명 체크용
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: CustomAppBar_2depth_4(
-          title: "내 정보 수정",
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '별명을 입력해주세요',
-                        style: heading_medium(context),
+    return Scaffold(
+      appBar: CustomAppBar_2depth_4(
+        title: "내 정보 수정",
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '별명을 입력해주세요',
+                      style: heading_medium(context),
+                    ),
+                    const SizedBox(height: 24),
+                    NicknameTextField(
+                      controller: _controller,
+                      decoration: const InputDecoration(
+                        labelText: '별명',
+                        border: OutlineInputBorder(),
                       ),
-                      const SizedBox(height: 24),
-                      NicknameTextField(
-                        controller: _controller,
-                        decoration: const InputDecoration(
-                          labelText: '별명',
-                          border: OutlineInputBorder(),
+                      existingNicknames: existingNicknames,
+                      onChanged: (text, error) {
+                        setState(() {
+                          errorMessage = error;
+                        });
+                      },
+                    ),
+                    if (errorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          errorMessage!,
+                          style: body_xsmall(context).copyWith(color: customColors.error),
                         ),
-                        existingNicknames: existingNicknames,
-                        onChanged: (text, error) {
-                          setState(() {
-                            errorMessage = error;
-                          });
-                        },
                       ),
-                      if (errorMessage != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Text(
-                            errorMessage!,
-                            style: body_xsmall(context).copyWith(color: customColors.error),
-                          ),
-                        ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: ButtonPrimary(
-                function: () {
-                  if (_controller.text.isNotEmpty &&
-                      _controller.text.length <= 8 &&
-                      !_controller.text.contains(' ') &&
-                      !existingNicknames.contains(_controller.text)) {
-                    ref.read(nicknameProvider.notifier).state = _controller.text;
-                    Navigator.pop(context, _controller.text);
-                  } else {
-                    setState(() {
-                      errorMessage = '별명은 1-8자 이내로 공백 없이 입력해주세요.';
-                    });
-                  }
-                },
-                title: '완료',
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: ButtonPrimary(
+              function: () {
+                if (_controller.text.isNotEmpty &&
+                    _controller.text.length <= 8 &&
+                    !_controller.text.contains(' ') &&
+                    !existingNicknames.contains(_controller.text)) {
+                  ref.read(nicknameProvider.notifier).state = _controller.text;
+                  Navigator.pop(context, _controller.text);
+                } else {
+                  setState(() {
+                    errorMessage = '별명은 1-8자 이내로 공백 없이 입력해주세요.';
+                  });
+                }
+              },
+              title: '완료',
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

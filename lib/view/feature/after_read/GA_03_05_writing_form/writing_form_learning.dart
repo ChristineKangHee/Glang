@@ -109,6 +109,10 @@ class _SentencePracticeState extends ConsumerState<SentencePractice> {
               function: () {
                 print("제출하기");
                 // function은 상황에 맞게 재정의 할 것.
+                Navigator.popUntil(
+                  context,
+                      (route) => route.settings.name == 'LearningActivitiesPage',
+                );
               },
               title: '제출하기',
             )

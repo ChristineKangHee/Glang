@@ -52,8 +52,8 @@ class _CELearningState extends State<FCLearning> {
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    final data = "깊은 숲 속 작은 오두막에는 토끼 가족이 살고 있었어요. 어느 날, 토끼 엄마는 아기 토끼들에게 말했어요. ‘오늘은 숲 속에 숨어 있는 가장 달콤한 당근을 찾아보자.’ 아기 토끼들은 신이 나서 숲으로 달려갔어요. 그런데, 가장 작은 토끼가 길을 잃고 말았답니다. 작은 토끼는 용기를 내어 큰 나무 옆에 숨은 다람쥐에게 도움을 요청했어요. 작은 토끼는 용기를 내어 큰 나무 옆에 숨은 다람쥐에게 도움을 요청했어요.";
-    final provide_format = "특종 뉴스 기사를 작성 해야하는 기자가 되어서 특종 기사 형태로 글을 작성해주세요";
+    final data = "최근 맞춤형 읽기 도구와 실시간 피드백 시스템이 주목받고 있다. 기존 교육 시스템의 일률적인 방식이 학습 동기를 저하시킬 수 있다는 지적이 이어지면서, 학습자의 수준과 흥미를 고려한 개인화된 도구의 필요성이 대두되고 있다. 전문가들은 “이러한 도구가 학습 효율을 극대화하며, 미래의 교육 방향을 혁신적으로 바꿀 가능성이 있다”고 전망했다.";
+    final provide_format = "본문에서 세 문장을 선택해 흥미로운 뉴스 기사를 작성하세요.";
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -72,9 +72,9 @@ class _CELearningState extends State<FCLearning> {
                       padding: const EdgeInsets.all(16.0),
                       child: TitleSection_withoutIcon(
                         customColors: Theme.of(context).extension<CustomColors>()!, // CustomColors 가져오기
-                        title: "글을 읽고 나만의 결말을 작성해보세요!",               // 제목
-                        subtitle: "<토끼 가족 이야기>",                           // 부제목
-                        author: "김댕댕",                                         // 작성자                         // 아이콘 (기본값: Icons.import_contacts)
+                        title: "아래 글의 형식을 변환 시켜주세요!",               // 제목
+                        subtitle: "개인의 수준과 흥미를 고려한 읽기 도구의 필요성",                           // 부제목
+                        author: "AI",                                          // 작성자                         // 아이콘 (기본값: Icons.import_contacts)
                       ),
                     ),
                     // 본문 텍스트
