@@ -21,8 +21,7 @@ class RdMain extends StatefulWidget {
 }
 
 
-class _RdMainState extends State<RdMain>
-    with SingleTickerProviderStateMixin {
+class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
   bool _showOxQuiz = false;
   bool _showMcqQuiz = false;
   bool _showSubjectiveQuiz = false;
@@ -33,6 +32,12 @@ class _RdMainState extends State<RdMain>
   late AnimationController _animationController;
   late Animation<double> _animation;
   final TextEditingController _subjectiveController = TextEditingController();
+  String? subjectiveAnswer; // 주관식 답변 저장
+
+  // Track quiz completion status
+  bool oxCompleted = false;
+  bool mcqCompleted = false;
+  bool subjectiveCompleted = false;
 
   @override
   void initState() {
@@ -53,6 +58,53 @@ class _RdMainState extends State<RdMain>
     _subjectiveController.dispose();
     super.dispose();
   }
+
+  void checkOxAnswer(bool selectedAnswer) {
+    final question = widget.oxQuestions[currentOxQuestionIndex];
+    bool isCorrect = selectedAnswer == question.correctAnswer;
+
+    setState(() {
+      // 현재 인덱스에 답 저장
+      if (oxUserAnswers.length > currentOxQuestionIndex) {
+        oxUserAnswers[currentOxQuestionIndex] = selectedAnswer;
+      } else {
+        // 새로운 답 추가
+        oxUserAnswers.add(selectedAnswer);
+      }
+      oxCompleted = true;
+    });
+
+    showResultDialog(context, isCorrect, question.explanation, () {
+      setState(() {
+        _showOxQuiz = false;
+        _animationController.reverse();
+      });
+    });
+  }
+
+  void checkMcqAnswer(int selectedIndex) {
+    final question = widget.mcqQuestions[currentMcqQuestionIndex];
+    bool isCorrect = selectedIndex == question.correctAnswerIndex;
+
+    setState(() {
+      // 현재 인덱스에 답 저장
+      if (mcqUserAnswers.length > currentMcqQuestionIndex) {
+        mcqUserAnswers[currentMcqQuestionIndex] = selectedIndex;
+      } else {
+        // 새로운 답 추가
+        mcqUserAnswers.add(selectedIndex);
+      }
+      mcqCompleted = true;
+    });
+
+    showResultDialog(context, isCorrect, question.explanation, () {
+      setState(() {
+        _showMcqQuiz = false;
+        _animationController.reverse();
+      });
+    });
+  }
+
 
   void toggleQuizVisibility(String quizType) {
     setState(() {
@@ -77,45 +129,15 @@ class _RdMainState extends State<RdMain>
     });
   }
 
-  void checkOxAnswer(bool selectedAnswer) {
-    final question = oxQuestions[currentOxQuestionIndex];
-    bool isCorrect = selectedAnswer == question.correctAnswer;
 
-    setState(() {
-      oxUserAnswers.add(selectedAnswer);
-    });
-
-    showResultDialog(context, isCorrect, question.explanation, () {
-      setState(() {
-        _showOxQuiz = false;
-        _showMcqQuiz = false;
-        _showSubjectiveQuiz = false;
-        _animationController.reverse();
-      });
-    });
-  }
-
-  void checkMcqAnswer(int selectedIndex) {
-    final question = mcqQuestions[currentMcqQuestionIndex];
-    bool isCorrect = selectedIndex == question.correctAnswerIndex;
-
-    setState(() {
-      mcqUserAnswers.add(selectedIndex);
-    });
-
-    showResultDialog(context, isCorrect, question.explanation, () {
-      setState(() {
-        _showOxQuiz = false;
-        _showMcqQuiz = false;
-        _showSubjectiveQuiz = false;
-        _animationController.reverse();
-      });
-    });
-  }
 
   void submitSubjectiveAnswer() {
     final answer = _subjectiveController.text.trim();
-    _subjectiveController.clear();
+    setState(() {
+      subjectiveAnswer = answer; // Save the answer
+      subjectiveCompleted = true; // Mark as completed
+    });
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -124,13 +146,17 @@ class _RdMainState extends State<RdMain>
         content: Text('주관식 답변이 제출되었습니다.\n\n답변: $answer'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              Navigator.pop(context);
+              toggleQuizVisibility('SUBJECTIVE'); // Hide the quiz after submission
+            },
             child: Text('확인'),
           ),
         ],
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -166,11 +192,17 @@ class _RdMainState extends State<RdMain>
                       onTap: () => toggleQuizVisibility('OX'),
                       child: Column(
                         children: [
-                          _buildQuizButton(customColors, 'OX'),
+                          _buildQuizButton(customColors, 'OX', oxCompleted),
                           SizeTransition(
                             sizeFactor: _animation,
                             child: _showOxQuiz
-                                ? OxQuiz(question: oxQuestions[currentOxQuestionIndex], onAnswerSelected: checkOxAnswer)
+                                ? OxQuiz(
+                              question: widget.oxQuestions[currentOxQuestionIndex],
+                              onAnswerSelected: checkOxAnswer,
+                              userAnswer: oxUserAnswers.length > currentOxQuestionIndex
+                                  ? oxUserAnswers[currentOxQuestionIndex]
+                                  : null,
+                            )
                                 : SizedBox.shrink(),
                           ),
                         ],
@@ -187,11 +219,16 @@ class _RdMainState extends State<RdMain>
                       onTap: () => toggleQuizVisibility('SUBJECTIVE'),
                       child: Column(
                         children: [
-                          _buildQuizButton(customColors, 'SUBJECTIVE'),
+                          _buildQuizButton(customColors, 'SUBJECTIVE', subjectiveCompleted),
                           SizeTransition(
                             sizeFactor: _animation,
                             child: _showSubjectiveQuiz
-                                ? SubjectiveQuiz(controller: _subjectiveController, onSubmit: submitSubjectiveAnswer)
+                                ? SubjectiveQuiz(
+                              controller: _subjectiveController,
+                              onSubmit: submitSubjectiveAnswer,
+                              initialAnswer: subjectiveAnswer, // 초기 답변 전달
+                              enabled: !subjectiveCompleted, // Disable if completed
+                            )
                                 : SizedBox.shrink(),
                           ),
                         ],
@@ -208,11 +245,17 @@ class _RdMainState extends State<RdMain>
                       onTap: () => toggleQuizVisibility('MCQ'),
                       child: Column(
                         children: [
-                          _buildQuizButton(customColors, 'MCQ'),
+                          _buildQuizButton(customColors, 'MCQ', mcqCompleted),
                           SizeTransition(
                             sizeFactor: _animation,
                             child: _showMcqQuiz
-                                ? McqQuiz(question: mcqQuestions[currentMcqQuestionIndex], onAnswerSelected: checkMcqAnswer)
+                                ? McqQuiz(
+                              question: widget.mcqQuestions[currentMcqQuestionIndex],
+                              onAnswerSelected: checkMcqAnswer,
+                              userAnswer: mcqUserAnswers.length > currentMcqQuestionIndex
+                                  ? mcqUserAnswers[currentMcqQuestionIndex]
+                                  : null,
+                            )
                                 : SizedBox.shrink(),
                           ),
                         ],
@@ -242,12 +285,12 @@ class _RdMainState extends State<RdMain>
     );
   }
 
-  Widget _buildQuizButton(CustomColors customColors, String quizType) {
+  Widget _buildQuizButton(CustomColors customColors, String quizType, bool isCompleted) {
     return Container(
       width: 30, // 버튼의 가로 크기
       height: 30, // 버튼의 세로 크기
       decoration: BoxDecoration(
-        color: customColors.primary,
+        color: isCompleted ? customColors.primary20 : customColors.primary,
         shape: BoxShape.circle,
       ),
       alignment: Alignment.center, // 아이콘을 중앙에 배치

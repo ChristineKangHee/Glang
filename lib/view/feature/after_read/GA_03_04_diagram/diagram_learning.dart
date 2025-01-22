@@ -179,7 +179,7 @@ class RootedTreeScreen extends ConsumerWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              color: candidateData.isNotEmpty ? Colors.green.shade100 : customColors.primary60,
+              color: candidateData.isNotEmpty ? customColors.success40 : customColors.primary60,
             ),
             child: Text(
               label.isEmpty ? " " : label,

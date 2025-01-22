@@ -7,8 +7,10 @@ import '../../components/custom_button.dart';
 class OxQuiz extends StatefulWidget {
   final OxQuestion question;
   final Function(bool) onAnswerSelected;
+  final bool? userAnswer; // 추가: 이전 답안 표시
 
-  const OxQuiz({required this.question, required this.onAnswerSelected});
+  OxQuiz({required this.question, required this.onAnswerSelected, this.userAnswer});
+
 
   @override
   _OxQuizState createState() => _OxQuizState();
@@ -17,6 +19,22 @@ class OxQuiz extends StatefulWidget {
 class _OxQuizState extends State<OxQuiz> {
   List<bool> userAnswers = [];
   int currentQuestionIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // 초기 상태에 userAnswer 반영
+    if (widget.userAnswer != null) {
+      setState(() {
+        if (userAnswers.length == 0) {
+          userAnswers.add(widget.userAnswer!);
+        } else {
+          userAnswers[currentQuestionIndex] = widget.userAnswer!;
+        }
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
