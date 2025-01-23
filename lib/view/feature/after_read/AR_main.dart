@@ -5,6 +5,7 @@ import 'package:readventure/view/feature/after_read/GA_03_03_debate_activity/DA_
 import 'package:readventure/view/feature/after_read/GA_03_04_diagram/diagram_learning.dart';
 import 'package:readventure/view/feature/reading/GA_02_04_reading_Quiz/Reading_Quiz_component.dart';
 import 'package:readventure/view/feature/reading/GA_02_04_reading_Quiz_ox/Reading_Quiz_ox_main.dart';
+import '../Result_Report.dart';
 import '../reading/RD_exercise.dart';
 import '../reading/practice.dart';
 import '../reading/quiz_data.dart';
@@ -81,6 +82,10 @@ class ArMain extends StatelessWidget {
             ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
               builder: (context) => TextHighlight(),
             )), child: Text("밑줄")),
+            SizedBox(height: 30,),
+            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
+              builder: (context) => ResultReportPage(),
+            )), child: Text("리포트")),
             SizedBox(height: 30,),
           ],
         ),

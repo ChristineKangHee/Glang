@@ -12,6 +12,7 @@ import '../../../../theme/theme.dart';
 import '../../util/box_shadow_styles.dart';
 import '../components/custom_app_bar.dart';
 import '../components/custom_button.dart';
+import '../feature/before_read/GA_01_01_cover_research/CR_learning.dart';
 
 class CourseDetailPage extends StatelessWidget {
   final String title; // 코스 제목
@@ -38,7 +39,7 @@ class CourseDetailPage extends StatelessWidget {
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_1(title: '코스 상세'), // 사용자 정의 앱바
+      appBar: CustomAppBar_2depth_4(title: '코스 상세'), // 사용자 정의 앱바
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16), // 외부 여백
@@ -110,7 +111,7 @@ class CourseDetailPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CoverResearchMain(
+                        builder: (context) => CRLearning(
                           
                         ), // BrMain으로 이동
                       ),
