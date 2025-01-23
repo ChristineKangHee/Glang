@@ -65,7 +65,10 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     return Scaffold(
       backgroundColor: customColors.neutral90,
       appBar: CustomAppBar_2depth_6(
-        title: '학습 선택',
+        title: '학습 선택', automaticallyImplyLeading: false,
+          onIconPressed: () {
+            Navigator.pushNamed(context, '/'); // '/'로 이동
+          }
       ),
       body: Column(
         children: [

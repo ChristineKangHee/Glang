@@ -16,7 +16,11 @@ class FormatConversionMain extends StatelessWidget {
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     return Scaffold(
-      appBar: CustomAppBar_2depth_6(title: "형식 변환 연습"),
+      appBar: CustomAppBar_2depth_6(title: "형식 변환 연습", automaticallyImplyLeading: false,
+        onIconPressed: () {
+          Navigator.pop(context);
+        } ,
+      ),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {

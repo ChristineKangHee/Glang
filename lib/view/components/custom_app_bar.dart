@@ -69,6 +69,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:readventure/view/login/auth_controller.dart';
 import '../../theme/theme.dart';
 import '../../theme/font.dart';
 import '../../viewmodel/custom_colors_provider.dart';
@@ -538,6 +539,7 @@ class CustomAppBar_2depth_6 extends StatelessWidget implements PreferredSizeWidg
   final Color? backgroundColor;
   final Function()? onIconPressed;
   final PreferredSizeWidget? bottom;
+  final bool automaticallyImplyLeading;
 
   const CustomAppBar_2depth_6({
     Key? key,
@@ -545,6 +547,7 @@ class CustomAppBar_2depth_6 extends StatelessWidget implements PreferredSizeWidg
     this.backgroundColor,
     this.onIconPressed,
     this.bottom,
+    required this.automaticallyImplyLeading,
   }) : super(key: key);
 
   @override
@@ -552,6 +555,7 @@ class CustomAppBar_2depth_6 extends StatelessWidget implements PreferredSizeWidg
     final customColors = Theme.of(context).extension<CustomColors>();
 
     return AppBar(
+      automaticallyImplyLeading: automaticallyImplyLeading,
       scrolledUnderElevation: 0,
       bottom: bottom,
       title: Text(

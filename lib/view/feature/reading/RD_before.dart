@@ -18,7 +18,11 @@ class RdBefore extends StatelessWidget {
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     return Scaffold(
-      appBar: CustomAppBar_2depth_6(title: "어른의 어휘력"),
+      appBar: CustomAppBar_2depth_6(title: "어른의 어휘력", automaticallyImplyLeading: false,
+        onIconPressed: () {
+          Navigator.pop(context);
+        } ,
+      ),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
