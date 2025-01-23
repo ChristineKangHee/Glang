@@ -314,22 +314,24 @@ TextStyle body_xxsmall(BuildContext context) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 TextStyle reading_exercise(BuildContext context) {
-    return GoogleFonts.notoSerif(
+    return TextStyle(
+        fontFamily: 'NotoSerif',
         fontWeight: FontWeight.w400,
         fontSize: 16,
-        height: 1.8, // 줄 간격
-        letterSpacing: 0.0, // 자간
-        color: Theme.of(context).colorScheme.onSurface, // Light 모드: 검정 / Dark 모드: 흰색
+        height: 1.8,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
     );
 }
 
 TextStyle reading_textstyle(BuildContext context) {
-    return GoogleFonts.notoSerif(
+    return TextStyle(
+        fontFamily: 'NotoSerif',
         fontWeight: FontWeight.w500,
         fontSize: 18,
-        height: 2.3, // 줄 간격
-        letterSpacing: 0.0, // 자간
-        color: Theme.of(context).colorScheme.onSurface, // Light 모드: 검정 / Dark 모드: 흰색
+        height: 2.3,
+        letterSpacing: 0.0,
+        color: Theme.of(context).colorScheme.onSurface, // Light: 검 Dark: 흰
     );
 }
 
