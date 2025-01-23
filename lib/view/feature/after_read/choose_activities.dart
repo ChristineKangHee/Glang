@@ -8,6 +8,7 @@ import '../../components/custom_app_bar.dart';
 import 'package:readventure/theme/theme.dart';
 
 import '../../components/custom_button.dart';
+import '../Result_Report.dart';
 import 'GA_03_01_change_ending/CE_main.dart';
 import 'GA_03_02_content_summary/CS_main.dart';
 import 'GA_03_03_debate_activity/DA_main.dart';
@@ -150,54 +151,60 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
                     children: [
                       // 아니오 버튼
                       Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                          decoration: ShapeDecoration(
-                            color: customColors.neutral90,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context); // 팝업 닫기
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            decoration: ShapeDecoration(
+                              color: customColors.neutral90,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                             ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
+                            child: Center(
+                              child: Text(
                                 '아니오',
                                 textAlign: TextAlign.center,
                                 style: body_small_semi(context).copyWith(
                                   color: customColors.neutral60,
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(width: 16),
                       // 네 버튼
                       Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                          decoration: ShapeDecoration(
-                            color: customColors.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context); // 팝업 닫기
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ResultReportPage(), // 결과 페이지로 이동
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            decoration: ShapeDecoration(
+                              color: customColors.primary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                             ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
+                            child: Center(
+                              child: Text(
                                 '네',
                                 textAlign: TextAlign.center,
                                 style: body_small_semi(context).copyWith(
                                   color: customColors.neutral100,
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
@@ -211,6 +218,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
       },
     );
   }
+
 
   Widget LearningProgress(int completedCount, CustomColors customColors, BuildContext context) {
     int totalXP = activities

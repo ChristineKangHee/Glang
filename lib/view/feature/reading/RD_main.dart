@@ -35,6 +35,7 @@ class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
   final TextEditingController _subjectiveController = TextEditingController();
   String? subjectiveAnswer; // 주관식 답변 저장
 
+
   // Track quiz completion status
   bool oxCompleted = false;
   bool mcqCompleted = false;
