@@ -435,7 +435,7 @@ class CurrentSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (data.section != 1) ...[
+                  if (data.section != 0) ...[ // 이걸 1로 바꾸면 상단에 없어짐
                     Text(
                       data.title,
                       style: body_large_semi(context),

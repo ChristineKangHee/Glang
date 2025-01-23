@@ -25,12 +25,12 @@ class DebateGPTService {
             {
               'role': 'system',
               'content':
-              'You are participating in a debate. Stay focused on the topic and provide clear and logical arguments. say in 200 token'
+              'You are participating in a debate. Stay focused on the topic and provide clear and logical arguments. 무조건 공백포함 200자 이내로 답변해.'
             },
             {'role': 'user', 'content': 'Debate topic: $topic'},
             {'role': 'user', 'content': userInput},
           ],
-          'max_tokens': 200,
+          'max_tokens': 300,
           'temperature': 0.7,
           'n': 1,
         }),

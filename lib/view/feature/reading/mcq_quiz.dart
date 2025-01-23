@@ -6,15 +6,28 @@ import '../../../../theme/theme.dart';
 class McqQuiz extends StatefulWidget {
   final McqQuestion question;
   final Function(int) onAnswerSelected;
+  final int? userAnswer; // 추가: 이전 답안 표시
 
-  const McqQuiz({required this.question, required this.onAnswerSelected, Key? key}) : super(key: key);
+  McqQuiz({required this.question, required this.onAnswerSelected, this.userAnswer});
+
 
   @override
   _McqQuizState createState() => _McqQuizState();
 }
 
 class _McqQuizState extends State<McqQuiz> {
-  int? selectedAnswerIndex; // Track selected answer index
+  int? selectedAnswerIndex;
+  @override
+  void initState() {
+    super.initState();
+    // userAnswer 값으로 초기 상태 설정
+    if (widget.userAnswer != null) {
+      setState(() {
+        selectedAnswerIndex = widget.userAnswer;
+      });
+    }
+  }
+   // Track selected answer index
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +103,7 @@ class _McqQuizState extends State<McqQuiz> {
                     ),
                     child: Text(
                       option,
-                      style: body_medium(context),
+                      style: body_small(context),
                     ),
                   ),
                 );

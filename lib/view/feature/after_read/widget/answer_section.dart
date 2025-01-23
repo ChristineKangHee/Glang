@@ -79,7 +79,6 @@ class _AnswerSectionState extends State<Answer_Section> {
     );
   }
 }
-
 class Answer_Section_No_Title extends StatefulWidget {
   const Answer_Section_No_Title({
     super.key,

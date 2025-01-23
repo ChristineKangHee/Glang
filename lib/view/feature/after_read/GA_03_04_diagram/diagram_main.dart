@@ -36,7 +36,7 @@ class DiagramMain extends StatelessWidget {
                           SizedBox(height: 117.h),
                           TitleSectionMain(title: "트리 다이어그램을 그려", subtitle: "", subtitle2: "책의 구조를 한 눈에 파악해보세요", customColors: customColors,),
                           SizedBox(height: 51.h),
-                          IconSection(customColors: customColors, icon: Icons.edit,),
+                          SVGSection(customColors: customColors, assetPath: "assets/icons/diagram_cover.svg", size: 120,)
                         ],
                       ),
                       Column(
