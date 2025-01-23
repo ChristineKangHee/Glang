@@ -55,7 +55,13 @@ class _CELearningState extends State<CRLearning> {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: CustomAppBar_2depth_6(title: "표지 탐구하기"),
+      appBar: CustomAppBar_2depth_6(
+        title: "표지 탐구하기",
+        automaticallyImplyLeading: false,
+        onIconPressed: () {
+          Navigator.pop(context);
+        },
+      ),
       body: SafeArea(
         child: Column(
           children: [

@@ -16,7 +16,11 @@ class DiagramMain extends StatelessWidget {
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     return Scaffold(
-      appBar: CustomAppBar_2depth_6(title: "다이어그램"),
+      appBar: CustomAppBar_2depth_6(title: "다이어그램", automaticallyImplyLeading: false,
+        onIconPressed: () {
+          Navigator.pop(context);
+        } ,
+      ),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
