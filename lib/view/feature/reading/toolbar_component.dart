@@ -86,7 +86,7 @@ class _ToolbarState extends State<Toolbar> {
 
   void _showNoteDialog(BuildContext context, TextSelectionDelegate delegate) {
     final String selectedText = delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
-    final TextEditingController noteController = TextEditingController();
+    final TextEditingController _noteController = TextEditingController();
 
     // Show dialog with stateful widget content
     showDialog(
@@ -94,7 +94,7 @@ class _ToolbarState extends State<Toolbar> {
       builder: (BuildContext context) {
         return _NoteDialog(
           selectedText: selectedText,
-          noteController: noteController,
+          noteController: _noteController,
           customColors: widget.customColors,
         );
       },
