@@ -74,7 +74,7 @@ class DebateContent extends ConsumerWidget {
                 // 3분 타이머 (Riverpod 상태 기반)
                 CountdownTimer(
                   key: ValueKey(debateState.timerKey), // 타이머 재설정
-                  initialSeconds: 15, //타이머 초
+                  initialSeconds: 180, //타이머 초
                   onTimerComplete: () {
                     debateNotifier.nextRound(); // 라운드 전환
                     if (!debateNotifier.state.isFinished) {
