@@ -8,22 +8,35 @@ import 'package:readventure/theme/theme.dart';
 import '../../../../api/debate_chatgpt_service.dart';
 import 'widgets/alert_dialog.dart';
 import 'dart:async';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'widgets/debate_provider.dart';
+import 'widgets/debate_state.dart';
 
 class DebatePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider); // CustomColors 가져오기
+    final debateState = ref.watch(debateProvider);
+    final debateNotifier = ref.read(debateProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("토론"),
+        title: Text("토론", style: heading_xsmall(context).copyWith(color: customColors.neutral30,)),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.pause), // 일시정지 아이콘
-          onPressed: () {
-            // 일시정지 다이얼로그 호출
-            ref.read(debateProvider.notifier).pauseTimer(); // 타이머 일시정지
-            showPauseDialog(context, ref); // 다이얼로그 표시
+        leadingWidth: 90,
+        leading: CountdownTimer(
+          key: ValueKey(debateState.timerKey), // 타이머 재설정
+          initialSeconds: 180, //타이머 초
+          onTimerComplete: () {
+            debateNotifier.nextRound(); // 라운드 전환
+            if (!debateNotifier.state.isFinished) {
+              showStartDialog(
+                context,
+                debateState.currentRound + 1, // 다음 라운드 번호
+                "인공지능이 인간의 일자리를 대체하는 것에 대해 어떻게 생각하십니까?",
+                !debateState.isUserPro ? "찬성" : "반대",
+              );
+            }
           },
         ),
         actions: [
@@ -36,26 +49,6 @@ class DebatePage extends ConsumerWidget {
         ],
       ),
       body: DebateContent(customColors: customColors),
-    );
-  }
-
-  /// 일시 정지 다이얼로그
-  void showPauseDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("일시 정지"),
-        content: const Text("타이머가 일시 정지되었습니다."),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context); // 다이얼로그 닫기
-              ref.read(debateProvider.notifier).resumeTimer(); // 타이머 재개
-            },
-            child: const Text("재개"),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -99,22 +92,6 @@ class DebateContent extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                // 3분 타이머 (Riverpod 상태 기반)
-                CountdownTimer(
-                  key: ValueKey(debateState.timerKey), // 타이머 재설정
-                  initialSeconds: 180, //타이머 초
-                  onTimerComplete: () {
-                    debateNotifier.nextRound(); // 라운드 전환
-                    if (!debateNotifier.state.isFinished) {
-                      showStartDialog(
-                        context,
-                        debateState.currentRound + 1, // 다음 라운드 번호
-                        "인공지능이 인간의 일자리를 대체하는 것에 대해 어떻게 생각하십니까?",
-                        !debateState.isUserPro ? "찬성" : "반대",
-                      );
-                    }
-                  },
-                ),
               ],
             ),
           ),
@@ -129,8 +106,6 @@ class DebateContent extends ConsumerWidget {
       ),
     );
   }
-
-  /// 결과 다이얼로그 표시
   /// 결과 다이얼로그 표시
   void _showResultDialog(BuildContext context, DebateNotifier debateNotifier) {
     showDialog(
@@ -141,76 +116,105 @@ class DebateContent extends ConsumerWidget {
           contentPadding: const EdgeInsets.all(16.0),
           content: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 "학습 결과",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: body_small_semi(context)
               ),
               const SizedBox(height: 16),
               // ROUND 1
               _buildRoundResult(
+                context: context,
                 round: 1,
                 stance: "찬성",
                 userPercentage: 55,
                 aiPercentage: 45,
+                customColors: customColors,
               ),
               const SizedBox(height: 16),
               // ROUND 2
               _buildRoundResult(
+                context: context,
                 round: 2,
                 stance: "반대",
                 userPercentage: 80,
                 aiPercentage: 20,
+                customColors: customColors,
               ),
               const SizedBox(height: 16),
               // 종합 평가
-              const Text(
-                "종합 평가",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: customColors.neutral90,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "찬성 측과 반대 측의 주장에서 제시한 경제적 효과에 대한 구체적 수치와 사례 분석이 설득력이 높았습니다.",
-                style: TextStyle(
-                  fontSize: 14,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "종합 평가",
+                      style: body_xsmall_semi(context)
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "찬성 측과 반대 측의 주장에서 제시한 경제적 효과에 대한 구체적 수치와 사례 분석이 설득력이 높았습니다.",
+                      style: body_small(context)
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
           actions: [
-            TextButton(
-              onPressed: () {
-                // 다시 쓰기: 상태 초기화
-                debateNotifier.reset(); // 상태 초기화
-                Navigator.pop(context); // 다이얼로그 닫기
-              },
-              child: const Text(
-                "다시 쓰기",
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+            Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      debateNotifier.reset(); // 상태 초기화
+                      Navigator.pop(context); // 다이얼로그 닫기
+                    },
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12.0,
+                        horizontal: 32.0,
+                      ),
+                      backgroundColor: customColors.neutral90,
+                      foregroundColor: customColors.neutral60,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: Text("다시 쓰기", style: body_small_semi(context).copyWith(color: customColors.neutral60),),
+                  ),
                 ),
-              ),
-              onPressed: () {
-                // 완료: LearningActivitiesPage로 돌아가기
-                Navigator.popUntil(
-                  context,
-                      (route) => route.settings.name == 'LearningActivitiesPage',
-                );
-              },
-              child: const Text("완료"),
+                SizedBox(width: 16,),
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.popUntil(
+                        context,
+                            (route) => route.settings.name == 'LearningActivitiesPage',
+                      );
+                    },
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12.0,
+                        horizontal: 32.0,
+                      ),
+                      backgroundColor: customColors.primary,
+                      foregroundColor: customColors.neutral100,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: Text("완료", style: body_small_semi(context).copyWith(color: customColors.neutral100),),
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -220,26 +224,25 @@ class DebateContent extends ConsumerWidget {
 
   /// 라운드 결과 구성 위젯
   Widget _buildRoundResult({
+    required BuildContext context,
     required int round,
     required String stance,
     required int userPercentage,
     required int aiPercentage,
+    required CustomColors customColors,
   }) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(8),
+        color: customColors.neutral90,
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             "ROUND $round | $stance",
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
+            style: body_small(context).copyWith(color: customColors.neutral30)
           ),
           const SizedBox(height: 8),
           Row(
@@ -250,8 +253,8 @@ class DebateContent extends ConsumerWidget {
                 child: Container(
                   height: 8,
                   decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(4),
+                    color: customColors.primary,
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(4), bottomLeft: Radius.circular(4)),
                   ),
                 ),
               ),
@@ -260,7 +263,10 @@ class DebateContent extends ConsumerWidget {
                 flex: aiPercentage,
                 child: Container(
                   height: 8,
-                  color: Colors.grey,
+                  decoration: BoxDecoration(
+                    color: customColors.neutral60,
+                    borderRadius: BorderRadius.only(topRight: Radius.circular(4), bottomRight: Radius.circular(4)),
+                  ),
                 ),
               ),
             ],
@@ -271,18 +277,11 @@ class DebateContent extends ConsumerWidget {
             children: [
               Text(
                 "사용자 $userPercentage%",
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: body_small_semi(context).copyWith(color: customColors.primary)
               ),
               Text(
                 "AI $aiPercentage%",
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
+                style: body_small_semi(context).copyWith(color: customColors.neutral60)
               ),
             ],
           ),
@@ -384,7 +383,7 @@ class _AIDiscussionSectionState extends ConsumerState<AIDiscussionSection> {
         // 답변 채팅 섹션
         ConstrainedBox(
           constraints: const BoxConstraints(
-            maxHeight: 300
+              maxHeight: 300
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -422,43 +421,6 @@ class _AIDiscussionSectionState extends ConsumerState<AIDiscussionSection> {
           ),
         ),
       ],
-    );
-  }
-}
-
-class RoundSection extends StatelessWidget {
-  const RoundSection({
-    super.key,
-    required this.customColors,
-  });
-
-  final CustomColors customColors;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: customColors.neutral90,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Divider(color: customColors.primary, thickness: 1),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text(
-                "ROUND 1 | 찬성",
-                style: body_xsmall(context).copyWith(color: customColors.primary)
-              ),
-            ),
-            Expanded(
-              child: Divider(color: customColors.primary, thickness: 1),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -550,62 +512,67 @@ class _CountdownTimerState extends State<CountdownTimer> {
     });
   }
 
-  // void _pauseTimer(BuildContext context) {
-  //   _timer?.cancel(); // 타이머 정지
-  //   setState(() {
-  //     _isPaused = true; // 일시정지 상태로 변경
-  //   });
-  //
-  //   // 일시정지 다이얼로그 표시
-  //   showPauseDialog(context);
-  // }
+  void _pauseTimer(BuildContext context) {
+    _timer?.cancel(); // 타이머 정지
+    setState(() {
+      _isPaused = true; // 일시정지 상태로 변경
+    });
 
-  // void _resumeTimer() {
-  //   _startNewTimer(_remainingSeconds); // 남은 시간으로 타이머 재시작
-  // }
+    // 일시정지 다이얼로그 표시
+    showPauseDialog(context);
+  }
 
-  // void showPauseDialog(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (_) => AlertDialog(
-  //       title: const Text("일시 정지"),
-  //       content: const Text("타이머가 일시 정지되었습니다."),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () {
-  //             Navigator.pop(context); // 다이얼로그 닫기
-  //             _resumeTimer(); // 타이머 재개
-  //           },
-  //           child: const Text("재개"),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+  void _resumeTimer() {
+    _startNewTimer(_remainingSeconds); // 남은 시간으로 타이머 재시작
+  }
+
+  void showPauseDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("일시 정지"),
+        content: const Text("타이머가 일시 정지되었습니다."),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // 다이얼로그 닫기
+              _resumeTimer(); // 타이머 재개
+            },
+            child: const Text("재개"),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final minutes = (_remainingSeconds ~/ 60).toString().padLeft(2, '0'); // 분 계산
     final seconds = (_remainingSeconds % 60).toString().padLeft(2, '0'); // 초 계산
+    final customColors = Theme.of(context).extension<CustomColors>()!;
 
-    return Column(
-      children: [
-        Text(
-          "$minutes:$seconds", // "분:초" 형식으로 표시
-          style: const TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+    return Container(
+      decoration: BoxDecoration(
+        color: customColors.neutral90,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          InkWell(
+            onTap: _isPaused
+                ? null // 이미 일시정지 상태면 버튼 비활성화
+                : () => _pauseTimer(context),
+            child: SvgPicture.asset('assets/icons/pause.svg'),
           ),
-        ),
-        const SizedBox(height: 16),
-        // ElevatedButton(
-        //   onPressed: _isPaused
-        //       ? null // 이미 일시정지 상태면 버튼 비활성화
-        //       : () => _pauseTimer(context),
-        //   child: const Text("일시 정지"),
-        // ),
-      ],
+          SizedBox(width: 8,),
+          Text(
+            "$minutes:$seconds", // "분:초" 형식으로 표시
+            style: body_small(context).copyWith(color: customColors.neutral30)
+          ),
+        ],
+      ),
     );
   }
 }
