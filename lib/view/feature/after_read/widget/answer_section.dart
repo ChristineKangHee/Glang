@@ -79,20 +79,17 @@ class _AnswerSectionState extends State<Answer_Section> {
     );
   }
 }
-
 class Answer_Section_No_Title extends StatefulWidget {
   const Answer_Section_No_Title({
     super.key,
     required this.controller,
     required this.customColors,
     this.maxLength = 200, // 기본 최대 글자 수
-    required this.enabled, // TextField 활성화 여부
   });
 
   final TextEditingController controller;
   final CustomColors customColors;
   final int maxLength;
-  final bool enabled; // TextField 활성화 여부
 
   @override
   _AnswerSectionNoTitleState createState() => _AnswerSectionNoTitleState();
@@ -129,7 +126,6 @@ class _AnswerSectionNoTitleState extends State<Answer_Section_No_Title> {
           height: 200,
           child: TextField(
             controller: widget.controller,
-            enabled: widget.enabled, // 활성화 여부를 외부에서 설정
             maxLength: widget.maxLength, // 최대 글자 수 설정
             maxLines: null, // 자동으로 줄 수를 조정
             expands: true, // `maxLines`와 함께 사용하지 않음

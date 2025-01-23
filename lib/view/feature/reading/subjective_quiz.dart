@@ -77,14 +77,10 @@ class _SubjectiveQuizState extends State<SubjectiveQuiz> {
 
             const SizedBox(height: 12),
             // Answer_Section_No_Title에 disabled 상태 전달
-            AbsorbPointer( // 클릭을 막기 위해 AbsorbPointer를 사용
-              absorbing: _isSubmitted, // 제출 후엔 클릭 못하게 설정
-              child: Answer_Section_No_Title(
+            Answer_Section_No_Title(
                 controller: widget.controller,
                 customColors: customColors,
-                enabled: !_isSubmitted, // 제출 후엔 TextField 비활성화
               ),
-            ),
             const SizedBox(height: 12),
             if (!_isSubmitted) // 제출 후 버튼을 숨기기 위해 조건 추가
               Container(

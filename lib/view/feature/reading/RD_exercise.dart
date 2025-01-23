@@ -2,10 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:readventure/view/feature/reading/reading_chatbot.dart';
 
 // 사용자 정의 폰트 스타일, 색상, 컴포넌트 import
 import '../../../theme/font.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
+import '../../chat/chat_screen.dart';
 import '../../components/my_divider.dart';
 
 // Riverpod 상태 관리를 사용한 CustomSelectableText 위젯 정의
@@ -24,37 +26,31 @@ class _CustomSelectableTextState extends ConsumerState<CustomSelectableText> {
     final customColors = ref.watch(customColorsProvider);
 
     // MaterialApp과 Scaffold를 사용하여 기본 레이아웃 설정
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Custom Text Selection')), // AppBar에 제목 추가
-        body: Center(
-          // 텍스트 선택이 가능한 SelectableText 위젯을 중앙에 배치
-          child: SelectableText(
-            '드래그해서 선택하세요! 드래그 할 수 있는 많고 많은 텍스트들 한번 해봐라\n 으히히',
-            selectionControls: RdMain(customColors: customColors), // 커스텀 선택 컨트롤 적용
-            style: const TextStyle(fontSize: 20), // 텍스트 스타일 설정 (폰트 크기 20)
-            cursorColor: customColors.primary, // 커서 색상을 사용자 정의 색상으로 설정
-          ),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Custom Text Selection')), // AppBar에 제목 추가
+      body: Center(
+        child: SelectableText(
+          '드래그해서 선택하세요! 드래그 할 수 있는 많고 많은 텍스트들 한번 해봐라\n 으히히',
+          selectionControls: RdMain(customColors: customColors), // 커스텀 선택 컨트롤 적용
+          style: const TextStyle(fontSize: 20), // 텍스트 스타일 설정 (폰트 크기 20)
+          cursorColor: customColors.primary, // 커서 색상을 사용자 정의 색상으로 설정
         ),
       ),
     );
   }
 }
 
-// MaterialTextSelectionControls를 확장하여 커스텀 텍스트 선택 컨트롤 구현
 class RdMain extends MaterialTextSelectionControls {
-  final customColors; // customColors를 저장할 필드 추가
+  final customColors;
 
-  // 생성자에서 customColors를 받아와서 저장
   RdMain({required this.customColors});
 
   @override
   void handleCopy(TextSelectionDelegate delegate) {
-    // 텍스트 복사 시 커스텀 메시지와 함께 복사
     final text = delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
-    Clipboard.setData(ClipboardData(text: '커스텀 복사: $text')); // 복사된 텍스트에 "커스텀 복사" 추가
-    delegate.bringIntoView(delegate.textEditingValue.selection.extent); // 선택된 텍스트를 화면에 맞추기
-    delegate.hideToolbar(); // 복사 후 툴바 숨기기
+    Clipboard.setData(ClipboardData(text: '커스텀 복사: $text'));
+    delegate.bringIntoView(delegate.textEditingValue.selection.extent);
+    delegate.hideToolbar();
   }
 
   @override
@@ -68,65 +64,238 @@ class RdMain extends MaterialTextSelectionControls {
       ValueListenable<ClipboardStatus>? clipboardStatus,
       Offset? lastSecondaryTapDownPosition,
       ) {
-    const double toolbarHeight = 50; // 툴바의 높이 설정
+    const double toolbarHeight = 50;
+    const double toolbarPadding = 16.0;
+    const double toolbarWidth = 180;
 
-    // 커스텀 툴바 위젯 반환
-    return Center(
-      child: ToolBar(toolbarHeight, context), // 화면 중앙에 툴바 배치
+    final double toolbarX = (endpoints.first.point.dx + endpoints.last.point.dx) / 2
+        - toolbarWidth / 2
+        - globalEditableRegion.left;
+
+    final double toolbarY = endpoints.first.point.dy
+        + globalEditableRegion.top
+        - toolbarHeight
+        - toolbarPadding;
+
+    final double toolbarXAdjusted = toolbarX < 0
+        ? 0
+        : (toolbarX + toolbarWidth > globalEditableRegion.width
+        ? globalEditableRegion.width - toolbarWidth
+        : toolbarX);
+
+    final double toolbarYAdjusted = toolbarY < 0 ? 0 : toolbarY;
+
+    return Stack(
+      children: [
+        Positioned(
+          left: toolbarXAdjusted,
+          top: toolbarYAdjusted,
+          child: ToolBar(toolbarWidth, toolbarHeight, context, delegate),
+        ),
+      ],
     );
   }
 
-  // 커스텀 툴바 위젯을 만드는 메서드
-  Container ToolBar(double toolbarHeight, BuildContext context) {
+  Widget ToolBar(double toolbarWidth, double toolbarHeight, BuildContext context, TextSelectionDelegate delegate) {
     return Container(
-      child: Material(
-        color: Colors.transparent, // 툴바 배경을 투명하게 설정
-        child: Container(
-          height: toolbarHeight, // 툴바의 높이 설정
-          decoration: BoxDecoration(
-            color: customColors.neutral90, // 사용자 정의 색상 적용
-            borderRadius: BorderRadius.circular(10), // 툴바 모서리를 둥글게 처리
-            boxShadow: [
-              BoxShadow(
-                color: Color(0x3F000000), // 그림자 색상 설정
-                blurRadius: 30, // 그림자 블러 효과
-                offset: Offset(0, 2), // 그림자 위치 설정
-                spreadRadius: 0, // 그림자 확산 정도
+      width: toolbarWidth,
+      height: toolbarHeight,
+      decoration: BoxDecoration(
+        color: customColors.neutral90,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x3F000000),
+            blurRadius: 30,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10),  // 수평 패딩을 줄임
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildToolbarButton(context, '밑줄', () {}, false, delegate),
+          _buildToolbarButton(
+            context,
+            '메모',
+                () {
+              final String selectedText = delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
+              _showNoteDialog(context, selectedText);
+            },
+            false,
+            delegate, // Pass delegate here
+          ),
+          _buildToolbarButton(context, '해석', () {}, false, delegate), // Pass delegate here
+          _buildToolbarButton(context, '챗봇', () {}, true, delegate),  // 마지막 버튼, pass delegate here
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToolbarButton(BuildContext context, String label, VoidCallback onPressed, bool isLast, TextSelectionDelegate delegate) {
+    return GestureDetector(
+      onTap: () {
+        if (label == '밑줄') {
+          final String selectedText = delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
+          if (selectedText.isNotEmpty) {
+            _highlightText(context, selectedText, delegate);
+          }
+        }
+        if (label == '해석') {
+          final String selectedText = delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
+          if (_isWordSelected(selectedText)) {
+            _showWordPopup(context, selectedText);
+          } else {
+            _showSentencePopup(context, selectedText);
+          }
+        }
+        if (label == '챗봇') {
+          final String selectedText = delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
+          if (selectedText.isNotEmpty) {
+            // Navigate to ChatScreen and pass the selected text
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatBot(selectedText: selectedText),
+              ),
+            );
+          }
+        }
+        onPressed();  // Invoke the passed callback after handling the "해석" logic
+      },
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: body_small_semi(context).copyWith(
+              color: customColors.neutral0,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          if (!isLast) VerticalDivider(),
+        ],
+      ),
+    );
+  }
+
+  void _highlightText(BuildContext context, String selectedText, TextSelectionDelegate delegate) {
+    final TextStyle highlightedStyle = TextStyle(
+      color: Colors.yellow,
+      backgroundColor: Colors.yellow.withOpacity(0.3),
+      decoration: TextDecoration.underline, // Underline text
+    );
+
+    // This part assumes a custom method to update the text styling, or you can use a rich text controller
+    final String updatedText = delegate.textEditingValue.text.replaceRange(
+      delegate.textEditingValue.selection.start,
+      delegate.textEditingValue.selection.end,
+      selectedText,
+    );
+
+    // Notify UI changes using state management (e.g., setState, Riverpod, etc.)
+  }
+
+  void _showNoteDialog(BuildContext context, String selectedText) {
+    final TextEditingController _noteController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('메모 추가'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '밑줄 친 텍스트: $selectedText',
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _noteController,
+                decoration: const InputDecoration(
+                  hintText: '메모를 입력하세요...',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 8), // 툴바 내 패딩 설정
-          child: Row(
-            mainAxisSize: MainAxisSize.min, // 버튼들을 가로로 배치
-            children: [
-              // 툴바 버튼들 (밑줄, 메모, 해석, 챗봇)
-              _buildToolbarButton(context, '밑줄', () {}),
-              _buildToolbarButton(context, '메모', () {}),
-              _buildToolbarButton(context, '해석', () {}),
-              _buildToolbarButton(context, '챗봇', () {}),
-            ],
-          ),
-        ),
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                final note = _noteController.text.trim();
+                if (note.isNotEmpty) {
+                  // 메모를 저장하거나 처리하는 로직 추가
+                  debugPrint('메모 저장: $note');
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('저장'),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  // 툴바 버튼을 만드는 메서드
-  Widget _buildToolbarButton(BuildContext context, String label, VoidCallback onPressed) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8), // 버튼 내부 패딩
-      child: Row(
-        mainAxisSize: MainAxisSize.min, // 버튼 내용을 가로로 배치
-        children: [
-          Text(
-            label, // 버튼에 표시될 텍스트
-            style: body_small_semi(context).copyWith( // 사용자 정의 색상으로 텍스트 스타일 적용
-              color: customColors.neutral0,
-            ),
+  void _showWordPopup(BuildContext context, String selectedText) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('단어 해석: $selectedText'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('사전적 의미: ...'),
+              Text('문맥상 의미: ...'),
+              Text('유사어: ...'),
+              Text('반의어: ...'),
+            ],
           ),
-          Divider(), // 버튼들 사이에 구분선 추가
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('닫기'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  bool _isWordSelected(String selectedText) {
+    return selectedText.split(' ').length == 1;
+  }
+
+  void _showSentencePopup(BuildContext context, String selectedText) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('문장 해석: $selectedText'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('문맥상 의미: ...'),
+              Text('요약: ...'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('닫기'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
