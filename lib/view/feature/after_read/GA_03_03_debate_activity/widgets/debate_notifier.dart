@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Debate 상태 관리
@@ -6,12 +7,14 @@ class DebateState {
   final bool isUserPro;
   final int timerKey;
   final bool isFinished;
+  final bool isPaused; // 타이머 일시정지 상태
 
   DebateState({
     required this.currentRound,
     required this.isUserPro,
     required this.timerKey,
     required this.isFinished,
+    required this.isPaused,
   });
 
   /// 상태 복사본 생성
@@ -20,12 +23,14 @@ class DebateState {
     bool? isUserPro,
     int? timerKey,
     bool? isFinished,
+    bool? isPaused,
   }) {
     return DebateState(
       currentRound: currentRound ?? this.currentRound,
       isUserPro: isUserPro ?? this.isUserPro,
       timerKey: timerKey ?? this.timerKey,
       isFinished: isFinished ?? this.isFinished,
+      isPaused: isPaused ?? this.isPaused,
     );
   }
 
@@ -36,12 +41,15 @@ class DebateState {
       isUserPro: true,
       timerKey: 0,
       isFinished: false,
+      isPaused: false, // 초기 상태: 일시정지 아님
     );
   }
 }
 
 /// Debate 상태 관리용 StateNotifier
 class DebateNotifier extends StateNotifier<DebateState> {
+  Timer? _timer; // 내부 타이머 객체
+
   DebateNotifier() : super(DebateState.initial());
 
   /// 라운드 전환 및 상태 갱신
@@ -59,9 +67,27 @@ class DebateNotifier extends StateNotifier<DebateState> {
     }
   }
 
+  /// 타이머 일시정지
+  void pauseTimer() {
+    state = state.copyWith(isPaused: true); // 일시정지 상태로 변경
+    _timer?.cancel(); // 타이머 정지
+  }
+
+  /// 타이머 재개
+  void resumeTimer() {
+    state = state.copyWith(isPaused: false); // 일시정지 해제
+    state = state.copyWith(timerKey: state.timerKey + 1); // 타이머 재시작
+  }
+
   /// 상태 초기화
   void reset() {
     state = DebateState.initial();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // 타이머 해제
+    super.dispose();
   }
 }
 

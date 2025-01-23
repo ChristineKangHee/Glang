@@ -18,6 +18,14 @@ class DebatePage extends ConsumerWidget {
       appBar: AppBar(
         title: Text("토론"),
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.pause), // 일시정지 아이콘
+          onPressed: () {
+            // 일시정지 다이얼로그 호출
+            ref.read(debateProvider.notifier).pauseTimer(); // 타이머 일시정지
+            showPauseDialog(context, ref); // 다이얼로그 표시
+          },
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.close),
@@ -28,6 +36,26 @@ class DebatePage extends ConsumerWidget {
         ],
       ),
       body: DebateContent(customColors: customColors),
+    );
+  }
+
+  /// 일시 정지 다이얼로그
+  void showPauseDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("일시 정지"),
+        content: const Text("타이머가 일시 정지되었습니다."),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // 다이얼로그 닫기
+              ref.read(debateProvider.notifier).resumeTimer(); // 타이머 재개
+            },
+            child: const Text("재개"),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -353,35 +381,43 @@ class _AIDiscussionSectionState extends ConsumerState<AIDiscussionSection> {
             },
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: widget.customColors.neutral100,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      hintText: "시간 내에 의견을 입력해주세요",
-                      hintStyle: body_small(context).copyWith(
-                        color: widget.customColors.neutral60,
-                      ),
-                      border: const OutlineInputBorder(
-                        borderSide: BorderSide.none,
+        // 답변 채팅 섹션
+        ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxHeight: 300
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: widget.customColors.neutral100,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      maxLines: 4,
+                      minLines: 1,
+                      controller: _controller,
+                      decoration: InputDecoration(
+                        hintText: "시간 내에 의견을 입력해주세요",
+                        hintStyle: body_small(context).copyWith(
+                          color: widget.customColors.neutral60,
+                        ),
+                        border: const OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: Icon(Icons.send, color: widget.customColors.primary),
-                  onPressed: _sendMessage,
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: Icon(Icons.send, color: widget.customColors.primary),
+                    onPressed: _sendMessage,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -473,6 +509,7 @@ class CountdownTimer extends StatefulWidget {
 class _CountdownTimerState extends State<CountdownTimer> {
   late int _remainingSeconds; // 남은 시간
   Timer? _timer; // 타이머 객체
+  bool _isPaused = false; // 타이머 일시정지 상태
 
   @override
   void initState() {
@@ -499,6 +536,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
     _timer?.cancel(); // 기존 타이머 정지
     setState(() {
       _remainingSeconds = seconds; // 남은 시간을 새로 설정
+      _isPaused = false; // 타이머 시작 시 일시정지 해제
     });
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_remainingSeconds > 0) {
@@ -512,48 +550,62 @@ class _CountdownTimerState extends State<CountdownTimer> {
     });
   }
 
+  // void _pauseTimer(BuildContext context) {
+  //   _timer?.cancel(); // 타이머 정지
+  //   setState(() {
+  //     _isPaused = true; // 일시정지 상태로 변경
+  //   });
+  //
+  //   // 일시정지 다이얼로그 표시
+  //   showPauseDialog(context);
+  // }
+
+  // void _resumeTimer() {
+  //   _startNewTimer(_remainingSeconds); // 남은 시간으로 타이머 재시작
+  // }
+
+  // void showPauseDialog(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (_) => AlertDialog(
+  //       title: const Text("일시 정지"),
+  //       content: const Text("타이머가 일시 정지되었습니다."),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () {
+  //             Navigator.pop(context); // 다이얼로그 닫기
+  //             _resumeTimer(); // 타이머 재개
+  //           },
+  //           child: const Text("재개"),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
     final minutes = (_remainingSeconds ~/ 60).toString().padLeft(2, '0'); // 분 계산
     final seconds = (_remainingSeconds % 60).toString().padLeft(2, '0'); // 초 계산
 
-    return Text(
-      "$minutes:$seconds", // "분:초" 형식으로 표시
-      style: const TextStyle(
-        fontSize: 32,
-        fontWeight: FontWeight.bold,
-        color: Colors.black,
-      ),
-    );
-  }
-}
-
-class DebateResultPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("토론 결과"),
-        centerTitle: true,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "토론이 종료되었습니다!",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context); // 메인 화면으로 돌아가기
-              },
-              child: Text("메인으로 돌아가기"),
-            ),
-          ],
+    return Column(
+      children: [
+        Text(
+          "$minutes:$seconds", // "분:초" 형식으로 표시
+          style: const TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
-      ),
+        const SizedBox(height: 16),
+        // ElevatedButton(
+        //   onPressed: _isPaused
+        //       ? null // 이미 일시정지 상태면 버튼 비활성화
+        //       : () => _pauseTimer(context),
+        //   child: const Text("일시 정지"),
+        // ),
+      ],
     );
   }
 }

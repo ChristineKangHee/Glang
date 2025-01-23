@@ -135,20 +135,3 @@ class _StartDialogContentState extends State<_StartDialogContent>
     );
   }
 }
-
-
-void showPauseDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (_) => AlertDialog(
-      title: Text("일시 정지"),
-      content: Text("타이머가 일시 정지되었습니다."),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text("재개"),
-        ),
-      ],
-    ),
-  );
-}
