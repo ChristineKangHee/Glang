@@ -1,11 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:readventure/view/components/custom_button.dart';
 import 'package:readventure/view/feature/reading/quiz_data.dart';
 import 'package:readventure/view/feature/reading/result_dialog.dart';
 import 'package:readventure/view/feature/reading/subjective_quiz.dart';
+import 'package:readventure/view/feature/reading/toolbar_component.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../../components/custom_app_bar.dart';
+import '../../components/custom_button.dart';
 import '../after_read/choose_activities.dart';
 import 'mcq_quiz.dart';
 import 'ox_quiz.dart';
@@ -19,7 +21,6 @@ class RdMain extends StatefulWidget {
   @override
   _RdMainState createState() => _RdMainState();
 }
-
 
 class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
   bool _showOxQuiz = false;
@@ -105,7 +106,6 @@ class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
     });
   }
 
-
   void toggleQuizVisibility(String quizType) {
     setState(() {
       if (quizType == 'OX') {
@@ -128,8 +128,6 @@ class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
       }
     });
   }
-
-
 
   void submitSubjectiveAnswer() {
     final answer = _subjectiveController.text.trim();
@@ -157,7 +155,6 @@ class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
@@ -171,18 +168,20 @@ class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            SelectableText(
               '현대 사회에서 읽기 능력은 지식 습득과 의사소통의 기본이지만, 학습자가 자신의 수준과 흥미에 맞는 텍스트를 접할 기회는 제한적이다.',
               style: reading_textstyle(context).copyWith(color: customColors.neutral0),
+              selectionControls: Read_Toolbar(customColors: customColors),
+              cursorColor: customColors.primary,
             ),
             const SizedBox(height: 16),
-            RichText(
-              text: TextSpan(
+            SelectableText.rich(
+
+              TextSpan(
                 style: reading_textstyle(context).copyWith(
                   color: customColors.neutral0,
                 ),
                 children: [
-                  //ox 문제
                   TextSpan(
                     text: '기존의 교육 시스템은 주로 일률적인 교재와 평가 방식을 사용하며, 이는 학습 동기를 저하시킬 위험이 있다. ',
                   ),
@@ -209,7 +208,6 @@ class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  //핵심 질문
                   TextSpan(
                     text: '또한, 읽기 과정에서 즉각적인 피드백을 제공하는 시스템이 부족하여 학습자는 자신의 약점이나 강점을 파악하기 어렵다.',
                   ),
@@ -235,7 +233,6 @@ class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  //객관식
                   TextSpan(
                     text: '맞춤형 읽기 도구와 실시간 피드백 시스템은 학습자가 적합한 자료를 통해 능동적으로 읽기 능력을 향상시키고, 스스로 학습 과정을 조율할 수 있는 환경을 제공할 잠재력이 있다. 또한, 맞춤형 읽기 도구는 학습자의 수준과 흥미를 고려하여 적합한 자료를 제공할 수 있다.',
                   ),
@@ -264,6 +261,7 @@ class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
                   ),
                 ],
               ),
+              selectionControls: Read_Toolbar(customColors: customColors),
             ),
             SizedBox(height: 40,),
             ButtonPrimary(
@@ -295,6 +293,53 @@ class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
       ),
       alignment: Alignment.center, // 아이콘을 중앙에 배치
       child: Icon(Icons.star, color: customColors.secondary, size: 14),
+    );
+  }
+}
+class Read_Toolbar extends MaterialTextSelectionControls {
+  final customColors;
+
+  Read_Toolbar({required this.customColors});
+
+  @override
+  Widget buildToolbar(
+      BuildContext context,
+      Rect globalEditableRegion,
+      double textLineHeight,
+      Offset position,
+      List<TextSelectionPoint> endpoints,
+      TextSelectionDelegate delegate,
+      ValueListenable<ClipboardStatus>? clipboardStatus,
+      Offset? lastSecondaryTapDownPosition,
+      ) {
+    const double toolbarHeight = 50;
+    const double toolbarWidth = 135;
+
+    // Get the screen size to limit the toolbar's position
+    final screenSize = MediaQuery.of(context).size;
+
+    // Calculate the ideal position for the toolbar
+    double leftPosition = (endpoints.first.point.dx + endpoints.last.point.dx) / 2 - toolbarWidth / 2;
+    double topPosition = endpoints.first.point.dy + globalEditableRegion.top - toolbarHeight - 16.0;
+
+    // Ensure the toolbar stays within the screen boundaries (left, top, and right)
+    leftPosition = leftPosition.clamp(0.0, screenSize.width - toolbarWidth);
+    topPosition = topPosition.clamp(0.0, screenSize.height - toolbarHeight);
+
+    return Stack(
+      children: [
+        Positioned(
+          left: leftPosition,
+          top: topPosition,
+          child: Toolbar(
+            toolbarWidth: toolbarWidth,
+            toolbarHeight: toolbarHeight,
+            context: context,
+            delegate: delegate,
+            customColors: customColors,
+          ),
+        ),
+      ],
     );
   }
 }

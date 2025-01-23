@@ -103,7 +103,7 @@ class _McqQuizState extends State<McqQuiz> {
                     ),
                     child: Text(
                       option,
-                      style: body_medium(context),
+                      style: body_small(context),
                     ),
                   ),
                 );
