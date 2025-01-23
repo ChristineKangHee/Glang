@@ -10,6 +10,7 @@ import 'package:readventure/theme/theme.dart';
 import '../../components/custom_button.dart';
 import 'GA_03_01_change_ending/CE_main.dart';
 import 'GA_03_02_content_summary/CS_main.dart';
+import 'GA_03_03_debate_activity/DA_main.dart';
 import 'GA_03_04_diagram/diagram_learning.dart';
 import 'GA_03_05_writing_form/writing_form_main.dart';
 import 'GA_03_06_writing_essay/WE_main.dart';
@@ -390,7 +391,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
                                 case '요약하기':
                                   return ContentSummaryMain();
                                 case '토론':
-                                  return ContentSummaryMain();
+                                  return DebateActivityMain();
                                 case '다이어그램':
                                   return DiagramMain();
                                 case '문장 구조':
