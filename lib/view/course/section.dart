@@ -39,7 +39,6 @@ class Section extends StatelessWidget {
           time: data.totalTime[index],
           level: data.difficultyLevel[index],
           description: data.textContents[index],
-          imageUrl: data.imageUrls[index],
           missions: data.missions[index],
           effects: data.effects[index],
           achievement: data.achievement[index],

@@ -11,7 +11,6 @@ class SectionPopup extends StatelessWidget {
   final String time;
   final String level;
   final String description;
-  final String imageUrl;
   final List<String> missions;
   final List<String> effects;
   final String achievement;
@@ -24,7 +23,6 @@ class SectionPopup extends StatelessWidget {
     required this.time,
     required this.level,
     required this.description,
-    required this.imageUrl,
     required this.missions,
     required this.effects,
     required this.achievement,
@@ -93,7 +91,6 @@ class SectionPopup extends StatelessWidget {
                           time: time,
                           level: level,
                           description: description,
-                          imageUrl: imageUrl,
                           mission: missions,
                           effect: effects,
                         ),
