@@ -103,16 +103,14 @@ class CourseDetailPage extends StatelessWidget {
               // 시작 버튼
               Container(
                 width: MediaQuery.of(context).size.width,
-                child: ButtonPrimary(
+                child: ButtonPrimary_noPadding(
                   function: () {
                     print("시작하기");
                     //function 은 상황에 맞게 재 정의 할 것.
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CRLearning(
-                          
-                        ), // BrMain으로 이동
+                        builder: (context) => CRLearning(), // BrMain으로 이동
                       ),
                     );
                   },

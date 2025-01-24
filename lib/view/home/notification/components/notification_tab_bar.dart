@@ -55,8 +55,7 @@ class NotificationTabBar extends StatelessWidget implements PreferredSizeWidget 
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return Container(
-      width: 100, // 고정 너비
-      height: 40, // 고정 높이
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       alignment: Alignment.center,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12), // 둥근 모서리
@@ -69,7 +68,7 @@ class NotificationTabBar extends StatelessWidget implements PreferredSizeWidget 
       child: Text(
         text,
         textAlign: TextAlign.center,
-        style: body_small_semi(context).copyWith(
+        style: body_xsmall_semi(context).copyWith(
           color: isSelected ? customColors.white : customColors.neutral60, // 텍스트 색상을 동적으로 변경
         ),
       ),
@@ -77,5 +76,5 @@ class NotificationTabBar extends StatelessWidget implements PreferredSizeWidget 
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(68); // TabBar 높이 설정
+  Size get preferredSize => const Size.fromHeight(58); // TabBar 높이 설정
 }

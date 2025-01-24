@@ -311,7 +311,7 @@ class _CourseMainState extends State<CourseMain> {
   int iCurrentSection = 0;
 
   /// UI 요소들의 고정된 높이.
-  final heightFirstBox = 56.0;
+  final heightFirstBox = 0.0;
   final heightSection = 1020.0;
 
   /// 스크롤 동작을 관리하는 컨트롤러.
@@ -325,7 +325,7 @@ class _CourseMainState extends State<CourseMain> {
 
   /// 스크롤 이벤트를 감지하고 현재 섹션 인덱스를 업데이트.
   void scrollListener() {
-    final currentScroll = scrollCtrl.position.pixels - heightFirstBox - 24.0;
+    final currentScroll = scrollCtrl.position.pixels;
     int index = (currentScroll / heightSection).floor();
 
     if (index < 0) index = 0;
@@ -360,13 +360,8 @@ class _CourseMainState extends State<CourseMain> {
                   : Section(
                 data: data[i - 1],
               ),
-              separatorBuilder: (_, i) => const SizedBox(
-                height: 24.0,
-              ),
-              padding: const EdgeInsets.only(
-                bottom: 24.0,
-                // left: 16.0,
-                // right: 16.0,
+              separatorBuilder: (_, i) => SizedBox(
+                height: i == 0 ? 0.0 : 24.0,  // First item has 0 height, others have 24 height
               ),
               itemCount: data.length + 1,
             ),

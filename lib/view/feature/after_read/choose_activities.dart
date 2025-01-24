@@ -266,6 +266,8 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
                 ),
                 progressColor: customColors.primary,
                 backgroundColor: customColors.neutral80 ?? Colors.grey,
+                // Add this line to make the ends rounded
+                circularStrokeCap: CircularStrokeCap.round,
               ),
               const SizedBox(width: 16),
               Column(
@@ -418,6 +420,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
                           ));
                         },
                         style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                           backgroundColor: activity.isCompleted
                               ? customColors.neutral80
                               : customColors.primary,
@@ -427,7 +430,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
                         ),
                         child: Text(
                           activity.isCompleted ? '학습완료' : '학습하기',
-                          style: body_xsmall(context).copyWith(
+                          style: body_xsmall_semi(context).copyWith(
                             color: activity.isCompleted
                                 ? customColors.neutral30
                                 : customColors.neutral100,
