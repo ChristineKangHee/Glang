@@ -19,7 +19,7 @@ class LoginPage extends ConsumerWidget {
           gradient: LinearGradient(
             colors: [
               customColors.neutral100 ?? Colors.blue,  // Start color of the gradient
-              customColors.primary20 ?? Colors.green, // End color of the gradient
+              customColors.primary10 ?? Colors.green, // End color of the gradient
             ],
             begin: Alignment.centerLeft,
             end: Alignment.bottomRight,
@@ -102,7 +102,6 @@ class GoogleLoginButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: customColors.neutral100,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: customColors.neutral80??Colors.grey, width: 1),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

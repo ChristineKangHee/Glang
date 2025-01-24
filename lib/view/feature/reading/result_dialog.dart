@@ -40,7 +40,7 @@ void showResultDialog(BuildContext context, bool isCorrect, String explanation, 
             ),
           ),
           const SizedBox(height: 20),
-          ButtonPrimary(
+          ButtonPrimary_noPadding(
             function: () {
               Navigator.pop(context);
               onCompleted();

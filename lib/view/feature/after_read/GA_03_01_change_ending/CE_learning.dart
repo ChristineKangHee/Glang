@@ -106,7 +106,7 @@ class _CELearningState extends State<CELearning> {
     );
   }
 
-  SizedBox buildButton(CustomColors customColors) {
+  Widget buildButton(CustomColors customColors) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(

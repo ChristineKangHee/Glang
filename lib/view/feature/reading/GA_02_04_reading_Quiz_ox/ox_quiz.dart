@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:readventure/view/feature/reading/quiz_data.dart';
-import '../../../../theme/font.dart';
-import '../../../../theme/theme.dart';
-import '../../components/custom_button.dart';
+import '../../../../../theme/font.dart';
+import '../../../../../theme/theme.dart';
+import '../../../components/custom_button.dart';
 
 class OxQuiz extends StatefulWidget {
   final OxQuestion question;

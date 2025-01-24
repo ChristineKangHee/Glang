@@ -9,8 +9,8 @@ import '../../../../theme/theme.dart';
 import '../../components/custom_app_bar.dart';
 import '../../components/custom_button.dart';
 import '../after_read/choose_activities.dart';
-import 'mcq_quiz.dart';
-import 'ox_quiz.dart';
+import 'GA_02_04_reading_Quiz_mcq//mcq_quiz.dart';
+import 'GA_02_04_reading_Quiz_ox/ox_quiz.dart';
 
 class RdMain extends StatefulWidget {
   final List<OxQuestion> oxQuestions;
