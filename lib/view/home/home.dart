@@ -77,26 +77,24 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
                 ProgressSection(data: data),
                 SizedBox(height: 24.h,),
 
-                // //TODO: 인기 게시물 위젯
                 // HotPostSection(customColors: customColors),
+                //TODO: 출석체크 위젯
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("출석 체크", style: body_small_semi(context),),
+                    SizedBox(height: 12,),
                     Container(
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: customColors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: customColors.neutral100,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                         child: AttendanceWidget()
                     ),
                   ],
                 ),
                 SizedBox(height: 24.h,),
-
-                //TODO: 출석체크 위젯
-
 
                 //TODO: 이번달 학습 기록 위젯
                 InkWell(
@@ -131,7 +129,6 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
     );
   }
 }
-
 class AttendanceWidget extends StatelessWidget {
   final List<AttendanceDay> attendanceDays = [
     AttendanceDay(date: '1/19', status: AttendanceStatus.missed, xp: 0),
@@ -171,26 +168,30 @@ class AttendanceDayWidget extends StatelessWidget {
     Color? iconColor;
     Color? textColor;
     Color? backgroundColor;
-    String iconText;
+    Color? borderColor;
+    IconData iconData;
 
     switch (day.status) {
       case AttendanceStatus.missed:
         iconColor = customColors.neutral60;
         textColor = customColors.neutral60;
         backgroundColor = customColors.neutral80;
-        iconText = 'X';
+        borderColor=customColors.neutral60;
+        iconData = Icons.close_rounded; // Icon for missed
         break;
       case AttendanceStatus.completed:
         iconColor = customColors.primary;
         textColor = customColors.primary;
-        backgroundColor = Colors.blue.shade100;
-        iconText = '♥';
+        backgroundColor = customColors.primary10;
+        borderColor=customColors.primary;
+        iconData = Icons.favorite; // Icon for completed
         break;
       case AttendanceStatus.upcoming:
         iconColor = customColors.neutral60;
         textColor = customColors.neutral60;
-        backgroundColor = Colors.grey.shade100;
-        iconText = '♥';
+        backgroundColor = customColors.neutral90;
+        borderColor=customColors.neutral60;
+        iconData = Icons.favorite; // Icon for upcoming
         break;
     }
 
@@ -198,29 +199,31 @@ class AttendanceDayWidget extends StatelessWidget {
       children: [
         Text(
           day.date,
-          style: TextStyle(color: Colors.black, fontSize: 12),
+          style: body_xxsmall(context).copyWith(color: customColors.neutral30,),
         ),
-        SizedBox(height: 4),
-        CircleAvatar(
-          radius: 20,
-          backgroundColor: backgroundColor,
-          child: Text(
-            iconText,
-            style: TextStyle(
-              color: iconColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
+        SizedBox(height: 8),
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            shape: BoxShape.circle,
+            border: Border.all(
+              width: 2,
+              color: borderColor??Colors.grey,
             ),
           ),
-        ),
-        SizedBox(height: 4),
-        Text(
-          day.status == AttendanceStatus.missed ? '미출석' : '+${day.xp}xp',
-          style: TextStyle(
-            color: textColor,
-            fontSize: 12,
+          child: Icon(
+            iconData,
+            color: iconColor,
+            size: 20,
           ),
         ),
+        SizedBox(height: 8),
+        // Text(
+        //   day.status == AttendanceStatus.missed ? '미출석' : '+${day.xp}xp',
+        //   style: body_xxsmall(context).copyWith(color: textColor,),
+        // ),
       ],
     );
   }
@@ -248,7 +251,7 @@ class LearningSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(child: LearningSection_Card(customColors: customColors, imageLink: imageLink_1, title: "4시간 30분", subtitle: "학습 시간",)),
-            SizedBox(width: 20,),
+            SizedBox(width: 16,),
             Expanded(child: LearningSection_Card(customColors: customColors, imageLink: imageLink_2, title: "32개", subtitle: "완료한 미션",)),
           ],
         ),
@@ -275,8 +278,6 @@ class LearningSection_Card extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Container(
-        // width: 170.5.w,
-        height: 142,
         padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

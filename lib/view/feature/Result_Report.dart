@@ -42,7 +42,7 @@ class _ResultReportPageState extends ConsumerState<ResultReportPage> {
                   SizedBox(
                     width: double.infinity,
                     child: Text(
-                      '대단해요 ! 오늘도 열심히 공부하셨어요!',
+                      '대단해요 ! 오늘도 열심히 읽으셨네요!',
                       style: body_small(context)
                           .copyWith(color: customColors.neutral30),
                     ),
@@ -105,7 +105,7 @@ class _ResultReportPageState extends ConsumerState<ResultReportPage> {
                 ),
               ),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start, // 수정된 부분
                 children: [
                   Text(
                     '분석',
