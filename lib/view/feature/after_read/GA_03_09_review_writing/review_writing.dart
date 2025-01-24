@@ -152,7 +152,7 @@ class _ReflectionScreenState extends ConsumerState<ReflectionScreen> {
       padding: const EdgeInsets.all(16),
       width: double.infinity,
       child: _isAnyTextFieldFilled
-          ? ButtonPrimary(
+          ? ButtonPrimary_noPadding(
         function: () {
           print("제출하기");
           // 상황에 맞는 함수 호출
@@ -163,7 +163,7 @@ class _ReflectionScreenState extends ConsumerState<ReflectionScreen> {
         },
         title: '제출하기',
       )
-          : ButtonPrimary20(
+          : ButtonPrimary20_noPadding(
         function: () {
           print("제출하기");
           // 상황에 맞는 함수 호출

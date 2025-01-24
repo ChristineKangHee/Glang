@@ -265,7 +265,7 @@ class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
               selectionControls: Read_Toolbar(customColors: customColors),
             ),
             SizedBox(height: 40,),
-            ButtonPrimary(
+            ButtonPrimary_noPadding(
               function: () {
                 Navigator.push(
                   context,
