@@ -5,7 +5,6 @@ import 'package:readventure/theme/theme.dart';
 import '../../viewmodel/custom_colors_provider.dart';
 import 'auth_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 class LoginPage extends ConsumerWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -15,59 +14,70 @@ class LoginPage extends ConsumerWidget {
     final customColors = ref.watch(customColorsProvider); // CustomColors 가져오기
 
     return Scaffold(
-      backgroundColor: customColors.primary,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Expanded(
-              child: Center(
-                child: SvgPicture.asset("assets/icons/app_icon.svg"),
-              )
-            ),
-            GestureDetector(
-              onTap: () {
-                authController.signInWithGoogle(
-                  onNicknameRequired: () {
-                    Navigator.pushReplacementNamed(context, '/nickname');
-                  },
-                  onHome: () {
-                    Navigator.pushReplacementNamed(context, '/');
-                  },
-                );
-              },
-              child: GoogleLoginButton(customColors: customColors),
-            ),
-            SizedBox(height: 16,),
-            GestureDetector(
-              onTap: () {
-                // authController.signInWithKakao(
-                //   onNicknameRequired: () {
-                //     Navigator.pushReplacementNamed(context, '/nickname');
-                //   },
-                //   onHome: () {
-                //     Navigator.pushReplacementNamed(context, '/');
-                //   },
-                // );
-              },
-              child: AppleLoginButton(customColors: customColors),
-            ),
-            SizedBox(height: 16,),
-            GestureDetector(
-              onTap: () {
-                authController.signInWithKakao(
-                  onNicknameRequired: () {
-                    Navigator.pushReplacementNamed(context, '/nickname');
-                  },
-                  onHome: () {
-                    Navigator.pushReplacementNamed(context, '/');
-                  },
-                );
-              },
-              child: KakaoLoginButton(customColors: customColors),
-            ),
-            SizedBox(height: 86,),
-          ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              customColors.neutral100 ?? Colors.blue,  // Start color of the gradient
+              customColors.primary20 ?? Colors.green, // End color of the gradient
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Expanded(
+                  child: Center(
+                    child: SvgPicture.asset("assets/icons/app_login_logo.svg"),
+                  )
+              ),
+              GestureDetector(
+                onTap: () {
+                  authController.signInWithGoogle(
+                    onNicknameRequired: () {
+                      Navigator.pushReplacementNamed(context, '/nickname');
+                    },
+                    onHome: () {
+                      Navigator.pushReplacementNamed(context, '/');
+                    },
+                  );
+                },
+                child: GoogleLoginButton(customColors: customColors),
+              ),
+              SizedBox(height: 16,),
+              GestureDetector(
+                onTap: () {
+                  // authController.signInWithKakao(
+                  //   onNicknameRequired: () {
+                  //     Navigator.pushReplacementNamed(context, '/nickname');
+                  //   },
+                  //   onHome: () {
+                  //     Navigator.pushReplacementNamed(context, '/');
+                  //   },
+                  // );
+                },
+                child: AppleLoginButton(customColors: customColors),
+              ),
+              SizedBox(height: 16,),
+              GestureDetector(
+                onTap: () {
+                  authController.signInWithKakao(
+                    onNicknameRequired: () {
+                      Navigator.pushReplacementNamed(context, '/nickname');
+                    },
+                    onHome: () {
+                      Navigator.pushReplacementNamed(context, '/');
+                    },
+                  );
+                },
+                child: KakaoLoginButton(customColors: customColors),
+              ),
+              SizedBox(height: 40,),
+            ],
+          ),
         ),
       ),
     );
@@ -87,12 +97,12 @@ class GoogleLoginButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
-        width: 361,
-        height: 64,
+        padding: EdgeInsets.symmetric(vertical: 16),
+        width: double.infinity,
         decoration: BoxDecoration(
           color: customColors.neutral100,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Color(0xFFCDCED3), width: 1.5),
+          border: Border.all(color: customColors.neutral80??Colors.grey, width: 1),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -100,17 +110,6 @@ class GoogleLoginButton extends StatelessWidget {
             Container(
               width: 24,
               height: 24,
-              // 구글 아이콘 뒤 그림자 현재 제대로 적용안됌
-              // decoration: const BoxDecoration(
-              //   boxShadow: [
-              //     BoxShadow(
-              //       color: Color.fromRGBO(0, 0, 0, 0.25),
-              //       blurRadius: 4,
-              //       offset: Offset(0, 4),
-              //       // spreadRadius: 0,
-              //     )
-              //   ],
-              // ),
               child: Image.asset("assets/icons/google.png"),
             ),
             SizedBox(width: 16,),
@@ -135,8 +134,8 @@ class AppleLoginButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
-        width: 361,
-        height: 64,
+        padding: EdgeInsets.symmetric(vertical: 16),
+        width: double.infinity,
         decoration: BoxDecoration(
           color: customColors.neutral0,
           borderRadius: BorderRadius.circular(16),
@@ -145,8 +144,8 @@ class AppleLoginButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 32,
-              height: 32,
+              width: 24,
+              height: 24,
               child: Image.asset("assets/icons/apple_icon_white.png"),
             ),
             SizedBox(width: 16,),
@@ -171,8 +170,8 @@ class KakaoLoginButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
-        width: 361,
-        height: 64,
+        padding: EdgeInsets.symmetric(vertical: 16),
+        width: double.infinity,
         decoration: BoxDecoration(
           color: Color(0xFFFAE100),
           borderRadius: BorderRadius.circular(16),
@@ -181,8 +180,8 @@ class KakaoLoginButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 32,
-              height: 32,
+              width: 24,
+              height: 24,
               child: Image.asset("assets/icons/kakao_icon.png"),
             ),
             SizedBox(width: 16,),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/view/feature/after_read/AR_main.dart';
 import 'package:readventure/view/feature/after_read/GA_03_08_paragraph_analysis/paragraph_analysis.dart';
 import '../../../../theme/font.dart';
+import '../../../../theme/theme.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
 import 'dart:math'; // For the pi constant
 
@@ -33,7 +34,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 16),
         padding: const EdgeInsets.all(16),
         decoration: ShapeDecoration(
-          color: Colors.white,
+          color: customColors.neutral100,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -60,7 +61,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
               alignment: Alignment.center,
               child: CustomPaint(
                 size: Size(150, 75), // Custom size for the graphic
-                painter: HalfCirclePainter(percentage: percentage * 100), // Convert to percentage
+                painter: HalfCirclePainter(percentage: percentage * 100, customColors: customColors, context: context, ), // Convert to percentage
               ),
             ),
             const SizedBox(height: 16),
@@ -195,31 +196,32 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
     );
   }
 }
-
-
 class HalfCirclePainter extends CustomPainter {
   final double percentage;
+  final CustomColors customColors;
+  final BuildContext context; // Add textStyle to the constructor
 
-  HalfCirclePainter({required this.percentage});
+  HalfCirclePainter({required this.percentage, required this.customColors, required this.context});
 
   @override
   void paint(Canvas canvas, Size size) {
     final Paint backgroundPaint = Paint()
-      ..color = Colors.grey.shade300
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 10;
-
-    final Paint progressPaint = Paint()
-      ..color = Colors.blue
+      ..color = customColors.neutral80!  // customColors 사용
       ..style = PaintingStyle.stroke
       ..strokeWidth = 10
-      ..strokeCap = StrokeCap.round; // Ensures the ends are rounded
+      ..strokeCap = StrokeCap.round;
+
+    final Paint progressPaint = Paint()
+      ..color = customColors.primary!
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 10
+      ..strokeCap = StrokeCap.round;
 
     // Draw half-circle background
     canvas.drawArc(
       Rect.fromLTWH(0, 0, size.width, size.height * 2),
-      pi, // Start angle (180 degrees)
-      pi, // End angle (180 degrees)
+      pi,
+      pi,
       false,
       backgroundPaint,
     );
@@ -228,8 +230,8 @@ class HalfCirclePainter extends CustomPainter {
     final double sweepAngle = (percentage / 100) * pi;
     canvas.drawArc(
       Rect.fromLTWH(0, 0, size.width, size.height * 2),
-      pi, // Start angle (180 degrees)
-      sweepAngle, // Sweep angle based on the percentage
+      pi,
+      sweepAngle,
       false,
       progressPaint,
     );
@@ -238,7 +240,10 @@ class HalfCirclePainter extends CustomPainter {
     final textPainter = TextPainter(
       text: TextSpan(
         text: "${percentage.toInt()}점",
-        style: TextStyle(fontSize: 20, color: Colors.black),
+        style: body_large_semi(context).copyWith(
+          color: customColors.neutral30,
+          decoration: TextDecoration.none,
+        ),
       ),
       textDirection: TextDirection.ltr,
     );

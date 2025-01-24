@@ -86,13 +86,13 @@ class _SubjectiveQuizState extends State<SubjectiveQuiz> {
               Container(
                 width: MediaQuery.of(context).size.width,
                 child: _isTextFieldEmpty
-                    ? ButtonPrimary20(
+                    ? ButtonPrimary20_noPadding(
                   function: () {
                     print("텍스트를 입력해주세요.");
                   },
                   title: '제출하기',
                 )
-                    : ButtonPrimary(
+                    : ButtonPrimary_noPadding(
                   function: () {
                     setState(() {
                       _showProblem = false;

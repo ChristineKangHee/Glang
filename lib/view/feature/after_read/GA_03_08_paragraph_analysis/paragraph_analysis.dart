@@ -12,7 +12,6 @@ import '../../../components/custom_button.dart';
 
 // 문제 데이터 모델
 class Question {
-  final String paragraph; // 질문
   final String content;//문단 내용
   final List<String> options; // 선택지
   final int correctAnswerIndex; // 정답의 인덱스
@@ -20,7 +19,6 @@ class Question {
 
 
   Question({
-    required this.paragraph,
     required this.options,
     required this.correctAnswerIndex,
     required this.explanation,
@@ -31,21 +29,18 @@ class Question {
 // 샘플 데이터
 final List<Question> questions = [
   Question(
-    paragraph: '다음 중 첫 번째 문단의 주제로 가장 적합한 것은?',
     content:'현대 사회에서 읽기 능력은 지식 습득과 의사소통의 기본이지만, 학습자가 자신의 수준과 흥미에 맞는 텍스트를 접할 기회는 제한적이다. 기존의 교육 시스템은 주로 일률적인 교재와 평가 방식을 사용하며, 이는 학습 동기를 저하시킬 위험이 있다. 또한, 읽기 과정에서 즉각적인 피드백을 제공하는 시스템이 부족하여 학습자는 자신의 약점이나 강점을 파악하기 어렵다.',
     options: ['기존 교육 시스템의 문제점', '읽기 능력의 정의와 의의', '개인화된 학습 도구의 효과', '실시간 피드백 시스템의 필요성'],
     correctAnswerIndex: 0,
     explanation: '기존 교육 시스템의 문제점을 논의하며 현재의 한계를 설명하는 내용이 중심입니다. 다른 선택지는 구체적 방법이나 효과에 관한 주제로, 본 문단의 초점과 다릅니다.',
   ),
   Question(
-    paragraph: '다음 중 두 번째 문단의 주제로 가장 적합한 것은?',
     content:'맞춤형 읽기 도구와 실시간 피드백 시스템은 학습자가 적합한 자료를 통해 능동적으로 읽기 능력을 향상시키고, 스스로 학습 과정을 조율할 수 있는 환경을 제공할 잠재력이 있다. 또한, 맞춤형 읽기 도구는 학습자의 수준과 흥미를 고려하여 적합한 자료를 제공할 수 있다.',
     options: ['학습 동기 향상을 위한 도구 개발', '맞춤형 읽기 도구와 실시간 피드백 시스템의 장점', '읽기 능력 향상을 위한 전통적 방법', '교재의 일률적 내용에 대한 비판'],
     correctAnswerIndex: 1,
     explanation: '맞춤형 읽기 도구와 실시간 피드백 시스템의 장점에 대해 설명하며 해당 방법의 유용성을 강조합니다. 다른 선택지는 내용의 초점과 거리가 있습니다.',
   ),
   Question(
-    paragraph: '다음 중 세 번째 문단의 주제로 가장 적합한 것은?',
     content:'이러한 도구의 개발과 보급은 개인화된 학습의 미래를 열어갈 중요한 과제가 될 것이다.',
     options: ['맞춤형 도구의 개발과 활용 방안', '교육의 전통적 방식 유지 필요성', '개인화된 학습 환경 구축의 중요성', '읽기 능력 훈련을 위한 기존 교재의 개선'],
     correctAnswerIndex: 2,
@@ -125,7 +120,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            ButtonPrimary(
+            ButtonPrimary_noPadding(
               function: () {
                 Navigator.pop(context); // BottomSheet 닫기
                 if (currentQuestionIndex < questions.length - 1) {
@@ -242,7 +237,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Q${currentQuestionIndex + 1}. ${question.paragraph}',
+                    'Q${currentQuestionIndex + 1}. 다음 중 문단의 주제로 가장 적합한 것을 골라볼까요?',
                     style: body_small_semi(context).copyWith(
                       color: customColors.primary,
                     ),

@@ -23,28 +23,38 @@ class Section extends StatelessWidget {
 
   void _showPopup(BuildContext context, int index) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       barrierColor: Colors.transparent,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 95.0),
-        child: SectionPopup(
-          title: data.title,
-          subTitle: data.subdetailTitle[index],
-          time: data.totalTime[index],
-          level: data.difficultyLevel[index],
-          description: data.textContents[index],
-          missions: data.missions[index],
-          effects: data.effects[index],
-          achievement: data.achievement[index],
-          status: data.status[index],
-        ),
-      ),
+      builder: (BuildContext context) {
+        return Stack(
+          children: [
+            // 뒤쪽 화면이 클릭 가능하도록 설정
+            GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              behavior: HitTestBehavior.translucent,
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 60.0),
+                padding: const EdgeInsets.all(20.0),
+                child: SectionPopup(
+                  title: data.title,
+                  subTitle: data.subdetailTitle[index],
+                  time: data.totalTime[index],
+                  level: data.difficultyLevel[index],
+                  description: data.textContents[index],
+                  missions: data.missions[index],
+                  effects: data.effects[index],
+                  achievement: data.achievement[index],
+                  status: data.status[index],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -77,7 +87,10 @@ class Section extends StatelessWidget {
               left: _getMargin(i),
               right: _getMargin(i, isLeft: false),
             ),
-            child: StatusButton(status: data.status[i], onPressed: () => _showPopup(context, i),),
+            child: StatusButton(
+              status: data.status[i],
+              onPressed: () => _showPopup(context, i),
+            ),
           ),
         ),
       ],

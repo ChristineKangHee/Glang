@@ -191,10 +191,10 @@ class StatusButton extends StatelessWidget {
     return status == 'start' || status == 'in_progress'
         ? PulsatingPlayButton(
             onPressed: onPressed,
-            buttonColor: buttonColor,
+            buttonColor: buttonColor??Colors.purple,
             buttonIcon: buttonIcon,
             iconSize: iconSize,
-            iconColor: iconColor,
+            iconColor: iconColor??Colors.white,
           )
         : ElevatedButton(
       onPressed: status == 'locked' ? null : onPressed,
@@ -206,20 +206,25 @@ class StatusButton extends StatelessWidget {
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         minimumSize: Size.zero,
       ),
-      child: Icon(buttonIcon, size: iconSize, color: Colors.white),
+      child: Icon(buttonIcon, size: iconSize, color: customColors.neutral30),
     );
   }
 }
-
 class PulsatingPlayButton extends StatefulWidget {
   final VoidCallback onPressed;
-  final buttonColor;
-  final buttonIcon;
-  final iconSize;
-  final iconColor;
+  final Color buttonColor;
+  final IconData buttonIcon;
+  final double iconSize;
+  final Color iconColor;
 
-  const PulsatingPlayButton({Key? key, required this.onPressed, required this.buttonColor, this.buttonIcon, this.iconSize, this.iconColor})
-      : super(key: key);
+  const PulsatingPlayButton({
+    Key? key,
+    required this.onPressed,
+    required this.buttonColor,
+    required this.buttonIcon,
+    required this.iconSize,
+    required this.iconColor,
+  }) : super(key: key);
 
   @override
   _PulsatingPlayButtonState createState() => _PulsatingPlayButtonState();
@@ -256,33 +261,35 @@ class _PulsatingPlayButtonState extends State<PulsatingPlayButton>
 
   @override
   Widget build(BuildContext context) {
-    final customColors = Theme.of(context).extension<CustomColors>()!;
-    return Center(
+    return SizedBox(
+      width: 120, // 고정된 크기 설정
+      height: 120,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // AnimatedBuilder(
-          //   animation: _controller,
-          //   builder: (context, child) {
-          //     return Container(
-          //       width: 100 * _scaleAnimation.value,
-          //       height: 100 * _scaleAnimation.value,
-          //       decoration: BoxDecoration(
-          //         shape: BoxShape.circle,
-          //         color: customColors.accent?.withOpacity(_opacityAnimation.value),
-          //       ),
-          //     );
-          //   },
-          // ),
-          InkWell(
-            onTap: widget.onPressed,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: widget.buttonColor,
-              ),
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return Container(
+                width: 100 * _scaleAnimation.value,
+                height: 100 * _scaleAnimation.value,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: widget.buttonColor.withOpacity(_opacityAnimation.value),
+                ),
+              );
+            },
+          ),
+          ElevatedButton(
+            onPressed: widget.onPressed,
+            style: ElevatedButton.styleFrom(
+              shape: const CircleBorder(),
+              backgroundColor: widget.buttonColor,
+              fixedSize: const Size(80, 80), // 버튼 크기 고정
+              elevation: 0,
+            ),
+            child: Transform.translate(
+              offset: const Offset(-4, 0), // 아이콘을 왼쪽으로 4px 이동
               child: Icon(
                 widget.buttonIcon,
                 color: widget.iconColor,
