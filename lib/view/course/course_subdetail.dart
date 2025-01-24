@@ -13,13 +13,13 @@ import '../../util/box_shadow_styles.dart';
 import '../components/custom_app_bar.dart';
 import '../components/custom_button.dart';
 import '../feature/before_read/GA_01_01_cover_research/CR_learning.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class CourseDetailPage extends StatelessWidget {
   final String title; // 코스 제목
   final String time; // 소요 시간
   final String level; // 난이도
   final String description; // 코스 설명
-  final String imageUrl; // 이미지 URL
   final List<String> mission; // 학습 미션 리스트
   final List<String> effect; // 학습 효과 리스트
 
@@ -27,7 +27,6 @@ class CourseDetailPage extends StatelessWidget {
     super.key,
     required this.title,
     required this.description,
-    required this.imageUrl,
     required this.mission,
     required this.effect,
     required this.time,
@@ -77,8 +76,8 @@ class CourseDetailPage extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 36),
-                          Image.network(
-                            imageUrl, // 네트워크 이미지
+                          SvgPicture.asset(
+                            'assets/images/charactor.svg', // 네트워크 이미지
                             width: 106,
                             height: 98,
                             fit: BoxFit.cover,
