@@ -44,11 +44,11 @@ class CustomNavigationBar extends ConsumerWidget {
             label: '홈',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.article_rounded),
+            icon: Icon(Icons.stars_rounded),
             label: '코스',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.leaderboard),
+            icon: Icon(Icons.article_rounded),
             label: '커뮤니티',
           ),
           BottomNavigationBarItem(

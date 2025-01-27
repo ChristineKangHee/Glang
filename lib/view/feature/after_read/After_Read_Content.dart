@@ -4,25 +4,20 @@ import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../../components/custom_app_bar.dart';
 
-class RdMain extends StatefulWidget {
-  final List<OxQuestion> oxQuestions;
-  final List<McqQuestion> mcqQuestions;
-
-  RdMain({required this.oxQuestions, required this.mcqQuestions});
-
+class AfterReadContent extends StatefulWidget {
   @override
-  _RdMainState createState() => _RdMainState();
+  _AfterReadContentState createState() => _AfterReadContentState();
 }
 
 
-class _RdMainState extends State<RdMain> {
+class _AfterReadContentState extends State<AfterReadContent> {
 
 @override
 Widget build(BuildContext context) {
   final customColors = Theme.of(context).extension<CustomColors>()!;
 
   return Scaffold(
-      appBar: CustomAppBar_2depth_8(
+      appBar: CustomAppBar_2depth_4(
         title: "읽기 도구의 필요성",
       ),
       body: SingleChildScrollView(

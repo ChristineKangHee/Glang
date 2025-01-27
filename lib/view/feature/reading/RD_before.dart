@@ -4,12 +4,6 @@ import 'package:readventure/theme/theme.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/view/components/custom_button.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:readventure/view/feature/after_read/GA_03_08_paragraph_analysis/paragraph_analysis.dart';
-import 'package:readventure/view/feature/after_read/GA_03_09_review_writing/review_writing.dart';
-import '../after_read/widget/start_page/description_section_main.dart';
-import '../after_read/widget/start_page/icon_section_main.dart';
-import '../after_read/widget/start_page/title_section_main.dart';
-import 'RD_exercise.dart';
 
 class RdBefore extends StatelessWidget {
   const RdBefore({super.key});
@@ -18,7 +12,7 @@ class RdBefore extends StatelessWidget {
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     return Scaffold(
-      appBar: CustomAppBar_2depth_6(title: "어른의 어휘력", automaticallyImplyLeading: false,
+      appBar: CustomAppBar_2depth_6(title: "읽기의 중요성", automaticallyImplyLeading: false,
         onIconPressed: () {
           Navigator.pop(context);
         } ,

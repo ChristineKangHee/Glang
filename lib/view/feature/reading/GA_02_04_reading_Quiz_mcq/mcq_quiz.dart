@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:readventure/view/feature/reading/quiz_data.dart';
-import '../../../../theme/font.dart';
-import '../../../../theme/theme.dart';
+import '../../../../../theme/font.dart';
+import '../../../../../theme/theme.dart';
 
 class McqQuiz extends StatefulWidget {
   final McqQuestion question;
