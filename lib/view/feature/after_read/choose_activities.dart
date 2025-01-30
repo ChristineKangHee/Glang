@@ -1,7 +1,12 @@
+/// File: choose_activities.dart
+/// Purpose: 읽기후 학습선택하는 코드
+/// Author: 강희
+/// Created: 2024-1-19
+/// Last Modified: 2024-1-30 by 강희
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:readventure/view/feature/after_read/GA_03_04_diagram/diagram_main.dart';
 import '../../../theme/font.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/custom_app_bar.dart';
@@ -13,6 +18,7 @@ import 'GA_03_01_change_ending/CE_main.dart';
 import 'GA_03_02_content_summary/CS_main.dart';
 import 'GA_03_03_debate_activity/DA_main.dart';
 import 'GA_03_04_diagram/diagram_learning.dart';
+import 'GA_03_04_diagram/diagram_main.dart';
 import 'GA_03_05_writing_form/writing_form_main.dart';
 import 'GA_03_06_writing_essay/WE_main.dart';
 import 'GA_03_07_format_conversion/FC_main.dart';
@@ -58,17 +64,16 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
   @override
   Widget build(BuildContext context) {
     final customColors = ref.watch(customColorsProvider);
-
-    // 완료한 학습의 수
     int completedCount = activities.where((activity) => activity.isCompleted).length;
 
     return Scaffold(
       backgroundColor: customColors.neutral90,
       appBar: CustomAppBar_2depth_6(
-        title: '학습 선택', automaticallyImplyLeading: false,
-          onIconPressed: () {
-            Navigator.pushNamed(context, '/'); // '/'로 이동
-          }
+        title: '학습 선택',
+        automaticallyImplyLeading: false,
+        onIconPressed: () {
+          Navigator.pushNamed(context, '/');
+        },
       ),
       body: Column(
         children: [
@@ -78,23 +83,21 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    // 학습 상황 카드 추가
                     LearningProgress(completedCount, customColors, context),
                     const SizedBox(height: 20),
-                    // 학습 활동 목록
                     ActivityList(context, customColors),
                   ],
                 ),
               ),
             ),
           ),
-          // 학습 결과 확인 버튼
           ResultButton(context, completedCount, customColors),
         ],
       ),
     );
   }
 
+  // 학습 결과 확인 버튼
   Widget ResultButton(BuildContext context, int completedCount, CustomColors customColors) {
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -102,20 +105,21 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
       child: completedCount / activities.length < 1.0
           ? ButtonPrimary20(
         function: () {
-          print("학습 결과 확인하기"); // 팝업을 띄우는 함수 호출
+          print("학습 결과 확인하기");
         },
         title: '학습 결과 확인하기',
       )
           : ButtonPrimary(
         function: () {
           print("학습 결과 확인하기");
-          _showResultDialog(context, customColors); // 팝업을 띄우는 함수 호출
+          _showResultDialog(context, customColors);
         },
         title: '학습 결과 확인하기',
       ),
     );
   }
 
+  // 결과 팝업
   void _showResultDialog(BuildContext context, CustomColors customColors) {
     showDialog(
       context: context,
@@ -132,88 +136,13 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // 팝업 제목
-                Container(
-                  width: double.infinity,
-                  child: Text(
-                    '결과를 확인하시겠습니까?',
-                    style: body_small_semi(context).copyWith(
-                      color: customColors.neutral30,
-                    ),
-                  ),
+                Text(
+                  '결과를 확인하시겠습니까?',
+                  style: body_small_semi(context).copyWith(color: customColors.neutral30),
                 ),
                 const SizedBox(height: 20),
-                // 팝업 버튼들
-                Container(
-                  width: double.infinity,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // 아니오 버튼
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context); // 팝업 닫기
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                            decoration: ShapeDecoration(
-                              color: customColors.neutral90,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                '아니오',
-                                textAlign: TextAlign.center,
-                                style: body_small_semi(context).copyWith(
-                                  color: customColors.neutral60,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      // 네 버튼
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context); // 팝업 닫기
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ResultReportPage(), // 결과 페이지로 이동
-                              ),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                            decoration: ShapeDecoration(
-                              color: customColors.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                '네',
-                                textAlign: TextAlign.center,
-                                style: body_small_semi(context).copyWith(
-                                  color: customColors.neutral100,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                _buildDialogButtons(context, customColors),
               ],
             ),
           ),
@@ -222,16 +151,97 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     );
   }
 
+  // 팝업 버튼
+  Widget _buildDialogButtons(BuildContext context, CustomColors customColors) {
+    return Row(
+      children: [
+        _buildDialogButton(context, '아니오', customColors.neutral90!, customColors.neutral60!, () {
+          Navigator.pop(context);
+        }),
+        const SizedBox(width: 16),
+        _buildDialogButton(context, '네', customColors.primary!, customColors.neutral100!, () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ResultReportPage()),
+          );
+        }),
+      ],
+    );
+  }
 
+  // 팝업 버튼 생성
+  Widget _buildDialogButton(BuildContext context, String title, Color bgColor, Color textColor, VoidCallback onPressed) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onPressed,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          decoration: ShapeDecoration(
+            color: bgColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: body_small_semi(context).copyWith(color: textColor),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 학습 진행 상황
   Widget LearningProgress(int completedCount, CustomColors customColors, BuildContext context) {
-    int totalXP = activities
-        .where((activity) => activity.isCompleted)
-        .map((activity) => int.parse(activity.xp.replaceAll('xp', '')))
-        .fold(0, (prev, element) => prev + element);
+    int totalXP = activities.where((activity) => activity.isCompleted).map((activity) => int.parse(activity.xp.replaceAll('xp', ''))).fold(0, (prev, element) => prev + element);
+    int totalPossibleXP = activities.map((activity) => int.parse(activity.xp.replaceAll('xp', ''))).fold(0, (prev, element) => prev + element);
 
-    int totalPossibleXP = activities
-        .map((activity) => int.parse(activity.xp.replaceAll('xp', '')))
-        .fold(0, (prev, element) => prev + element);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: ShapeDecoration(
+        color: customColors.neutral100,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+      ),
+      child: Row(
+        children: [
+          CircularPercentIndicator(
+            radius: 40.0,
+            lineWidth: 10.0,
+            animation: true,
+            percent: completedCount / activities.length,
+            center: Text('${(completedCount / activities.length * 100).toStringAsFixed(0)}%', style: body_xsmall_semi(context).copyWith(color: customColors.neutral30)),
+            progressColor: customColors.primary,
+            backgroundColor: customColors.neutral80 ?? Colors.grey,
+            circularStrokeCap: CircularStrokeCap.round,
+          ),
+          const SizedBox(width: 16),
+          _buildProgressText(totalXP, totalPossibleXP, completedCount, customColors),
+        ],
+      ),
+    );
+  }
+
+  // 학습 진행 텍스트
+  Widget _buildProgressText(int totalXP, int totalPossibleXP, int completedCount, CustomColors customColors) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('$totalXP/$totalPossibleXP xp', style: heading_medium(context).copyWith(color: customColors.neutral30)),
+        const SizedBox(height: 8),
+        Text('$completedCount/${activities.length} 학습 완료', style: body_xsmall(context).copyWith(color: customColors.neutral60)),
+      ],
+    );
+  }
+
+  // 학습 활동 목록
+  Widget ActivityList(BuildContext context, CustomColors customColors) {
+    final sortedActivities = activities..sort((a, b) => a.isCompleted ? 1 : -1);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -244,207 +254,109 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '학습 상황',
-            style: body_small_semi(context).copyWith(
-              color: customColors.neutral30,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              CircularPercentIndicator(
-                radius: 40.0,
-                lineWidth: 10.0,
-                animation: true,
-                percent: completedCount / activities.length,
-                center: Text(
-                  '${(completedCount / activities.length * 100).toStringAsFixed(0)}%',
-                  style: body_xsmall_semi(context).copyWith(
-                    color: customColors.neutral30,
-                  ),
-                ),
-                progressColor: customColors.primary,
-                backgroundColor: customColors.neutral80 ?? Colors.grey,
-                // Add this line to make the ends rounded
-                circularStrokeCap: CircularStrokeCap.round,
-              ),
-              const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$totalXP/$totalPossibleXP xp',
-                    style: heading_medium(context).copyWith(
-                      color: customColors.neutral30,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '$completedCount/${activities.length} 학습 완료',
-                    style: body_xsmall(context).copyWith(
-                      color: customColors.neutral60,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          Text('학습 활동', style: body_small_semi(context)),
+          const SizedBox(height: 20),
+          ...sortedActivities.map((activity) => _buildActivityItem(context, activity, customColors)),
         ],
       ),
     );
   }
 
-  Widget ActivityList(BuildContext context, CustomColors customColors) {
-    // 완료된 항목은 리스트 하단으로 정렬
-    final sortedActivities = activities..sort((a, b) => a.isCompleted ? 1 : -1);
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: ShapeDecoration(
-        color: customColors.neutral100,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+  // 학습 항목
+  Widget _buildActivityItem(BuildContext context, LearningActivity activity, CustomColors customColors) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: ShapeDecoration(
+          color: activity.isCompleted ? customColors.neutral90 : customColors.neutral100,
+          shape: RoundedRectangleBorder(
+            side: activity.isCompleted ? BorderSide.none : BorderSide(width: 1, color: customColors.neutral80 ?? Color(0xFFCDCED3)),
+            borderRadius: BorderRadius.circular(18),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildActivityText(activity, customColors),
+            _buildActivityButton(context, activity, customColors),
+          ],
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start, // 왼쪽 정렬
-        children: [
-          Text(
-            '학습 활동',
-            style: body_small_semi(context),
-          ),
-          const SizedBox(height: 20),
-          Column(
-            children: sortedActivities.map((activity) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  decoration: ShapeDecoration(
-                    color: activity.isCompleted
-                        ? customColors.neutral90
-                        : customColors.neutral100,
-                    shape: RoundedRectangleBorder(
-                      side: activity.isCompleted
-                          ? BorderSide.none
-                          : BorderSide(width: 1, color: customColors.neutral80 ?? Color(0xFFCDCED3)),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start, // 왼쪽 정렬
-                        children: [
-                          Text(
-                            activity.title,
-                            style: body_small_semi(context).copyWith(
-                              color: customColors.neutral30,
-                            ),
-                          ),
-                          const SizedBox(height: 8,),
-                          if (!activity.isCompleted)
-                            Row(
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(Icons.timer, size: 16, color: customColors.neutral30),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      activity.time,
-                                      style: body_xsmall(context).copyWith(
-                                        color: customColors.neutral30,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(width: 8),
-                                Row(
-                                  children: [
-                                    Icon(Icons.star, size: 16, color: customColors.neutral30),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      activity.xp,
-                                      style: body_xsmall(context).copyWith(
-                                        color: customColors.neutral30,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            )
-                          else
-                            Text(
-                              '경험치 ${activity.xp} 획득!',
-                              style: body_xsmall(context).copyWith(
-                                color: customColors.primary,
-                              ),
-                            ),
-                        ],
-                      ),
-                      ElevatedButton(
-                        onPressed: activity.isCompleted
-                            ? null
-                            : () {
-                          setState(() {
-                            activity.isCompleted = true; // 색상 변화 유지
-                          });
-                          Navigator.push(context, MaterialPageRoute(
-                            builder: (context) {
-                              // 각 활동에 따른 페이지 연결
-                              switch (activity.title) {
-                                case '결말 바꾸기':
-                                  return ChangeEndingMain();
-                                case '에세이 작성':
-                                  return WritingEssayMain();
-                                case '형식 변환하기':
-                                  return FormatConversionMain();
-                                case '요약하기':
-                                  return ContentSummaryMain();
-                                case '토론':
-                                  return DebateActivityMain();
-                                case '다이어그램':
-                                  return DiagramMain();
-                                case '문장 구조':
-                                  return WritingFormMain();
-                                case '주제 추출':
-                                  return ParagraphAnalysisMain();
-                                case '자유 소감':
-                                  return ReviewWritingMain();
-                                default:
-                                  return LearningActivitiesPage(); // 기본 페이지
-                              }
-                            },
-                          ));
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                          backgroundColor: activity.isCompleted
-                              ? customColors.neutral80
-                              : customColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          activity.isCompleted ? '학습완료' : '학습하기',
-                          style: body_xsmall_semi(context).copyWith(
-                            color: activity.isCompleted
-                                ? customColors.neutral30
-                                : customColors.neutral100,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
+    );
+  }
+
+  // 학습 항목 텍스트
+  Widget _buildActivityText(LearningActivity activity, CustomColors customColors) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(activity.title, style: body_small_semi(context).copyWith(color: customColors.neutral30)),
+        const SizedBox(height: 8),
+        if (!activity.isCompleted)
+          Row(
+            children: [
+              Icon(Icons.timer, size: 16, color: customColors.neutral30),
+              const SizedBox(width: 4),
+              Text(activity.time, style: body_xsmall(context).copyWith(color: customColors.neutral30)),
+              const SizedBox(width: 8),
+              Icon(Icons.star, size: 16, color: customColors.neutral30),
+              const SizedBox(width: 4),
+              Text(activity.xp, style: body_xsmall(context).copyWith(color: customColors.neutral30)),
+            ],
+          )
+        else
+          Text('경험치 ${activity.xp} 획득!', style: body_xsmall(context).copyWith(color: customColors.primary)),
+      ],
+    );
+  }
+
+  // 학습하기 버튼
+  Widget _buildActivityButton(BuildContext context, LearningActivity activity, CustomColors customColors) {
+    return ElevatedButton(
+      onPressed: activity.isCompleted
+          ? null
+          : () {
+        setState(() {
+          activity.isCompleted = true;
+        });
+        Navigator.push(context, MaterialPageRoute(builder: (context) => _getActivityPage(activity.title)));
+      },
+      style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        backgroundColor: activity.isCompleted ? customColors.neutral80 : customColors.primary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      child: Text(
+        activity.isCompleted ? '학습완료' : '학습하기',
+        style: body_xsmall_semi(context).copyWith(color: activity.isCompleted ? customColors.neutral30 : customColors.neutral100),
       ),
     );
+  }
+
+  // 학습 활동에 맞는 페이지 반환
+  Widget _getActivityPage(String title) {
+    switch (title) {
+    case '결말 바꾸기':
+    return ChangeEndingMain();
+    case '에세이 작성':
+    return WritingEssayMain();
+    case '형식 변환하기':
+    return FormatConversionMain();
+    case '요약하기':
+    return ContentSummaryMain();
+    case '토론':
+    return DebateActivityMain();
+    case '다이어그램':
+    return DiagramMain();
+    case '문장 구조':
+    return WritingFormMain();
+    case '주제 추출':
+    return ParagraphAnalysisMain();
+    case '자유 소감':
+    return ReviewWritingMain();
+      default:
+        return SizedBox();
+    }
   }
 }

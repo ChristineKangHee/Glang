@@ -10,7 +10,7 @@ import 'package:readventure/view/community/community_main.dart';
 import 'package:readventure/view/course/course_main.dart';
 import 'package:readventure/view/feature/after_read/AR_main.dart';
 import 'package:readventure/view/feature/before_read/BR_main.dart';
-import 'package:readventure/view/feature/reading/RD_main.dart';
+import 'package:readventure/view/feature/reading/GA_02/RD_main.dart';
 import 'package:readventure/view/feature/reading/quiz_data.dart';
 import 'package:readventure/view/home/example.dart';
 import 'package:readventure/view/home/home.dart';

@@ -1,16 +1,18 @@
+
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:readventure/view/feature/reading/quiz_data.dart';
 import 'package:readventure/view/feature/reading/result_dialog.dart';
-import 'package:readventure/view/feature/reading/subjective_quiz.dart';
-import 'package:readventure/view/feature/reading/toolbar_component.dart';
-import '../../../../theme/font.dart';
-import '../../../../theme/theme.dart';
-import '../../components/custom_app_bar.dart';
-import '../../components/custom_button.dart';
-import '../after_read/choose_activities.dart';
-import 'GA_02_04_reading_Quiz_mcq//mcq_quiz.dart';
-import 'GA_02_04_reading_Quiz_ox/ox_quiz.dart';
+import 'package:readventure/view/feature/reading/GA_02_02_subjective/subjective_quiz.dart';
+import 'package:readventure/view/feature/reading/GA_02/toolbar_component.dart';
+import '../../../../../theme/font.dart';
+import '../../../../../theme/theme.dart';
+import '../../../components/custom_app_bar.dart';
+import '../../../components/custom_button.dart';
+import '../../after_read/choose_activities.dart';
+import '../GA_02_04_reading_Quiz_mcq/mcq_quiz.dart';
+import '../GA_02_04_reading_Quiz_ox/ox_quiz.dart';
 
 class RdMain extends StatefulWidget {
   final List<OxQuestion> oxQuestions;
@@ -76,7 +78,7 @@ class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
       oxCompleted = true;
     });
 
-    showResultDialog(context, isCorrect, question.explanation, () {
+    ResultDialog.show(context, isCorrect, question.explanation, () {
       setState(() {
         _showOxQuiz = false;
         _animationController.reverse();
@@ -99,7 +101,7 @@ class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
       mcqCompleted = true;
     });
 
-    showResultDialog(context, isCorrect, question.explanation, () {
+    ResultDialog.show(context, isCorrect, question.explanation, () {
       setState(() {
         _showMcqQuiz = false;
         _animationController.reverse();
@@ -320,8 +322,8 @@ class Read_Toolbar extends MaterialTextSelectionControls {
     final screenSize = MediaQuery.of(context).size;
 
     // Calculate the ideal position for the toolbar
-    double leftPosition = (endpoints.first.point.dx + endpoints.last.point.dx) / 2 - toolbarWidth / 2;
-    double topPosition = endpoints.first.point.dy + globalEditableRegion.top - toolbarHeight - 16.0;
+    double leftPosition = (endpoints.first.point.dx + endpoints.last.point.dx) / 2 - toolbarWidth / 2+16;
+    double topPosition = endpoints.first.point.dy + globalEditableRegion.top - toolbarHeight - 32.0;
 
     // Ensure the toolbar stays within the screen boundaries (left, top, and right)
     leftPosition = leftPosition.clamp(0.0, screenSize.width - toolbarWidth);

@@ -1,8 +1,14 @@
+/// File: tpolbar_component.dart
+/// Purpose: 읽기중 드래그 후 나타나는 툴바 코드
+/// Author: 강희
+/// Created: 2024-1-19
+/// Last Modified: 2024-1-30 by 강희
+
 import 'package:flutter/material.dart';
-import '../../../theme/theme.dart';
-import '../../../view/feature/reading/reading_chatbot.dart';
-import '../../../theme/font.dart';
-import '../after_read/widget/answer_section.dart';
+import '../../../../theme/theme.dart';
+import 'reading_chatbot.dart';
+import '../../../../theme/font.dart';
+import '../../after_read/widget/answer_section.dart';
 
 class Toolbar extends StatefulWidget {
   final double toolbarWidth;
