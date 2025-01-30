@@ -1,3 +1,9 @@
+/// File: RD_before.dart
+/// Purpose: 읽기 중 시작 전 튜토리얼 구현 코드
+/// Author: 강희
+/// Created: 2024-1-19
+/// Last Modified: 2024-1-30 by 강희
+
 import 'package:flutter/material.dart';
 import 'package:readventure/view/components/custom_app_bar.dart';
 import 'package:readventure/theme/theme.dart';

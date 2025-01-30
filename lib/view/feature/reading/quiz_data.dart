@@ -1,3 +1,9 @@
+/// File: quiz_data.dart
+/// Purpose: 읽기중 퀴즈에 들어갈 데이터 코드
+/// Author: 강희
+/// Created: 2024-1-19
+/// Last Modified: 2024-1-30 by 강희
+
 class OxQuestion {
   final String paragraph;
   final bool correctAnswer;

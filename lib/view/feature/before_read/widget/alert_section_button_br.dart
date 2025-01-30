@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/theme.dart';
 
-import '../../reading/RD_before.dart';
+import '../../reading/GA_02/RD_before.dart';
 
 class AlertSectionButtonBr extends StatelessWidget {
   const AlertSectionButtonBr({
