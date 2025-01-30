@@ -61,7 +61,7 @@ class DebateActivityMain extends StatelessWidget {
                               },
                               {
                                 "icon": Icons.access_time_filled, // 사용자 지정 아이콘
-                                "text": "학습을 시작하면 타이머가 작동해요!",
+                                "text": "미션을 시작하면 타이머가 작동해요!",
                               },
                             ],
                           ),

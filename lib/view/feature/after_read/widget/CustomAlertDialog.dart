@@ -26,7 +26,7 @@ class CustomAlertDialog extends StatelessWidget {
               children: [
                 // 타이틀
                 Text(
-                  "학습 결과",
+                  "결과",
                   style: const TextStyle(
                     fontSize: 18.0,
                     fontWeight: FontWeight.bold,

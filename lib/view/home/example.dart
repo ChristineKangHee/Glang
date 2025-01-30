@@ -9,8 +9,8 @@
 //   Widget build(BuildContext context) {
 //     final sectionData = SectionData(
 //       section: 1,
-//       title: '초급 코스',
-//       sectionDetail: '초급 코스의 설명입니다.',
+//       title: '코스1',
+//       sectionDetail: '코스1의 설명입니다.',
 //       subdetailTitle: ['학습 목표 1', '학습 목표 2'],
 //       totalTime: ['10', '20'],
 //       achievement: ['50', '70'],

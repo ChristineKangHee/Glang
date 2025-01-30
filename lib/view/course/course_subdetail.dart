@@ -38,7 +38,7 @@ class CourseDetailPage extends StatelessWidget {
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_4(title: '코스 상세'), // 사용자 정의 앱바
+      appBar: CustomAppBar_2depth_4(title: '스테이지 상세'), // 사용자 정의 앱바
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16), // 외부 여백
@@ -86,12 +86,12 @@ class CourseDetailPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 20),
                       MissionSection(
-                        title: '학습 미션', // 미션 섹션 제목
+                        title: '미션', // 미션 섹션 제목
                         missions: mission, // 미션 리스트
                       ),
                       const SizedBox(height: 20),
                       EffectSection(
-                        title: '학습 효과', // 학습 효과 섹션 제목
+                        title: '효과', // 학습 효과 섹션 제목
                         effects: effect, // 학습 효과 리스트
                       ),
                       const SizedBox(height: 20),

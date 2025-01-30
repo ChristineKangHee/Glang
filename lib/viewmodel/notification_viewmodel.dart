@@ -17,10 +17,10 @@ class NotificationNotifier extends StateNotifier<List<NotificationItem>> {
       isRead: false,
     ),
     NotificationItem(
-      title: '학습 알림',
-      description: '오늘 학습 목표를 완료하세요!',
+      title: '코스',
+      description: '오늘 읽기 목표를 완료하세요!',
       date: DateTime.now().subtract(Duration(days: 2)),
-      category: '학습',
+      category: '코스',
       isRead: true,
     ),
     NotificationItem(
@@ -82,10 +82,10 @@ class NotificationNotifier extends StateNotifier<List<NotificationItem>> {
         isRead: false,
       ),
       NotificationItem(
-        title: '오늘의 학습 알림',
-        description: '학습 목표를 달성해 보세요!',
+        title: '오늘의 읽기 알림',
+        description: '읽기 목표를 달성해 보세요!',
         date: DateTime.now().subtract(const Duration(hours: 3)),
-        category: '학습',
+        category: '코스',
         isRead: false,
       ),
     ];

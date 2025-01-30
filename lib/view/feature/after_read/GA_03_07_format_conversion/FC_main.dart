@@ -56,11 +56,11 @@ class FormatConversionMain extends StatelessWidget {
                             items: [
                               {
                                 "icon": Icons.message_outlined, // 사용자 지정 아이콘
-                                "text": "학습에 대한 부가설명이 들어갑니다",
+                                "text": "미션에 대한 부가설명이 들어갑니다",
                               },
                               {
                                 "icon": Icons.access_time_filled, // 사용자 지정 아이콘
-                                "text": "학습을 시작하면 타이머가 작동해요!",
+                                "text": "미션을 시작하면 타이머가 작동해요!",
                               },
                             ],
                           ),

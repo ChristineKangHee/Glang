@@ -119,7 +119,7 @@ class DebateContent extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                "학습 결과",
+                "결과",
                 style: body_small_semi(context)
               ),
               const SizedBox(height: 16),

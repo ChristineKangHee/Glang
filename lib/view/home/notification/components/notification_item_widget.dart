@@ -55,7 +55,7 @@ class NotificationItemWidget extends StatelessWidget {
   Widget _buildCategoryIcon(String category) {
     // 카테고리에 따른 아이콘 및 색상 결정
     switch (category) {
-      case '학습':
+      case '코스':
         return const Icon(Icons.school, color: Colors.blue);
       case '보상':
         return const Icon(Icons.card_giftcard, color: Colors.green);

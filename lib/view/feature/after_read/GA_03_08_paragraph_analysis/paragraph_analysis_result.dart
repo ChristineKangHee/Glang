@@ -69,7 +69,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
     return Align(
       alignment: Alignment.center,
       child: Text(
-        '학습 결과', // 제목 텍스트
+        '결과', // 제목 텍스트
         style: body_small_semi(context).copyWith(
           color: customColors.neutral30, // 텍스트 색상
           decoration: TextDecoration.none,

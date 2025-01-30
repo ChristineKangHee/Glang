@@ -148,7 +148,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     return Scaffold(
       backgroundColor: customColors.neutral90,
       appBar: CustomAppBar_2depth_6(
-        title: '학습 선택',
+        title: '미션 선택',
         automaticallyImplyLeading: false,
         onIconPressed: () {
           Navigator.pushNamed(context, '/');
@@ -184,16 +184,16 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
       child: completedCount / activities.length < 1.0
           ? ButtonPrimary20(
         function: () {
-          print("학습 결과 확인하기");
+          print("결과 확인하기");
         },
-        title: '학습 결과 확인하기',
+        title: '결과 확인하기',
       )
           : ButtonPrimary(
         function: () {
-          print("학습 결과 확인하기");
+          print("결과 확인하기");
           _showResultDialog(context, customColors);
         },
-        title: '학습 결과 확인하기',
+        title: '결과 확인하기',
       ),
     );
   }
@@ -313,7 +313,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
       children: [
         Text('$totalXP/$totalPossibleXP xp', style: heading_medium(context).copyWith(color: customColors.neutral30)),
         const SizedBox(height: 8),
-        Text('$completedCount/${activities.length} 학습 완료', style: body_xsmall(context).copyWith(color: customColors.neutral60)),
+        Text('$completedCount/${activities.length} 미션 완료', style: body_xsmall(context).copyWith(color: customColors.neutral60)),
       ],
     );
   }
@@ -333,7 +333,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('학습 활동', style: body_small_semi(context)),
+          Text('미션', style: body_small_semi(context)),
           const SizedBox(height: 20),
           ...sortedActivities.map((activity) => _buildActivityItem(context, activity, customColors)),
         ],
@@ -407,7 +407,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       child: Text(
-        activity.isCompleted ? '학습완료' : '학습하기',
+        activity.isCompleted ? '미션완료' : '미션하기',
         style: body_xsmall_semi(context).copyWith(color: activity.isCompleted ? customColors.neutral30 : customColors.neutral100),
       ),
     );
