@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/theme.dart';
 
+import '../../../../theme/font.dart';
 import '../choose_activities.dart';
 
 class AlertSectionButton extends StatelessWidget {
@@ -14,49 +15,51 @@ class AlertSectionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(
-              vertical: 12.0,
-              horizontal: 32.0,
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            decoration: ShapeDecoration(
+              color: customColors.neutral90,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
-            backgroundColor: customColors.neutral90,
-            foregroundColor: customColors.neutral60,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
+            child: TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                "다시 쓰기",
+                style: body_small_semi(context).copyWith(color: customColors.neutral60),
+              ),
             ),
           ),
-          child: const Text("다시 쓰기"),
         ),
-        TextButton(
-          onPressed: () {
-            // Navigator.pushAndRemoveUntil(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => LearningActivitiesPage()),
-            //       (route) => false, // 이전 화면을 모두 제거
-            // );
-            Navigator.popUntil(
-              context,
-                  (route) => route.settings.name == 'LearningActivitiesPage',
-            );
-          },
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(
-              vertical: 12.0,
-              horizontal: 32.0,
+        SizedBox(width: 8), // Optional: Add space between the two buttons
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            decoration: ShapeDecoration(
+              color: customColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
-            backgroundColor: customColors.primary,
-            foregroundColor: customColors.neutral100,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
+            child: TextButton(
+              onPressed: () {
+                Navigator.popUntil(
+                  context,
+                      (route) => route.settings.name == 'LearningActivitiesPage',
+                );
+              },
+              child: Text(
+                "완료",
+                style: body_small_semi(context).copyWith(color: customColors.neutral100),
+              ),
             ),
           ),
-          child: const Text("완료"),
         ),
       ],
     );
