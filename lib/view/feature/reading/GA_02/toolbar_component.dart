@@ -121,10 +121,10 @@ class _NoteDialog extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  __NoteDialogState createState() => __NoteDialogState();
+  _NoteDialogState createState() => _NoteDialogState();
 }
 
-class __NoteDialogState extends State<_NoteDialog> {
+class _NoteDialogState extends State<_NoteDialog> {
   late Color saveButtonColor;
   bool isQuestionIncluded = false; // State to track if the question is included
 
@@ -147,137 +147,175 @@ class __NoteDialogState extends State<_NoteDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        padding: const EdgeInsets.all(16), // Padding inside the popup
-        decoration: ShapeDecoration(
-          color: widget.customColors.neutral100,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+      child: SingleChildScrollView( // Make the dialog scrollable
+        child: Container(
+          padding: const EdgeInsets.all(16), // Padding inside the popup
+          decoration: ShapeDecoration(
+            color: widget.customColors.neutral100,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '메모',
-              textAlign: TextAlign.center,
-              style: body_small_semi(context).copyWith(
-                color: widget.customColors.neutral30,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                '선택된 문장',
-                style: body_xsmall_semi(context),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-              decoration: ShapeDecoration(
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(width: 1, color: widget.customColors.neutral90),
-                  borderRadius: BorderRadius.circular(10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '메모',
+                textAlign: TextAlign.center,
+                style: body_small_semi(context).copyWith(
+                  color: widget.customColors.neutral30,
                 ),
               ),
-              child: Align(
+              const SizedBox(height: 24),
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  widget.selectedText,
-                  style: body_xsmall(context),
+                  '선택된 문장',
+                  style: body_xsmall_semi(context),
                 ),
               ),
-            ),
-            Answer_Section_No_Title(
-              controller: widget.noteController,
-              customColors: widget.customColors,
-            ),
-            const SizedBox(height: 12),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  isQuestionIncluded = !isQuestionIncluded; // Toggle the state
-                });
-              },
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.check_circle_rounded,
-                    color: isQuestionIncluded
-                        ? widget.customColors.primary // Primary color when active
-                        : widget.customColors.neutral80, // Neutral color when inactive
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                decoration: ShapeDecoration(
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(width: 1, color: widget.customColors.neutral90),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '질문 포함',
-                    style: body_xsmall(context).copyWith(
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    widget.selectedText,
+                    style: body_xsmall(context),
+                  ),
+                ),
+              ),
+              Answer_Section_No_Title(
+                controller: widget.noteController,
+                customColors: widget.customColors,
+              ),
+              const SizedBox(height: 12),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isQuestionIncluded = !isQuestionIncluded; // Toggle the state
+                  });
+                },
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.check_circle_rounded,
                       color: isQuestionIncluded
-                          ? widget.customColors.primary // Match text color to state
-                          : widget.customColors.neutral30,
+                          ? widget.customColors.primary // Primary color when active
+                          : widget.customColors.neutral80, // Neutral color when inactive
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '질문 포함',
+                      style: body_xsmall(context).copyWith(
+                        color: isQuestionIncluded
+                            ? widget.customColors.primary // Match text color to state
+                            : widget.customColors.neutral30,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: ShapeDecoration(
+                        color: widget.customColors.neutral90,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(
+                          '취소',
+                          style: body_small_semi(context).copyWith(color: widget.customColors.neutral60),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: ShapeDecoration(
+                        color: saveButtonColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: TextButton(
+                        onPressed: () {
+                          final note = widget.noteController.text.trim();
+                          if (note.isNotEmpty) {
+                            debugPrint('메모 저장: $note');
+                            debugPrint('질문 포함 상태: $isQuestionIncluded');
+                          }
+
+                          // Show customized SnackBar at the bottom
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Container(
+                                padding: EdgeInsets.all(16),
+                                clipBehavior: Clip.antiAlias,
+                                decoration: ShapeDecoration(
+                                  color: widget.customColors.neutral60, // Custom color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min, // Ensure the width hugs content
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      '질문이 저장되었어요.',
+                                      style: body_small_semi(context).copyWith(color: widget.customColors.neutral100),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              duration: Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating, // To make it float and hug the content
+                              backgroundColor: Colors.transparent, // Make the background transparent
+                              elevation: 0, // Remove the default shadow (dim effect)
+                              onVisible: () {
+                                // Fade out effect using an animation
+                                Future.delayed(Duration(seconds: 2), () {
+                                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                });
+                              },
+                            ),
+                          );
+
+                          Navigator.pop(context); // Close the note dialog
+                        },
+                        child: Text(
+                          '저장',
+                          style: body_small_semi(context).copyWith(color: widget.customColors.neutral100),
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    decoration: ShapeDecoration(
-                      color: widget.customColors.neutral90,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(
-                        '취소',
-                        style: body_small_semi(context).copyWith(color: widget.customColors.neutral60),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    decoration: ShapeDecoration(
-                      color: saveButtonColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: TextButton(
-                      onPressed: () {
-                        final note = widget.noteController.text.trim();
-                        if (note.isNotEmpty) {
-                          debugPrint('메모 저장: $note');
-                          debugPrint('질문 포함 상태: $isQuestionIncluded');
-                        }
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        '저장',
-                        style: body_small_semi(context).copyWith(color: widget.customColors.neutral100),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
-
-
 
 
   void _showWordOrSentencePopup(BuildContext context, TextSelectionDelegate delegate) {

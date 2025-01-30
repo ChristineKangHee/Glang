@@ -89,11 +89,11 @@ class _CSLearningState extends State<CSLearning> {
             // 버튼 동작
             _showHintDialog();
           },
-          backgroundColor: Colors.yellow,
+          backgroundColor: customColors.secondary,
           shape: const CircleBorder(),
-          child: const Icon(
+          child: Icon(
             Icons.emoji_objects_outlined,
-            color: Colors.black,
+            color: customColors.neutral100,
             size: 28,
           ),
         ),
