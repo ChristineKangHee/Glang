@@ -4,6 +4,7 @@
 /// Created: 2024-1-19
 /// Last Modified: 2024-1-30 by 강희
 
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -60,6 +61,84 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     LearningActivity(title: '주제 추출', time: '5분', xp: '10xp'),
     LearningActivity(title: '자유 소감', time: '5분', xp: '10xp'),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // 팝업 10초 후에 띄우기
+    Future.delayed(Duration(seconds: 0), () {
+      _showExplanationPopup();
+    });
+
+    // 10초 후 팝업을 닫기
+    Future.delayed(Duration(seconds: 2), () {
+      Navigator.pop(context);  // 팝업을 닫음
+    });
+  }
+
+
+  // 설명 팝업을 띄우는 함수
+  void _showExplanationPopup() {
+    final customColors = ref.watch(customColorsProvider);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 44, vertical: 28),
+            decoration: ShapeDecoration(
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Container(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: Text(
+                            '읽은 내용과 관련된\n미션을 해볼까요?',
+                            textAlign: TextAlign.center,
+                            style: body_large_semi(context).copyWith(color: customColors.neutral30),
+                          ),
+                        ),
+                        const SizedBox(height: 28),
+                        Container(
+                          width: 172,
+                          height: 172,
+                          child: Image.asset("assets/images/book_star.png"),
+                        ),
+                        const SizedBox(height: 28),
+                        SizedBox(
+                          width: double.infinity,
+                          child: Text(
+                            '경험치를 채워 미션을 완료해보세요!',
+                            textAlign: TextAlign.center,
+                            style: body_small(context).copyWith(color: customColors.neutral60),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {

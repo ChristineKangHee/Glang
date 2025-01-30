@@ -97,6 +97,7 @@ class GoogleLoginButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
+        height: 64,
         padding: EdgeInsets.symmetric(vertical: 16),
         width: double.infinity,
         decoration: BoxDecoration(
@@ -107,8 +108,8 @@ class GoogleLoginButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 24,
-              height: 24,
+              width: 32,
+              height: 32,
               child: Image.asset("assets/icons/google.png"),
             ),
             SizedBox(width: 16,),
@@ -133,6 +134,7 @@ class AppleLoginButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
+        height: 64,
         padding: EdgeInsets.symmetric(vertical: 16),
         width: double.infinity,
         decoration: BoxDecoration(
@@ -171,6 +173,7 @@ class KakaoLoginButton extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 16),
         width: double.infinity,
+        height: 64,
         decoration: BoxDecoration(
           color: Color(0xFFFAE100),
           borderRadius: BorderRadius.circular(16),
