@@ -46,7 +46,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage> with Single
     // 탭별로 데이터를 필터링 및 정렬
     final allNotifications = NotificationUtil.sortByDate(notifications);
     final unreadNotifications = NotificationUtil.filterUnread(allNotifications);
-    final studyNotifications = allNotifications.where((n) => n.category == '학습').toList();
+    final studyNotifications = allNotifications.where((n) => n.category == '코스').toList();
     final rewardNotifications = allNotifications.where((n) => n.category == '보상').toList();
     final systemNotifications = allNotifications.where((n) => n.category == '시스템').toList();
 
@@ -62,7 +62,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage> with Single
           children: [
             _buildRefreshableList(allNotifications, textStyle), // 전체 알림
             _buildRefreshableList(unreadNotifications, textStyle), // 읽지 않은 알림
-            _buildRefreshableList(studyNotifications, textStyle), // 학습 관련 알림
+            _buildRefreshableList(studyNotifications, textStyle), // 코스 관련 알림
             _buildRefreshableList(rewardNotifications, textStyle), // 보상 관련 알림
             _buildRefreshableList(systemNotifications, textStyle), // 시스템 알림
           ],

@@ -19,11 +19,11 @@ class InfoHistory extends ConsumerWidget {
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        title: "학습 기록",
+        title: "기록",
       ),
       body: Column(
         children: [
-          Text("학습 기록"),
+          Text("기록"),
         ],
       ),
     );

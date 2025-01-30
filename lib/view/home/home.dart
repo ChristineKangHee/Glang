@@ -43,16 +43,16 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
 
     final data = SectionData(
       section: 1,
-      title: "초급 코스",
+      title: "코스1",
       subdetailTitle: ["읽기 도구의 필요성"],
-      textContents: ["이 섹션에서는 학습 목표를 달성하는 방법을 배웁니다."],
+      textContents: ["이 섹션에서는 목표를 달성하는 방법을 배웁니다."],
       achievement: ['0'],
       totalTime: ['30'],
       difficultyLevel: ["쉬움"],
       missions: [['미션 1-1', '미션 1-2', '미션 1-3', '미션 1-4', '미션 1-5', '미션 1-6'],],
       effects: [['미션 1-1', '미션 1-2', '미션 1-3',],],
       status: ["start",],
-      sectionDetail: '중급 코스의 설명 내용입니다.', // 상태값 예시
+      sectionDetail: '코스2의 설명 내용입니다.', // 상태값 예시
     );
 
 
@@ -244,12 +244,12 @@ class LearningSection extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("이번달 학습 기록", style: body_small_semi(context),),
+        Text("이번달 기록", style: body_small_semi(context),),
         SizedBox(height: 12.h,),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(child: LearningSection_Card(customColors: customColors, imageLink: imageLink_1, title: "4시간 30분", subtitle: "학습 시간",)),
+            Expanded(child: LearningSection_Card(customColors: customColors, imageLink: imageLink_1, title: "4시간 30분", subtitle: "읽은 시간",)),
             SizedBox(width: 16,),
             Expanded(child: LearningSection_Card(customColors: customColors, imageLink: imageLink_2, title: "32개", subtitle: "완료한 미션",)),
           ],
@@ -310,7 +310,7 @@ class ProgressSection extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("진행 중인 학습", style: body_small_semi(context),),
+        Text("진행 중인 스테이지", style: body_small_semi(context),),
         SizedBox(height: 12.h,),
         SectionPopup(
           title: data.title,
@@ -343,7 +343,7 @@ class GreetingSection extends StatelessWidget {
       children: [
         Text("안녕하세요, $name님!", style: heading_medium(context),),
         SizedBox(height: 4.h,),
-        Text("오늘의 학습 목표를 달성해 보세요!", style: body_xsmall(context),),
+        Text("오늘의 목표를 달성해 보세요!", style: body_xsmall(context),),
       ],
     );
   }

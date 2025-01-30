@@ -21,7 +21,7 @@ class CustomTapBar extends StatelessWidget{
         tabs: [
           Tab(text: '전체',),
           Tab(text: '안읽음',),
-          Tab(text: '학습',),
+          Tab(text: '코스',),
           Tab(text: '보상',),
           Tab(text: '시스템',),
         ],

@@ -38,7 +38,7 @@ class NotificationTabBar extends StatelessWidget implements PreferredSizeWidget 
                   final isSelected = tabController.index == index;
                   return _buildTab(
                     context,
-                    text: ['전체', '안읽음', '학습', '보상', '시스템'][index],
+                    text: ['전체', '안읽음', '코스', '보상', '시스템'][index],
                     isSelected: isSelected,
                     index: index, // 인덱스를 전달
                   );

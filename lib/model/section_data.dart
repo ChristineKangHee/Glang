@@ -1,6 +1,6 @@
 class SectionData {
   final int section; // 섹션 1 2 3 숫자로 구분. course에서 사용
-  final String title; // 초급 코스, 중급 코스
+  final String title; // 코스1, 코스2
   final String sectionDetail; // 초급코스 설명 내용
   final List<String> subdetailTitle; // subdetail 페이지에서 하나의 스테이지의 제목
   final List<String> totalTime; // 스테이지 완료 예상 시간

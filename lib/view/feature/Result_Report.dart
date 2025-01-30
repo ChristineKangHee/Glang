@@ -113,7 +113,7 @@ class _ResultReportPageState extends ConsumerState<ResultReportPage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'AI가 하나둘셋제로님의 학습을 분석했어요',
+                    'AI가 하나둘셋제로님의 읽기 능력을 분석했어요',
                     style: body_small(context),
                   ),
                   const SizedBox(height: 16),
@@ -191,7 +191,7 @@ class _ResultReportPageState extends ConsumerState<ResultReportPage> {
                       ),
                       const SizedBox(width: 9),
                       Text(
-                        '세부 학습 리포트 보기',
+                        '세부 리포트 보기',
                         style: body_medium_semi(context),
                       ),
                     ],

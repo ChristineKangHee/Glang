@@ -25,7 +25,7 @@ class InfoStatistics extends ConsumerWidget {
     final customColors = ref.watch(customColorsProvider);
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        title: "학습 통계",
+        title: "통계",
       ),
       backgroundColor: customColors.neutral90,
       body: const StatisticsWidget(),
@@ -48,9 +48,9 @@ class StatisticsWidget extends StatelessWidget {
           const SizedBox(height: 24),
           _buildAnalysisBox(context,customColors),
           const SizedBox(height: 24),
-          Text('학습 성과', style: body_medium_semi(context)),
+          Text('성과', style: body_medium_semi(context)),
           const SizedBox(height: 4),
-          Text('1월 23일은 총 3회의 학습을 진행했어요', style: body_small(context)),
+          Text('1월 23일은 총 3회의 읽기를 진행했어요', style: body_small(context)),
           const SizedBox(height: 8),
           _buildGoalBox(context, customColors),
         ],
@@ -70,7 +70,7 @@ class StatisticsWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '학습 시간',
+            '시간',
             style: body_medium_semi(context),
           ),
           const SizedBox(height: 8),
@@ -96,12 +96,12 @@ class StatisticsWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '학습 분석',
+            '분석',
             style: body_medium_semi(context),
           ),
           const SizedBox(height: 8),
           Text(
-            'AI가 하나둘셋제로님의 학습을 분석했어요',
+            'AI가 하나둘셋제로님의 읽기 능력을 분석했어요',
             style: body_small(context),
           ),
           const SizedBox(height: 16),
