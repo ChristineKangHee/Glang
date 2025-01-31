@@ -188,6 +188,8 @@ class _NoteDialogState extends State<_NoteDialog> {
                   child: Text(
                     widget.selectedText,
                     style: body_xsmall(context),
+                    maxLines: 2, // Limit to two lines
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
@@ -268,7 +270,7 @@ class _NoteDialogState extends State<_NoteDialog> {
                                 padding: EdgeInsets.all(16),
                                 clipBehavior: Clip.antiAlias,
                                 decoration: ShapeDecoration(
-                                  color: widget.customColors.neutral60, // Custom color
+                                  color: widget.customColors.neutral60.withOpacity(0.8), // Custom color
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(100),
                                   ),
@@ -279,19 +281,19 @@ class _NoteDialogState extends State<_NoteDialog> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Text(
-                                      '질문이 저장되었어요.',
+                                      '메모가 저장되었어요.',
                                       style: body_small_semi(context).copyWith(color: widget.customColors.neutral100),
                                     ),
                                   ],
                                 ),
                               ),
-                              duration: Duration(seconds: 2),
+                              duration: Duration(seconds: 1),
                               behavior: SnackBarBehavior.floating, // To make it float and hug the content
                               backgroundColor: Colors.transparent, // Make the background transparent
                               elevation: 0, // Remove the default shadow (dim effect)
                               onVisible: () {
                                 // Fade out effect using an animation
-                                Future.delayed(Duration(seconds: 2), () {
+                                Future.delayed(Duration(seconds: 1), () {
                                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                 });
                               },
