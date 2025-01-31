@@ -130,6 +130,7 @@ class TutorialPage extends StatelessWidget {
               function: () {
                 print("시작하기 버튼이 눌렸습니다!");
                 // 시작하기 버튼을 눌렀을 때의 동작을 여기에 정의
+                Navigator.pushNamed(context, '/'); // '/'로 이동
               },
               title: '시작하기',
             ),

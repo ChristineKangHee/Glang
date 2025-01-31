@@ -80,7 +80,7 @@ class ArMain extends StatelessWidget {
             SizedBox(height: 30,),
             ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
               builder: (context) => TutorialScreen(),
-            )), child: Text("읽기 후 글")),
+            )), child: Text("튜토리얼")),
             SizedBox(height: 30,),
           ],
         ),
