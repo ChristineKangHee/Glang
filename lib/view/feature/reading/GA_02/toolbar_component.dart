@@ -256,7 +256,9 @@ class _NoteDialogState extends State<_NoteDialog> {
                         ),
                       ),
                       child: TextButton(
-                        onPressed: () {
+                        onPressed: saveButtonColor == widget.customColors.primary20
+                            ? null // Disable the button if the saveButtonColor is primary20
+                            : () {
                           final note = widget.noteController.text.trim();
                           if (note.isNotEmpty) {
                             debugPrint('메모 저장: $note');
@@ -318,6 +320,7 @@ class _NoteDialogState extends State<_NoteDialog> {
     );
   }
 }
+
 
 
   void _showWordOrSentencePopup(BuildContext context, TextSelectionDelegate delegate) {
@@ -442,6 +445,7 @@ void _showWordPopup(BuildContext context, String selectedText) {
     },
   );
 }
+
 
 
   void _showSentencePopup(BuildContext context, String selectedText) {
