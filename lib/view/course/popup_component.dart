@@ -14,7 +14,7 @@ class SectionPopup extends StatelessWidget {
   final List<String> missions;
   final List<String> effects;
   final String achievement;
-  final String status; // 학습 상태 추가
+  final String status;
 
   const SectionPopup({
     super.key,
@@ -26,26 +26,34 @@ class SectionPopup extends StatelessWidget {
     required this.missions,
     required this.effects,
     required this.achievement,
-    required this.status, // 학습 상태 추가
+    required this.status,
   });
 
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     Color? cardColor;
+    Color? titleColor;
+    Color? subTitleColor;
 
     // 상태에 따른 색상 설정
     switch (status) {
       case 'start':
       case 'in_progress':
         cardColor = customColors.primary;
+        titleColor = customColors.neutral100;
+        subTitleColor = customColors.neutral100;
         break;
       case 'completed':
         cardColor = customColors.primary40;
+        titleColor = customColors.neutral30; // Completed 상태에서 title 색상
+        subTitleColor = customColors.neutral30; // Completed 상태에서 subTitle 색상
         break;
       case 'locked':
       default:
         cardColor = customColors.neutral80;
+        titleColor = customColors.neutral30; // Locked 상태에서 title 색상
+        subTitleColor = customColors.neutral30; // Locked 상태에서 subTitle 색상
         break;
     }
 
@@ -69,12 +77,12 @@ class SectionPopup extends StatelessWidget {
                     Text(
                       title,
                       style: body_xsmall_semi(context)
-                          .copyWith(color: customColors.neutral100),
+                          .copyWith(color: titleColor), // Apply dynamic color
                     ),
                     Text(
                       subTitle,
                       style: body_large_semi(context)
-                          .copyWith(color: customColors.neutral100),
+                          .copyWith(color: subTitleColor), // Apply dynamic color
                     ),
                   ],
                 ),
@@ -82,7 +90,7 @@ class SectionPopup extends StatelessWidget {
                   onPressed: status == 'locked'
                       ? null
                       : () {
-                    // Navigator.pop(context);
+                    // Navigate to the next page
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -98,16 +106,19 @@ class SectionPopup extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: customColors.neutral100,
+                    backgroundColor: status == 'locked'
+                        ? customColors.neutral60
+                        : customColors.neutral100,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   ),
                   child: Text(
-                    status == 'locked' ? '잠김' : '시작하기',
-                    style: body_xsmall_semi(context),
+                    status == 'locked' ? '잠겨있음' : '시작하기',
+                    style: body_xsmall_semi(context).copyWith(
+                      color: customColors.neutral0,
+                    ),
                   ),
                 ),
               ],
@@ -115,13 +126,35 @@ class SectionPopup extends StatelessWidget {
             const SizedBox(height: 32),
             Row(
               children: [
-                _buildIconWithText(context, Icons.check_circle,
-                    '$achievement%', customColors),
+                _buildIconWithText(
+                  context,
+                  Icons.check_circle,
+                  '$achievement%',
+                  customColors,
+                  status == 'completed' || status == 'locked'
+                      ? customColors.neutral30!
+                      : customColors.neutral90!,
+                ),
                 const SizedBox(width: 8),
                 _buildIconWithText(
-                    context, Icons.timer, '$time 분', customColors),
+                  context,
+                  Icons.timer,
+                  '$time 분',
+                  customColors,
+                  status == 'completed' || status == 'locked'
+                      ? customColors.neutral30!
+                      : customColors.neutral90!,
+                ),
                 const SizedBox(width: 8),
-                _buildIconWithText(context, Icons.star, level, customColors),
+                _buildIconWithText(
+                  context,
+                  Icons.star,
+                  level,
+                  customColors,
+                  status == 'completed' || status == 'locked'
+                      ? customColors.neutral30!
+                      : customColors.neutral90!,
+                ),
               ],
             ),
           ],
@@ -131,19 +164,25 @@ class SectionPopup extends StatelessWidget {
   }
 
   Widget _buildIconWithText(
-      BuildContext context, IconData icon, String text, CustomColors customColors) {
+      BuildContext context,
+      IconData icon,
+      String text,
+      CustomColors customColors,
+      Color iconTextColor
+      ) {
     return Row(
       children: [
-        Icon(icon, color: customColors.neutral90, size: 16),
+        Icon(icon, color: iconTextColor, size: 16),
         const SizedBox(width: 4),
         Text(
           text,
-          style: body_xsmall_semi(context).copyWith(color: customColors.neutral90),
+          style: body_xsmall_semi(context).copyWith(color: iconTextColor),
         ),
       ],
     );
   }
 }
+
 
 class StatusButton extends StatelessWidget {
   final String status;
@@ -197,7 +236,7 @@ class StatusButton extends StatelessWidget {
             iconColor: iconColor??Colors.white,
           )
         : ElevatedButton(
-      onPressed: status == 'locked' ? null : onPressed,
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: buttonColor,
         fixedSize: const Size(80, 80),
