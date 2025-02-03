@@ -10,7 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart' as kakao;
 
-import '../home/attendance_service.dart';
+import '../home/attendance/attendance_service.dart';
 
 final authControllerProvider =
 StateNotifierProvider<AuthController, User?>((ref) => AuthController());

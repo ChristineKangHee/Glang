@@ -23,8 +23,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'attendance_model.dart';
-import 'attendance_provider.dart';
+import 'attendance/attendance_model.dart';
+import 'attendance/attendance_provider.dart';
 
 class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
   const MyHomePage({super.key});

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';
 import '../../viewmodel/custom_colors_provider.dart';
-import '../home/attendance_provider.dart';
+import '../home/attendance/attendance_provider.dart';
 import 'auth_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 class LoginPage extends ConsumerWidget {

@@ -1,3 +1,9 @@
+/// File: attendance_repository.dart
+/// Purpose: Firebase Firestore에서 출석 데이터를 가져오는 기능을 제공하는 저장소 클래스
+/// Author: 박민준
+/// Created: 2025-02-03
+/// Last Modified: 2025-02-03 by 박민준
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'attendance_model.dart'; // AttendanceDay 및 AttendanceStatus 정의 파일
 
