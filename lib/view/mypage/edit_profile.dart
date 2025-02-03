@@ -2,7 +2,7 @@
 /// Purpose: 사용자의 정보를 수정할 수 있다.
 /// Author: 윤은서
 /// Created: 2025-01-08
-/// Last Modified: 2025-01-09 by 윤은서
+/// Last Modified: 2025-01-29 by 윤은서
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,8 +13,8 @@ import '../components/custom_app_bar.dart';
 import '../components/custom_button.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
-
-final nicknameProvider = StateProvider<String>((ref) => '하나둘셋제로');
+import '../home/user_service.dart';
+import 'edit_nick_input.dart';
 
 class EditProfile extends ConsumerWidget {
   const EditProfile({super.key});
@@ -22,6 +22,12 @@ class EditProfile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider);
+    final userName = ref.watch(userNameProvider); // 사용자 이름 상태 구독
+
+    if (userName != null) {
+      ref.read(userNameProvider.notifier).fetchUserName(userName);
+    }
+
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
         title: "내 정보 수정",

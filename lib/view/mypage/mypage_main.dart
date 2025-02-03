@@ -2,7 +2,7 @@
 /// Purpose: 마이페이지 화면 구현
 /// Author: 박민준
 /// Created: 2025-01-02
-/// Last Modified: 2025-01-08 by 윤은서
+/// Last Modified: 2025-01-28 by 윤은서
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,22 +12,25 @@ import '../../theme/font.dart';
 import '../../theme/theme.dart';
 import 'package:d_chart/d_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../viewmodel/custom_colors_provider.dart';
+import '../home/user_service.dart';
 
 /// 마이페이지 메인 화면 위젯
 /// - 상단 앱바, 하단 네비게이션 바, 컨텐츠
-class MyPageMain extends ConsumerStatefulWidget {
+/// 마이페이지 메인 화면 위젯
+class MyPageMain extends ConsumerWidget {
   const MyPageMain({super.key});
 
   @override
-  ConsumerState<MyPageMain> createState() => _MyPageMainState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final customColors =ref.watch(customColorsProvider);
+    final userName = ref.watch(userNameProvider); // 사용자 이름 상태 구독
 
-/// 마이페이지 메인 화면의 상태 관리 위젯
-/// - SafeArea와 Scaffold 화면 구조를 설정
-class _MyPageMainState extends ConsumerState<MyPageMain> with SingleTickerProviderStateMixin {
-  @override
-  Widget build(BuildContext context) {
-    final customColors = Theme.of(context).extension<CustomColors>()!;
+    if (userName != null) {
+      ref.read(userNameProvider.notifier).fetchUserName(userName);
+    }
+
     return Scaffold(
       appBar: CustomAppBar_MyPage(),
       body: SafeArea(
@@ -42,7 +45,7 @@ class _MyPageMainState extends ConsumerState<MyPageMain> with SingleTickerProvid
               ],
             ),
           ),
-          child: const MyPageContent(), // 실제 화면 컨텐츠
+          child: MyPageContent(name: userName), // 실제 화면 컨텐츠에 이름 전달
         ),
       ),
       bottomNavigationBar: CustomNavigationBar(),
@@ -51,9 +54,9 @@ class _MyPageMainState extends ConsumerState<MyPageMain> with SingleTickerProvid
 }
 
 /// 마이페이지의 컨텐츠 본문
-/// - 사용자 프로필, 학습 현황 및 통계
 class MyPageContent extends StatelessWidget {
-  const MyPageContent({super.key});
+  final String? name;
+  const MyPageContent({super.key, required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -63,22 +66,19 @@ class MyPageContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const UserProfileSection(), // 사용자 프로필 섹션
+            UserProfileSection(name: name), // 사용자 프로필 섹션에 이름 전달
             const SizedBox(height: 40),
             const UserStatsSection(), // 사용자 경험치, 코스, 랭킹 표시
             const SizedBox(height: 24),
-            // 학습 통계 카드
             InfoCard(
               title: '학습 통계',
               description: '일주일에 활동한 학습을 확인하세요!',
-              child: const ProgressChart(),
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/statistics');
               },
             ),
             const SizedBox(height: 16),
-            // 배지 카드
             InfoCard(
               title: '획득한 배지',
               child: const BadgeRow(),
@@ -88,7 +88,6 @@ class MyPageContent extends StatelessWidget {
               },
             ),
             const SizedBox(height: 16),
-            // 저장된 학습 데이터 카드
             InfoCard(
               leadingIcon: Icons.bookmark_rounded,
               title: '저장',
@@ -98,7 +97,6 @@ class MyPageContent extends StatelessWidget {
               },
             ),
             const SizedBox(height: 16),
-            // 학습 기록 카드
             InfoCard(
               leadingIcon: Icons.book,
               title: '학습 기록',
@@ -115,9 +113,9 @@ class MyPageContent extends StatelessWidget {
 }
 
 /// 사용자 프로필 섹션
-/// - 프로필 이미지, 사용자 이름, 내 정보 수정
 class UserProfileSection extends StatelessWidget {
-  const UserProfileSection({super.key});
+  final String? name;
+  const UserProfileSection({super.key, required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +140,7 @@ class UserProfileSection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('하나둘셋제로', style: heading_small(context)),
+              Text('$name', style: heading_small(context)),
               const SizedBox(height: 12),
               InkWell(
                 onTap: () {
@@ -185,8 +183,6 @@ class UserStatsSection extends StatelessWidget {
           Expanded(child: StatBox(value: '1100', label: '경험치')),
           VerticalDivider(color: Theme.of(context).extension<CustomColors>()?.neutral80),
           Expanded(child: StatBox(value: '중급', label: '코스')),
-          VerticalDivider(color: Theme.of(context).extension<CustomColors>()?.neutral80),
-          Expanded(child: StatBox(value: '2위', label: '랭킹')),
         ],
       ),
     );
@@ -194,6 +190,7 @@ class UserStatsSection extends StatelessWidget {
 }
 
 /// 학습 통계 그래프 위젯
+/*
 class ProgressChart extends StatelessWidget {
   const ProgressChart({super.key});
 
@@ -255,6 +252,7 @@ class ProgressChart extends StatelessWidget {
     );
   }
 }
+*/
 
 /// 배지 리스트를 표시하는 위젯
 class BadgeRow extends StatelessWidget {
@@ -370,15 +368,24 @@ class InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // '학습 통계' 카드 비활성화 여부 확인
+    final bool isDisabled = title == '학습 통계';
+
     return InkWell(
-      onTap: onTap,
+      onTap: isDisabled ? null : onTap, // 비활성화 시 onTap 비활성화
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDisabled ? Colors.black.withOpacity(0.05) : Colors.white, // 비활성화 시 색상 변경
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 2, offset: const Offset(0, 1)),
+          boxShadow: isDisabled
+              ? []
+              : [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 2,
+              offset: const Offset(0, 1),
+            ),
           ],
         ),
         child: Column(
@@ -391,7 +398,11 @@ class InfoCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     if (leadingIcon != null) ...[
-                      Icon(leadingIcon, size: 24, color: Colors.black),
+                      Icon(
+                        leadingIcon,
+                        size: 24,
+                        color: Colors.black,
+                      ),
                       const SizedBox(width: 12),
                     ],
                     Column(
@@ -399,13 +410,19 @@ class InfoCard extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: pretendardSemiBold(context).copyWith(fontSize: 18),
+                          style: pretendardSemiBold(context).copyWith(
+                            fontSize: 18,
+                            color: isDisabled ? Colors.black54 : Colors.black, // 비활성화 시 텍스트 색상 변경
+                          ),
                         ),
                         if (description != null) ...[
                           const SizedBox(height: 4),
                           Text(
                             description!,
-                            style: pretendardRegular(context).copyWith(fontSize: 16, color: Colors.black),
+                            style: pretendardRegular(context).copyWith(
+                              fontSize: 16,
+                              color: isDisabled ? Colors.black54 : Colors.black, // 비활성화 시 텍스트 색상 변경
+                            ),
                           ),
                         ],
                       ],
@@ -413,10 +430,14 @@ class InfoCard extends StatelessWidget {
                   ],
                 ),
                 if (trailingIcon != null)
-                  Icon(trailingIcon, size: 20, color: Colors.black54),
+                  Icon(
+                    trailingIcon,
+                    size: 20,
+                    color: isDisabled ? Colors.grey : Colors.black54, // 비활성화 시 아이콘 색상 변경
+                  ),
               ],
             ),
-            if (child != null) ...[
+            if (child != null && !isDisabled) ...[
               const SizedBox(height: 16), // child와 상단 텍스트 간격
               child!,
             ],
