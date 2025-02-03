@@ -96,7 +96,7 @@ class TutorialPage extends StatelessWidget {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     // 디바이스 화면 크기 정보 가져오기
     double screenWidth = MediaQuery.of(context).size.width;
-    double imageWidth = screenWidth * 0.9; // 화면 너비의 90%로 이미지 크기 조정
+    double imageWidth = screenWidth * 0.8; // 화면 너비의 90%로 이미지 크기 조정
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -117,10 +117,15 @@ class TutorialPage extends StatelessWidget {
             ),
           ],
         ),
-        Image.asset(
-          image,
-          width: imageWidth, // 비율에 맞춰 이미지 크기 조정
-          fit: BoxFit.contain, // 이미지 비율 유지
+        SizedBox(height: 16,),
+        ClipRRect(
+          child: Image.asset(
+            image,
+            width: screenWidth, // 화면 너비에 맞춤
+            height: screenWidth * 1.2, // 적절한 높이 설정 (화면 비율에 따라 조정)
+            fit: BoxFit.cover, // 위쪽을 기준으로 아래쪽이 잘리도록 설정
+            alignment: Alignment.topCenter, // 위쪽 정렬
+          ),
         ),
         // 마지막 페이지에서만 "시작하기" 버튼 추가
         if (showStartButton)

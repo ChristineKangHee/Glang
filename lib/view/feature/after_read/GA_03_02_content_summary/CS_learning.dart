@@ -234,6 +234,7 @@ class _CSLearningState extends State<CSLearning> {
                         // 첫 번째 버튼
                         Expanded(
                           child: InkWell(
+                            borderRadius: BorderRadius.circular(16.0),
                             onTap: () {
                               setState(() {
                                 selectedOption = 1; // 첫 번째 버튼 선택
@@ -248,7 +249,7 @@ class _CSLearningState extends State<CSLearning> {
                                 borderRadius: BorderRadius.circular(16.0),
                                 border: selectedOption == 1
                                     ? Border.all(color: customColors.primary ?? Colors.blue) // 선택된 경우 색상 변경
-                                    : null
+                                    : null,
                               ),
                               child: Center(
                                 child: Text(
@@ -263,6 +264,7 @@ class _CSLearningState extends State<CSLearning> {
                         // 두 번째 버튼
                         Expanded(
                           child: InkWell(
+                            borderRadius: BorderRadius.circular(16.0),
                             onTap: () {
                               setState(() {
                                 selectedOption = 2; // 두 번째 버튼 선택
@@ -271,25 +273,22 @@ class _CSLearningState extends State<CSLearning> {
                             child: Container(
                               height: 120,
                               decoration: BoxDecoration(
-                                  color: selectedOption == 2
-                                      ? customColors.primary10 // 선택된 경우 색상 변경
-                                      : customColors.neutral90,
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  border: selectedOption == 2
-                                      ? Border.all(color: customColors.primary ?? Colors.blue) // 선택된 경우 색상 변경
-                                      : null
+                                color: selectedOption == 2
+                                    ? customColors.primary10 // 선택된 경우 색상 변경
+                                    : customColors.neutral90,
+                                borderRadius: BorderRadius.circular(16.0),
+                                border: selectedOption == 2
+                                    ? Border.all(color: customColors.primary ?? Colors.blue) // 선택된 경우 색상 변경
+                                    : null,
                               ),
                               child: Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      "맥락에 맞는 글",
+                                      "맥락에 맞는 글\n자동 추가",
                                       style: body_small_semi(context).copyWith(color: customColors.neutral30),
-                                    ),
-                                    Text(
-                                      "자동 추가",
-                                      style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                                      textAlign: TextAlign.center,
                                     ),
                                   ],
                                 ),
@@ -300,22 +299,27 @@ class _CSLearningState extends State<CSLearning> {
                       ],
                     ),
                     const SizedBox(height: 16.0),
-                    // 선택 완료 버튼
-                    ButtonPrimary_noPadding(
+
+                    // 선택 완료 버튼 - 상태에 따라 다른 버튼 사용
+                    selectedOption == null
+                        ? ButtonPrimary20_noPadding(
+                      function: () {}, // 선택 전이므로 동작 없음
+                      title: '선택 완료',
+                      condition: "null",
+                    )
+                        : ButtonPrimary_noPadding(
                       function: () {
                         Navigator.of(context).pop();
                         if (selectedOption == 1) {
-                          // 첫 번째 옵션 동작
                           print("키워드 3개 선택");
                           _updateKeywords(["#읽기 능력", "#맞춤형 도구", "#피드백"]); // 키워드 업데이트
                         } else if (selectedOption == 2) {
-                          // 두 번째 옵션 동작
                           print("맥락에 맞는 글 자동 추가 선택");
                           _updateTextField("추후 AI가 자동 생성합니다!"); // 텍스트 필드에 단어 추가
                         }
                       },
                       title: '선택 완료',
-                      condition: selectedOption != null ? "not null" : "null", // 선택된 옵션에 따라 상태 결정
+                      condition: "not null",
                     ),
                   ],
                 ),
@@ -326,6 +330,7 @@ class _CSLearningState extends State<CSLearning> {
       },
     );
   }
+
 
 
 
