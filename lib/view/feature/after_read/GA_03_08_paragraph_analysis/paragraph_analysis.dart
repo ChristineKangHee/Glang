@@ -190,18 +190,20 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
           BigDivider(), // 구분선
           const SizedBox(height: 16),
           // 선택지 표시
+          // 선택지 표시
           ...List.generate(
             question.options.length,
                 (index) {
               final isSelected = userAnswers.length > currentQuestionIndex &&
-                  userAnswers[currentQuestionIndex] == index; // 선택 여부 확인
-              final isCorrect = question.correctAnswerIndex == index; // 정답 여부 확인
+                  userAnswers[currentQuestionIndex] == index; // 사용자가 선택했는지 확인
+              final isCorrect = question.correctAnswerIndex == index; // 정답인지 확인
+              final hasAnswered = userAnswers.length > currentQuestionIndex; // 사용자가 답을 선택했는지 확인
 
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16), // 선택지 패딩
                 child: GestureDetector(
                   onTap: () {
-                    if (userAnswers.length <= currentQuestionIndex) {
+                    if (!hasAnswered) {
                       checkAnswer(index); // 정답 확인
                     }
                   },
@@ -210,18 +212,22 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isSelected
+                      color: hasAnswered
                           ? (isCorrect
-                          ? (customColors.success40 ?? Colors.green)
-                          : (customColors.error40 ?? Colors.red))
-                          : (customColors.neutral100 ?? Colors.grey[200]),
+                          ? (customColors.success40 ?? Colors.green) // 정답 강조
+                          : (isSelected
+                          ? (customColors.error40 ?? Colors.red) // 오답 강조
+                          : (customColors.neutral100 ?? Colors.grey[200])))
+                          : (customColors.neutral100 ?? Colors.grey[200]), // 선택 전 기본 색상
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                        color: isSelected
+                        color: hasAnswered
                             ? (isCorrect
-                            ? (customColors.success ?? Colors.green)
-                            : (customColors.error ?? Colors.red))
-                            : (customColors.neutral80 ?? Colors.grey),
+                            ? (customColors.success ?? Colors.green) // 정답 선택 시 초록색 테두리
+                            : (isSelected
+                            ? (customColors.error ?? Colors.red) // 오답 선택 시 빨간색 테두리
+                            : (customColors.neutral80 ?? Colors.grey)))
+                            : (customColors.neutral80 ?? Colors.grey), // 선택 전 기본 테두리
                         width: 2,
                       ),
                     ),
@@ -234,6 +240,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
               );
             },
           ),
+
         ],
       ),
     );
