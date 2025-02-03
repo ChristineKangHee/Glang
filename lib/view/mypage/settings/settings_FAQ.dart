@@ -54,7 +54,7 @@ class SettingsFAQ extends ConsumerWidget {
             alignment: Alignment.centerLeft, // 텍스트를 좌측 정렬
             child: Padding(
               padding: const EdgeInsets.all(16.0), // 여백 추가
-              child: Text("$userName,\n무엇을 도와드릴까요?", style: heading_large(context)),
+              child: Text("$userName님,\n무엇을 도와드릴까요?", style: heading_large(context)),
             ),
           ),
           Expanded( // ListView가 크기를 가지도록 Expanded 위젯으로 감쌈
@@ -103,8 +103,8 @@ class FAQDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('FAQ 상세 내용'),
+      appBar: CustomAppBar_2depth_4(
+        title: '자주 묻는 질문',
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

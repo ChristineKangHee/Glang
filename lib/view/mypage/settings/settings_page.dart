@@ -126,11 +126,9 @@ class SettingsPage extends ConsumerWidget {
             title: Text('최신 버전 업데이트',
               style: body_medium_semi(context).copyWith(color: customColors.neutral0),
             ),
-            onTap: () {
-              // TODO: 프로필 설정 페이지로 이동
-              Navigator.pushNamed(context, '/mypage/settings/profile');
-            },
-            trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
+            trailing: Text('v0.7.0',
+              style: body_small_semi(context).copyWith(color: customColors.neutral0),
+            ),
           ),
           Divider(color: customColors.neutral80,),
           ListTile(

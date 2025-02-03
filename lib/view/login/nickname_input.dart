@@ -130,7 +130,7 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
               width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.all(20),
               child: isInputValid && !isLoading
-                  ? ButtonPrimary(
+                  ? ButtonPrimary_noPadding(
                 function: _saveNickname,
                 title: '완료',
               )
