@@ -227,7 +227,7 @@ class _RdMainState extends State<RdMain> with SingleTickerProviderStateMixin {
         shape: BoxShape.circle,
       ),
       alignment: Alignment.center,
-      child: Icon(Icons.star, color: customColors.secondary, size: 14),
+      child: Text('Q', style: body_small_semi(context).copyWith(color: customColors.secondary),),
     );
   }
 }
