@@ -10,6 +10,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart' as kakao;
 
+import '../home/attendance_service.dart';
+
 final authControllerProvider =
 StateNotifierProvider<AuthController, User?>((ref) => AuthController());
 
@@ -84,8 +86,12 @@ class AuthController extends StateNotifier<User?> {
 
   Future<void> _handleUserState(User user, Function onNicknameRequired, Function onHome) async {
     try {
+      // **여기서 출석 체크 호출**
+      await markTodayAttendanceAsChecked(user.uid);
+
       final userDoc = _firestore.collection('users').doc(user.uid);
       final docSnapshot = await userDoc.get();
+
 
       if (!docSnapshot.exists) {
         await userDoc.set({
