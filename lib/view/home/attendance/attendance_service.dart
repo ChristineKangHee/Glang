@@ -1,4 +1,9 @@
-// attendance_service.dart
+/// File: attendance_service.dart
+/// Purpose: 사용자의 출석 상태를 Firestore에 등록 및 업데이트하는 서비스 함수 제공
+/// Author: 박민준
+/// Created: 2025-02-03
+/// Last Modified: 2025-02-03 by 박민준
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// 오늘 날짜에 해당하는 출석 기록을 Firestore에 등록/업데이트하는 함수

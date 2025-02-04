@@ -22,7 +22,7 @@ class Section extends StatelessWidget {
   }
 
   void _showPopup(BuildContext context, int index) {
-    final customColors = Theme.of(context).extension<CustomColors>()!;
+    final stage = data.stages[index]; // 🔹 StageData 객체 직접 사용
     showDialog(
       context: context,
       barrierColor: Colors.transparent,
@@ -40,15 +40,15 @@ class Section extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 60.0),
                 padding: const EdgeInsets.all(20.0),
                 child: SectionPopup(
-                  title: data.title,
-                  subTitle: data.subdetailTitle[index],
-                  time: data.totalTime[index],
-                  level: data.difficultyLevel[index],
-                  description: data.textContents[index],
-                  missions: data.missions[index],
-                  effects: data.effects[index],
-                  achievement: data.achievement[index],
-                  status: data.status[index],
+                  title: data.title, // 코스 제목
+                  subTitle: stage.subdetailTitle, // 스테이지 제목
+                  time: stage.totalTime, // 예상 소요 시간
+                  level: stage.difficultyLevel, // 난이도
+                  description: stage.textContents, // 설명
+                  missions: stage.missions, // 미션 리스트
+                  effects: stage.effects, // 학습 효과 리스트
+                  achievement: stage.achievement, // 성취도
+                  status: stage.status, // 상태 (시작 가능, 잠김 등)
                 ),
               ),
             ),
@@ -60,50 +60,84 @@ class Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final customColors = Theme.of(context).extension<CustomColors>()!;
-    // Check if the status is either 'start' or 'completed'
-    Color? containerColor = data.status.contains('start') || data.status.contains('completed')
-        ? customColors.primary10
-        : customColors.neutral90;
-
-    return Container(
-      color: containerColor,  // Apply the dynamically set color
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            color: customColors.neutral100,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(data.title, style: body_large_semi(context)),
-                  Text(data.sectionDetail, style: body_small(context)),
-                ],
-              ),
-            ),
+// <<<<<<< HEAD
+//     final customColors = Theme.of(context).extension<CustomColors>()!;
+//     // Check if the status is either 'start' or 'completed'
+//     Color? containerColor = data.status.contains('start') || data.status.contains('completed')
+//         ? customColors.primary10
+//         : customColors.neutral90;
+//
+//     return Container(
+//       color: containerColor,  // Apply the dynamically set color
+//       child: Column(
+//         mainAxisSize: MainAxisSize.min,
+//         children: [
+//           Container(
+//             color: customColors.neutral100,
+//             width: double.infinity,
+//             child: Padding(
+//               padding: const EdgeInsets.all(12.0),
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 mainAxisSize: MainAxisSize.min,
+//                 children: [
+//                   Text(data.title, style: body_large_semi(context)),
+//                   Text(data.sectionDetail, style: body_small(context)),
+//                 ],
+//               ),
+//             ),
+//           ),
+//           const SizedBox(height: 24.0),
+//           ...List.generate(
+//             data.subdetailTitle.length,
+//                 (i) => Container(
+//               margin: EdgeInsets.only(
+//                 bottom: i != data.subdetailTitle.length - 1 ? 24.0 : 0,
+// =======
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(data.title, style: body_large_semi(context)), // 코스 제목
+              Text(data.sectionDetail, style: body_small(context)), // 코스 설명
+            ],
           ),
-          const SizedBox(height: 24.0),
-          ...List.generate(
-            data.subdetailTitle.length,
-                (i) => Container(
+        ),
+        const SizedBox(height: 24.0),
+        ...List.generate(
+          data.stages.length, // 🔹 `stages` 리스트 기반으로 반복
+              (i) {
+            final stage = data.stages[i]; // 🔹 `StageData` 객체 참조
+            return Container(
               margin: EdgeInsets.only(
-                bottom: i != data.subdetailTitle.length - 1 ? 24.0 : 0,
+                bottom: i != data.stages.length - 1 ? 24.0 : 0,
                 left: _getMargin(i),
                 right: _getMargin(i, isLeft: false),
               ),
               child: StatusButton(
-                status: data.status[i],
+// <<<<<<< HEAD
+//                 status: data.status[i],
+//                 onPressed: () => _showPopup(context, i),
+//               ),
+//             ),
+//           ),
+//           const SizedBox(height: 24.0),
+//         ],
+//       ),
+// =======
+                status: stage.status, // 🔹 `stage` 객체에서 상태 가져오기
                 onPressed: () => _showPopup(context, i),
               ),
-            ),
-          ),
-          const SizedBox(height: 24.0),
-        ],
-      ),
+            );
+          },
+        ),
+      ],
     );
   }
 }
