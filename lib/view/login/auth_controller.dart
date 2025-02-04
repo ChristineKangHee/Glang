@@ -9,7 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart' as kakao;
-
+import 'package:sign_in_with_apple/sign_in_with_apple.dart'; // Apple 로그인 추가
 import '../home/attendance/attendance_service.dart';
 
 final authControllerProvider =
@@ -83,6 +83,37 @@ class AuthController extends StateNotifier<User?> {
     }
   }
 
+  /// Apple 로그인
+  Future<void> signInWithApple({
+    required Function onNicknameRequired,
+    required Function onHome,
+  }) async {
+    try {
+      // Apple ID 자격 증명 요청
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      // Firebase용 OAuth 자격 증명 생성
+      final oauthCredential = OAuthProvider("apple.com").credential(
+        idToken: appleCredential.identityToken,
+        // authorizationCode를 accessToken 자리로 사용합니다.
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      final userCredential = await _auth.signInWithCredential(oauthCredential);
+      final user = userCredential.user;
+      if (user != null) {
+        await _handleUserState(user, onNicknameRequired, onHome);
+        state = user;
+      }
+    } catch (e) {
+      print('Apple 로그인 오류: $e');
+    }
+  }
 
   Future<void> _handleUserState(User user, Function onNicknameRequired, Function onHome) async {
     try {
