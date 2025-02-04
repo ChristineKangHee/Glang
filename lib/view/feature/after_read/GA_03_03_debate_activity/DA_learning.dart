@@ -6,7 +6,6 @@ import '../../../../viewmodel/custom_colors_provider.dart';
 import '../../../components/message_bubble.dart';
 import 'package:readventure/theme/theme.dart';
 import '../../../../api/debate_chatgpt_service.dart';
-import 'DA_main.dart';
 import 'widgets/alert_dialog.dart';
 import 'dart:async';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -19,19 +18,6 @@ class DebatePage extends ConsumerWidget {
     final customColors = ref.watch(customColorsProvider); // CustomColors 가져오기
     final debateState = ref.watch(debateProvider);
     final debateNotifier = ref.read(debateProvider.notifier);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!debateState.isFinished) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return DebateActivityMain(onStart: () {
-              Navigator.pop(context); // 팝업 닫기
-            });
-          },
-        );
-      }
-    });
-
 
     return Scaffold(
       appBar: AppBar(
