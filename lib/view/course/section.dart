@@ -61,39 +61,49 @@ class Section extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: double.infinity,
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(data.title, style: body_large_semi(context)),
-                Text(data.sectionDetail, style: body_small(context)),
-              ],
+    // Check if the status is either 'start' or 'completed'
+    Color? containerColor = data.status.contains('start') || data.status.contains('completed')
+        ? customColors.primary10
+        : customColors.neutral90;
+
+    return Container(
+      color: containerColor,  // Apply the dynamically set color
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            color: customColors.neutral100,
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(data.title, style: body_large_semi(context)),
+                  Text(data.sectionDetail, style: body_small(context)),
+                ],
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 24.0),
-        ...List.generate(
-          data.subdetailTitle.length,
-              (i) => Container(
-            margin: EdgeInsets.only(
-              bottom: i != data.subdetailTitle.length - 1 ? 24.0 : 0,
-              left: _getMargin(i),
-              right: _getMargin(i, isLeft: false),
-            ),
-            child: StatusButton(
-              status: data.status[i],
-              onPressed: () => _showPopup(context, i),
+          const SizedBox(height: 24.0),
+          ...List.generate(
+            data.subdetailTitle.length,
+                (i) => Container(
+              margin: EdgeInsets.only(
+                bottom: i != data.subdetailTitle.length - 1 ? 24.0 : 0,
+                left: _getMargin(i),
+                right: _getMargin(i, isLeft: false),
+              ),
+              child: StatusButton(
+                status: data.status[i],
+                onPressed: () => _showPopup(context, i),
+              ),
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: 24.0),
+        ],
+      ),
     );
   }
 }

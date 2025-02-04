@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import '../../../theme/font.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
+import '../../components/alarm_dialog.dart';
 import '../../components/custom_app_bar.dart';
 import 'package:readventure/theme/theme.dart';
 
@@ -191,85 +192,21 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
           : ButtonPrimary(
         function: () {
           print("결과 확인하기");
-          _showResultDialog(context, customColors);
+          showResultDialog(
+            context,
+            customColors,
+            "결과를 확인하시겠습니까?",
+            "아니오",
+            "예",
+                (ctx) {
+              Navigator.pushReplacement(
+                ctx,
+                MaterialPageRoute(builder: (ctx) => ResultReportPage()),
+              );
+            },
+          );
         },
         title: '결과 확인하기',
-      ),
-    );
-  }
-
-  // 결과 팝업
-  void _showResultDialog(BuildContext context, CustomColors customColors) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: ShapeDecoration(
-              color: customColors.neutral100,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '결과를 확인하시겠습니까?',
-                  style: body_small_semi(context).copyWith(color: customColors.neutral30),
-                ),
-                const SizedBox(height: 20),
-                _buildDialogButtons(context, customColors),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // 팝업 버튼
-  Widget _buildDialogButtons(BuildContext context, CustomColors customColors) {
-    return Row(
-      children: [
-        _buildDialogButton(context, '아니오', customColors.neutral90!, customColors.neutral60!, () {
-          Navigator.pop(context);
-        }),
-        const SizedBox(width: 16),
-        _buildDialogButton(context, '네', customColors.primary!, customColors.neutral100!, () {
-          Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ResultReportPage()),
-          );
-        }),
-      ],
-    );
-  }
-
-  // 팝업 버튼 생성
-  Widget _buildDialogButton(BuildContext context, String title, Color bgColor, Color textColor, VoidCallback onPressed) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onPressed,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          decoration: ShapeDecoration(
-            color: bgColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
-          child: Center(
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: body_small_semi(context).copyWith(color: textColor),
-            ),
-          ),
-        ),
       ),
     );
   }
