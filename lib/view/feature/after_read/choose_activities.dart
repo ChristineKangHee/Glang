@@ -17,6 +17,7 @@ import 'package:readventure/theme/theme.dart';
 import '../../components/custom_button.dart';
 import '../Result_Report.dart';
 import 'GA_03_01_change_ending/CE_main.dart';
+import 'GA_03_02_content_summary/CS_learning.dart';
 import 'GA_03_02_content_summary/CS_main.dart';
 import 'GA_03_03_debate_activity/DA_main.dart';
 import 'GA_03_04_diagram/diagram_learning.dart';
@@ -360,7 +361,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     case '형식 변환하기':
     return FormatConversionMain();
     case '요약':
-    return ContentSummaryMain();
+    return CSLearning();
     case '토론':
     return DebateActivityMain();
     case '다이어그램':
