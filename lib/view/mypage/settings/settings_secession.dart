@@ -9,6 +9,7 @@ import '../../components/custom_app_bar.dart';
 import '../../components/custom_button.dart';
 import '../../home/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SettingsSecession extends ConsumerWidget {
   const SettingsSecession({super.key});
@@ -26,23 +27,45 @@ class SettingsSecession extends ConsumerWidget {
 
     Future<void> _deleteAccount() async {
       try {
-        // Delete the user's account
-        await _auth.currentUser?.delete();
+        final user = _auth.currentUser;
+        if (user != null) {
+          final userId = user.uid;
 
-        // Show a confirmation message or navigate after account deletion
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("계정이 삭제되었습니다.")),
-        );
+          // Firestore에서 사용자 데이터 삭제
+          await FirebaseFirestore.instance.collection('users').doc(userId).delete();
 
-        // Navigate the user to the login screen after deletion
-        Navigator.of(context).pushReplacementNamed('/login'); // Navigate to login screen
+          // Firestore에서 닉네임 데이터 삭제
+          final nicknameSnapshot = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+          final nickname = nicknameSnapshot.data()?['nicknames'];
+          if (nickname != null) {
+            // 닉네임이 존재하면 삭제
+            await FirebaseFirestore.instance.collection('nicknames').doc(nickname).delete();
+          }
+
+          // Firebase Authentication에서 계정 삭제
+          await user.delete();
+
+          // userNameProvider 상태 초기화 (UI 즉시 반영)
+          ref.read(userNameProvider.notifier).state = "";
+
+          // 확인 메시지 표시
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("탈퇴가 완료되었습니다. 다음에 또 만나요.")),
+          );
+
+          // 로그인 화면으로 이동
+          Navigator.of(context).pushReplacementNamed('/login');
+        }
       } catch (e) {
-        // Handle any errors that occur during account deletion
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("삭제 중 오류가 발생했습니다: $e")),
         );
       }
     }
+
+
+
+
 
     return Scaffold(
       appBar:

@@ -81,7 +81,7 @@ class _CourseMainState extends State<CourseMain> {
                 data: data[i - 1],
               ),
               separatorBuilder: (_, i) => SizedBox(
-                height: i == 0 ? 0.0 : 24.0,  // First item has 0 height, others have 24 height
+                height: i == 0 ? 0.0 : 0.0,  // First item has 0 height, others have 24 height
               ),
               itemCount: data.length + 1,
             ),

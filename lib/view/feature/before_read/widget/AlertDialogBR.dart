@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';
 import 'alert_section_button_br.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class AlertDialogBR extends StatelessWidget {
   const AlertDialogBR({super.key});
+  final int tickCount = 5; // Example, replace with actual tickCount value
 
   @override
   Widget build(BuildContext context) {
@@ -33,22 +35,46 @@ class AlertDialogBR extends StatelessWidget {
                     color: Colors.black87,
                   ),
                 ),
-                const SizedBox(height: 16),
+
+                const SizedBox(height: 24),
+
 
                 // 레이더 차트 (플레이스홀더)
-                Container(
-                  width: 200,
-                  height: 200,
-                  color: Colors.grey.shade200, // 실제 레이더 차트 라이브러리 사용 가능
-                  child: Center(
-                    child: Text(
-                        "Radar Chart",
-                        style: body_small(context)
+                SizedBox(
+                  width: 250,
+                  height: 180,
+                  child: SizedBox(
+                    width: 250,
+                    height: 200,
+                    child: RadarChart(
+                      RadarChartData(
+                        radarShape: RadarShape.polygon,
+                        titlePositionPercentageOffset: 0.2,
+                        dataSets: [
+                          RadarDataSet(
+                            dataEntries: [
+                              RadarEntry(value: 4),
+                              RadarEntry(value: 3),
+                              RadarEntry(value: 5),
+                            ],
+                            fillColor: customColors.primary40?.withOpacity(0.3),
+                            borderColor: customColors.primary,
+                            entryRadius: 4,  // 각 끝에 원형 추가
+                            borderWidth: 3,
+                          ),
+                        ],
+                        radarBackgroundColor: tickCount % 2 == 1 ? customColors.neutral100 : customColors.neutral80,
+                        borderData: FlBorderData(show: false),
+                        tickCount: tickCount,
+                        titleTextStyle: body_xsmall_semi(context).copyWith(color: customColors.neutral30),
+                        getTitle: (index, _) {
+                          const titles = ['표현력', '구성력', '논리력'];
+                          return RadarChartTitle(text: titles[index]);
+                        },
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-
                 // AI 피드백
                 Container(
                   padding: const EdgeInsets.all(16.0),

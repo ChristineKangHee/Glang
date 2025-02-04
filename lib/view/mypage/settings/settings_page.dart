@@ -5,10 +5,13 @@ import '../../../viewmodel/app_state_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../viewmodel/custom_colors_provider.dart';
+import '../../../viewmodel/theme_controller.dart';
+import '../../components/alarm_dialog.dart';
 import '../../components/custom_app_bar.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({Key? key}) : super(key: key);
+
 
   Future<void> _logout(BuildContext context, WidgetRef ref) async {
     try {
@@ -27,6 +30,8 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final appState = ref.watch(appStateProvider); // 사용자 상태
     final customColors = ref.watch(customColorsProvider);
+    final themeController = ref.read(themeProvider.notifier); // 테마 컨트롤러
+    final isLightTheme = ref.watch(themeProvider); // 현재 테마 상태
 
     bool isNotificationEnabled = false; // 알림 설정 여부
     bool isMarketingAgreement = false; // 마케팅 동의 여부
@@ -46,7 +51,10 @@ class SettingsPage extends ConsumerWidget {
                 // TODO: 알림 설정 값 변경
                 isNotificationEnabled = value;
               },
-              activeColor: customColors.primary,
+              activeColor: customColors.neutral100,
+              activeTrackColor: customColors.primary,
+              inactiveThumbColor: customColors.neutral100,
+              inactiveTrackColor: customColors.neutral80,
             ),
           ),
           ListTile(
@@ -57,7 +65,10 @@ class SettingsPage extends ConsumerWidget {
                 // TODO: 마케팅 동의 값 변경
                 isMarketingAgreement = value;
               },
-              activeColor: customColors.primary,
+              activeColor: customColors.neutral100,
+              activeTrackColor: customColors.primary,
+              inactiveThumbColor: customColors.neutral100,
+              inactiveTrackColor: customColors.neutral80,
             ),
           ),
           Divider(color: customColors.neutral80,),
@@ -94,11 +105,12 @@ class SettingsPage extends ConsumerWidget {
           ),
           ListTile(
             title: Text('테마 설정', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
-            onTap: () {
-              // TODO: 테마 설정 페이지로 이동
-              Navigator.pushNamed(context, '/mypage/settings/theme');
-            },
-            trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
+            trailing: IconButton(
+              icon: Icon(isLightTheme ? Icons.dark_mode : Icons.light_mode),
+              onPressed: () {
+                themeController.toggleTheme(); // 테마 변경
+              },
+            ),
           ),
           ListTile(
             title: Text(
@@ -134,8 +146,17 @@ class SettingsPage extends ConsumerWidget {
           ListTile(
             title: Text('로그아웃', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
             onTap: () {
+              showResultDialog(
+                context,
+                customColors,
+                "로그아웃하시겠습니까?",
+                "취소",
+                "로그아웃",
+                    (ctx) {
+                      _logout(context, ref);
+                },
+              );
               // TODO: 로그아웃 기능 구현
-              _logout(context, ref);
             },
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
           ),
