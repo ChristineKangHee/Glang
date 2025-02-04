@@ -189,9 +189,10 @@ class RootedTreeScreen extends ConsumerWidget {
         child: Center(
           child: InteractiveViewer(
             constrained: false,
-            boundaryMargin: const EdgeInsets.all(4),
-            minScale: 0.1,
+            boundaryMargin: const EdgeInsets.all(100),
+            minScale: 0.5,
             maxScale: 3.0,
+            // clipBehavior: Clip.none, // 클리핑 해제
             child: GraphView(
               graph: graph,
               algorithm: BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder)),
@@ -205,6 +206,7 @@ class RootedTreeScreen extends ConsumerWidget {
               },
             ),
           ),
+
         ),
       ),
     );
