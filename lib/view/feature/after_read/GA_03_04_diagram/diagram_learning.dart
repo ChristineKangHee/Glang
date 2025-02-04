@@ -217,18 +217,18 @@ class RootedTreeScreen extends ConsumerWidget {
     final customColors = ref.watch(customColorsProvider);
 
     // 노드 색상 설정
-    Color nodeColor;
+    Color? nodeColor;
     switch (nodeId) {
       case 'Root':
-        nodeColor = Colors.redAccent;
+        nodeColor = customColors.secondary;
         break;
       case 'Child 1':
       case 'Child 2':
       case 'Child 3':
-        nodeColor = Colors.blueAccent;
+        nodeColor = customColors.primary60;
         break;
       default:
-        nodeColor = Colors.greenAccent;
+        nodeColor = customColors.primary40;
         break;
     }
 
