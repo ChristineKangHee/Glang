@@ -49,7 +49,7 @@ class Section extends ConsumerWidget {
                   description: stage.textContents, // 설명
                   missions: stage.missions, // 미션 리스트
                   effects: stage.effects, // 학습 효과 리스트
-                  achievement: stage.achievement, // 성취도
+                  achievement: stage.achievement.toString(), // 성취도
                   status: stage.status, // 상태 (시작 가능, 잠김 등)
                 ),
               ),

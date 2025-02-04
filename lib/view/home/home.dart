@@ -329,7 +329,7 @@ class ProgressSection extends StatelessWidget {
           description: data.textContents,
           missions: data.missions,
           effects: data.effects,
-          achievement: data.achievement,
+          achievement: data.achievement.toString(),
           status: data.status,
         ),
       ],
