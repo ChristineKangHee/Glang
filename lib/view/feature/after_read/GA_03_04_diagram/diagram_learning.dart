@@ -121,27 +121,32 @@ class RootedTreeScreen extends ConsumerWidget {
     }
   }
 
+  final dialogShownProvider = StateProvider<bool>((ref) => false);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final customColors = ref.watch(customColorsProvider); // 사용자 정의 색상 가져오기
+    final customColors = ref.watch(customColorsProvider);
+    final dialogShown = ref.watch(dialogShownProvider);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return const DiagramMainDialog();
-        },
-      );
-    });
+    if (!dialogShown) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return const DiagramMainDialog();
+          },
+        );
+        ref.read(dialogShownProvider.notifier).state = true; // 다이얼로그가 표시되었음을 기록
+      });
+    }
 
     return Scaffold(
       backgroundColor: customColors.neutral90,
       appBar: CustomAppBar_2depth_8(
-        title: '다이어그램', // 화면 제목
+        title: '다이어그램',
       ),
       body: Column(
         children: [
-          // 제목 섹션
           Container(
             decoration: ShapeDecoration(
               color: customColors.neutral100,
@@ -159,15 +164,14 @@ class RootedTreeScreen extends ConsumerWidget {
               ),
             ),
           ),
-          // 트리 다이어그램
           RootedTree(customColors, ref, context),
-          // 단어 리스트 위젯
           WordListWidget(),
           const SizedBox(height: 20),
         ],
       ),
     );
   }
+
 
   // 트리 다이어그램 위젯
   Widget RootedTree(CustomColors customColors, WidgetRef ref, BuildContext context) {
