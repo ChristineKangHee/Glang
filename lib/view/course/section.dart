@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../model/section_data.dart';
 import '../../util/box_shadow_styles.dart';
+import '../../viewmodel/custom_colors_provider.dart';
 import 'course_subdetail.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import 'popup_component.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class Section extends StatelessWidget {
+class Section extends ConsumerWidget {
   final SectionData data; // 섹션 데이터
 
   const Section({super.key, required this.data});
@@ -59,85 +61,50 @@ class Section extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-// <<<<<<< HEAD
-//     final customColors = Theme.of(context).extension<CustomColors>()!;
-//     // Check if the status is either 'start' or 'completed'
-//     Color? containerColor = data.status.contains('start') || data.status.contains('completed')
-//         ? customColors.primary10
-//         : customColors.neutral90;
-//
-//     return Container(
-//       color: containerColor,  // Apply the dynamically set color
-//       child: Column(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           Container(
-//             color: customColors.neutral100,
-//             width: double.infinity,
-//             child: Padding(
-//               padding: const EdgeInsets.all(12.0),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 mainAxisSize: MainAxisSize.min,
-//                 children: [
-//                   Text(data.title, style: body_large_semi(context)),
-//                   Text(data.sectionDetail, style: body_small(context)),
-//                 ],
-//               ),
-//             ),
-//           ),
-//           const SizedBox(height: 24.0),
-//           ...List.generate(
-//             data.subdetailTitle.length,
-//                 (i) => Container(
-//               margin: EdgeInsets.only(
-//                 bottom: i != data.subdetailTitle.length - 1 ? 24.0 : 0,
-// =======
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(data.title, style: body_large_semi(context)), // 코스 제목
-              Text(data.sectionDetail, style: body_small(context)), // 코스 설명
-            ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final customColors = ref.watch(customColorsProvider);
+    return Container(
+      color: data.stages.any((stage) =>
+      stage.status.contains('start') || stage.status.contains('completed'))
+          ? customColors.primary10
+          : customColors.neutral90, // Conditionally set color
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            color: customColors.neutral100,
+            width: double.infinity,
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(data.title, style: body_large_semi(context)), // 코스 제목
+                Text(data.sectionDetail, style: body_small(context)), // 코스 설명
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 24.0),
-        ...List.generate(
-          data.stages.length, // 🔹 `stages` 리스트 기반으로 반복
-              (i) {
-            final stage = data.stages[i]; // 🔹 `StageData` 객체 참조
-            return Container(
-              margin: EdgeInsets.only(
-                bottom: i != data.stages.length - 1 ? 24.0 : 0,
-                left: _getMargin(i),
-                right: _getMargin(i, isLeft: false),
-              ),
-              child: StatusButton(
-// <<<<<<< HEAD
-//                 status: data.status[i],
-//                 onPressed: () => _showPopup(context, i),
-//               ),
-//             ),
-//           ),
-//           const SizedBox(height: 24.0),
-//         ],
-//       ),
-// =======
-                status: stage.status, // 🔹 `stage` 객체에서 상태 가져오기
-                onPressed: () => _showPopup(context, i),
-              ),
-            );
-          },
-        ),
-      ],
+          const SizedBox(height: 24.0),
+          ...List.generate(
+            data.stages.length, // 🔹 `stages` 리스트 기반으로 반복
+                (i) {
+              final stage = data.stages[i]; // 🔹 `StageData` 객체 참조
+              return Container(
+                margin: EdgeInsets.only(
+                  bottom: i != data.stages.length - 1 ? 24.0 : 0,
+                  left: _getMargin(i),
+                  right: _getMargin(i, isLeft: false),
+                ),
+                child: StatusButton(
+                  status: stage.status, // 🔹 `stage` 객체에서 상태 가져오기
+                  onPressed: () => _showPopup(context, i),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 24,),
+        ],
+      ),
     );
   }
 }
