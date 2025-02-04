@@ -1,3 +1,9 @@
+/// File: tutorial_screen.dart
+/// Purpose: 앱의 튜토리얼 화면을 제공하며, PageView를 활용하여 여러 페이지를 스크롤 가능하도록 구현
+/// Author: 박민준
+/// Created: 2025-01-01
+/// Last Modified: 2025-02-03 by 박민준
+
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';

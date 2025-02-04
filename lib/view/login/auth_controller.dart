@@ -2,7 +2,7 @@
 /// Purpose: Firebase 및 Google 로그인 기능을 제공하며 사용자 인증 상태를 관리
 /// Author: 박민준
 /// Created: 2025-01-07
-/// Last Modified: 2025-01-07 by 박민준
+/// Last Modified: 2025-02-03 by 박민준
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';

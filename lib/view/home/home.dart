@@ -43,20 +43,24 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
       ref.read(userNameProvider.notifier).fetchUserName(userId);
     }
 
+    // 🔹 첫 번째 섹션의 첫 번째 스테이지 데이터를 가져옴
+    final firstSection = sectionList.isNotEmpty ? sectionList[0] : null;
+    final firstStage = firstSection?.stages.isNotEmpty == true ? firstSection!.stages[0] : null;
 
-    final data = SectionData(
-      section: 1,
-      title: "코스1",
-      subdetailTitle: ["읽기 도구의 필요성"],
-      textContents: ["이 섹션에서는 목표를 달성하는 방법을 배웁니다."],
-      achievement: ['0'],
-      totalTime: ['30'],
-      difficultyLevel: ["쉬움"],
-      missions: [['미션 1-1', '미션 1-2', '미션 1-3', '미션 1-4', '미션 1-5', '미션 1-6'],],
-      effects: [['미션 1-1', '미션 1-2', '미션 1-3',],],
-      status: ["start",],
-      sectionDetail: '코스2의 설명 내용입니다.', // 상태값 예시
-    );
+
+    // final data = SectionData(
+    //   section: 1,
+    //   title: "코스1",
+    //   subdetailTitle: ["읽기 도구의 필요성"],
+    //   textContents: ["이 섹션에서는 목표를 달성하는 방법을 배웁니다."],
+    //   achievement: ['0'],
+    //   totalTime: ['30'],
+    //   difficultyLevel: ["쉬움"],
+    //   missions: [['미션 1-1', '미션 1-2', '미션 1-3', '미션 1-4', '미션 1-5', '미션 1-6'],],
+    //   effects: [['미션 1-1', '미션 1-2', '미션 1-3',],],
+    //   status: ["start",],
+    //   sectionDetail: '코스2의 설명 내용입니다.', // 상태값 예시
+    // );
 
 
     return Scaffold(
@@ -76,7 +80,7 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
                 SizedBox(height: 24.h,),
 
                 //TODO: 진행 중인 학습 위젯
-                ProgressSection(data: data),
+                if (firstStage != null) ProgressSection(data: firstStage), // 🔹 `ProgressSection`에서 `StageData` 사용
                 SizedBox(height: 24.h,),
 
                 // HotPostSection(customColors: customColors),
@@ -307,7 +311,7 @@ class ProgressSection extends StatelessWidget {
     required this.data,
   });
 
-  final SectionData data;
+  final StageData data; // 🔹 `SectionData` → `StageData` 로 변경
 
   @override
   Widget build(BuildContext context) {
@@ -318,15 +322,15 @@ class ProgressSection extends StatelessWidget {
         Text("진행 중인 스테이지", style: body_small_semi(context),),
         SizedBox(height: 12.h,),
         SectionPopup(
-          title: data.title,
-          subTitle: data.subdetailTitle[0],
-          time: data.totalTime[0],
-          level: data.difficultyLevel[0],
-          description: data.textContents[0],
-          missions: data.missions[0],
-          effects: data.effects[0],
-          achievement: data.achievement[0],
-          status: data.status[0],
+          title: "코스 진행", // 🔹 `data.title` 제거
+          subTitle: data.subdetailTitle, // 🔹 `StageData`에서 제목 가져오기
+          time: data.totalTime,
+          level: data.difficultyLevel,
+          description: data.textContents,
+          missions: data.missions,
+          effects: data.effects,
+          achievement: data.achievement,
+          status: data.status,
         ),
       ],
     );
