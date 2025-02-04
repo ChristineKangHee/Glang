@@ -57,20 +57,22 @@ class LoginPage extends ConsumerWidget {
                 child: GoogleLoginButton(customColors: customColors),
               ),
               SizedBox(height: 16,),
+              // Apple 로그인 버튼 (수정됨)
               GestureDetector(
                 onTap: () {
-                  // authController.signInWithKakao(
-                  //   onNicknameRequired: () {
-                  //     Navigator.pushReplacementNamed(context, '/nickname');
-                  //   },
-                  //   onHome: () {
-                  //     Navigator.pushReplacementNamed(context, '/');
-                  //     ref.refresh(attendanceProvider);
-                  //   },
-                  // );
+                  authController.signInWithApple(
+                    onNicknameRequired: () {
+                      Navigator.pushReplacementNamed(context, '/nickname');
+                    },
+                    onHome: () {
+                      Navigator.pushReplacementNamed(context, '/');
+                      ref.refresh(attendanceProvider);
+                    },
+                  );
                 },
                 child: AppleLoginButton(customColors: customColors),
               ),
+              // Kakao 로그인 버튼
               SizedBox(height: 16,),
               GestureDetector(
                 onTap: () {

@@ -123,27 +123,30 @@ class AnnouncementDetailPage extends ConsumerWidget {
       appBar: CustomAppBar_2depth_4(
         title: '공지사항'.tr(),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              announcement.title,
-              style: body_small_semi(context),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              announcement.date,
-              style: body_xsmall(context).copyWith(color: customColors.neutral60),
-            ),
-            Divider(color: customColors.neutral80,),
-            const SizedBox(height: 20),
-            Text(
-              announcement.detail,  // Displaying the detailed content
-              style: body_small(context),
-            ),
-          ],
+      body: Container(
+        color: customColors.neutral90,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                announcement.title,
+                style: body_small_semi(context),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                announcement.date,
+                style: body_xsmall(context).copyWith(color: customColors.neutral60),
+              ),
+              Divider(color: customColors.neutral80,),
+              const SizedBox(height: 20),
+              Text(
+                announcement.detail,  // Displaying the detailed content
+                style: body_small(context),
+              ),
+            ],
+          ),
         ),
       ),
     );
