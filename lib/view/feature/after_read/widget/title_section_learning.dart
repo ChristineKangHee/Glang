@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';
 
+import '../After_Read_Content.dart';
+
 class TitleSection_withIcon extends StatelessWidget {
   const TitleSection_withIcon({
     super.key,
@@ -56,23 +58,31 @@ class TitleSection_withIcon extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 16), // 텍스트와 아이콘 간 간격
-        _buildIcon(customColors),
+        _buildIcon(customColors, context),
       ],
     );
   }
 
-  Widget _buildIcon(CustomColors customColors) {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: const ShapeDecoration(
-        color: Color(0xFF514FFF),
-        shape: OvalBorder(),
-      ),
-      child: Icon(
-        icon,
-        color: customColors.neutral100,
-        size: 24,
+  Widget _buildIcon(CustomColors customColors, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AfterReadContent()),
+        );
+      },
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: ShapeDecoration(
+          color: customColors.primary,
+          shape: const OvalBorder(),
+        ),
+        child: Icon(
+          icon,
+          color: customColors.neutral100,
+          size: 24,
+        ),
       ),
     );
   }
