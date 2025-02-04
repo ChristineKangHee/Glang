@@ -1,3 +1,9 @@
+/// File: attendance_provider.dart
+/// Purpose: 출석 데이터 관리를 위한 Riverpod Provider 정의
+/// Author: 박민준
+/// Created: 2025-02-03
+/// Last Modified: 2025-02-03 by 박민준
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'attendance_model.dart';
 import 'attendance_repository.dart';

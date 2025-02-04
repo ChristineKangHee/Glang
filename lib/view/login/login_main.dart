@@ -1,11 +1,18 @@
+/// File: login_page.dart
+/// Purpose: 사용자 로그인 화면, Google, Apple, Kakao 로그인 버튼 제공
+/// Author: 박민준
+/// Created: 2025-01-01
+/// Last Modified: 2025-02-03 by 박민준
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';
 import '../../viewmodel/custom_colors_provider.dart';
-import '../home/attendance_provider.dart';
+import '../home/attendance/attendance_provider.dart';
 import 'auth_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
 class LoginPage extends ConsumerWidget {
   const LoginPage({Key? key}) : super(key: key);
 

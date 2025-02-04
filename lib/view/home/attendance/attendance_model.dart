@@ -1,4 +1,8 @@
-// attendance_model.dart
+/// File: attendance_model.dart
+/// Purpose: 출석 데이터 모델을 정의하고, 출석 상태 변환 함수 제공
+/// Author: 박민준
+/// Created: 2025-02-03
+/// Last Modified: 2025-02-03 by 박민준
 
 /// 출석 상태를 나타내는 열거형(enum)
 enum AttendanceStatus { missed, completed, upcoming }
