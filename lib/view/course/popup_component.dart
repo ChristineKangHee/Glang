@@ -38,22 +38,25 @@ class SectionPopup extends StatelessWidget {
 
     // 상태에 따른 색상 설정
     switch (status) {
-      case 'start':
-      case 'in_progress':
+      case 'inProgress':
+      // 진행 중 상태
         cardColor = customColors.primary;
         titleColor = customColors.neutral100;
         subTitleColor = customColors.neutral100;
         break;
+
       case 'completed':
         cardColor = customColors.primary40;
-        titleColor = customColors.neutral30; // Completed 상태에서 title 색상
-        subTitleColor = customColors.neutral30; // Completed 상태에서 subTitle 색상
+        titleColor = customColors.neutral30;
+        subTitleColor = customColors.neutral30;
         break;
+
       case 'locked':
       default:
+      // locked 또는 잘못된 문자열 → locked로 처리
         cardColor = customColors.neutral80;
-        titleColor = customColors.neutral30; // Locked 상태에서 title 색상
-        subTitleColor = customColors.neutral30; // Locked 상태에서 subTitle 색상
+        titleColor = customColors.neutral30;
+        subTitleColor = customColors.neutral30;
         break;
     }
 
@@ -205,29 +208,30 @@ class StatusButton extends StatelessWidget {
 
     // 상태에 따른 색상, 아이콘 및 아이콘 크기 설정
     switch (status) {
-      case 'start':
-      case 'in_progress':
+      case 'inProgress':
         buttonColor = customColors.primary;
         buttonIcon = Icons.play_arrow_rounded;
         iconSize = 40.0;
-        iconColor = customColors.neutral100;
+        iconColor = customColors.neutral100!;
         break;
+
       case 'completed':
         buttonColor = customColors.primary40;
         buttonIcon = Icons.check_rounded;
         iconSize = 40.0;
-        iconColor = customColors.neutral100;
+        iconColor = customColors.neutral100!;
         break;
+
       case 'locked':
       default:
         buttonColor = customColors.neutral80;
         buttonIcon = Icons.lock_rounded;
         iconSize = 24.0;
-        iconColor = customColors.neutral30;
+        iconColor = customColors.neutral30!;
         break;
     }
 
-    return status == 'start' || status == 'in_progress'
+    return status == 'start' || status == 'inProgress'
         ? PulsatingPlayButton(
             onPressed: onPressed,
             buttonColor: buttonColor??Colors.purple,
