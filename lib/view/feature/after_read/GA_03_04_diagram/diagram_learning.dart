@@ -189,9 +189,10 @@ class RootedTreeScreen extends ConsumerWidget {
         child: Center(
           child: InteractiveViewer(
             constrained: false,
-            boundaryMargin: const EdgeInsets.all(4),
-            minScale: 0.1,
+            boundaryMargin: const EdgeInsets.all(100),
+            minScale: 0.5,
             maxScale: 3.0,
+            // clipBehavior: Clip.none, // 클리핑 해제
             child: GraphView(
               graph: graph,
               algorithm: BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder)),
@@ -205,6 +206,7 @@ class RootedTreeScreen extends ConsumerWidget {
               },
             ),
           ),
+
         ),
       ),
     );
@@ -215,18 +217,18 @@ class RootedTreeScreen extends ConsumerWidget {
     final customColors = ref.watch(customColorsProvider);
 
     // 노드 색상 설정
-    Color nodeColor;
+    Color? nodeColor;
     switch (nodeId) {
       case 'Root':
-        nodeColor = Colors.redAccent;
+        nodeColor = customColors.secondary;
         break;
       case 'Child 1':
       case 'Child 2':
       case 'Child 3':
-        nodeColor = Colors.blueAccent;
+        nodeColor = customColors.primary60;
         break;
       default:
-        nodeColor = Colors.greenAccent;
+        nodeColor = customColors.primary40;
         break;
     }
 

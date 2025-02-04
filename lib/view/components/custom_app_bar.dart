@@ -76,6 +76,8 @@ import '../../viewmodel/custom_colors_provider.dart';
 import 'dart:async';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'alarm_dialog.dart';
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////        1 Depth App Bar        //////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -722,9 +724,21 @@ class _CustomAppBar_2depth_8State extends State<CustomAppBar_2depth_8> {
       actions: [
         IconButton(
           icon: Icon(Icons.close, color: customColors.neutral30, size: 28),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            showResultDialog(
+              context,
+              customColors,
+              "결과를 저장하고 이동할까요?",
+              "아니오",
+              "예",
+                  (ctx) {
+                    Navigator.pop(context);
+              },
+            );
+          },
         ),
       ],
+
       backgroundColor: widget.backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
