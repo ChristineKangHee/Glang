@@ -55,7 +55,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     LearningActivity(title: '결말 바꾸기', time: '20분', xp: '100xp'),
     LearningActivity(title: '에세이 작성', time: '15분', xp: '80xp'),
     LearningActivity(title: '형식 변환하기', time: '30분', xp: '150xp'),
-    LearningActivity(title: '요약하기', time: '10분', xp: '50xp'),
+    LearningActivity(title: '요약', time: '10분', xp: '50xp'),
     LearningActivity(title: '토론', time: '25분', xp: '120xp'),
     LearningActivity(title: '다이어그램', time: '5분', xp: '10xp'),
     LearningActivity(title: '문장 구조', time: '5분', xp: '10xp'),
@@ -359,12 +359,12 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     return WritingEssayMain();
     case '형식 변환하기':
     return FormatConversionMain();
-    case '요약하기':
+    case '요약':
     return ContentSummaryMain();
     case '토론':
     return DebateActivityMain();
     case '다이어그램':
-    return DiagramMain();
+    return RootedTreeScreen();
     case '문장 구조':
     return WritingFormMain();
     case '주제 추출':

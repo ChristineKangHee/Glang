@@ -36,20 +36,6 @@ class TitleSectionMain extends StatelessWidget {
           title,
           style: body_medium_semi(context),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              subtitle,
-              style: body_medium_semi(context)
-                  .copyWith(color: customColors.primary),
-            ),
-            Text(
-              subtitle2,
-              style: body_medium_semi(context),
-            ),
-          ],
-        ),
       ],
     );
   }
