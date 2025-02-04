@@ -14,6 +14,7 @@ import '../../../../viewmodel/custom_colors_provider.dart';
 import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_button.dart';
 import '../widget/title_section_learning.dart';
+import 'diagram_main.dart';
 
 // 단어 리스트를 관리하기 위한 StateNotifierProvider 정의
 final wordListProvider = StateNotifierProvider<WordListNotifier, List<String>>((ref) {
@@ -123,6 +124,15 @@ class RootedTreeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider); // 사용자 정의 색상 가져오기
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return const DiagramMainDialog();
+        },
+      );
+    });
 
     return Scaffold(
       backgroundColor: customColors.neutral90,

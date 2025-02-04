@@ -45,5 +45,6 @@ class DebateNotifier extends StateNotifier<DebateState> {
     _timer?.cancel(); // 머 해제
     super.dispose();
   }
+
 }
 

@@ -75,6 +75,8 @@ class _StartDialogContentState extends State<_StartDialogContent>
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
+    final Color stanceColor = widget.stance == "반대" ? customColors.error! : customColors.primary!;
+
     return AlertDialog(
       contentPadding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
       content: Column(
@@ -83,15 +85,34 @@ class _StartDialogContentState extends State<_StartDialogContent>
           // 라운드 정보
           Text(
             "ROUND ${widget.roundNumber}",
-            style: body_small(context).copyWith(color: customColors.neutral30)
+            style: body_small_semi(context).copyWith(color: customColors.neutral30)
           ),
           const SizedBox(height: 16),
-
           // 토론 주제
-          Text(
-            widget.topic,
+          // Text(
+          //   widget.topic,
+          //   textAlign: TextAlign.center,
+          //   style: body_medium_semi(context).copyWith(color: customColors.neutral30),
+          // ),
+          // 입장 정보
+          RichText(
             textAlign: TextAlign.center,
-            style: body_medium_semi(context).copyWith(color: customColors.neutral30),
+            text: TextSpan(
+              children: [
+                TextSpan(
+                    text: "당신은 ",
+                    style: body_medium_semi(context)
+                ),
+                TextSpan(
+                    text: "'${widget.stance}' ",
+                    style: body_medium_semi(context).copyWith(color: stanceColor), // 변경된 색상 적용
+                ),
+                TextSpan(
+                    text: "입장입니다",
+                    style: body_medium_semi(context)
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 24),
 
@@ -107,28 +128,6 @@ class _StartDialogContentState extends State<_StartDialogContent>
             progressColor: customColors.primary, // 진행 색상
             backgroundColor: customColors.neutral80!, // 배경 색상
             circularStrokeCap: CircularStrokeCap.round, // 끝을 둥글게 처리
-          ),
-          const SizedBox(height: 24),
-
-          // 입장 정보
-          RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: "당신은 ",
-                  style: body_medium(context)
-                ),
-                TextSpan(
-                  text: "'${widget.stance}' ",
-                  style: body_medium_semi(context).copyWith(color: customColors.primary)
-                ),
-                TextSpan(
-                  text: "입장입니다\n곧 토론이 시작합니다",
-                  style: body_medium(context)
-                ),
-              ],
-            ),
           ),
         ],
       ),
