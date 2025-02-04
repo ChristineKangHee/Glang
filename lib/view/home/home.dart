@@ -16,6 +16,7 @@ import 'package:readventure/theme/font.dart';
 import '../../model/section_data.dart';
 import '../../viewmodel/custom_colors_provider.dart';
 import '../../viewmodel/notification_controller.dart';
+import '../../viewmodel/section_provider.dart';
 import '../components/custom_app_bar.dart';
 import '../components/custom_button.dart';
 import '../course/popup_component.dart';
@@ -38,97 +39,105 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
     final FirebaseAuth _auth = FirebaseAuth.instance;
     final String? userId = _auth.currentUser?.uid;
     final userName = ref.watch(userNameProvider); // 사용자 이름 상태 구독
+    final sectionAsync = ref.watch(sectionProvider); // ✅ FutureProvider 사용
 
     if (userId != null) {
       ref.read(userNameProvider.notifier).fetchUserName(userId);
     }
 
-    // 🔹 첫 번째 섹션의 첫 번째 스테이지 데이터를 가져옴
-    final firstSection = sectionList.isNotEmpty ? sectionList[0] : null;
-    final firstStage = firstSection?.stages.isNotEmpty == true ? firstSection!.stages[0] : null;
-
-
-    // final data = SectionData(
-    //   section: 1,
-    //   title: "코스1",
-    //   subdetailTitle: ["읽기 도구의 필요성"],
-    //   textContents: ["이 섹션에서는 목표를 달성하는 방법을 배웁니다."],
-    //   achievement: ['0'],
-    //   totalTime: ['30'],
-    //   difficultyLevel: ["쉬움"],
-    //   missions: [['미션 1-1', '미션 1-2', '미션 1-3', '미션 1-4', '미션 1-5', '미션 1-6'],],
-    //   effects: [['미션 1-1', '미션 1-2', '미션 1-3',],],
-    //   status: ["start",],
-    //   sectionDetail: '코스2의 설명 내용입니다.', // 상태값 예시
-    // );
-
-
     return Scaffold(
       backgroundColor: customColors.neutral90,
       appBar: CustomAppBar_Logo(),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            padding: EdgeInsets.all(16.0.r),
-            decoration: BoxDecoration(gradient: AppGradients.whiteToGrey(customColors)),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                //TODO: 인사말 위젯
-                GreetingSection(name: userName),
-                SizedBox(height: 24.h,),
+        child: userId == null
+          ? Center(child: Text("로그인이 필요합니다"),)
+        :  sectionAsync.when(
+          data: (sections){
+              // 🔹 첫 번째 섹션의 첫 번째 스테이지 데이터 가져오기
+            StageData? findFirstInProgress(List<SectionData> sections) {
+              try {
+                // 조건을 만족하는 첫 번째 StageData 반환
+                return sections
+                    .expand((s) => s.stages)
+                    .firstWhere((stage) => stage.status == StageStatus.inProgress);
+              } catch (e) {
+                // StateError가 발생하면, 진행 중인 스테이지가 없다는 뜻이므로 null 반환
+                return null;
+              }
+            }
+            final ongoingStage = findFirstInProgress(sections);
+            if (ongoingStage != null) {
+              // 진행 중인 스테이지 표시
+            } else {
+              // 없음
+            }
 
-                //TODO: 진행 중인 학습 위젯
-                if (firstStage != null) ProgressSection(data: firstStage), // 🔹 `ProgressSection`에서 `StageData` 사용
-                SizedBox(height: 24.h,),
+            return SingleChildScrollView(
+                child: Container(
+                  padding: EdgeInsets.all(16.0.r),
+                  decoration: BoxDecoration(gradient: AppGradients.whiteToGrey(customColors)),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //TODO: 인사말 위젯
+                      GreetingSection(name: userName),
+                      SizedBox(height: 24.h,),
 
-                // HotPostSection(customColors: customColors),
-                //TODO: 출석체크 위젯
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("출석 체크", style: body_small_semi(context),),
-                    SizedBox(height: 12,),
-                    Container(
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: customColors.neutral100,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: AttendanceWidget()
-                    ),
-                  ],
+                      //TODO: 진행 중인 학습 위젯
+                      if (ongoingStage != null) ProgressSection(data: ongoingStage), // 🔹 `ProgressSection`에서 `StageData` 사용
+                      SizedBox(height: 24.h,),
+
+                      // HotPostSection(customColors: customColors),
+                      //TODO: 출석체크 위젯
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("출석 체크", style: body_small_semi(context),),
+                          SizedBox(height: 12,),
+                          Container(
+                              padding: EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: customColors.neutral100,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: AttendanceWidget()
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 24.h,),
+
+                      //TODO: 이번달 학습 기록 위젯
+                      InkWell(
+                        onTap: () => Navigator.pushNamed(context, "/mypage/statistics"),
+                        child: LearningSection(customColors: customColors),
+                      ),
+
+                      // ElevatedButton(
+                      //   onPressed: showNotification,
+                      //   child: Text('Show Notification'),
+                      // ),
+
+                      ElevatedButton(
+                        onPressed: () => Navigator.pushNamed(context, "/brmain"),
+                        child: Text('읽기 전 코스 이동'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pushNamed(context, "/rdmain"),
+                        child: Text('읽기 중 코스 이동'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pushNamed(context, "/armain"),
+                        child: Text('읽기 후 코스 이동'),
+                      ),
+
+                    ],
+                  ),
                 ),
-                SizedBox(height: 24.h,),
-
-                //TODO: 이번달 학습 기록 위젯
-                InkWell(
-                  onTap: () => Navigator.pushNamed(context, "/mypage/statistics"),
-                  child: LearningSection(customColors: customColors),
-                ),
-
-                // ElevatedButton(
-                //   onPressed: showNotification,
-                //   child: Text('Show Notification'),
-                // ),
-
-                ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, "/brmain"),
-                  child: Text('읽기 전 코스 이동'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, "/rdmain"),
-                  child: Text('읽기 중 코스 이동'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, "/armain"),
-                  child: Text('읽기 후 코스 이동'),
-                ),
-
-              ],
-            ),
-          ),
+              );
+          },
+          loading: () => Center(child: CircularProgressIndicator()), // ✅ 로딩 중
+          error: (error, stack) => Center(child: Text("데이터 로딩 실패: $error")), // ✅ 에러 처리
         ),
       ),
       bottomNavigationBar: const CustomNavigationBar(), // 네비게이션 바
@@ -313,6 +322,18 @@ class ProgressSection extends StatelessWidget {
 
   final StageData data; // 🔹 `SectionData` → `StageData` 로 변경
 
+  // enum → string 변환 함수 (StageData에도 존재할 수 있으나 여기선 간단히 작성)
+  String stageStatusToString(StageStatus status) {
+    switch (status) {
+      case StageStatus.locked:
+        return 'locked';
+      case StageStatus.inProgress:
+        return 'inProgress';
+      case StageStatus.completed:
+        return 'completed';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -330,7 +351,7 @@ class ProgressSection extends StatelessWidget {
           missions: data.missions,
           effects: data.effects,
           achievement: data.achievement.toString(),
-          status: data.status,
+          status: stageStatusToString(data.status),
         ),
       ],
     );
