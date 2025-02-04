@@ -25,8 +25,11 @@ import 'package:readventure/view/mypage/info/info_statistics.dart';
 import 'package:readventure/view/mypage/mypage_main.dart';
 import 'package:readventure/view/mypage/info/info_saved.dart';
 import 'package:readventure/view/mypage/settings/settings_language.dart';
-import 'package:readventure/view/mypage/settings/settings_notification.dart';
-import 'package:readventure/view/mypage/settings/settings_profile.dart';
+import 'package:readventure/view/mypage/settings/settings_FAQ.dart';
+import 'package:readventure/view/mypage/settings/settings_politics.dart';
+import 'package:readventure/view/mypage/settings/settings_announcement.dart';
+import 'package:readventure/view/mypage/settings/settings_requests.dart';
+import 'package:readventure/view/mypage/settings/settings_secession.dart';
 import 'viewmodel/theme_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -70,7 +73,9 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
             '/': (context) => const MyHomePage(),
             '/armain': (context) => const ArMain(),
             '/brmain': (context) => const BrMain(),
-            '/rdmain': (context) => RdMain(oxQuestions: oxQuestions, mcqQuestions: mcqQuestions,),
+            '/rdmain': (context) => RdMain(
+              // oxQuestions: oxQuestions, mcqQuestions: mcqQuestions,
+              stageIndex: 0,),
             '/login': (context) => const LoginPage(),
             '/nickname': (context) => const NicknameInput(),
             '/notification': (context) => const NotificationPage(),
@@ -78,10 +83,13 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
             '/community': (context) => const CommunityMain(),
             '/mypage': (context) => const MyPageMain(),
             '/mypage/settings' : (context) => const SettingsPage(),
-            '/mypage/settings/profile' : (context) => const SettingsProfile(),
-            '/mypage/settings/notification' : (context) => const SettingsNotification(),
+            '/mypage/settings/announcement' : (context) => const SettingsAnnouncement(),
+            '/mypage/settings/FAQ' : (context) => const SettingsFAQ(),
             '/mypage/settings/theme' : (context) => const SettingsTheme(),
             '/mypage/settings/language' : (context) => const SettingsLanguage(),
+            '/mypage/settings/politics' : (context) => const SettingsPolitics(),
+            '/mypage/settings/requests' : (context) => const SettingsRequests(),
+            '/mypage/settings/secession' : (context) => const SettingsSecession(),
             '/mypage/edit_profile' : (context) => const EditProfile(),
             '/mypage/edit_nick_input' : (context) => const EditNickInput(),
             '/mypage/info/statistics' : (context) => const InfoStatistics(),

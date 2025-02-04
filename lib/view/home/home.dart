@@ -23,6 +23,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'attendance_model.dart';
+import 'attendance_provider.dart';
+
 class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
   const MyHomePage({super.key});
 
@@ -128,38 +131,40 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
     );
   }
 }
-class AttendanceWidget extends StatelessWidget {
-  final List<AttendanceDay> attendanceDays = [
-    AttendanceDay(date: '1/19', status: AttendanceStatus.missed, xp: 0),
-    AttendanceDay(date: '1/20', status: AttendanceStatus.missed, xp: 0),
-    AttendanceDay(date: '1/21', status: AttendanceStatus.completed, xp: 10),
-    AttendanceDay(date: '1/22', status: AttendanceStatus.upcoming, xp: 10),
-    AttendanceDay(date: '1/23', status: AttendanceStatus.upcoming, xp: 10),
-  ];
+
+class AttendanceWidget extends ConsumerWidget {
+  const AttendanceWidget({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: attendanceDays.map((day) => AttendanceDayWidget(day)).toList(),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final attendanceAsync = ref.watch(attendanceProvider);
+    return attendanceAsync.when(
+      data: (attendanceDays) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: attendanceDays
+            .map((day) => AttendanceDayWidget(day))
+            .toList(),
+      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(child: Text("오류 발생: $error")),
     );
   }
 }
-
-class AttendanceDay {
-  final String date;
-  final AttendanceStatus status;
-  final int xp;
-
-  AttendanceDay({required this.date, required this.status, required this.xp});
-}
-
-enum AttendanceStatus { missed, completed, upcoming }
 
 class AttendanceDayWidget extends StatelessWidget {
   final AttendanceDay day;
 
   const AttendanceDayWidget(this.day);
+
+  String formatDateForDisplay(String storedDate) {
+    // storedDate는 "2025-2-2" 형태라고 가정합니다.
+    // '-'로 분할한 후, 두 번째(월)와 세 번째(일) 부분만 사용하여 "/"로 결합
+    final parts = storedDate.split('-');
+    if (parts.length == 3) {
+      return "${parts[1]}/${parts[2]}";
+    }
+    return storedDate; // 예상치 못한 경우 그대로 반환
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +202,7 @@ class AttendanceDayWidget extends StatelessWidget {
     return Column(
       children: [
         Text(
-          day.date,
+          formatDateForDisplay(day.date),
           style: body_xxsmall(context).copyWith(color: customColors.neutral30,),
         ),
         SizedBox(height: 8),

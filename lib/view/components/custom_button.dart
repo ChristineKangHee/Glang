@@ -169,12 +169,11 @@ class ButtonPrimary_noPadding extends StatelessWidget { //
 
 class ButtonPrimary20_noPadding extends StatelessWidget { //
   const ButtonPrimary20_noPadding( //파라미터
-          {Key? key,
+          {super.key,
         required this.function,
         required this.title,
         this.condition = "not null",
-      })
-      : super(key: key);
+      });
 
   final String title;
   final Function function;
@@ -195,7 +194,7 @@ class ButtonPrimary20_noPadding extends StatelessWidget { //
           width: MediaQuery.of(context).size.width, //MediaQuery 를 통해서 버튼 넓이 설정해놓음.
           height: 56, // 버튼 높이
           decoration: BoxDecoration(
-            color: condition.contains("not null") ? customColors.primary20 : Colors.deepPurple,
+            color: condition.contains("not null") ? customColors.primary20 : customColors.primary20,
             borderRadius: BorderRadius.circular(16),
             boxShadow: BoxShadowStyles.shadow1(context),
           ), // Button Edge 둥글게
