@@ -222,7 +222,7 @@ class CustomAppBar_Community extends StatelessWidget implements PreferredSizeWid
           onPressed: onSearchPressed,
         ),
       ],
-      backgroundColor: backgroundColor ?? customColors.neutral90,
+      backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
   }

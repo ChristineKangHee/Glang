@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:readventure/view/community/CM_1depth.dart';
 import 'package:readventure/view/components/custom_app_bar.dart';
 import 'package:readventure/view/feature/after_read/GA_03_01_change_ending/CE_main.dart';
 import 'package:readventure/view/feature/after_read/GA_03_03_debate_activity/DA_main.dart';
@@ -91,6 +92,10 @@ class ArMain extends StatelessWidget {
             ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
               builder: (context) => InterestSelectionPage(),
             )), child: Text("관심사")),
+            SizedBox(height: 30,),
+            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
+              builder: (context) => CommunityMainPage(),
+            )), child: Text("커뮤니티")),
             SizedBox(height: 30,),
           ],
         ),
