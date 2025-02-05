@@ -1,4 +1,10 @@
- import 'package:flutter/material.dart';
+/// File: CR_learning.dart
+/// Purpose: 사용자가 표지를 보고 제목을 유추하는 학습 화면 구현
+/// Author: 박민준
+/// Created: 2025-01-0?
+/// Last Modified: 2025-02-05 by 박민준
+
+import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/view/components/custom_app_bar.dart';
 import 'package:readventure/view/components/my_divider.dart';

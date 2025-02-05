@@ -53,7 +53,6 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
           ? Center(child: Text("로그인이 필요합니다"),)
         :  sectionAsync.when(
           data: (sections){
-              // 🔹 첫 번째 섹션의 첫 번째 스테이지 데이터 가져오기
             StageData? findFirstInProgress(List<SectionData> sections) {
               try {
                 // 조건을 만족하는 첫 번째 StageData 반환

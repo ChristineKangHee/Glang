@@ -18,7 +18,8 @@ class SettingsFAQ extends ConsumerWidget {
     final FirebaseAuth _auth = FirebaseAuth.instance;
     final String? userId = _auth.currentUser?.uid;
 
-    if (userId != null) {
+    // userName이 null이고, userId가 있을 때만 fetch
+    if (userId != null && userName == null) {
       ref.read(userNameProvider.notifier).fetchUserName(userId);
     }
 
