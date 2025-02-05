@@ -11,12 +11,15 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart' as kakao;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart'; // Apple 로그인 추가
 import '../home/attendance/attendance_service.dart';
+import '../home/stage_provider.dart';
 
 final authControllerProvider =
-StateNotifierProvider<AuthController, User?>((ref) => AuthController());
+StateNotifierProvider<AuthController, User?>((ref) => AuthController(ref));
 
 class AuthController extends StateNotifier<User?> {
-  AuthController() : super(null);
+  final Ref ref; // ⬅️ Riverpod의 Ref
+
+  AuthController(this.ref) : super(null);
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -115,14 +118,18 @@ class AuthController extends StateNotifier<User?> {
     }
   }
 
-  Future<void> _handleUserState(User user, Function onNicknameRequired, Function onHome) async {
+  Future<void> _handleUserState(
+      User user, Function onNicknameRequired, Function onHome) async {
     try {
-      // **여기서 출석 체크 호출**
+      // 출석 체크
       await markTodayAttendanceAsChecked(user.uid);
 
+      // DB에서 users/{user.uid} 문서 조회
       final userDoc = _firestore.collection('users').doc(user.uid);
       final docSnapshot = await userDoc.get();
 
+      // ✅ 로그인 직후, userIdProvider 업데이트!
+      ref.read(userIdProvider.notifier).state = user.uid;
 
       if (!docSnapshot.exists) {
         await userDoc.set({
@@ -143,4 +150,5 @@ class AuthController extends StateNotifier<User?> {
       print('사용자 상태 확인 오류: $e');
     }
   }
+
 }

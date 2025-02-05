@@ -1,9 +1,13 @@
-/// File: stage_data.dart
+/// File: section_data.dart
 /// Purpose: 학습 코스 및 스테이지 데이터를 관리하는 모델 클래스 정의
 /// Author: 박민준
 /// Created: 2025-02-03
 /// Last Modified: 2025-02-03 by 박민준
 
+import 'package:readventure/model/reading_data.dart';
+
+import 'ar_data.dart';
+import 'br_data.dart';
 import 'stage_data.dart';
 
 enum StageStatus { locked, inProgress, completed }
@@ -22,6 +26,11 @@ class StageData {
   // 활동 완료 여부는 Map으로
   final Map<String, bool> activityCompleted;
 
+  // **추가: 새로운 하위 모델**
+  final BrData? brData;         // 읽기 전(BR) 데이터
+  final ReadingData? readingData;   // 읽기 중(READING) 데이터
+  final ArData? arData;         // 읽기 후(AR) 데이터
+
   StageData({
     required this.stageId,
     required this.subdetailTitle,
@@ -33,6 +42,9 @@ class StageData {
     required this.missions,
     required this.effects,
     required this.activityCompleted,
+    this.brData,
+    this.readingData,
+    this.arData,
   });
 
   // Firestore → StageData
@@ -48,6 +60,17 @@ class StageData {
       missions: List<String>.from(json['missions'] as List),
       effects: List<String>.from(json['effects'] as List),
       activityCompleted: Map<String, bool>.from(json['activityCompleted'] as Map),
+
+      // 하위 모델은 존재하면 fromJson, 없으면 null
+      brData: json['brData'] == null
+          ? null
+          : BrData.fromJson(json['brData']),
+      readingData: json['readingData'] == null
+          ? null
+          : ReadingData.fromJson(json['readingData']),
+      arData: json['arData'] == null
+          ? null
+          : ArData.fromJson(json['arData']),
     );
   }
 
@@ -63,6 +86,11 @@ class StageData {
       'missions': missions,
       'effects': effects,
       'activityCompleted': activityCompleted,
+
+      // 하위 모델
+      'brData': brData?.toJson(),
+      'readingData': readingData?.toJson(),
+      'arData': arData?.toJson(),
     };
   }
 
@@ -97,11 +125,11 @@ class StageData {
       activityCompleted[activityType] = true;
       // TODO: 로직에 따라 어떤 percent를 더할지 결정
       if (activityType == 'beforeReading') {
-        achievement += 30;
+        achievement += 20;
       } else if (activityType == 'duringReading') {
         achievement += 30;
       } else if (activityType == 'afterReading') {
-        achievement += 40;
+        achievement += 50;
       }
 
       // 100% 초과 방지

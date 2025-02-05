@@ -9,48 +9,39 @@ import 'package:readventure/view/course/section.dart';
 import 'package:readventure/view/feature/before_read/GA_01_01_cover_research/CR_main.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
+import '../../model/section_data.dart';
 import '../../util/box_shadow_styles.dart';
 import '../components/custom_app_bar.dart';
 import '../components/custom_button.dart';
 import '../feature/before_read/GA_01_01_cover_research/CR_learning.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CourseDetailPage extends StatelessWidget {
-  final String title; // 코스 제목
-  final String time; // 소요 시간
-  final String level; // 난이도
-  final String description; // 코스 설명
-  final List<String> mission; // 학습 미션 리스트
-  final List<String> effect; // 학습 효과 리스트
+import '../home/stage_provider.dart';
 
-  const CourseDetailPage({
-    super.key,
-    required this.title,
-    required this.description,
-    required this.mission,
-    required this.effect,
-    required this.time,
-    required this.level,
-  });
+// course_subdetail.dart
+class CourseDetailPage extends ConsumerWidget {
+  final StageData stage; // 스테이지 전체를 받음
+
+  const CourseDetailPage({Key? key, required this.stage}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_4(title: '스테이지 상세'), // 사용자 정의 앱바
+      appBar: CustomAppBar_2depth_4(title: '스테이지 상세'),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(16), // 외부 여백
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 스크롤 가능한 콘텐츠
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      // 코스 제목 및 상세 정보
+                      // 예: 스테이지 정보 표시
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -58,26 +49,26 @@ class CourseDetailPage extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(title, style: body_large_semi(context)), // 코스 제목
+                                Text(stage.subdetailTitle, style: body_large_semi(context)),
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    IconTextRow(icon: Icons.timer, text: time + '분'), // 시간 아이콘과 텍스트
+                                    IconTextRow(icon: Icons.timer, text: '${stage.totalTime}분'),
                                     const SizedBox(width: 12),
-                                    IconTextRow(icon: Icons.star, text: level), // 난이도 아이콘과 텍스트
+                                    IconTextRow(icon: Icons.star, text: stage.difficultyLevel),
                                   ],
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  description,
-                                  style: body_small(context), // 설명 텍스트 스타일
+                                  stage.textContents,
+                                  style: body_small(context),
                                 ),
                               ],
                             ),
                           ),
                           const SizedBox(width: 36),
                           SvgPicture.asset(
-                            'assets/images/charactor.svg', // 네트워크 이미지
+                            'assets/images/charactor.svg',
                             width: 106,
                             height: 98,
                             fit: BoxFit.cover,
@@ -85,15 +76,9 @@ class CourseDetailPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      MissionSection(
-                        title: '미션', // 미션 섹션 제목
-                        missions: mission, // 미션 리스트
-                      ),
+                      MissionSection(title: '미션', missions: stage.missions),
                       const SizedBox(height: 20),
-                      EffectSection(
-                        title: '효과', // 학습 효과 섹션 제목
-                        effects: effect, // 학습 효과 리스트
-                      ),
+                      EffectSection(title: '효과', effects: stage.effects),
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -105,17 +90,39 @@ class CourseDetailPage extends StatelessWidget {
                 width: MediaQuery.of(context).size.width,
                 child: ButtonPrimary_noPadding(
                   function: () {
-                    print("시작하기");
-                    //function 은 상황에 맞게 재 정의 할 것.
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CRLearning(), // BrMain으로 이동
-                      ),
-                    );
+                    // ⭐ 핵심: 현재 스테이지 ID를 Riverpod에 설정
+                    ref.read(selectedStageIdProvider.notifier).state = stage.stageId;
+
+                    if (stage.activityCompleted["beforeReading"] == true &&
+                        stage.activityCompleted["duringReading"] == false) {
+                      // 읽기 전 완료 → 읽기 중 화면으로 이동
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(builder: (_) => const READMain()),
+                      // );
+                      print("읽기 중 화면 이동 예정");
+                    } else if (stage.activityCompleted["duringReading"] == true) {
+                      // 읽기 중 완료 → 읽기 후 화면으로 이동
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(builder: (_) => const ARMain()),
+                      // );
+                      print("읽기 후 화면 이동 예정");
+                    } else {
+                      // 기본적으로 읽기 전 화면으로 이동
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const CRLearning()),
+                      );
+                    }
+
+                    // // 그리고 CRLearning 화면으로 이동
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(builder: (_) => const CRLearning()),
+                    // );
                   },
                   title: '시작하기',
-                  // 버튼 안에 들어갈 텍스트.
                 ),
               ),
             ],
