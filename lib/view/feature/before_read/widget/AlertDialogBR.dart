@@ -1,3 +1,9 @@
+/// File: AlertDialogBR.dart
+/// Purpose: 사용자의 학습 결과를 시각적으로 표시하는 알림 다이얼로그 (레이더 차트, AI 피드백 포함)
+/// Author: 박민준
+/// Created: 2025-01-0?
+/// Last Modified: 2025-02-05 by 박민준
+
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';

@@ -30,8 +30,13 @@ class UserNameNotifier extends StateNotifier<String?> {
 
   final UserService _userService = UserService();
 
-  void fetchUserName(String userId) async {
-    state = await _userService.getUserName(userId); // 상태 업데이트
+  Future<void> fetchUserName(String userId) async {
+    // 만약 state가 이미 존재하면, 굳이 Firestore 안 불러오고 건너뛸 수도 있음
+    if (state != null) {
+      return; // 이미 사용자 이름이 있으므로 재조회하지 않음
+    }
+    // 처음 불러올 때만 Firestore 호출
+    state = await _userService.getUserName(userId);
   }
 }
 

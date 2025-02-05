@@ -1,6 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'section_data.dart'; // SectionData, StageData 등
+/// File: stage_data.dart
+/// Purpose: Firestore에서 학습 스테이지 데이터를 불러오고 관리하는 기능을 제공
+/// Author: 박민준
+/// Created: 2025-02-04
+/// Last Modified: 2025-02-05 by 박민준
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'section_data.dart'; // SectionData, StageData
 /// Firestore에서 현재 유저의 모든 스테이지 문서를 불러와서 List<StageData>로 변환
 Future<List<StageData>> loadStagesFromFirestore(String userId) async {
   final progressRef = FirebaseFirestore.instance

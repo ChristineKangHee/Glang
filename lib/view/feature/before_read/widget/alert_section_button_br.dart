@@ -1,3 +1,9 @@
+/// File: alert_section_button_br.dart
+/// Purpose: 학습 진행 중 알림 섹션에서 "다시 쓰기" 및 "글 읽기" 버튼을 제공하는 위젯
+/// Author: 박민준
+/// Created: 2025-01-0?
+/// Last Modified: 2025-02-05 by 박민준
+
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/theme.dart';
 
