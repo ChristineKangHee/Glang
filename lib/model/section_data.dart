@@ -1,3 +1,9 @@
+/// File: stage_data.dart
+/// Purpose: 학습 코스 및 스테이지 데이터를 관리하는 모델 클래스 정의
+/// Author: 박민준
+/// Created: 2025-02-03
+/// Last Modified: 2025-02-03 by 박민준
+
 import 'stage_data.dart';
 
 enum StageStatus { locked, inProgress, completed }
@@ -138,19 +144,19 @@ class SectionData {
     return [
       SectionData(
         section: 1,
-        title: '초급 코스',
+        title: '코스1',
         sectionDetail: '초급 학습을 위한 코스입니다.',
         stages: stages.sublist(0, 1), // 첫 번째 스테이지
       ),
       SectionData(
         section: 2,
-        title: '중급 코스',
+        title: '코스2',
         sectionDetail: '중급 학습을 위한 코스입니다.',
         stages: stages.sublist(1, 2), // 두 번째 스테이지
       ),
       SectionData(
         section: 3,
-        title: '고급 코스',
+        title: '코스3',
         sectionDetail: '고급 학습을 위한 코스입니다.',
         stages: stages.sublist(2, 4),
       ),

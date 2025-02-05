@@ -112,7 +112,7 @@ class _CourseMainState extends State<CourseMain> {
                   controller: scrollCtrl,
                   itemCount: sections.length + 1,
                   separatorBuilder: (_, i) =>
-                      SizedBox(height: i == 0 ? 0.0 : 24.0),
+                      SizedBox(height: i == 0 ? 0.0 : 0.0),
                   itemBuilder: (_, i) {
                     // 첫 번째 아이템은 빈 박스로 대체
                     if (i == 0) {

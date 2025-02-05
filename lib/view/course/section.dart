@@ -7,6 +7,7 @@ import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import 'course_subdetail.dart';
 import 'popup_component.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 // 🔹 StageStatus를 enum → 문자열로 변환하는 헬퍼 (중복 피하려면 별도 파일로 분리 가능)
 String stageStatusToString(StageStatus status) {
@@ -80,57 +81,79 @@ class Section extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider);
 
-    // 🔸 스테이지 중에서 진행 중(inProgress) 또는 완료(completed)가 하나라도 있으면 배경색 변경
+    // 🔸 스테이지 중에서 진행 중(inProgress) 또는 완료(completed)가 하나라도 있으면 활성화
     final bool isAnyStageActiveOrComplete = data.stages.any((stage) =>
     stage.status == StageStatus.inProgress ||
         stage.status == StageStatus.completed);
 
-    return Container(
-      color: isAnyStageActiveOrComplete
-          ? customColors.primary10
-          : customColors.neutral90, // 이전: 문자열 비교 → 지금: enum 비교
+    // 🔹 코스 제목을 기반으로 SVG 파일명 결정
+    String courseImage = '';
+    switch (data.title) {
+      case '코스1':
+        courseImage = 'assets/images/course1.svg';
+        break;
+      case '코스2':
+        courseImage = 'assets/images/course2.svg';
+        break;
+      case '코스3':
+        courseImage = 'assets/images/course3.svg';
+        break;
+      default:
+        courseImage = 'assets/images/default_course.svg'; // 기본값
+    }
 
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 섹션 제목/설명 영역
-          Container(
-            color: customColors.neutral100,
-            width: double.infinity,
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(data.title, style: body_large_semi(context)),
-                Text(data.sectionDetail, style: body_small(context)),
-              ],
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: SvgPicture.asset(
+            courseImage,
+            fit: BoxFit.cover,
+            colorFilter: isAnyStageActiveOrComplete
+                ? null
+                : ColorFilter.mode(customColors.neutral90!, BlendMode.saturation), // 비활성화 처리
+          ),
+        ),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 섹션 제목/설명 영역
+            Container(
+              color: customColors.neutral100,
+              width: double.infinity,
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(data.title, style: body_large_semi(context)),
+                  Text(data.sectionDetail, style: body_small(context)),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 24.0),
+            const SizedBox(height: 24.0),
 
-          // 🔹 스테이지 목록 표시
-          ...List.generate(
-            data.stages.length,
-                (i) {
-              final stage = data.stages[i];
-              return Container(
-                margin: EdgeInsets.only(
-                  bottom: i != data.stages.length - 1 ? 24.0 : 0,
-                  left: _getMargin(i),
-                  right: _getMargin(i, isLeft: false),
-                ),
-                child: StatusButton(
-                  // StatusButton이 문자열 상태를 기대한다면 enum을 변환해서 넘겨줌
-                  status: stageStatusToString(stage.status),
-                  onPressed: () => _showPopup(context, i),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 24,),
-        ],
-      ),
+            // 🔹 스테이지 목록 표시
+            ...List.generate(
+              data.stages.length,
+                  (i) {
+                final stage = data.stages[i];
+                return Container(
+                  margin: EdgeInsets.only(
+                    bottom: i != data.stages.length - 1 ? 24.0 : 0,
+                    left: _getMargin(i),
+                    right: _getMargin(i, isLeft: false),
+                  ),
+                  child: StatusButton(
+                    status: stageStatusToString(stage.status),
+                    onPressed: () => _showPopup(context, i),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ],
     );
   }
 }
