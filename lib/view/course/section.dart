@@ -1,3 +1,9 @@
+/// File: section.dart
+/// Purpose: 학습 코스(섹션)와 해당 섹션의 스테이지 목록을 표시하는 UI 위젯
+/// Author: 박민준
+/// Created: 2025-02-03
+/// Last Modified: 2025-02-03 by 박민준
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../model/section_data.dart';
@@ -57,18 +63,7 @@ class Section extends ConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.only(bottom: 60.0),
                 padding: const EdgeInsets.all(20.0),
-                child: SectionPopup(
-                  title: data.title,              // 코스 제목
-                  subTitle: stage.subdetailTitle, // 스테이지 제목
-                  time: stage.totalTime,          // 예상 소요 시간
-                  level: stage.difficultyLevel,   // 난이도
-                  description: stage.textContents,// 설명
-                  missions: stage.missions,       // 미션 리스트
-                  effects: stage.effects,         // 학습 효과 리스트
-                  achievement: stage.achievement.toString(),
-                  // 팝업에 상태를 문자열로 넘길 경우
-                  status: stageStatusToString(stage.status),
-                ),
+                child: SectionPopup(stage: stage)
               ),
             ),
           ],

@@ -341,17 +341,7 @@ class ProgressSection extends StatelessWidget {
       children: [
         Text("진행 중인 스테이지", style: body_small_semi(context),),
         SizedBox(height: 12.h,),
-        SectionPopup(
-          title: "코스 진행", // 🔹 `data.title` 제거
-          subTitle: data.subdetailTitle, // 🔹 `StageData`에서 제목 가져오기
-          time: data.totalTime,
-          level: data.difficultyLevel,
-          description: data.textContents,
-          missions: data.missions,
-          effects: data.effects,
-          achievement: data.achievement.toString(),
-          status: stageStatusToString(data.status),
-        ),
+        SectionPopup(stage: data),
       ],
     );
   }

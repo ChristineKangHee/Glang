@@ -5,7 +5,23 @@
 /// Last Modified: 2025-02-05 by 박민준
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:readventure/model/reading_data.dart';
+import 'ar_data.dart';
+import 'br_data.dart';
 import 'section_data.dart'; // SectionData, StageData
+import 'package:firebase_storage/firebase_storage.dart';
+
+/// 특정 파일의 Firebase Storage 다운로드 URL을 가져오는 함수 현재는 covers 폴더
+Future<String?> getCoverImageUrl(String fileName) async {
+  try {
+    final ref = FirebaseStorage.instance.ref().child('covers/$fileName');
+    return await ref.getDownloadURL();
+  } catch (e) {
+    print('❌ Error getting download URL for $fileName: $e');
+    return null;
+  }
+}
+
 /// Firestore에서 현재 유저의 모든 스테이지 문서를 불러와서 List<StageData>로 변환
 Future<List<StageData>> loadStagesFromFirestore(String userId) async {
   final progressRef = FirebaseFirestore.instance
@@ -33,7 +49,9 @@ Future<List<StageData>> loadStagesFromFirestore(String userId) async {
 
 /// 초기 상태(처음 앱에 들어왔을 때) Firestore에 기본 스테이지 문서를 만드는 함수
 Future<void> _createDefaultStages(CollectionReference progressRef) async {
-  // 원하는 만큼 기본 스테이지 생성
+  final stageCoverUrl = await getCoverImageUrl("stage_001.png");
+  print("[_createDefaultStages] stageCoverUrl: $stageCoverUrl");
+
   final defaultStages = [
     StageData(
       stageId: "stage_001",
@@ -50,13 +68,65 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
         "duringReading": false,
         "afterReading": false,
       },
+
+      // 읽기 전(BR) 화면용 데이터
+      brData: BrData(
+        // Firebase Storage에서 다운받을 수 있는 URL을 바로 넣거나
+        // 또는 일단 가짜로 두고 수정 가능
+        coverImageUrl: stageCoverUrl ?? "",
+        keywords: ["#읽기능력", "#맞춤형도구", "#피드백"],
+      ),
+
+      // 읽기 중(READING) 화면용 데이터
+      readingData: ReadingData(
+        coverImageUrl: stageCoverUrl ?? "",
+        // 글 내용 3분할
+        textSegments: [
+          "이 글의 1단계 내용...",
+          "이 글의 2단계 내용...",
+          "이 글의 3단계 내용...",
+        ],
+
+        // 사지선다 퀴즈
+        multipleChoice: MultipleChoiceQuiz(
+          question: "이 글의 핵심 주제는 무엇일까요?",
+          correctAnswer: "B",
+          choices: [
+            "A. 전혀 관련 없는 답",
+            "B. 읽기 도구의 필요성",
+            "C. 읽기 전 활동의 중요성",
+            "D. 잘못된 선택지",
+          ],
+        ),
+
+        // OX 퀴즈
+        oxQuiz: OXQuiz(
+          question: "이 글은 과학 분야이다.",
+          correctAnswer: false,
+        ),
+      ),
+
+      // 읽기 후(AR) 화면용 데이터 - 지금은 간단히 예시만
+      arData: ArData(
+        // 예: 어떤 feature를 쓸지(여기서는 2번, 5번, 9번).
+        features: [2, 5, 9],
+        // featureData에 어떤 형태든 넣을 수 있음
+        featureData: {
+          "feature2Title": "단어 빈칸 채우기",
+          "feature5Description": "특정 UI 설정 값",
+          "feature9Something": 123,
+        },
+      ),
     ),
+
+    // ------ stage_002, stage_003, stage_004도 동일하게 작성 ------
+    // 예시로 하나 더
     StageData(
       stageId: "stage_002",
       subdetailTitle: "읽기 도구 사용법",
       totalTime: "20",
       achievement: 0,
-      status: StageStatus.locked,  // 아직 잠김
+      status: StageStatus.locked,
       difficultyLevel: "쉬움",
       textContents: "읽기 도구의 사용법을 익힙니다.",
       missions: ["미션 2-1", "미션 2-2"],
@@ -66,38 +136,127 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
         "duringReading": false,
         "afterReading": false,
       },
+      brData: BrData(
+        coverImageUrl: stageCoverUrl ?? "",
+        keywords: ["#사용법", "#연습하기", "#키워드3"],
+      ),
+      readingData: ReadingData(
+        coverImageUrl: stageCoverUrl ?? "",
+        textSegments: ["내용1", "내용2", "내용3"],
+        multipleChoice: MultipleChoiceQuiz(
+          question: "해당 도구의 장점이 아닌 것은?",
+          correctAnswer: "A",
+          choices: ["A. 실제로 단점", "B. 장점1", "C. 장점2", "D. 장점3"],
+        ),
+        oxQuiz: OXQuiz(question: "이 도구는 무료이다.", correctAnswer: true),
+      ),
+      arData: ArData(
+        features: [1, 3, 7],
+        featureData: {"feature1Title": "예시데이터..."},
+      ),
     ),
+
     StageData(
       stageId: "stage_003",
-      subdetailTitle: "심화 읽기 도구",
-      totalTime: "25",
+      subdetailTitle: "읽기 도구의 필요성",
+      totalTime: "30",
       achievement: 0,
-      status: StageStatus.locked,
-      difficultyLevel: "보통",
-      textContents: "조금 더 복잡한 도구 사용법.",
-      missions: ["미션 3-1"],
-      effects: ["읽기 속도 증가"],
+      status: StageStatus.locked, // 첫 스테이지만 시작 가능
+      difficultyLevel: "쉬움",
+      textContents: "읽기 도구가 왜 필요한지 알아봅니다.",
+      missions: ["미션 1-1", "미션 1-2", "미션 1-3"],
+      effects: ["집중력 향상", "읽기 속도 증가"],
       activityCompleted: {
         "beforeReading": false,
         "duringReading": false,
         "afterReading": false,
       },
+
+      // 읽기 전(BR) 화면용 데이터
+      brData: BrData(
+        // Firebase Storage에서 다운받을 수 있는 URL을 바로 넣거나
+        // 또는 일단 가짜로 두고 수정 가능
+        coverImageUrl: stageCoverUrl ?? "",
+        keywords: ["#읽기능력", "#맞춤형도구", "#피드백"],
+      ),
+
+      // 읽기 중(READING) 화면용 데이터
+      readingData: ReadingData(
+        coverImageUrl: stageCoverUrl ?? "",
+        // 글 내용 3분할
+        textSegments: [
+          "이 글의 1단계 내용...",
+          "이 글의 2단계 내용...",
+          "이 글의 3단계 내용...",
+        ],
+
+        // 사지선다 퀴즈
+        multipleChoice: MultipleChoiceQuiz(
+          question: "이 글의 핵심 주제는 무엇일까요?",
+          correctAnswer: "B",
+          choices: [
+            "A. 전혀 관련 없는 답",
+            "B. 읽기 도구의 필요성",
+            "C. 읽기 전 활동의 중요성",
+            "D. 잘못된 선택지",
+          ],
+        ),
+
+        // OX 퀴즈
+        oxQuiz: OXQuiz(
+          question: "이 글은 과학 분야이다.",
+          correctAnswer: false,
+        ),
+      ),
+
+      // 읽기 후(AR) 화면용 데이터 - 지금은 간단히 예시만
+      arData: ArData(
+        // 예: 어떤 feature를 쓸지(여기서는 2번, 5번, 9번).
+        features: [2, 5, 9],
+        // featureData에 어떤 형태든 넣을 수 있음
+        featureData: {
+          "feature2Title": "단어 빈칸 채우기",
+          "feature5Description": "특정 UI 설정 값",
+          "feature9Something": 123,
+        },
+      ),
     ),
+
+    // ------ stage_002, stage_003, stage_004도 동일하게 작성 ------
+    // 예시로 하나 더
     StageData(
       stageId: "stage_004",
-      subdetailTitle: "읽기 도구 실전 적용",
-      totalTime: "40",
+      subdetailTitle: "읽기 도구 사용법",
+      totalTime: "20",
       achievement: 0,
       status: StageStatus.locked,
-      difficultyLevel: "어려움",
-      textContents: "실전에서 도구를 제대로 활용해 봅시다.",
-      missions: ["미션 4-1", "미션 4-2"],
-      effects: ["이해력/속도 동시 향상"],
+      difficultyLevel: "쉬움",
+      textContents: "읽기 도구의 사용법을 익힙니다.",
+      missions: ["미션 2-1", "미션 2-2"],
+      effects: ["이해력 향상", "읽기 효율 증가"],
       activityCompleted: {
         "beforeReading": false,
         "duringReading": false,
         "afterReading": false,
       },
+      brData: BrData(
+        coverImageUrl: stageCoverUrl ?? "",
+        keywords: ["#사용법", "#연습하기", "#키워드3"],
+      ),
+      readingData: ReadingData(
+        coverImageUrl: stageCoverUrl ?? "",
+        textSegments: ["내용1", "내용2", "내용3"],
+        multipleChoice: MultipleChoiceQuiz(
+          question: "해당 도구의 장점이 아닌 것은?",
+          correctAnswer: "A",
+          choices: ["A. 실제로 단점", "B. 장점1", "C. 장점2", "D. 장점3"],
+        ),
+        oxQuiz: OXQuiz(question: "이 도구는 무료이다.", correctAnswer: true),
+      ),
+      arData: ArData(
+        features: [1, 3, 7],
+        featureData: {"feature1Title": "예시데이터..."},
+      ),
     ),
   ];
 
@@ -106,6 +265,7 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
     await progressRef.doc(stage.stageId).set(stage.toJson());
   }
 }
+
 
 /// 특정 스테이지의 진행 상태를 업데이트하고, Firestore에도 반영하는 함수.
 /// 예: "읽기 전 활동 완료" 버튼을 눌렀을 때 호출
