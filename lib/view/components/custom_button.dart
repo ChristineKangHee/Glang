@@ -147,7 +147,7 @@ class ButtonPrimary_noPadding extends StatelessWidget { //
           width: MediaQuery.of(context).size.width, //MediaQuery 를 통해서 버튼 넓이 설정해놓음.
           height: 56, // 버튼 높이
           decoration: BoxDecoration(
-            color: condition.contains("not null") ? customColors.primary : Colors.purple,
+            color: condition.contains("not null") ? customColors.primary : customColors.primary20,
             borderRadius: BorderRadius.circular(16),
             boxShadow: BoxShadowStyles.shadow1(context),
           ), // Button Edge 둥글게
