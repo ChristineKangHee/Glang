@@ -73,9 +73,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
             '/': (context) => const MyHomePage(),
             '/armain': (context) => const ArMain(),
             '/brmain': (context) => const BrMain(),
-            '/rdmain': (context) => RdMain(
-              // oxQuestions: oxQuestions, mcqQuestions: mcqQuestions,
-              stageIndex: 0,),
+            '/rdmain': (context) => RdMain(),
             '/login': (context) => const LoginPage(),
             '/nickname': (context) => const NicknameInput(),
             '/notification': (context) => const NotificationPage(),

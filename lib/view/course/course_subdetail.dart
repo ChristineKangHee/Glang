@@ -13,10 +13,12 @@ import '../../model/section_data.dart';
 import '../../util/box_shadow_styles.dart';
 import '../components/custom_app_bar.dart';
 import '../components/custom_button.dart';
+import '../feature/after_read/choose_activities.dart';
 import '../feature/before_read/GA_01_01_cover_research/CR_learning.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../feature/reading/GA_02/RD_before.dart';
 import '../home/stage_provider.dart';
 
 // course_subdetail.dart
@@ -96,18 +98,18 @@ class CourseDetailPage extends ConsumerWidget {
                     if (stage.activityCompleted["beforeReading"] == true &&
                         stage.activityCompleted["duringReading"] == false) {
                       // 읽기 전 완료 → 읽기 중 화면으로 이동
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (_) => const READMain()),
-                      // );
-                      print("읽기 중 화면 이동 예정");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RdBefore()),
+                      );
                     } else if (stage.activityCompleted["duringReading"] == true) {
-                      // 읽기 중 완료 → 읽기 후 화면으로 이동
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (_) => const ARMain()),
-                      // );
-                      print("읽기 후 화면 이동 예정");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          settings: RouteSettings(name: 'LearningActivitiesPage'),
+                          builder: (context) => LearningActivitiesPage(),
+                        ),
+                      );
                     } else {
                       // 기본적으로 읽기 전 화면으로 이동
                       Navigator.push(
