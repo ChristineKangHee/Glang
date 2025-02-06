@@ -441,7 +441,7 @@ class CustomAppBar_2depth_3 extends StatelessWidget implements PreferredSizeWidg
     return Size.fromHeight(kToolbarHeight + bottomHeight);
   }
 }
-
+////////////////////// 이전으로 돌아가는 앱바 //////////////////////
 class CustomAppBar_2depth_4 extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Color? backgroundColor; // null 가능하도록 수정
@@ -484,7 +484,7 @@ class CustomAppBar_2depth_4 extends StatelessWidget implements PreferredSizeWidg
     return Size.fromHeight(kToolbarHeight + bottomHeight);
   }
 }
-
+////////////////////// 검색 앱바 //////////////////////
 class CustomAppBar_2depth_5 extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Color? backgroundColor; // null 가능하도록 수정
@@ -535,7 +535,7 @@ class CustomAppBar_2depth_5 extends StatelessWidget implements PreferredSizeWidg
     return Size.fromHeight(kToolbarHeight + bottomHeight);
   }
 }
-
+////////////////////// 오른쪽 close 버튼 앱바(뒤로 back 안생기도록 automaticallyImplyLeading:false 지정) //////////////////////
 class CustomAppBar_2depth_6 extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Color? backgroundColor;
@@ -742,5 +742,55 @@ class _CustomAppBar_2depth_8State extends State<CustomAppBar_2depth_8> {
       backgroundColor: widget.backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
+  }
+}
+////////////////////// 커뮤니티 글쓰기 임시저장 등록 앱바 //////////////////////
+class CustomAppBar_2depth_9 extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final Color? backgroundColor;
+  final Function()? onIconPressed;
+  final PreferredSizeWidget? bottom;
+  final List<Widget> actions; // Added actions parameter
+
+  const CustomAppBar_2depth_9({
+    Key? key,
+    required this.title,
+    this.backgroundColor,
+    this.onIconPressed,
+    this.bottom,
+    this.actions = const [], // Default empty list for actions
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      scrolledUnderElevation: 0,
+      bottom: bottom,
+      leading: IconButton(
+        icon: IconButton(
+          icon: Icon(Icons.close, color: customColors.neutral30, size: 28,),
+          onPressed: onIconPressed,
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+      title: Text(
+        title,
+        style: heading_xsmall(context).copyWith(color: customColors.neutral30),
+      ).tr(),
+      centerTitle: true,
+      actions: actions, // Use actions here
+      backgroundColor: backgroundColor ?? customColors.neutral100,
+      elevation: 0,
+    );
+  }
+
+  @override
+  Size get preferredSize {
+    final bottomHeight = bottom?.preferredSize.height ?? 0.0;
+    return Size.fromHeight(kToolbarHeight + bottomHeight);
   }
 }
