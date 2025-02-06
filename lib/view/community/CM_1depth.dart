@@ -78,7 +78,7 @@ class CommunityMainPage extends ConsumerWidget {
                           ),
                           Expanded(
                             child: Align(
-                              alignment: Alignment.centerRight, // Align to the right
+                              alignment: Alignment.centerRight,
                               child: Text(
                                 formatPostDate(post.createdAt),
                                 style: body_xxsmall(context).copyWith(color: customColors.neutral60),
@@ -88,27 +88,28 @@ class CommunityMainPage extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      // 제목 & 내용
                       Text(
                         post.title,
                         style: body_small_semi(context),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        post.content,
-                        style: body_xxsmall(context),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                      Expanded(
+                        child: Text(
+                          post.content,
+                          style: body_xxsmall(context),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      const SizedBox(height: 16),
-// 프로필 정보
+                      const SizedBox(height: 8),
+                      Spacer(),
                       Row(
                         children: [
                           Row(
                             children: [
                               CircleAvatar(
                                 backgroundImage: NetworkImage(post.profileImage),
-                                radius: 12, // Adjusted profile image size
+                                radius: 12,
                               ),
                               const SizedBox(width: 8),
                               Text(
@@ -117,11 +118,11 @@ class CommunityMainPage extends ConsumerWidget {
                               ),
                             ],
                           ),
-                          Expanded( // Ensure this is wrapping the whole content
+                          Expanded(
                             child: Align(
-                              alignment: Alignment.centerRight, // Align to the right
+                              alignment: Alignment.centerRight,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end, // Ensures the likes/views are pushed to the right
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Row(
                                     children: [
@@ -150,7 +151,6 @@ class CommunityMainPage extends ConsumerWidget {
                           ),
                         ],
                       )
-
                     ],
                   ),
                 ),
@@ -161,6 +161,7 @@ class CommunityMainPage extends ConsumerWidget {
       ],
     );
   }
+
 
   Widget RankingPreview(BuildContext context, CustomColors customColors) {
     return Column(

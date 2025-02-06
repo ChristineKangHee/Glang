@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../../theme/theme.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/custom_app_bar.dart';
 import '../../components/my_divider.dart';
 import 'CM_2depth_board.dart';
 import 'community_data.dart';
+import 'community_posting.dart';
 
 class Cm2depthBoardmain extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider);
     return Scaffold(
-      appBar: CustomAppBar_2depth_4(title: '게시판'),
+      appBar: CustomAppBar_2depth_5(title: '게시판'),
       body: DefaultTabController(
-        length: 3, // Number of tabs
+        length: 3,
         child: Column(
           children: [
             TabBar(
@@ -28,33 +28,52 @@ class Cm2depthBoardmain extends ConsumerWidget {
                 Tab(text: '주제'),
               ],
             ),
-            // TabBarView를 Expanded 없이 바로 넣기
             Expanded(
               child: TabBarView(
                 children: [
-                  // 전체 Tab
-                  BoardPostList(posts, context, customColors),
-                  // 코스 Tab
-                  BoardPostList(posts, context, customColors),
-                  // 주제 Tab
-                  BoardPostList(posts, context, customColors),
+                  BoardPostList(posts, context, customColors), // 전체
+                  BoardPostList(posts.where((post) => post.category == '코스').toList(), context, customColors), // 코스
+                  BoardPostList(posts.where((post) => post.category == '인사이트' || post.category == '에세이').toList(), context, customColors), // 주제
                 ],
               ),
             ),
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CommunityPostPage(),
+            ),
+          );
+        },
+        backgroundColor: customColors.primary,
+        child: Icon(Icons.create, color: customColors.neutral100),
+        shape: CircleBorder(),  // Ensures the button is completely round
+        elevation: 6.0,  // Optional: Adds a shadow to the button
+      ),
     );
   }
 
-  Widget BoardPostList(posts, BuildContext context, CustomColors customColors) {
+  Widget BoardPostList(List<Post> posts, BuildContext context, CustomColors customColors) {
+    if (posts.isEmpty) {
+      return Center(
+        child: Text(
+          '게시글이 없습니다.',
+          style: body_small(context).copyWith(color: customColors.neutral60),
+        ),
+      );
+    }
+
     return ListView.builder(
-      itemCount: posts.length * 2 - 1, // Multiply by 2 and subtract 1 to fit dividers
+      itemCount: posts.length * 2 - 1,
       itemBuilder: (context, index) {
         if (index.isOdd) {
-          return BigDivider(); // Add the BigDivider between posts
+          return BigDivider();
         } else {
-          var post = posts[index ~/ 2]; // Use integer division to get the correct post
+          var post = posts[index ~/ 2];
           return GestureDetector(
             onTap: () {
               Navigator.push(
@@ -84,7 +103,7 @@ class Cm2depthBoardmain extends ConsumerWidget {
                       ),
                       Expanded(
                         child: Align(
-                          alignment: Alignment.centerRight, // Align to the right
+                          alignment: Alignment.centerRight,
                           child: Text(
                             formatPostDate(post.createdAt),
                             style: body_xxsmall(context).copyWith(color: customColors.neutral60),
@@ -165,7 +184,7 @@ class Cm2depthBoardmain extends ConsumerWidget {
 
   String formatPostDate(DateTime? postDate) {
     if (postDate == null) {
-      return '알 수 없음'; // Handle the case when the postDate is null
+      return '알 수 없음';
     }
 
     final now = DateTime.now();
