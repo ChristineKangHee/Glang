@@ -244,13 +244,23 @@ class _CommunityPostPageState extends ConsumerState<CommunityPostPage> {
   }
 
   // Add the below method to handle the pop-up for keyword selection
-  void showKeywordSelectionDialog(BuildContext context) {
-    showDialog(
+  // 수정된 다이얼로그 호출 함수
+  void showKeywordSelectionDialog(BuildContext context) async {
+    final result = await showDialog<String>(
       context: context,
       builder: (context) {
         return _KeywordSelectionDialog(keywordList);
       },
     );
+
+    // 결과가 있으면 제목 입력란에 키워드를 넣고 편집중 상태로 포커스를 준다.
+    if (result != null && result.isNotEmpty) {
+      setState(() {
+        selectedKeyword = result;
+        titleController.text = result;
+      });
+      titleFocusNode.requestFocus();
+    }
   }
 
   Widget ChooseCategory(BuildContext context, CustomColors customColors) {
@@ -426,8 +436,11 @@ class _KeywordSelectionDialogState extends ConsumerState<_KeywordSelectionDialog
               ),
               SizedBox(width: 20),
               ElevatedButton(
-                onPressed: selectedKeyword.isEmpty ? null : () {
-                  Navigator.of(context).pop();
+                // 선택된 키워드가 없으면 비활성화, 있으면 선택 결과를 반환
+                onPressed: selectedKeyword.isEmpty
+                    ? null
+                    : () {
+                  Navigator.of(context).pop(selectedKeyword);
                   print("선택된 키워드: $selectedKeyword");
                 },
                 child: Text("작성하기"),

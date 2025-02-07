@@ -102,7 +102,8 @@ class Section extends ConsumerWidget {
         Positioned.fill(
           child: SvgPicture.asset(
             courseImage,
-            fit: BoxFit.cover,
+            fit: BoxFit.none, // 이미지 크기 변경 방지
+            alignment: Alignment.topCenter, // 위쪽 정렬
             colorFilter: isAnyStageActiveOrComplete
                 ? null
                 : ColorFilter.mode(customColors.neutral90!, BlendMode.saturation), // 비활성화 처리
