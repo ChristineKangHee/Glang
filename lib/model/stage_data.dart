@@ -55,13 +55,13 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
   final defaultStages = [
     StageData(
       stageId: "stage_001",
-      subdetailTitle: "읽기 도구의 필요성",
+      subdetailTitle: "환경 보호와 지속 가능한 미래",
       totalTime: "30",
       achievement: 0,
       status: StageStatus.inProgress, // 첫 스테이지만 시작 가능
       difficultyLevel: "쉬움",
-      textContents: "읽기 도구가 왜 필요한지 알아봅니다.",
-      missions: ["미션 1-1", "미션 1-2", "미션 1-3"],
+      textContents: "환경 보호와 지속 가능한 미래",
+      missions: ["토론", "내용 요약", "Tree 구조화"],
       effects: ["집중력 향상", "읽기 속도 증가"],
       activityCompleted: {
         "beforeReading": false,
@@ -82,9 +82,9 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
         coverImageUrl: stageCoverUrl ?? "",
         // 글 내용 3분할
         textSegments: [
-          "이 글의 1단계 내용...",
-          "이 글의 2단계 내용...",
-          "이 글의 3단계 내용...",
+          "환경 보호는 단지 자연을 지키는 것 이상의 중요성을 지닌다. 우리가 자원을 절약하고, 재활용을 장려하며, 탄소 배출을 줄이는 것이 우리의 미래를 위해 매우 중요하다. 기후 변화에 대응하기 위한 여러 기업과 국가의 노력들은 점차 긍정적인 변화를 만들어 가고 있지만, 여전히 많은 사람들이 일상 속에서 환경을 보호하는 실천을 외면하고 있다.",
+          "특히, 개인의 작은 변화가 큰 영향을 미친다는 점에서, 정부의 정책 강화와 교육의 필요성이 더욱 강조된다. 또한, 기술 발전이 환경 보호와 지속 가능성을 지원하는 중요한 도전 과제가 될 것이다. ",
+          "전 세계적으로 환경 친화적인 정책과 실천이 확산되고 있는 가운데, 우리는 계속해서 그 발전을 촉진할 책임이 있다.",
         ],
 
         // 사지선다 퀴즈
@@ -92,31 +92,31 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
           question: "이 글의 핵심 주제는 무엇일까요?",
           correctAnswer: "B",
           choices: [
-            "A. 전혀 관련 없는 답",
-            "B. 읽기 도구의 필요성",
-            "C. 읽기 전 활동의 중요성",
-            "D. 잘못된 선택지",
+            "A. 기후 변화의 부정적인 영향",
+            "B. 자연 자원의 절약과 재활용",
+            "C. 정책을 통한 환경 보호",
+            "D. 환경 보호의 경제적 이점",
           ],
-          explanation: "맞춤형 읽기 도구는 학습자의 수준과 흥미를 반영하여 적합한 자료를 제공합니다."
+          explanation: "환경 보호의 핵심은 자원의 절약과 재활용을 통한 지속 가능성 확보입니다."
         ),
 
         // OX 퀴즈
         oxQuiz: OXQuiz(
-          question: "이 글은 과학 분야이다.",
-          correctAnswer: false,
-          explanation: "맞춤형 읽기 도구는 학습자의 수준과 흥미를 반영하여 적합한 자료를 제공합니다."
+          question: "환경 보호가 기후 변화에 긍정적인 영향을 미친다고 주장하는 글의 내용에 맞는가?",
+          correctAnswer: true,
+          explanation: "글에서 환경 보호가 기후 변화에 긍정적인 영향을 미친다고 언급하고 있습니다.."
         ),
       ),
 
       // 읽기 후(AR) 화면용 데이터 - 지금은 간단히 예시만
       arData: ArData(
-        // 예: 어떤 feature를 쓸지(여기서는 2번, 5번, 9번).
-        features: [2, 5, 9],
+        // 예: 어떤 feature를 쓸지(여기서는 2번, 3번, 4번).
+        features: [2, 3, 4],
         // featureData에 어떤 형태든 넣을 수 있음
         featureData: {
-          "feature2Title": "단어 빈칸 채우기",
-          "feature5Description": "특정 UI 설정 값",
-          "feature9Something": 123,
+          "feature2ContentSummary": "내용 요약",
+          "feature3Debate": "토론하기",
+          "feature4Diagram": "다이어그램",
         },
       ),
     ),
