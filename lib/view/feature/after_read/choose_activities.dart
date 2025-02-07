@@ -8,11 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../model/section_data.dart';
 import '../../../model/stage_data.dart';
 import '../../../theme/font.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
+import '../../../viewmodel/section_provider.dart';
 import '../../components/alarm_dialog.dart';
 import '../../components/custom_app_bar.dart';
 import 'package:readventure/theme/theme.dart';
@@ -97,6 +98,132 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
       print('Stage $stageId not found: $e');
       return null;
     }
+  }
+
+  Future<void> _onSubmit(StageData stage, CustomColors customColors) async {
+    // 실제 유저 ID 가져오기
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      print("⚠️ 유저가 로그인되지 않음!");
+      return;
+    }
+
+    print(">> _onSubmit 시작: stageId=${stage.stageId}");
+
+    // 현재 스테이지의 afterReading 활동 완료 처리
+    await completeActivityForStage(
+      userId: userId,
+      stageId: stage.stageId,
+      activityType: 'afterReading',
+    );
+    print(">> completeActivityForStage 호출 완료 for activityType 'afterReading'");
+
+    // 업데이트가 완료된 후, Firestore에서 다시 현재 스테이지 데이터를 가져옵니다.
+    final currentStageRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('progress')
+        .doc(stage.stageId);
+    final updatedSnapshot = await currentStageRef.get();
+
+    if (!updatedSnapshot.exists) {
+      print("⚠️ 현재 스테이지(${stage.stageId}) 문서를 찾을 수 없습니다.");
+      return;
+    }
+
+    final updatedStage =
+    StageData.fromJson(updatedSnapshot.id, updatedSnapshot.data()!);
+    print(">> 현재 스테이지 업데이트 확인: stageId=${updatedStage.stageId}, status=${updatedStage.status}, achievement=${updatedStage.achievement}");
+
+    // 현재 스테이지가 완전히 완료되었는지 확인 (Status가 completed인 경우)
+    if (updatedStage.status == StageStatus.completed) {
+      final nextStageId = _getNextStageId(stage.stageId);
+      if (nextStageId != null) {
+        print(">> 다음 스테이지 ID: $nextStageId");
+        final nextStageRef = FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .collection('progress')
+            .doc(nextStageId);
+        final nextSnapshot = await nextStageRef.get();
+
+        if (nextSnapshot.exists) {
+          final nextStage =
+          StageData.fromJson(nextSnapshot.id, nextSnapshot.data()!);
+          print(">> 다음 스테이지 현재 상태: stageId=${nextStage.stageId}, status=${nextStage.status}");
+          if (nextStage.status == StageStatus.locked) {
+            nextStage.status = StageStatus.inProgress;
+            await nextStageRef.update(nextStage.toJson());
+            print(">> 다음 스테이지 해금 완료: stageId=${nextStage.stageId} -> status=${nextStage.status}");
+          } else {
+            print(">> 다음 스테이지는 이미 해금되었거나 완료됨: stageId=${nextStage.stageId}, status=${nextStage.status}");
+          }
+        } else {
+          print("⚠️ 다음 스테이지 문서($nextStageId)가 존재하지 않습니다.");
+        }
+      } else {
+        print("⚠️ 다음 스테이지 ID를 계산할 수 없습니다. (현재 stageId: ${stage.stageId})");
+      }
+    } else {
+      print(">> 현재 스테이지가 아직 완료되지 않았습니다. (status: ${updatedStage.status})");
+    }
+
+    ref.invalidate(sectionProvider);
+
+    // 결과 다이얼로그 띄우기
+    showResultDialog(
+      context,
+      customColors,
+      "결과를 확인하시겠습니까?",
+      "아니오",
+      "예",
+          (ctx) {
+        Navigator.pushReplacement(
+          ctx,
+          MaterialPageRoute(builder: (ctx) => ResultReportPage()),
+        );
+      },
+    );
+  }
+
+  /// 현재 스테이지 ID("stage_001")에서 다음 스테이지 ID("stage_002")를 구하는 헬퍼 함수
+  String? _getNextStageId(String currentStageId) {
+    final parts = currentStageId.split('_');
+    if (parts.length != 2) return null;
+    final number = int.tryParse(parts[1]);
+    if (number == null) return null;
+    final nextNumber = number + 1;
+    final nextId = 'stage_${nextNumber.toString().padLeft(3, '0')}';
+    print(">> _getNextStageId: $currentStageId -> $nextId");
+    return nextId;
+  }
+
+  // 학습 결과 확인 버튼 (ResultButton) 위젯 수정: stageData를 추가로 전달
+  Widget ResultButton(
+      BuildContext context,
+      int completedCount,
+      CustomColors customColors,
+      List<LearningActivity> availableActivities,
+      StageData stageData,
+      ) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      padding: const EdgeInsets.all(16.0),
+      child: completedCount / availableActivities.length < 1.0
+          ? ButtonPrimary20(
+        function: () {
+          print("결과 확인하기 (미완료)");
+        },
+        title: '결과 확인하기',
+      )
+          : ButtonPrimary(
+        function: () async {
+          print("결과 확인하기");
+          await _onSubmit(stageData, customColors);
+        },
+        title: '결과 확인하기',
+      ),
+    );
   }
 
   // 설명 팝업 표시 함수
@@ -216,45 +343,12 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
                   ),
                 ),
               ),
-              ResultButton(context, completedCount, customColors, availableActivities),
+              ResultButton(context, completedCount, customColors,
+                  availableActivities, stageData),
             ],
           ),
         );
       },
-    );
-  }
-
-  // 학습 결과 확인 버튼
-  Widget ResultButton(BuildContext context, int completedCount, CustomColors customColors, List<LearningActivity> availableActivities) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      padding: const EdgeInsets.all(16.0),
-      child: completedCount / availableActivities.length < 1.0
-          ? ButtonPrimary20(
-        function: () {
-          print("결과 확인하기");
-        },
-        title: '결과 확인하기',
-      )
-          : ButtonPrimary(
-        function: () {
-          print("결과 확인하기");
-          showResultDialog(
-            context,
-            customColors,
-            "결과를 확인하시겠습니까?",
-            "아니오",
-            "예",
-                (ctx) {
-              Navigator.pushReplacement(
-                ctx,
-                MaterialPageRoute(builder: (ctx) => ResultReportPage()),
-              );
-            },
-          );
-        },
-        title: '결과 확인하기',
-      ),
     );
   }
 
