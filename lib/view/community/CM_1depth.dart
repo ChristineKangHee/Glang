@@ -219,7 +219,7 @@ class CommunityMainPage extends ConsumerWidget {
 
   Widget rankingnavigation(BuildContext context, CustomColors customColors) {
     return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 16),
+      contentPadding: EdgeInsets.symmetric(horizontal: 0),
       title: Text(
         '랭킹',
         style: body_small_semi(context),
