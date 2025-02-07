@@ -146,6 +146,13 @@ class StageData {
       }
     }
   }
+  /// 새로운 메서드: AR 내 특정 feature의 완료 상태를 업데이트
+  void updateArFeatureCompletion(int featureNumber, bool isCompleted) {
+    if (arData != null) {
+      arData!.featuresCompleted[featureNumber.toString()] = isCompleted;
+    }
+  }
+
 }
 
 /// 각 코스(섹션)의 데이터를 관리하는 모델 클래스

@@ -40,11 +40,13 @@ class LearningActivity {
   final String time;
   final String xp;
   bool isCompleted;
+  final int featureNumber;
 
   LearningActivity({
     required this.title,
     required this.time,
     required this.xp,
+    required this.featureNumber,
     this.isCompleted = false,
   });
 }
@@ -56,16 +58,17 @@ class LearningActivitiesPage extends ConsumerStatefulWidget {
 
 class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage> {
   // 전체 학습 활동 리스트 (인덱스+1을 feature 번호로 가정)
+  // activities 리스트 생성 시 각 미션에 featureNumber를 할당
   final List<LearningActivity> activities = [
-    LearningActivity(title: '결말 바꾸기', time: '20분', xp: '100xp'),
-    LearningActivity(title: '요약', time: '10분', xp: '50xp'),
-    LearningActivity(title: '토론', time: '25분', xp: '120xp'),
-    LearningActivity(title: '다이어그램', time: '5분', xp: '10xp'),
-    LearningActivity(title: '문장 구조', time: '5분', xp: '10xp'),
-    LearningActivity(title: '에세이 작성', time: '15분', xp: '80xp'),
-    LearningActivity(title: '형식 변환하기', time: '30분', xp: '150xp'),
-    LearningActivity(title: '주제 추출', time: '5분', xp: '10xp'),
-    LearningActivity(title: '자유 소감', time: '5분', xp: '10xp'),
+    LearningActivity(title: '결말 바꾸기', time: '20분', xp: '100xp', featureNumber: 1),
+    LearningActivity(title: '요약', time: '10분', xp: '50xp', featureNumber: 2),
+    LearningActivity(title: '토론', time: '25분', xp: '120xp', featureNumber: 3),
+    LearningActivity(title: '다이어그램', time: '5분', xp: '10xp', featureNumber: 4),
+    LearningActivity(title: '문장 구조', time: '5분', xp: '10xp', featureNumber: 5),
+    LearningActivity(title: '에세이 작성', time: '15분', xp: '80xp', featureNumber: 6),
+    LearningActivity(title: '형식 변환하기', time: '30분', xp: '150xp', featureNumber: 7),
+    LearningActivity(title: '주제 추출', time: '5분', xp: '10xp', featureNumber: 8),
+    LearningActivity(title: '자유 소감', time: '5분', xp: '10xp', featureNumber: 9),
   ];
 
   // Firestore에서 로드한 StageData를 저장할 Future
@@ -337,7 +340,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
                       children: [
                         LearningProgress(completedCount, customColors, context, availableActivities),
                         const SizedBox(height: 20),
-                        ActivityList(context, customColors, availableActivities),
+                        ActivityList(context, customColors, stageData),
                       ],
                     ),
                   ),
@@ -402,7 +405,23 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
   }
 
   // 학습 활동 목록
-  Widget ActivityList(BuildContext context, CustomColors customColors, List<LearningActivity> availableActivities) {
+  Widget ActivityList(BuildContext context, CustomColors customColors, StageData stageData) {
+    // stageData.arData.features에 포함된 feature 번호만 사용하고,
+    // Firestore의 featuresCompleted 값을 반영하여 각 미션의 isCompleted 값을 초기화
+    final availableActivities = <LearningActivity>[];
+    for (var activity in activities) {
+      if (stageData.arData != null && stageData.arData!.features.contains(activity.featureNumber)) {
+        final completed = stageData.arData!.featuresCompleted[activity.featureNumber.toString()] ?? false;
+        availableActivities.add(LearningActivity(
+          title: activity.title,
+          time: activity.time,
+          xp: activity.xp,
+          featureNumber: activity.featureNumber,
+          isCompleted: completed,
+        ));
+      }
+    }
+    // 완료되지 않은 미션이 위쪽에 오도록 정렬
     final sortedActivities = List<LearningActivity>.from(availableActivities)
       ..sort((a, b) => a.isCompleted ? 1 : -1);
 
@@ -419,35 +438,57 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
         children: [
           Text('미션', style: body_small_semi(context)),
           const SizedBox(height: 20),
-          ...sortedActivities.map((activity) => _buildActivityItem(context, activity, customColors)),
+          ...sortedActivities.map((activity) => Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: ShapeDecoration(
+                color: activity.isCompleted ? customColors.neutral90 : customColors.neutral100,
+                shape: RoundedRectangleBorder(
+                  side: activity.isCompleted
+                      ? BorderSide.none
+                      : BorderSide(width: 1, color: customColors.neutral80 ?? const Color(0xFFCDCED3)),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildActivityText(activity, customColors),
+                  // _buildActivityButton 호출 시 StageData 전달
+                  _buildActivityButton(context, activity, customColors, stageData),
+                ],
+              ),
+            ),
+          )),
         ],
       ),
     );
   }
 
-  // 개별 학습 항목
-  Widget _buildActivityItem(BuildContext context, LearningActivity activity, CustomColors customColors) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: ShapeDecoration(
-          color: activity.isCompleted ? customColors.neutral90 : customColors.neutral100,
-          shape: RoundedRectangleBorder(
-            side: activity.isCompleted ? BorderSide.none : BorderSide(width: 1, color: customColors.neutral80 ?? const Color(0xFFCDCED3)),
-            borderRadius: BorderRadius.circular(18),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _buildActivityText(activity, customColors),
-            _buildActivityButton(context, activity, customColors),
-          ],
-        ),
-      ),
-    );
-  }
+  // // 개별 학습 항목
+  // Widget _buildActivityItem(BuildContext context, LearningActivity activity, CustomColors customColors) {
+  //   return Padding(
+  //     padding: const EdgeInsets.only(bottom: 8.0),
+  //     child: Container(
+  //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+  //       decoration: ShapeDecoration(
+  //         color: activity.isCompleted ? customColors.neutral90 : customColors.neutral100,
+  //         shape: RoundedRectangleBorder(
+  //           side: activity.isCompleted ? BorderSide.none : BorderSide(width: 1, color: customColors.neutral80 ?? const Color(0xFFCDCED3)),
+  //           borderRadius: BorderRadius.circular(18),
+  //         ),
+  //       ),
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           _buildActivityText(activity, customColors),
+  //           _buildActivityButton(context, activity, customColors),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   // 학습 항목 텍스트
   Widget _buildActivityText(LearningActivity activity, CustomColors customColors) {
@@ -475,14 +516,17 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
   }
 
   // 학습하기 버튼
-  Widget _buildActivityButton(BuildContext context, LearningActivity activity, CustomColors customColors) {
+  Widget _buildActivityButton(BuildContext context, LearningActivity activity, CustomColors customColors, StageData stageData) {
     return ElevatedButton(
       onPressed: activity.isCompleted
           ? null
-          : () {
+          : () async {
+        // Firestore 업데이트: 해당 feature의 완료 상태를 true로 변경
+        await _updateFeatureCompletion(stageData, activity.featureNumber, true);
         setState(() {
           activity.isCompleted = true;
         });
+        // 각 미션에 해당하는 페이지로 이동
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => _getActivityPage(activity.title)),
@@ -495,7 +539,8 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
       ),
       child: Text(
         activity.isCompleted ? '미션완료' : '미션하기',
-        style: body_xsmall_semi(context).copyWith(color: activity.isCompleted ? customColors.neutral30 : customColors.neutral100),
+        style: body_xsmall_semi(context).copyWith(
+            color: activity.isCompleted ? customColors.neutral30 : customColors.neutral100),
       ),
     );
   }
@@ -526,3 +571,24 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     }
   }
 }
+
+/// 지정된 feature의 완료 상태를 업데이트하는 함수
+Future<void> _updateFeatureCompletion(StageData stage, int featureNumber, bool isCompleted) async {
+  final userId = FirebaseAuth.instance.currentUser?.uid;
+  if (userId == null || stage.arData == null) return;
+
+  // StageData 내에서 AR feature 완료 상태 업데이트
+  stage.updateArFeatureCompletion(featureNumber, isCompleted);
+
+  // Firestore에 반영 (전체 arData를 업데이트)
+  final stageRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(userId)
+      .collection('progress')
+      .doc(stage.stageId);
+
+  await stageRef.update({
+    'arData': stage.arData!.toJson(),
+  });
+}
+
