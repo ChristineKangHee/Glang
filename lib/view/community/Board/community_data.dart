@@ -35,7 +35,7 @@ final List<Post> posts = [
     likes: 67,
     views: 203,
     createdAt: DateTime.now().subtract(Duration(hours: 3)),
-    category: '코스',
+    category: '미션 글',
   ),
   Post(
     id: '2',
@@ -47,7 +47,7 @@ final List<Post> posts = [
     likes: 45,
     views: 180,
     createdAt: DateTime.now().subtract(Duration(days: 1, hours: 5)),
-    category: '인사이트',
+    category: '자유글',
   ),
   Post(
     id: '3',
