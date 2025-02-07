@@ -4,32 +4,42 @@ import 'package:readventure/view/components/custom_app_bar.dart';
 import 'package:readventure/view/components/custom_button.dart';
 import 'package:readventure/view/components/my_divider.dart';
 import '../../../../theme/theme.dart';
+import '../../../home/stage_provider.dart';
 import '../widget/answer_section.dart';
 import '../widget/CustomAlertDialog.dart';
 import '../widget/custom_chip.dart';
 import '../widget/text_section.dart';
 import '../widget/title_section_learning.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'CS_main.dart';
 
-class CSLearning extends StatefulWidget {
-  const CSLearning({super.key});
+/// ConsumerStatefulWidget으로 변경하여 Riverpod의 ref 사용
+class CSLearning extends ConsumerStatefulWidget {
+  const CSLearning({Key? key}) : super(key: key);
 
   @override
-  State<CSLearning> createState() => _CSLearningState();
+  ConsumerState<CSLearning> createState() => _CSLearningState();
 }
 
-class _CSLearningState extends State<CSLearning> {
+class _CSLearningState extends ConsumerState<CSLearning> {
   final TextEditingController _controller = TextEditingController();
   bool _isButtonEnabled = false;
-  // 키워드 상태 추가
   List<String> _keywords = [];
 
   @override
   void initState() {
     super.initState();
     _controller.addListener(_updateButtonState);
+
+    // 예시: 화면이 뜨자마자 ContentSummaryMain 다이얼로그 띄우기
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return const ContentSummaryMain();
+        },
+      );
+    });
   }
 
   @override
@@ -45,7 +55,6 @@ class _CSLearningState extends State<CSLearning> {
     });
   }
 
-  // 결과창 띄우기
   void _showAlertDialog() {
     showDialog(
       context: context,
@@ -59,11 +68,9 @@ class _CSLearningState extends State<CSLearning> {
   void _updateTextField(String newWord) {
     setState(() {
       final currentText = _controller.text;
-      _controller.text = currentText.isEmpty
-          ? newWord
-          : '$currentText $newWord'; // 기존 텍스트에 단어 추가
+      _controller.text = currentText.isEmpty ? newWord : '$currentText $newWord';
       _controller.selection = TextSelection.fromPosition(
-        TextPosition(offset: _controller.text.length), // 커서를 맨 끝으로 이동
+        TextPosition(offset: _controller.text.length),
       );
     });
   }
@@ -75,29 +82,34 @@ class _CSLearningState extends State<CSLearning> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    final data= "현대 사회에서 읽기 능력은 지식 습득과 의사소통의 기본이지만, 학습자가 자신의 수준과 흥미에 맞는 텍스트를 접할 기회는 제한적이다. 기존의 교육 시스템은 주로 일률적인 교재와 평가 방식을 사용하며, 이는 학습 동기를 저하시킬 위험이 있다. 또한, 읽기 과정에서 즉각적인 피드백을 제공하는 시스템이 부족하여 학습자는 자신의 약점이나 강점을 파악하기 어렵다. 맞춤형 읽기 도구와 실시간 피드백 시스템은 학습자가 적합한 자료를 통해 능동적으로 읽기 능력을 향상시키고, 스스로 학습 과정을 조율할 수 있는 환경을 제공할 잠재력이 있다. 또한, 맞춤형 읽기 도구는 학습자의 수준과 흥미를 고려하여 적합한 자료를 제공할 수 있다. 이러한 도구의 개발과 보급은 개인화된 학습의 미래를 열어갈 중요한 과제가 될 것이다.";
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return const ContentSummaryMain();
-        },
+    // currentStageProvider를 구독하여 현재 선택된 스테이지 데이터 가져오기
+    final currentStage = ref.watch(currentStageProvider);
+
+    // 아직 데이터가 없으면 로딩 인디케이터 표시
+    if (currentStage == null) {
+      return Scaffold(
+        appBar: CustomAppBar_2depth_8(title: "내용 요약 게임"),
+        body: Center(child: CircularProgressIndicator()),
       );
-    });
+    }
+
+    // 읽기 중(READING) 데이터의 textSegments를 이어붙여 본문 텍스트 구성
+    final readingText = currentStage.readingData?.textSegments.join(" ")
+        ?? "텍스트 데이터가 없습니다.";
+    // 읽기 전(BR) 데이터의 키워드 배열 가져오기
+    final stageKeywords = currentStage.brData?.keywords ?? [];
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: CustomAppBar_2depth_8(title: "내용 요약 게임"),
-      // floatingActionButtonLocation: ,
       floatingActionButton: Container(
-        margin: const EdgeInsets.only(bottom: 70), // 하단에서 50px 위로 이동
+        margin: const EdgeInsets.only(bottom: 70),
         child: FloatingActionButton(
           onPressed: () {
-            // 버튼 동작
-            _showHintDialog();
+            _showHintDialog(stageKeywords, readingText);
           },
           backgroundColor: customColors.secondary,
           shape: const CircleBorder(),
@@ -111,46 +123,47 @@ class _CSLearningState extends State<CSLearning> {
       body: SafeArea(
         child: Column(
           children: [
-            // 스크롤 가능한 콘텐츠
+            // 스크롤 가능한 콘텐츠 영역
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 타이머와 제목 섹션
+                    // 타이틀 영역 (스테이지 제목 활용)
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: TitleSection_withoutIcon(
-                        customColors: Theme.of(context).extension<CustomColors>()!, // CustomColors 가져오기
-                        title: "글을 3문장으로 요약해주세요!",               // 제목
-                        subtitle: "개인의 수준과 흥미를 고려한 읽기 도구의 필요성",                           // 부제목
-                        author: "AI",                                     // 작성자                         // 아이콘 (기본값: Icons.import_contacts)
+                        customColors: customColors,
+                        title: "글을 3문장으로 요약해주세요!",
+                        subtitle: currentStage.subdetailTitle,
+                        author: "AI",
                       ),
                     ),
-                    // 본문 텍스트
+                    // 본문 텍스트 영역 → 읽기 중 데이터 이용
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Container(
                         height: 200,
-                          child:SingleChildScrollView(
-                            child: Text_Section(
-                              text: data,
-                            ),
-                          )
+                        child: SingleChildScrollView(
+                          child: Text_Section(
+                            text: readingText,
+                          ),
+                        ),
                       ),
                     ),
-                    SizedBox(height: 8,),
+                    const SizedBox(height: 8),
                     BigDivider(),
                     BigDivider(),
-                    SizedBox(height: 8,),
+                    const SizedBox(height: 8),
                     // 사용자 입력 영역
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16,16,16,0),
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                       child: Answer_Section(
                         controller: _controller,
                         customColors: customColors,
                       ),
                     ),
+                    // 선택된 키워드 Chip들 표시
                     if (_keywords.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -161,14 +174,13 @@ class _CSLearningState extends State<CSLearning> {
                               .map(
                                 (keyword) => CustomChip(
                               label: keyword,
-                              customColors: customColors, // CustomColors를 전달
-                              borderRadius: 14.0, // 원하는 Radius 값 설정 가능
+                              customColors: customColors,
+                              borderRadius: 14.0,
                             ),
                           )
                               .toList(),
                         ),
                       ),
-
                   ],
                 ),
               ),
@@ -176,7 +188,23 @@ class _CSLearningState extends State<CSLearning> {
             // 제출 버튼
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: buildButton(customColors),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isButtonEnabled ? _showAlertDialog : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: customColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    disabledBackgroundColor: customColors.primary20,
+                    disabledForegroundColor: Colors.white,
+                  ),
+                  child: const Text("제출하기", style: TextStyle(fontSize: 16)),
+                ),
+              ),
             ),
           ],
         ),
@@ -184,29 +212,10 @@ class _CSLearningState extends State<CSLearning> {
     );
   }
 
-  SizedBox buildButton(CustomColors customColors) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _isButtonEnabled ? _showAlertDialog : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: customColors.primary,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-          disabledBackgroundColor: customColors.primary20,
-          disabledForegroundColor: Colors.white,
-        ),
-        child: const Text("제출하기", style: TextStyle(fontSize: 16)),
-      ),
-    );
-  }
-
-  void _showHintDialog() {
+  // 힌트 다이얼로그: 옵션 1은 키워드, 옵션 2는 본문 자동 추가 처리
+  void _showHintDialog(List<String> stageKeywords, String readingText) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    int? selectedOption; // 선택된 옵션을 저장
+    int? selectedOption;
 
     showDialog(
       context: context,
@@ -214,7 +223,7 @@ class _CSLearningState extends State<CSLearning> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              insetPadding: EdgeInsets.all(16),
+              insetPadding: const EdgeInsets.all(16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.0),
               ),
@@ -223,84 +232,85 @@ class _CSLearningState extends State<CSLearning> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // 제목 및 닫기 버튼
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           "힌트 2가지 중 하나를 선택해주세요",
-                          style: body_large_semi(context).copyWith(color: customColors.neutral30),
+                          style: body_large_semi(context)
+                              .copyWith(color: customColors.neutral30),
                         ),
                         IconButton(
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          icon: Icon(Icons.close),
+                          icon: const Icon(Icons.close),
                         ),
                       ],
                     ),
                     const SizedBox(height: 16.0),
                     Row(
                       children: [
-                        // 첫 번째 버튼
+                        // 옵션 1: brData의 키워드를 사용
                         Expanded(
                           child: InkWell(
                             borderRadius: BorderRadius.circular(16.0),
                             onTap: () {
                               setState(() {
-                                selectedOption = 1; // 첫 번째 버튼 선택
+                                selectedOption = 1;
                               });
                             },
                             child: Container(
                               height: 120,
                               decoration: BoxDecoration(
                                 color: selectedOption == 1
-                                    ? customColors.primary10 // 선택된 경우 색상 변경
+                                    ? customColors.primary10
                                     : customColors.neutral90,
                                 borderRadius: BorderRadius.circular(16.0),
                                 border: selectedOption == 1
-                                    ? Border.all(color: customColors.primary ?? Colors.blue) // 선택된 경우 색상 변경
+                                    ? Border.all(
+                                    color: customColors.primary ?? Colors.blue)
                                     : null,
                               ),
                               child: Center(
                                 child: Text(
-                                  "키워드 3개",
-                                  style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                                  "키워드 ${stageKeywords.length}개",
+                                  style: body_small_semi(context)
+                                      .copyWith(color: customColors.neutral30),
                                 ),
                               ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 16.0),
-                        // 두 번째 버튼
+                        // 옵션 2: 읽기 중 본문 자동 추가
                         Expanded(
                           child: InkWell(
                             borderRadius: BorderRadius.circular(16.0),
                             onTap: () {
                               setState(() {
-                                selectedOption = 2; // 두 번째 버튼 선택
+                                selectedOption = 2;
                               });
                             },
                             child: Container(
                               height: 120,
                               decoration: BoxDecoration(
                                 color: selectedOption == 2
-                                    ? customColors.primary10 // 선택된 경우 색상 변경
+                                    ? customColors.primary10
                                     : customColors.neutral90,
                                 borderRadius: BorderRadius.circular(16.0),
                                 border: selectedOption == 2
-                                    ? Border.all(color: customColors.primary ?? Colors.blue) // 선택된 경우 색상 변경
+                                    ? Border.all(
+                                    color: customColors.primary ?? Colors.blue)
                                     : null,
                               ),
                               child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "맥락에 맞는 글\n자동 추가",
-                                      style: body_small_semi(context).copyWith(color: customColors.neutral30),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
+                                child: Text(
+                                  "본문 자동 추가",
+                                  style: body_small_semi(context)
+                                      .copyWith(color: customColors.neutral30),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                             ),
@@ -309,11 +319,10 @@ class _CSLearningState extends State<CSLearning> {
                       ],
                     ),
                     const SizedBox(height: 16.0),
-
-                    // 선택 완료 버튼 - 상태에 따라 다른 버튼 사용
+                    // 선택 완료 버튼: 선택에 따라 동작 분기
                     selectedOption == null
                         ? ButtonPrimary20_noPadding(
-                      function: () {}, // 선택 전이므로 동작 없음
+                      function: () {},
                       title: '선택 완료',
                       condition: "null",
                     )
@@ -321,11 +330,9 @@ class _CSLearningState extends State<CSLearning> {
                       function: () {
                         Navigator.of(context).pop();
                         if (selectedOption == 1) {
-                          print("키워드 3개 선택");
-                          _updateKeywords(["#읽기 능력", "#맞춤형 도구", "#피드백"]); // 키워드 업데이트
+                          _updateKeywords(stageKeywords);
                         } else if (selectedOption == 2) {
-                          print("맥락에 맞는 글 자동 추가 선택");
-                          _updateTextField("추후 AI가 자동 생성합니다!"); // 텍스트 필드에 단어 추가
+                          _updateTextField(readingText);
                         }
                       },
                       title: '선택 완료',
@@ -340,8 +347,4 @@ class _CSLearningState extends State<CSLearning> {
       },
     );
   }
-
-
-
-
 }

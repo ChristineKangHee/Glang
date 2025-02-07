@@ -70,7 +70,7 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
       },
 
       // 읽기 전(BR) 화면용 데이터
-      brData: BrData(
+      brData: BrData (
         // Firebase Storage에서 다운받을 수 있는 URL을 바로 넣거나
         // 또는 일단 가짜로 두고 수정 가능
         coverImageUrl: stageCoverUrl ?? "",
@@ -112,6 +112,12 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
       arData: ArData(
         // 예: 어떤 feature를 쓸지(여기서는 2번, 3번, 4번).
         features: [2, 3, 4],
+        // 여기서 features 리스트의 각 번호에 대해 false 기본값 설정
+        featuresCompleted: {
+                  "2": false,
+                  "3": false,
+                  "4": false,
+        },
         // featureData에 어떤 형태든 넣을 수 있음
         featureData: {
           "feature2ContentSummary": "내용 요약",
@@ -131,7 +137,7 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
       status: StageStatus.locked,
       difficultyLevel: "쉬움",
       textContents: "읽기 도구의 사용법을 익힙니다.",
-      missions: ["미션 2-1", "미션 2-2"],
+      missions: ["토론", "내용 요약", "Tree 구조화"],
       effects: ["이해력 향상", "읽기 효율 증가"],
       activityCompleted: {
         "beforeReading": false,
@@ -154,7 +160,12 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
         oxQuiz: OXQuiz(question: "이 도구는 무료이다.", correctAnswer: true, explanation: "맞춤형 읽기 도구는 학습자의 수준과 흥미를 반영하여 적합한 자료를 제공합니다.",),
       ),
       arData: ArData(
-        features: [1, 3, 7],
+        features: [2, 3, 4],
+        featuresCompleted: {
+                  "2": false,
+                  "3": false,
+                  "4": false,
+        },
         featureData: {"feature1Title": "예시데이터..."},
       ),
     ),
@@ -167,7 +178,7 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
       status: StageStatus.locked, // 첫 스테이지만 시작 가능
       difficultyLevel: "쉬움",
       textContents: "읽기 도구가 왜 필요한지 알아봅니다.",
-      missions: ["미션 1-1", "미션 1-2", "미션 1-3"],
+      missions: ["토론", "내용 요약", "Tree 구조화"],
       effects: ["집중력 향상", "읽기 속도 증가"],
       activityCompleted: {
         "beforeReading": false,
@@ -217,7 +228,14 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
       // 읽기 후(AR) 화면용 데이터 - 지금은 간단히 예시만
       arData: ArData(
         // 예: 어떤 feature를 쓸지(여기서는 2번, 5번, 9번).
-        features: [2, 5, 9],
+        features: [2, 3, 4],
+
+        featuresCompleted: {
+                  "2": false,
+                  "3": false,
+                  "4": false,
+        },
+
         // featureData에 어떤 형태든 넣을 수 있음
         featureData: {
           "feature2Title": "단어 빈칸 채우기",
@@ -237,7 +255,7 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
       status: StageStatus.locked,
       difficultyLevel: "쉬움",
       textContents: "읽기 도구의 사용법을 익힙니다.",
-      missions: ["미션 2-1", "미션 2-2"],
+      missions: ["토론", "내용 요약", "Tree 구조화"],    
       effects: ["이해력 향상", "읽기 효율 증가"],
       activityCompleted: {
         "beforeReading": false,
@@ -260,7 +278,14 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
         oxQuiz: OXQuiz(question: "이 도구는 무료이다.", correctAnswer: true, explanation: "맞춤형 읽기 도구는 학습자의 수준과 흥미를 반영하여 적합한 자료를 제공합니다.",),
       ),
       arData: ArData(
-        features: [1, 3, 7],
+        features: [2, 3, 4],
+
+        featuresCompleted: {
+                  "2": false,                   
+                  "3": false,
+                  "4": false,
+        },
+
         featureData: {"feature1Title": "예시데이터..."},
       ),
     ),
@@ -302,3 +327,4 @@ Future<void> completeActivityForStage({
   // Firestore 업데이트
   await docRef.update(stage.toJson());
 }
+
