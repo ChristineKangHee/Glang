@@ -97,12 +97,14 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
             "C. 읽기 전 활동의 중요성",
             "D. 잘못된 선택지",
           ],
+          explanation: "맞춤형 읽기 도구는 학습자의 수준과 흥미를 반영하여 적합한 자료를 제공합니다."
         ),
 
         // OX 퀴즈
         oxQuiz: OXQuiz(
           question: "이 글은 과학 분야이다.",
           correctAnswer: false,
+          explanation: "맞춤형 읽기 도구는 학습자의 수준과 흥미를 반영하여 적합한 자료를 제공합니다."
         ),
       ),
 
@@ -147,8 +149,9 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
           question: "해당 도구의 장점이 아닌 것은?",
           correctAnswer: "A",
           choices: ["A. 실제로 단점", "B. 장점1", "C. 장점2", "D. 장점3"],
+          explanation: "맞춤형 읽기 도구는 학습자의 수준과 흥미를 반영하여 적합한 자료를 제공합니다.",
         ),
-        oxQuiz: OXQuiz(question: "이 도구는 무료이다.", correctAnswer: true),
+        oxQuiz: OXQuiz(question: "이 도구는 무료이다.", correctAnswer: true, explanation: "맞춤형 읽기 도구는 학습자의 수준과 흥미를 반영하여 적합한 자료를 제공합니다.",),
       ),
       arData: ArData(
         features: [1, 3, 7],
@@ -200,12 +203,14 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
             "C. 읽기 전 활동의 중요성",
             "D. 잘못된 선택지",
           ],
+          explanation: "맞춤형 읽기 도구는 학습자의 수준과 흥미를 반영하여 적합한 자료를 제공합니다.",
         ),
 
         // OX 퀴즈
         oxQuiz: OXQuiz(
           question: "이 글은 과학 분야이다.",
           correctAnswer: false,
+          explanation: "맞춤형 읽기 도구는 학습자의 수준과 흥미를 반영하여 적합한 자료를 제공합니다.",
         ),
       ),
 
@@ -250,8 +255,9 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
           question: "해당 도구의 장점이 아닌 것은?",
           correctAnswer: "A",
           choices: ["A. 실제로 단점", "B. 장점1", "C. 장점2", "D. 장점3"],
+          explanation: "맞춤형 읽기 도구는 학습자의 수준과 흥미를 반영하여 적합한 자료를 제공합니다.",
         ),
-        oxQuiz: OXQuiz(question: "이 도구는 무료이다.", correctAnswer: true),
+        oxQuiz: OXQuiz(question: "이 도구는 무료이다.", correctAnswer: true, explanation: "맞춤형 읽기 도구는 학습자의 수준과 흥미를 반영하여 적합한 자료를 제공합니다.",),
       ),
       arData: ArData(
         features: [1, 3, 7],
