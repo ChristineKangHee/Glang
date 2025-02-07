@@ -7,7 +7,6 @@ import 'package:readventure/view/feature/after_read/GA_03_04_diagram/diagram_lea
 import 'package:readventure/view/feature/reading/selectable.dart';
 import 'package:readventure/view/login/interestSelection.dart';
 import 'package:readventure/view/login/tutorial.dart';
-import '../../community/Board/slide.dart';
 import '../Result_Report.dart';
 import '../reading/quiz_data.dart';
 import 'After_Read_Content.dart';
@@ -97,10 +96,6 @@ class ArMain extends StatelessWidget {
             ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
               builder: (context) => CommunityMainPage(),
             )), child: Text("커뮤니티")),
-            SizedBox(height: 30,),
-            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
-              builder: (context) => KeywordPicker(),
-            )), child: Text("Slide")),
             SizedBox(height: 30,),
           ],
         ),

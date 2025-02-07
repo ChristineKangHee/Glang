@@ -38,8 +38,8 @@ class Cm2depthBoardmain extends ConsumerWidget {
               child: TabBarView(
                 children: [
                   BoardPostList(posts, context, customColors), // 전체
-                  BoardPostList(posts.where((post) => post.category == '코스').toList(), context, customColors), // 코스
-                  BoardPostList(posts.where((post) => post.category == '인사이트' || post.category == '에세이').toList(), context, customColors), // 주제
+                  BoardPostList(posts.where((post) => post.category == '미션 글').toList(), context, customColors), // 코스
+                  BoardPostList(posts.where((post) => post.category == '자유글' || post.category == '에세이').toList(), context, customColors), // 주제
                 ],
               ),
             ),
