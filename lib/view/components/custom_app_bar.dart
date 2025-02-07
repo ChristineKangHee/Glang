@@ -744,13 +744,14 @@ class _CustomAppBar_2depth_8State extends State<CustomAppBar_2depth_8> {
     );
   }
 }
+
 ////////////////////// 커뮤니티 글쓰기 임시저장 등록 앱바 //////////////////////
 class CustomAppBar_2depth_9 extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Color? backgroundColor;
-  final Function()? onIconPressed;
+  final Function()? onIconPressed; // close 아이콘 눌렀을 때 실행할 콜백
   final PreferredSizeWidget? bottom;
-  final List<Widget> actions; // Added actions parameter
+  final List<Widget> actions;
 
   const CustomAppBar_2depth_9({
     Key? key,
@@ -758,7 +759,7 @@ class CustomAppBar_2depth_9 extends StatelessWidget implements PreferredSizeWidg
     this.backgroundColor,
     this.onIconPressed,
     this.bottom,
-    this.actions = const [], // Default empty list for actions
+    this.actions = const [], // 기본값: 빈 리스트
   }) : super(key: key);
 
   @override
@@ -769,11 +770,12 @@ class CustomAppBar_2depth_9 extends StatelessWidget implements PreferredSizeWidg
       scrolledUnderElevation: 0,
       bottom: bottom,
       leading: IconButton(
-        icon: IconButton(
-          icon: Icon(Icons.close, color: customColors.neutral30, size: 28,),
-          onPressed: onIconPressed,
+        icon: Icon(
+          Icons.close,
+          color: customColors.neutral30,
+          size: 28,
         ),
-        onPressed: () {
+        onPressed: onIconPressed ?? () {
           Navigator.pop(context);
         },
       ),
@@ -782,7 +784,7 @@ class CustomAppBar_2depth_9 extends StatelessWidget implements PreferredSizeWidg
         style: heading_xsmall(context).copyWith(color: customColors.neutral30),
       ).tr(),
       centerTitle: true,
-      actions: actions, // Use actions here
+      actions: actions,
       backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );

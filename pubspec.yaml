@@ -80,6 +80,9 @@ dev_dependencies:
   #indicator
   smooth_page_indicator: ^1.2.0+3
 
+  #multiple floatingbutton
+  flutter_speed_dial: ^7.0.0
+
 # 앱 아이콘 변경 (사용 모르겟어)
 #flutter_launcher_icons:
 #  android: "launcher_icon"
