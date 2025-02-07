@@ -33,6 +33,13 @@ class CommunityMainPage extends ConsumerWidget {
   }
 
   Widget CommunityPreview(posts, BuildContext context, CustomColors customColors) {
+    // 게시글을 좋아요 수 기준 내림차순 정렬합니다.
+    List<Post> sortedPosts = List.from(posts);
+    sortedPosts.sort((a, b) => b.likes.compareTo(a.likes));
+
+    // 정렬된 게시글 중 상위 3개만 사용합니다.
+    final topPosts = sortedPosts.take(3).toList();
+
     return Column(
       children: [
         postnavigation(context, customColors),
@@ -40,9 +47,9 @@ class CommunityMainPage extends ConsumerWidget {
           height: 170,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: posts.length,
+            itemCount: topPosts.length,
             itemBuilder: (context, index) {
-              var post = posts[index];
+              var post = topPosts[index];
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -71,7 +78,8 @@ class CommunityMainPage extends ConsumerWidget {
                               padding: const EdgeInsets.only(right: 8),
                               child: Text(
                                 tag,
-                                style: body_xxsmall(context).copyWith(color: customColors.primary60),
+                                style: body_xxsmall(context)
+                                    .copyWith(color: customColors.primary60),
                               ),
                             ))
                                 .toList(),
@@ -81,7 +89,8 @@ class CommunityMainPage extends ConsumerWidget {
                               alignment: Alignment.centerRight,
                               child: Text(
                                 formatPostDate(post.createdAt),
-                                style: body_xxsmall(context).copyWith(color: customColors.neutral60),
+                                style: body_xxsmall(context)
+                                    .copyWith(color: customColors.neutral60),
                               ),
                             ),
                           ),
@@ -114,7 +123,8 @@ class CommunityMainPage extends ConsumerWidget {
                               const SizedBox(width: 8),
                               Text(
                                 post.authorName,
-                                style: body_xsmall_semi(context).copyWith(color: customColors.neutral30),
+                                style: body_xsmall_semi(context)
+                                    .copyWith(color: customColors.neutral30),
                               ),
                             ],
                           ),
@@ -130,7 +140,8 @@ class CommunityMainPage extends ConsumerWidget {
                                       const SizedBox(width: 4),
                                       Text(
                                         post.likes.toString(),
-                                        style: body_xxsmall_semi(context).copyWith(color: customColors.neutral60),
+                                        style: body_xxsmall_semi(context)
+                                            .copyWith(color: customColors.neutral60),
                                       ),
                                     ],
                                   ),
@@ -141,7 +152,8 @@ class CommunityMainPage extends ConsumerWidget {
                                       const SizedBox(width: 4),
                                       Text(
                                         post.views.toString(),
-                                        style: body_xxsmall_semi(context).copyWith(color: customColors.neutral60),
+                                        style: body_xxsmall_semi(context)
+                                            .copyWith(color: customColors.neutral60),
                                       ),
                                     ],
                                   ),
@@ -161,7 +173,6 @@ class CommunityMainPage extends ConsumerWidget {
       ],
     );
   }
-
 
   Widget RankingPreview(BuildContext context, CustomColors customColors) {
     return Column(
