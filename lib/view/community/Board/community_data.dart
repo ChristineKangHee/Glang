@@ -39,7 +39,7 @@ final List<Post> posts = [
   ),
   Post(
     id: '2',
-    title: '두 번째 게시글',
+    title: 'two',
     content: '두 번째 게시글의 내용입니다.',
     authorName: '사용자2',
     profileImage: 'https://via.placeholder.com/40x40',

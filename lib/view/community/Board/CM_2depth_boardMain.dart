@@ -7,7 +7,9 @@ import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/custom_app_bar.dart';
 import '../../components/my_divider.dart';
 import 'CM_2depth_board.dart';
+import 'Component/component_communitypostlist.dart';
 import 'community_data.dart';
+import 'community_searchpage.dart';
 import 'essay_posting.dart';
 import 'free_posting.dart';
 import 'mission_posting.dart';
@@ -20,12 +22,21 @@ class Cm2depthBoardmain extends ConsumerWidget {
     final isDialOpen = ValueNotifier(false);
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_5(title: '게시판'),
+      appBar: CustomAppBar_2depth_5(
+        title: '게시판',
+        onIconPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SearchPage()), // Navigate to the search page
+          );
+        },
+      ),
       body: DefaultTabController(
         length: 3,
         child: Column(
           children: [
             TabBar(
+              labelStyle: body_small_semi(context),
               indicatorColor: customColors.primary,
               dividerColor: customColors.neutral80,
               tabs: const [
@@ -127,113 +138,16 @@ class Cm2depthBoardmain extends ConsumerWidget {
           return BigDivider();
         } else {
           var post = posts[index ~/ 2];
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PostDetailPage(post: post),
-                ),
-              );
-            },
-            child: Container(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Row(
-                        children: post.tags
-                            .map<Widget>((tag) => Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: Text(
-                            tag,
-                            style: body_xxsmall(context).copyWith(color: customColors.primary60),
-                          ),
-                        ))
-                            .toList(),
-                      ),
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            formatPostDate(post.createdAt),
-                            style: body_xxsmall(context).copyWith(color: customColors.neutral60),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    post.title,
-                    style: body_small_semi(context),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    post.content,
-                    style: body_xxsmall(context),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundImage: NetworkImage(post.profileImage),
-                            radius: 12,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            post.authorName,
-                            style: body_xsmall_semi(context).copyWith(color: customColors.neutral30),
-                          ),
-                        ],
-                      ),
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(Icons.favorite, size: 16, color: customColors.neutral60),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    post.likes.toString(),
-                                    style: body_xxsmall_semi(context).copyWith(color: customColors.neutral60),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(width: 8),
-                              Row(
-                                children: [
-                                  Icon(Icons.remove_red_eye, size: 16, color: customColors.neutral60),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    post.views.toString(),
-                                    style: body_xxsmall_semi(context).copyWith(color: customColors.neutral60),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+          return PostItemContainer(
+            post: post,
+            customColors: customColors,
+            context: context,
           );
         }
       },
     );
   }
+
 
   String formatPostDate(DateTime? postDate) {
     if (postDate == null) {

@@ -6,6 +6,7 @@ import '../../viewmodel/custom_colors_provider.dart';
 import '../components/custom_app_bar.dart';
 import 'Board/CM_2depth_board.dart';
 import 'Board/CM_2depth_boardMain.dart';
+import 'Board/community_searchpage.dart';
 import 'Ranking/CM_2depth_ranking.dart';
 import 'Ranking/ranking_component.dart';
 import 'Board/community_data.dart';
@@ -16,7 +17,14 @@ class CommunityMainPage extends ConsumerWidget {
     final customColors = ref.watch(customColorsProvider);
     return Scaffold(
       backgroundColor: customColors.neutral90,
-      appBar: CustomAppBar_Community(),
+      appBar: CustomAppBar_Community(
+        onSearchPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SearchPage()), // Navigate to the search page
+          );
+        },
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [

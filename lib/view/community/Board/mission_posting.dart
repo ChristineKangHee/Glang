@@ -6,6 +6,7 @@ import 'package:readventure/theme/theme.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/alarm_dialog.dart';
 import '../../components/custom_app_bar.dart';
+import 'missionBottomsheet.dart';
 
 class MissionPostPage extends ConsumerStatefulWidget {
   @override
@@ -13,7 +14,9 @@ class MissionPostPage extends ConsumerStatefulWidget {
 }
 
 class _MissionPostPageState extends ConsumerState<MissionPostPage> {
-  String selectedCategory = ''; // 코스, 인사이트, 에세이 등 선택
+  String selectedCourse = '';
+  String selectedStage = '';
+  String selectedMission = '';
   TextEditingController titleController = TextEditingController();
   TextEditingController contentController = TextEditingController();
   TextEditingController tagController = TextEditingController();
@@ -29,6 +32,9 @@ class _MissionPostPageState extends ConsumerState<MissionPostPage> {
   void initState() {
     super.initState();
 
+    // Automatically show the bottom sheet when the page is loaded
+    WidgetsBinding.instance.addPostFrameCallback((_) => showCourseSelectionSheet(context));
+
     void onTextChanged() {
       setState(() {});
     }
@@ -36,6 +42,29 @@ class _MissionPostPageState extends ConsumerState<MissionPostPage> {
     titleController.addListener(onTextChanged);
     contentController.addListener(onTextChanged);
     tagController.addListener(() => setState(() {}));
+  }
+  // 사용 예시: BottomSheet 띄우기
+  void showCourseSelectionSheet(BuildContext context) async {
+    final selectedMission = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,  // Allow custom height
+      isDismissible: false,  // Prevent dismissing by tapping outside
+      enableDrag: false,
+      builder: (context) => CourseSelectionBottomSheet(),
+    );
+
+    if (selectedMission != null) {
+      setState(() {
+        this.selectedMission = selectedMission;
+        titleController.text = selectedMission;
+
+        // 미션 내용 자동 입력
+        String missionContent = missionContents[selectedMission] ?? "해당 미션에 대한 내용이 없습니다.";
+        contentController.text = "$selectedMission에 관련된 내용입니다. $missionContent"; // 미션 내용 자동 입력
+      });
+
+      print("선택된 미션: $selectedMission");
+    }
   }
 
   // essay 작성 시 유효성 검사: 제목과 내용이 있어야 함
