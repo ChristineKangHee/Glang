@@ -23,6 +23,7 @@ import '../Result_Report.dart';
 import 'GA_03_01_change_ending/CE_main.dart';
 import 'GA_03_02_content_summary/CS_learning.dart';
 import 'GA_03_02_content_summary/CS_main.dart';
+import 'GA_03_03_debate_activity/DA_learning.dart';
 import 'GA_03_03_debate_activity/DA_main.dart';
 import 'GA_03_04_diagram/diagram_learning.dart';
 import 'GA_03_04_diagram/diagram_main.dart';
@@ -466,30 +467,6 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     );
   }
 
-  // // 개별 학습 항목
-  // Widget _buildActivityItem(BuildContext context, LearningActivity activity, CustomColors customColors) {
-  //   return Padding(
-  //     padding: const EdgeInsets.only(bottom: 8.0),
-  //     child: Container(
-  //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-  //       decoration: ShapeDecoration(
-  //         color: activity.isCompleted ? customColors.neutral90 : customColors.neutral100,
-  //         shape: RoundedRectangleBorder(
-  //           side: activity.isCompleted ? BorderSide.none : BorderSide(width: 1, color: customColors.neutral80 ?? const Color(0xFFCDCED3)),
-  //           borderRadius: BorderRadius.circular(18),
-  //         ),
-  //       ),
-  //       child: Row(
-  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //         children: [
-  //           _buildActivityText(activity, customColors),
-  //           _buildActivityButton(context, activity, customColors),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
   // 학습 항목 텍스트
   Widget _buildActivityText(LearningActivity activity, CustomColors customColors) {
     return Column(
@@ -521,11 +498,11 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
       onPressed: activity.isCompleted
           ? null
           : () async {
-        // Firestore 업데이트: 해당 feature의 완료 상태를 true로 변경
-        await _updateFeatureCompletion(stageData, activity.featureNumber, true);
-        setState(() {
-          activity.isCompleted = true;
-        });
+        // // Firestore 업데이트: 해당 feature의 완료 상태를 true로 변경
+        // await _updateFeatureCompletion(stageData, activity.featureNumber, true);
+        // setState(() {
+        //   activity.isCompleted = true;
+        // });
         // 각 미션에 해당하는 페이지로 이동
         Navigator.push(
           context,
@@ -553,7 +530,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
       case '요약':
         return CSLearning();
       case '토론':
-        return DebateActivityMain();
+        return DebatePage();
       case '다이어그램':
         return RootedTreeScreen();
       case '문장 구조':
@@ -573,7 +550,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
 }
 
 /// 지정된 feature의 완료 상태를 업데이트하는 함수
-Future<void> _updateFeatureCompletion(StageData stage, int featureNumber, bool isCompleted) async {
+Future<void> updateFeatureCompletion(StageData stage, int featureNumber, bool isCompleted) async {
   final userId = FirebaseAuth.instance.currentUser?.uid;
   if (userId == null || stage.arData == null) return;
 
