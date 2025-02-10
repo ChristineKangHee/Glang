@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';
+import 'package:readventure/view/components/custom_button.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/alarm_dialog.dart';
 import '../../components/custom_app_bar.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class EssayPostPage extends ConsumerStatefulWidget {
   @override
@@ -175,21 +177,26 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
   // 시스템 back 버튼 처리
   Future<bool> _onWillPop() async {
     if (hasUnsavedChanges()) {
-      showResultDialog(
-        context,
-        ref.watch(customColorsProvider),
-        "나가시겠습니까?",
-        "취소",
-        "나가기",
-            (ctx) {
-          discardDraft();
-          Navigator.of(ctx).pop();
-        },
-        continuationMessage: "작성 중인 내용은 저장되지 않습니다.",
-      );
-      return false; // Prevent the default back action until the dialog is handled
+      // Check if only selectedKeyword is set, but title and content are empty
+      if (selectedKeyword.isNotEmpty && titleController.text.isEmpty && contentController.text.isEmpty) {
+        Navigator.of(context).pop(); // If only keyword is selected and no content, just exit
+      } else {
+        showResultDialog(
+          context,
+          ref.watch(customColorsProvider), // You can get the customColors here as well
+          "나가시겠습니까?",
+          "취소",
+          "나가기",
+              (ctx) {
+            discardDraft();
+            Navigator.of(ctx).pop();
+          },
+          continuationMessage: "작성 중인 내용은 저장되지 않습니다.",
+        );
+        return false;
+      }
     }
-    return true; // No unsaved changes, allow normal back action
+      return true;
   }
 
 
@@ -389,23 +396,25 @@ class _KeywordSelectionDialog extends ConsumerStatefulWidget {
 
 class _KeywordSelectionDialogState extends ConsumerState<_KeywordSelectionDialog> {
   bool isSpinning = false;
+  bool isStarted = false;
   int currentIndex = 0;
   String selectedKeyword = '';
-  late Timer _timer;
+  Timer? _timer;
 
   void startSpinning() {
     setState(() {
+      isStarted = true;
       isSpinning = true;
     });
 
-    _timer = Timer.periodic(Duration(milliseconds: 80), (timer) {  // Faster rotation (50ms)
+    _timer = Timer.periodic(Duration(milliseconds: 80), (timer) {
       setState(() {
         currentIndex = (currentIndex + 1) % widget.keywordList.length;
       });
     });
 
-    Future.delayed(Duration(seconds: 1), () {  // Shortened delay to 1 second
-      _timer.cancel();
+    Future.delayed(Duration(seconds: 1), () {
+      _timer?.cancel();
       setState(() {
         isSpinning = false;
         selectedKeyword = widget.keywordList[currentIndex];
@@ -415,7 +424,7 @@ class _KeywordSelectionDialogState extends ConsumerState<_KeywordSelectionDialog
 
   @override
   void dispose() {
-    _timer.cancel();
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -423,6 +432,7 @@ class _KeywordSelectionDialogState extends ConsumerState<_KeywordSelectionDialog
   Widget build(BuildContext context) {
     final customColors = ref.watch(customColorsProvider);
     return AlertDialog(
+      contentPadding: EdgeInsets.all(16),
       title: Text(
         "랜덤 키워드 뽑기",
         style: body_medium_semi(context),
@@ -431,38 +441,87 @@ class _KeywordSelectionDialogState extends ConsumerState<_KeywordSelectionDialog
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedSwitcher(
-            duration: Duration(milliseconds: 100),
-            child: Align(
-              alignment: Alignment.center,
-              child: Text(
-                widget.keywordList[currentIndex],
-                style: body_large_semi(context).copyWith(color: customColors.primary),
-                key: ValueKey<int>(currentIndex),
+          if (!isStarted) ...[
+            Column(
+              children: [
+                SvgPicture.asset("assets/images/randombox.svg", height: 180),
+                SizedBox(height: 24),
+                Text(
+                  '뽑기 통을 돌려서\n에세이 주제를 선정해보아요',
+                  style: body_small(context).copyWith(color: customColors.neutral30),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 24),
+                ButtonPrimary_noPadding(
+                  function: startSpinning,
+                  title: '돌리기',
+                ),
+              ],
+            ),
+          ] else ...[
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 124),
+              child: AnimatedSwitcher(
+                duration: Duration(milliseconds: 100),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    widget.keywordList[currentIndex],
+                    style: body_large_semi(context).copyWith(color: customColors.primary),
+                    key: ValueKey<int>(currentIndex),
+                  ),
+                ),
               ),
             ),
-          ),
-          SizedBox(height: 20),
-          Row(
-            children: [
-              ElevatedButton(
-                onPressed: isSpinning ? null : startSpinning,
-                child: Text(isSpinning ? "로딩 중..." : "돌리기"),
-              ),
-              SizedBox(width: 20),
-              ElevatedButton(
-                onPressed: selectedKeyword.isEmpty
-                    ? null
-                    : () {
-                  Navigator.of(context).pop(selectedKeyword);
-                  print("선택된 키워드: $selectedKeyword");
-                },
-                child: Text("작성하기"),
-              ),
-            ],
-          ),
+            Row(
+              children: [
+                if (!isSpinning) ...[
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: startSpinning,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        decoration: ShapeDecoration(
+                          color: customColors.neutral90,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: Center(
+                          child: Text(
+                            '다시 돌리기',
+                            textAlign: TextAlign.center,
+                            style: body_small_semi(context).copyWith(color: customColors.neutral60),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: selectedKeyword.isEmpty ? null : () => Navigator.of(context).pop(selectedKeyword),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        decoration: ShapeDecoration(
+                          color: customColors.primary,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: Center(
+                          child: Text(
+                            '작성하기',
+                            textAlign: TextAlign.center,
+                            style: body_small_semi(context).copyWith(color: customColors.neutral100),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ]
         ],
       ),
+      backgroundColor: customColors.neutral100,
     );
   }
 }

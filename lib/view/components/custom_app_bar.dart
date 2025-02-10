@@ -144,7 +144,11 @@ class CustomAppBar_Logo extends StatelessWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
       leading: Padding(
         padding: const EdgeInsets.only(left: 16.0),
-        child: Container(child: SvgPicture.asset('assets/icons/app_logo_without_background.svg')),
+        child: SvgPicture.asset(
+          'assets/icons/logo_new.svg',
+          height: 28,
+          width: 35,
+        ),
       ),// logo 부분
       actions: [// 이 부분에 아이콘 버튼을 추가
         IconButton(
@@ -288,7 +292,11 @@ class CustomAppBar_Logo_only extends StatelessWidget implements PreferredSizeWid
       scrolledUnderElevation: 0,
       leading: Padding(
         padding: const EdgeInsets.only(left: 16.0),
-        child: Container(child: SvgPicture.asset('assets/icons/app_logo_without_background.svg')),
+        child: SvgPicture.asset(
+          'assets/icons/logo_new.svg',
+          height: 28,
+          width: 35,
+        ),
       ),// logo 부분. 추후 진짜 로고로 바꿀 것
       backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
