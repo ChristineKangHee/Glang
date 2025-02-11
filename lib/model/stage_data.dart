@@ -122,6 +122,7 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
         featureData: {
           "feature2ContentSummary": "내용 요약",
           "feature3Debate": "토론하기",
+          "feature3DebateTopic": "환경 보호를 위한 강력한 정책이 더 필요하다",
           "feature4Diagram": "다이어그램",
         },
       ),
@@ -166,7 +167,12 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
                   "3": false,
                   "4": false,
         },
-        featureData: {"feature1Title": "예시데이터..."},
+        featureData: {
+          "feature2ContentSummary": "내용 요약",
+          "feature3Debate": "토론하기",
+          "feature3DebateTopic": "환경 보호를 위한 강력한 정책이 더 필요하다",
+          "feature4Diagram": "다이어그램",
+        },
       ),
     ),
 
@@ -238,9 +244,10 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
 
         // featureData에 어떤 형태든 넣을 수 있음
         featureData: {
-          "feature2Title": "단어 빈칸 채우기",
-          "feature5Description": "특정 UI 설정 값",
-          "feature9Something": 123,
+          "feature2ContentSummary": "내용 요약",
+          "feature3Debate": "토론하기",
+          "feature3DebateTopic": "환경 보호를 위한 강력한 정책이 더 필요하다",
+          "feature4Diagram": "다이어그램",
         },
       ),
     ),
@@ -286,7 +293,12 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
                   "4": false,
         },
 
-        featureData: {"feature1Title": "예시데이터..."},
+        featureData: {
+          "feature2ContentSummary": "내용 요약",
+          "feature3Debate": "토론하기",
+          "feature3DebateTopic": "환경 보호를 위한 강력한 정책이 더 필요하다",
+          "feature4Diagram": "다이어그램",
+        },
       ),
     ),
   ];

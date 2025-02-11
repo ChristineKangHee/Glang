@@ -247,6 +247,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
   void _showExplanationPopup() {
     final customColors = ref.read(customColorsProvider);
     showDialog(
+      barrierDismissible: false, // 다이얼로그 외부 클릭 방지
       context: context,
       builder: (BuildContext context) {
         return Dialog(

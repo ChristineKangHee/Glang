@@ -55,7 +55,7 @@ class AlertSectionButtonBr extends StatelessWidget {
             ),
             child: TextButton(
               onPressed: () {
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => RdBefore()),
                 );
