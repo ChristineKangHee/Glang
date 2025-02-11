@@ -68,11 +68,10 @@ class CourseDetailPage extends ConsumerWidget {
                               ],
                             ),
                           ),
-                          const SizedBox(width: 36),
+                          const SizedBox(width: 24),
                           SvgPicture.asset(
-                            'assets/images/charactor.svg',
+                            'assets/images/character_total.svg',
                             width: 106,
-                            height: 98,
                             fit: BoxFit.cover,
                           ),
                         ],
