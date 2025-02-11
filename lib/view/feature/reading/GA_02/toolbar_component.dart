@@ -1,14 +1,20 @@
-/// File: tpolbar_component.dart
-/// Purpose: 읽기중 드래그 후 나타나는 툴바 코드
+/// File: toolbar_component.dart
+/// Purpose: 읽기 중 드래그 후 나타나는 툴바 및 단어/문장 해석 팝업 처리
 /// Author: 강희
 /// Created: 2024-1-19
-/// Last Modified: 2024-1-30 by 강희
+/// Last Modified: 2024-1-30 (수정: ChatGPT API 연동 및 DebateGPTService 참고)
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import '../../../../theme/theme.dart';
 import 'reading_chatbot.dart';
 import '../../../../theme/font.dart';
 import '../../after_read/widget/answer_section.dart';
+// ReadingData의 경로에 맞게 import 수정
+import 'package:readventure/model/reading_data.dart';
 
 class Toolbar extends StatefulWidget {
   final double toolbarWidth;
@@ -16,6 +22,7 @@ class Toolbar extends StatefulWidget {
   final BuildContext context;
   final TextSelectionDelegate delegate;
   final customColors;
+  final ReadingData readingData; // 추가: 현재 읽기 데이터를 전달
 
   const Toolbar({
     Key? key,
@@ -24,6 +31,7 @@ class Toolbar extends StatefulWidget {
     required this.context,
     required this.delegate,
     required this.customColors,
+    required this.readingData,
   }) : super(key: key);
 
   @override
@@ -72,29 +80,33 @@ class _ToolbarState extends State<Toolbar> {
               decoration: TextDecoration.none,
             ),
           ),
-          if (!isLast) VerticalDivider(color: widget.customColors.neutral60,),
+          if (!isLast)
+            VerticalDivider(
+              color: widget.customColors.neutral60,
+            ),
         ],
       ),
     );
   }
 
   void _highlightText(BuildContext context, TextSelectionDelegate delegate) {
-    final String selectedText = delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
+    final String selectedText =
+    delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
     if (selectedText.isNotEmpty) {
       final TextStyle highlightedStyle = TextStyle(
         color: Colors.yellow,
         backgroundColor: Colors.yellow.withOpacity(0.3),
         decoration: TextDecoration.underline,
       );
-      // Apply your highlight logic here
+      // 하이라이트 적용 로직 추가 가능
     }
   }
 
   void _showNoteDialog(BuildContext context, TextSelectionDelegate delegate) {
-    final String selectedText = delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
+    final String selectedText =
+    delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
     final TextEditingController _noteController = TextEditingController();
 
-    // Show dialog with stateful widget content
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -105,6 +117,418 @@ class _ToolbarState extends State<Toolbar> {
         );
       },
     );
+  }
+
+  /// ChatGPT API를 호출하여 단어 정보를 받아오는 함수
+  /// [textSegments]를 참조하여 문맥상 의미를 산출하며, 모든 결과는 한국어로 제공합니다.
+  Future<Map<String, dynamic>> _fetchWordDetails(String word, List<String> textSegments) async {
+    final apiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
+    if (apiKey.isEmpty) {
+      throw Exception('API Key가 .env 파일에 설정되어 있지 않습니다.');
+    }
+
+    const endpoint = 'https://api.openai.com/v1/chat/completions';
+    final url = Uri.parse(endpoint);
+    final String contextText = textSegments.join("\n");
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Authorization': 'Bearer $apiKey',
+      },
+      body: jsonEncode({
+        'model': 'gpt-3.5-turbo',
+        'messages': [
+          {
+            'role': 'system',
+            'content': 'You are a Korean dictionary assistant. For the given word, provide a JSON object with exactly the following keys: "dictionaryMeaning", "contextualMeaning", "synonyms", and "antonyms". "dictionaryMeaning" should be a brief definition of the word in Korean. "contextualMeaning" should explain how the word is used in context based on the following text segments: "$contextText". "synonyms" should be an array of similar words in Korean, and "antonyms" should be an array of opposite words in Korean. If any information is not available, set its value to "정보 없음". 모든 결과는 한국어로 제공하세요. Return only the JSON object with no additional text.'
+          },
+          {
+            'role': 'user',
+            'content': 'Word: "$word"'
+          },
+        ],
+        'max_tokens': 300,
+        'temperature': 0.2,
+        'n': 1,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> resBody = jsonDecode(utf8.decode(response.bodyBytes));
+      final String message = resBody["choices"][0]["message"]["content"];
+      try {
+        final Map<String, dynamic> data = jsonDecode(message);
+        return data;
+      } catch (e) {
+        throw Exception("ChatGPT 응답 파싱 실패: $e");
+      }
+    } else {
+      throw Exception("ChatGPT API 호출 실패: ${response.statusCode} ${response.body}");
+    }
+  }
+
+  void _showWordOrSentencePopup(BuildContext context, TextSelectionDelegate delegate) {
+    final String selectedText =
+    delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
+    if (_isWordSelected(selectedText)) {
+      _showWordPopup(context, selectedText);
+    } else {
+      _showSentencePopup(context, selectedText);
+    }
+  }
+
+  /// _showWordPopup: FutureBuilder를 사용하여 API로부터 단어 정보를 받아와 표시
+  void _showWordPopup(BuildContext context, String selectedText) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+          child: FutureBuilder<Map<String, dynamic>>(
+            future: _fetchWordDetails(selectedText, widget.readingData.textSegments),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 20),
+                      Text(
+                        '로딩 중...',
+                        style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                      ),
+                    ],
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '오류가 발생했습니다.',
+                        style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        snapshot.error.toString(),
+                        style: body_small(context),
+                      ),
+                      const SizedBox(height: 20),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(
+                          Icons.close,
+                          color: customColors.neutral30,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                final data = snapshot.data!;
+                final List<dynamic> synonyms = data['synonyms'] is List ? data['synonyms'] : [];
+                final List<dynamic> antonyms = data['antonyms'] is List ? data['antonyms'] : [];
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // 상단 타이틀 및 닫기 버튼
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '해석',
+                            style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: Icon(
+                              Icons.close,
+                              color: customColors.neutral30,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      // 선택된 단어 표시
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          selectedText,
+                          style: body_small_semi(context)
+                              .copyWith(color: customColors.primary),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // API에서 받아온 결과 표시
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: ShapeDecoration(
+                          color: customColors.neutral90,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '사전적 의미',
+                              style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
+                            ),
+                            Text(
+                              data['dictionaryMeaning'] ?? '정보 없음',
+                              style: body_small(context),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              '문맥상 의미',
+                              style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
+                            ),
+                            Text(
+                              data['contextualMeaning'] ?? '정보 없음',
+                              style: body_small(context),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              '유사어',
+                              style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
+                            ),
+                            Text(
+                              synonyms.isNotEmpty ? synonyms.join(', ') : '정보 없음',
+                              style: body_small(context),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              '반의어',
+                              style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
+                            ),
+                            Text(
+                              antonyms.isNotEmpty ? antonyms.join(', ') : '정보 없음',
+                              style: body_small(context),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                );
+              }
+            },
+          ),
+        );
+      },
+    );
+  }
+  /// ChatGPT API를 호출하여 문장 정보를 받아오는 함수
+  Future<Map<String, dynamic>> _fetchSentenceDetails(String sentence, List<String> textSegments) async {
+    final apiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
+    if (apiKey.isEmpty) {
+      throw Exception('API Key가 .env 파일에 설정되어 있지 않습니다.');
+    }
+
+    const endpoint = 'https://api.openai.com/v1/chat/completions';
+    final url = Uri.parse(endpoint);
+    final String contextText = textSegments.join("\n");
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Authorization': 'Bearer $apiKey',
+      },
+      body: jsonEncode({
+        'model': 'gpt-3.5-turbo',
+        'messages': [
+          {
+            'role': 'system',
+            'content': 'You are a Korean text analysis assistant. For the given sentence, provide a JSON object with exactly the following keys: "contextualMeaning" and "summary". "contextualMeaning" should explain how the sentence is used in context based on the following text segments: "$contextText". "summary" should provide a concise summary of the sentence in Korean. If any information is not available, set its value to "정보 없음". 모든 결과는 한국어로 제공하세요. Return only the JSON object with no additional text.'
+          },
+          {
+            'role': 'user',
+            'content': 'Sentence: "$sentence"'
+          },
+        ],
+        'max_tokens': 200,
+        'temperature': 0.2,
+        'n': 1,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> resBody = jsonDecode(utf8.decode(response.bodyBytes));
+      final String message = resBody["choices"][0]["message"]["content"];
+      try {
+        final Map<String, dynamic> data = jsonDecode(message);
+        return data;
+      } catch (e) {
+        throw Exception("ChatGPT 응답 파싱 실패: $e");
+      }
+    } else {
+      throw Exception("ChatGPT API 호출 실패: ${response.statusCode} ${response.body}");
+    }
+  }
+
+  /// _showSentencePopup: 선택한 문장에 대해 ChatGPT API를 호출하여 문맥상 의미와 요약을 표시
+  void _showSentencePopup(BuildContext context, String selectedText) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+          child: FutureBuilder<Map<String, dynamic>>(
+            future: _fetchSentenceDetails(selectedText, widget.readingData.textSegments),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 20),
+                      Text(
+                        '로딩 중...',
+                        style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                      ),
+                    ],
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '오류가 발생했습니다.',
+                        style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        snapshot.error.toString(),
+                        style: body_small(context),
+                      ),
+                      const SizedBox(height: 20),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(
+                          Icons.close,
+                          color: customColors.neutral30,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                final data = snapshot.data!;
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // 상단 타이틀 및 닫기 버튼
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '해석',
+                            style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: Icon(
+                              Icons.close,
+                              color: customColors.neutral30,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      // 선택된 문장 표시
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          selectedText,
+                          style: body_small_semi(context).copyWith(color: customColors.primary),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // API에서 받아온 결과 표시 (문맥상 의미 및 요약)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: ShapeDecoration(
+                          color: customColors.neutral90,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '문맥상 의미',
+                              style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
+                            ),
+                            Text(
+                              data['contextualMeaning'] ?? '정보 없음',
+                              style: body_small(context),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              '요약',
+                              style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
+                            ),
+                            Text(
+                              data['summary'] ?? '정보 없음',
+                              style: body_small(context),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                );
+              }
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  bool _isWordSelected(String selectedText) {
+    return selectedText.split(' ').length == 1;
+  }
+
+  void _navigateToChatbot(BuildContext context, TextSelectionDelegate delegate) {
+    final String selectedText =
+    delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
+    if (selectedText.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChatBot(selectedText: selectedText),
+        ),
+      );
+    }
   }
 }
 
@@ -126,14 +550,14 @@ class _NoteDialog extends StatefulWidget {
 
 class _NoteDialogState extends State<_NoteDialog> {
   late Color saveButtonColor;
-  bool isQuestionIncluded = false; // State to track if the question is included
+  bool isQuestionIncluded = false; // 질문 포함 여부 상태
 
   @override
   void initState() {
     super.initState();
     saveButtonColor = widget.customColors.primary20;
 
-    // Listen to changes in the TextField to update the button color
+    // TextField 변경에 따라 버튼 색상 업데이트
     widget.noteController.addListener(() {
       setState(() {
         saveButtonColor = widget.noteController.text.isNotEmpty
@@ -147,9 +571,9 @@ class _NoteDialogState extends State<_NoteDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16),
-      child: SingleChildScrollView( // Make the dialog scrollable
+      child: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.all(16), // Padding inside the popup
+          padding: const EdgeInsets.all(16),
           decoration: ShapeDecoration(
             color: widget.customColors.neutral100,
             shape: RoundedRectangleBorder(
@@ -188,7 +612,7 @@ class _NoteDialogState extends State<_NoteDialog> {
                   child: Text(
                     widget.selectedText,
                     style: body_xsmall(context),
-                    maxLines: 2, // Limit to two lines
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -201,7 +625,7 @@ class _NoteDialogState extends State<_NoteDialog> {
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    isQuestionIncluded = !isQuestionIncluded; // Toggle the state
+                    isQuestionIncluded = !isQuestionIncluded;
                   });
                 },
                 child: Row(
@@ -209,15 +633,15 @@ class _NoteDialogState extends State<_NoteDialog> {
                     Icon(
                       Icons.check_circle_rounded,
                       color: isQuestionIncluded
-                          ? widget.customColors.primary // Primary color when active
-                          : widget.customColors.neutral80, // Neutral color when inactive
+                          ? widget.customColors.primary
+                          : widget.customColors.neutral80,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       '질문 포함',
                       style: body_xsmall(context).copyWith(
                         color: isQuestionIncluded
-                            ? widget.customColors.primary // Match text color to state
+                            ? widget.customColors.primary
                             : widget.customColors.neutral30,
                       ),
                     ),
@@ -240,7 +664,8 @@ class _NoteDialogState extends State<_NoteDialog> {
                         onPressed: () => Navigator.pop(context),
                         child: Text(
                           '취소',
-                          style: body_small_semi(context).copyWith(color: widget.customColors.neutral60),
+                          style: body_small_semi(context)
+                              .copyWith(color: widget.customColors.neutral60),
                         ),
                       ),
                     ),
@@ -257,56 +682,54 @@ class _NoteDialogState extends State<_NoteDialog> {
                       ),
                       child: TextButton(
                         onPressed: saveButtonColor == widget.customColors.primary20
-                            ? null // Disable the button if the saveButtonColor is primary20
+                            ? null
                             : () {
                           final note = widget.noteController.text.trim();
                           if (note.isNotEmpty) {
                             debugPrint('메모 저장: $note');
                             debugPrint('질문 포함 상태: $isQuestionIncluded');
                           }
-
-                          // Show customized SnackBar at the bottom
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Container(
-                                padding: EdgeInsets.all(16),
+                                padding: const EdgeInsets.all(16),
                                 clipBehavior: Clip.antiAlias,
                                 decoration: ShapeDecoration(
-                                  color: widget.customColors.neutral60.withOpacity(0.8), // Custom color
+                                  color: widget.customColors.neutral60.withOpacity(0.8),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(100),
                                   ),
                                 ),
                                 child: Row(
-                                  mainAxisSize: MainAxisSize.min, // Ensure the width hugs content
+                                  mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Text(
                                       '메모가 저장되었어요.',
-                                      style: body_small_semi(context).copyWith(color: widget.customColors.neutral100),
+                                      style: body_small_semi(context)
+                                          .copyWith(color: widget.customColors.neutral100),
                                     ),
                                   ],
                                 ),
                               ),
-                              duration: Duration(seconds: 1),
-                              behavior: SnackBarBehavior.floating, // To make it float and hug the content
-                              backgroundColor: Colors.transparent, // Make the background transparent
-                              elevation: 0, // Remove the default shadow (dim effect)
+                              duration: const Duration(seconds: 1),
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: Colors.transparent,
+                              elevation: 0,
                               onVisible: () {
-                                // Fade out effect using an animation
-                                Future.delayed(Duration(seconds: 1), () {
+                                Future.delayed(const Duration(seconds: 1), () {
                                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                 });
                               },
                             ),
                           );
-
-                          Navigator.pop(context); // Close the note dialog
+                          Navigator.pop(context);
                         },
                         child: Text(
                           '저장',
-                          style: body_small_semi(context).copyWith(color: widget.customColors.neutral100),
+                          style: body_small_semi(context)
+                              .copyWith(color: widget.customColors.neutral100),
                         ),
                       ),
                     ),
@@ -320,236 +743,3 @@ class _NoteDialogState extends State<_NoteDialog> {
     );
   }
 }
-
-
-
-  void _showWordOrSentencePopup(BuildContext context, TextSelectionDelegate delegate) {
-    final String selectedText = delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
-    if (_isWordSelected(selectedText)) {
-      _showWordPopup(context, selectedText);
-    } else {
-      _showSentencePopup(context, selectedText);
-    }
-  }
-
-void _showWordPopup(BuildContext context, String selectedText) {
-  final customColors = Theme.of(context).extension<CustomColors>()!;
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return Dialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16), // Adds horizontal margin
-        child: Container(
-          padding: const EdgeInsets.all(16), // Padding inside the popup
-          decoration: ShapeDecoration(
-            color: customColors.neutral100,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween, // Space between title and icon
-                children: [
-                  Text(
-                    '해석',
-                    style: body_small_semi(context).copyWith(
-                      color: customColors.neutral30,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context), // Close dialog on click
-                    icon: Icon(
-                      Icons.close,
-                      color: customColors.neutral30,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  selectedText,
-                  style: body_small_semi(context).copyWith(
-                    color: customColors.primary,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: ShapeDecoration(
-                  color: customColors.neutral90,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '사전적 의미',
-                      style: heading_xxsmall(context).copyWith(
-                        color: customColors.neutral30,
-                      ),
-                    ),
-                    Text(
-                      '사전적 의미의 예시입니다.',
-                      style: body_small(context),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      '문맥상 의미',
-                      style: heading_xxsmall(context).copyWith(
-                        color: customColors.neutral30,
-                      ),
-                    ),
-                    Text(
-                      '문맥상 의미의 예시입니다.',
-                      style: body_small(context),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      '유사어',
-                      style: heading_xxsmall(context).copyWith(
-                        color: customColors.neutral30,
-                      ),
-                    ),
-                    Text(
-                      '유사어의 예시입니다.',
-                      style: body_small(context),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      '반의어',
-                      style: heading_xxsmall(context).copyWith(
-                        color: customColors.neutral30,
-                      ),
-                    ),
-                    Text(
-                      '반의어의 예시입니다.',
-                      style: body_small(context),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
-      );
-    },
-  );
-}
-
-
-
-  void _showSentencePopup(BuildContext context, String selectedText) {
-    final customColors = Theme.of(context).extension<CustomColors>()!;
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          insetPadding: const EdgeInsets.symmetric(horizontal: 16), // Adds horizontal margin
-          child: Container(
-            padding: const EdgeInsets.all(16), // Padding inside the popup
-            decoration: ShapeDecoration(
-              color: customColors.neutral100,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween, // Space between title and icon
-                  children: [
-                    Text(
-                      '해석',
-                      style: body_small_semi(context).copyWith(
-                        color: customColors.neutral30,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context), // Close dialog on click
-                      icon: Icon(
-                        Icons.close,
-                        color: customColors.neutral30,
-                      ),
-                    ),
-                  ],
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    selectedText,
-                    style: body_small_semi(context).copyWith(
-                      color: customColors.primary,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20,),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: ShapeDecoration(
-                    color: customColors.neutral90,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '문맥상 의미',
-                        style: heading_xxsmall(context).copyWith(
-                          color: customColors.neutral30,
-                        ),
-                      ),
-                      Text(
-                        '문맥상 의미의 예시입니다.',
-                        style: body_small(context),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        '요약',
-                        style: heading_xxsmall(context).copyWith(
-                          color: customColors.neutral30,
-                        ),
-                      ),
-                      Text(
-                        '요약의 예시입니다.',
-                        style: body_small(context),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  bool _isWordSelected(String selectedText) {
-    return selectedText.split(' ').length == 1;
-  }
-
-  void _navigateToChatbot(BuildContext context, TextSelectionDelegate delegate) {
-    final String selectedText = delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
-    if (selectedText.isNotEmpty) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ChatBot(selectedText: selectedText),
-        ),
-      );
-    }
-  }
