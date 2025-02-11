@@ -15,91 +15,63 @@ class DebateActivityMain extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    return Scaffold(
-      appBar: CustomAppBar_2depth_6(title: "토론", automaticallyImplyLeading: false,
-        onIconPressed: () {
-          Navigator.pop(context);
-        } ,
-      ),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight, // 화면의 전체 높이에 맞추기
-                ),
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(0, 16, 0, 16),
-                  color: customColors.neutral90,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      elevation: 5,
+      child: Builder(
+        builder: (context) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 16, 0, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,  // Adjust height to fit the content
+                children: [
+                  Column(
                     children: [
-                      Column(
-                        children: [
-                          SizedBox(height: 117.h),
-                          TitleSectionMain(
-                            title: "인공지능의 일자리 대체를",
-                            subtitle: "",
-                            subtitle2: "주제로 토론해볼까요?",
-                            customColors: customColors,
-                          ),
-                          SizedBox(height: 51.h),
-                          SVGSection(customColors: customColors)
-
-                        ],
+                      TitleSectionMain(
+                        title: "토론 미션",
+                        subtitle: "",
+                        subtitle2: "",
+                        customColors: customColors,
                       ),
-                      Column(
-                        children: [
-                          SizedBox(height: 30.h),
-                          DescriptionSection(
-                            customColors: customColors, // 필수: CustomColors 전달
-                            items: [
-                              {
-                                "icon": Icons.message_outlined, // 사용자 지정 아이콘
-                                "text": "찬성/반대 총 4번을 반복해요!",
-                              },
-                              {
-                                "icon": Icons.access_time_filled, // 사용자 지정 아이콘
-                                "text": "미션을 시작하면 타이머가 작동해요!",
-                              },
-                            ],
-                          ),
-                          SizedBox(height: 50.h),
-                          Button_Section(),
-                        ],
-                      ),
+                      SizedBox(height: 20,),
+                      SVGSection(customColors: customColors),
                     ],
                   ),
-                ),
+                  SizedBox(height: 20,),
+                  Column(
+                    children: [
+                      DescriptionSection(
+                        customColors: customColors,
+                        items: [
+                          {
+                            "icon": Icons.comment_outlined,
+                            "text": "찬성/반대 총 4번을 반복해요!",
+                          },
+                          {
+                            "icon": Icons.access_time_filled,
+                            "text": "미션을 시작하면 타이머가 작동해요!",
+                          },
+                        ],
+                      ),
+                      ButtonPrimary(
+                        function: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DebatePage(),
+                            ),
+                          );
+                        },
+                        title: '시작하기',
+                      )
+                    ],
+                  ),
+                ],
               ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class Button_Section extends StatelessWidget {
-  const Button_Section({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ButtonPrimary(
-        function: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DebatePage(),
             ),
           );
         },
-        title: '시작하기',
       ),
     );
   }

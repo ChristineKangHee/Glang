@@ -43,7 +43,7 @@ class DescriptionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(48.w, 0, 0, 0),
+      padding: EdgeInsets.all(16),
       child: Column(
         children: items.map((item) => _buildRow(context, item)).toList(),
       ),

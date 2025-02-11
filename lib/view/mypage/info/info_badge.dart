@@ -34,14 +34,12 @@ class BadgeWidget extends StatelessWidget {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     return Container(
       width: double.infinity,
-      height: 660, // 전체 컨테이너의 높이 고정
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: double.infinity,
-            height: 55,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -76,8 +74,6 @@ class BadgeWidget extends StatelessWidget {
                 itemCount: _badges.length,
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 140, // 가로 크기 조절
-                  mainAxisSpacing: 16, // 배지 간 세로 간격
-                  crossAxisSpacing: 16, // 배지 간 가로 간격
                   childAspectRatio: 1.0, // 정사각형 비율
                 ),
                 itemBuilder: (context, index) {
@@ -87,7 +83,6 @@ class BadgeWidget extends StatelessWidget {
                   final starColor = isObtained ? customColors.secondary : customColors.neutral80;
 
                   return Container(
-                    height: 160, // 세로 길이 고정
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [

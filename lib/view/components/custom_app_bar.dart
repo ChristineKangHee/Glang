@@ -76,6 +76,8 @@ import '../../viewmodel/custom_colors_provider.dart';
 import 'dart:async';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'alarm_dialog.dart';
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////        1 Depth App Bar        //////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +144,11 @@ class CustomAppBar_Logo extends StatelessWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
       leading: Padding(
         padding: const EdgeInsets.only(left: 16.0),
-        child: Container(child: SvgPicture.asset('assets/icons/app_logo_without_background.svg')),
+        child: SvgPicture.asset(
+          'assets/icons/logo_new.svg',
+          height: 28,
+          width: 35,
+        ),
       ),// logo 부분
       actions: [// 이 부분에 아이콘 버튼을 추가
         IconButton(
@@ -220,7 +226,7 @@ class CustomAppBar_Community extends StatelessWidget implements PreferredSizeWid
           onPressed: onSearchPressed,
         ),
       ],
-      backgroundColor: backgroundColor ?? customColors.neutral90,
+      backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
   }
@@ -286,7 +292,11 @@ class CustomAppBar_Logo_only extends StatelessWidget implements PreferredSizeWid
       scrolledUnderElevation: 0,
       leading: Padding(
         padding: const EdgeInsets.only(left: 16.0),
-        child: Container(child: SvgPicture.asset('assets/icons/app_logo_without_background.svg')),
+        child: SvgPicture.asset(
+          'assets/icons/logo_new.svg',
+          height: 28,
+          width: 35,
+        ),
       ),// logo 부분. 추후 진짜 로고로 바꿀 것
       backgroundColor: backgroundColor ?? customColors.neutral100,
       elevation: 0,
@@ -439,7 +449,7 @@ class CustomAppBar_2depth_3 extends StatelessWidget implements PreferredSizeWidg
     return Size.fromHeight(kToolbarHeight + bottomHeight);
   }
 }
-
+////////////////////// 이전으로 돌아가는 앱바 //////////////////////
 class CustomAppBar_2depth_4 extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Color? backgroundColor; // null 가능하도록 수정
@@ -482,7 +492,7 @@ class CustomAppBar_2depth_4 extends StatelessWidget implements PreferredSizeWidg
     return Size.fromHeight(kToolbarHeight + bottomHeight);
   }
 }
-
+////////////////////// 검색 앱바 //////////////////////
 class CustomAppBar_2depth_5 extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Color? backgroundColor; // null 가능하도록 수정
@@ -533,7 +543,7 @@ class CustomAppBar_2depth_5 extends StatelessWidget implements PreferredSizeWidg
     return Size.fromHeight(kToolbarHeight + bottomHeight);
   }
 }
-
+////////////////////// 오른쪽 close 버튼 앱바(뒤로 back 안생기도록 automaticallyImplyLeading:false 지정) //////////////////////
 class CustomAppBar_2depth_6 extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Color? backgroundColor;
@@ -722,11 +732,75 @@ class _CustomAppBar_2depth_8State extends State<CustomAppBar_2depth_8> {
       actions: [
         IconButton(
           icon: Icon(Icons.close, color: customColors.neutral30, size: 28),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            showResultDialog(
+              context,
+              customColors,
+              "결과를 저장하고 이동할까요?",
+              "아니오",
+              "예",
+                  (ctx) {
+                    Navigator.pop(context);
+              },
+            );
+          },
         ),
       ],
+
       backgroundColor: widget.backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
+  }
+}
+
+////////////////////// 커뮤니티 글쓰기 임시저장 등록 앱바 //////////////////////
+class CustomAppBar_2depth_9 extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final Color? backgroundColor;
+  final Function()? onIconPressed; // close 아이콘 눌렀을 때 실행할 콜백
+  final PreferredSizeWidget? bottom;
+  final List<Widget> actions;
+
+  const CustomAppBar_2depth_9({
+    Key? key,
+    required this.title,
+    this.backgroundColor,
+    this.onIconPressed,
+    this.bottom,
+    this.actions = const [], // 기본값: 빈 리스트
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      scrolledUnderElevation: 0,
+      bottom: bottom,
+      leading: IconButton(
+        icon: Icon(
+          Icons.close,
+          color: customColors.neutral30,
+          size: 28,
+        ),
+        onPressed: onIconPressed ?? () {
+          Navigator.pop(context);
+        },
+      ),
+      title: Text(
+        title,
+        style: heading_xsmall(context).copyWith(color: customColors.neutral30),
+      ).tr(),
+      centerTitle: true,
+      actions: actions,
+      backgroundColor: backgroundColor ?? customColors.neutral100,
+      elevation: 0,
+    );
+  }
+
+  @override
+  Size get preferredSize {
+    final bottomHeight = bottom?.preferredSize.height ?? 0.0;
+    return Size.fromHeight(kToolbarHeight + bottomHeight);
   }
 }

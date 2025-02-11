@@ -1,25 +1,30 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/view/components/custom_app_bar.dart';
 import 'package:readventure/view/components/my_divider.dart';
 import 'package:readventure/view/feature/after_read/widget/custom_chip.dart';
+import 'package:readventure/view/feature/after_read/widget/answer_section.dart';
+import '../../../../model/section_data.dart';
+import '../../../../model/stage_data.dart';
 import '../../../../theme/theme.dart';
-import '../../after_read/widget/answer_section.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import '../../../home/stage_provider.dart';
 import '../widget/AlertDialogBR.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class CRLearning extends StatefulWidget {
+class CRLearning extends ConsumerStatefulWidget {
   const CRLearning({super.key});
 
   @override
-  State<CRLearning> createState() => _CELearningState();
+  ConsumerState<CRLearning> createState() => _CRLearningState();
 }
 
-class _CELearningState extends State<CRLearning> {
+class _CRLearningState extends ConsumerState<CRLearning> {
   final TextEditingController _controller = TextEditingController();
   bool _isButtonEnabled = false;
-  List<String> _keywords = ["#읽기능력","#맞춤형도구","#피드백"];
+
+
   @override
   void initState() {
     super.initState();
@@ -39,13 +44,25 @@ class _CELearningState extends State<CRLearning> {
     });
   }
 
-  // 결과창 띄우기
-  void _showAlertDialog() {
+  // 진행도 업데이트 + 결과창
+  Future<void> _onSubmit(StageData stage) async {
+    // 실제 유저 ID 가져오기
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      print("⚠️ 유저가 로그인되지 않음!");
+      return;
+    }
+
+    await completeActivityForStage(
+      userId: userId,
+      stageId: stage.stageId,
+      activityType: 'beforeReading',
+    );
+
+    // 결과 다이얼로그 띄우기
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return const AlertDialogBR();
-      },
+      builder: (BuildContext context) => const AlertDialogBR(),
     );
   }
 
@@ -53,6 +70,19 @@ class _CELearningState extends State<CRLearning> {
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
+    final stage = ref.watch(currentStageProvider);
+    final brData = stage?.brData;
+
+    print("[CRLearning] selectedStageId = ${ref.watch(selectedStageIdProvider)}");
+    print("[CRLearning] stage = $stage"); // stage가 null이면 여기서 확인 가능
+    print("[CRLearning] brData = ${stage?.brData}");
+
+    final stagesAsync = ref.watch(stagesProvider);
+    print("[CRLearning] stagesProvider: ${stagesAsync.value?.map((s) => s.stageId).toList()}");
+
+    final uid = ref.watch(userIdProvider);
+    print("[CRLearning] userId = $uid");
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: CustomAppBar_2depth_6(
@@ -74,40 +104,43 @@ class _CELearningState extends State<CRLearning> {
                     // 타이머와 제목 섹션
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Text("표지를 보고 제목을 유추해보세요!", style: body_small_semi(context).copyWith(color: customColors.primary),),
+                      child: Text(
+                        "표지를 보고 제목을 유추해보세요!",
+                        style: body_small_semi(context).copyWith(color: customColors.primary),
+                      ),
                     ),
-                    // 본문 텍스트
+                    // 표지 이미지
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Container(
                         color: Colors.white,
                         width: MediaQuery.of(context).size.width,
                         height: 300.h,
-                        child: Image.asset("assets/images/cover.png"),
+                        child: brData?.coverImageUrl != null
+                            ? Image.network(brData!.coverImageUrl)
+                            : Image.asset("assets/images/cover.png"),
                       ),
                     ),
-                    ///TODO CustomChip추가: 키워드 3개
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Wrap(
-                        spacing: 8.0,
-                        runSpacing: 8.0,
-                        children: _keywords
-                            .map(
-                              (keyword) => CustomChip(
-                            label: keyword,
-                            customColors: customColors, // CustomColors를 전달
-                            borderRadius: 14.0, // 원하는 Radius 값 설정 가능
-                          ),
-                        )
-                            .toList(),
+                    // 키워드 표시
+                    if (brData?.keywords != null && brData!.keywords.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Wrap(
+                          spacing: 8.0,
+                          runSpacing: 8.0,
+                          children: brData.keywords.map(
+                                (keyword) => CustomChip(
+                              label: keyword,
+                              customColors: customColors,
+                              borderRadius: 14.0,
+                            ),
+                          ).toList(),
+                        ),
                       ),
-                    ),
-
-                    SizedBox(height: 8,),
+                    const SizedBox(height: 8),
                     BigDivider(),
                     BigDivider(),
-                    SizedBox(height: 8,),
+                    const SizedBox(height: 8),
                     // 사용자 입력 영역
                     Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -123,7 +156,7 @@ class _CELearningState extends State<CRLearning> {
             // 제출 버튼
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: buildButton(customColors),
+              child: buildButton(customColors, stage),
             ),
           ],
         ),
@@ -131,11 +164,11 @@ class _CELearningState extends State<CRLearning> {
     );
   }
 
-  SizedBox buildButton(CustomColors customColors) {
+  SizedBox buildButton(CustomColors customColors, StageData? stage) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _isButtonEnabled ? _showAlertDialog : null,
+        onPressed: _isButtonEnabled && stage != null ? () => _onSubmit(stage) : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: customColors.primary,
           foregroundColor: Colors.white,

@@ -1,3 +1,4 @@
+// debate_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'debate_notifier.dart';
 import 'debate_state.dart';

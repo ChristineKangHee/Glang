@@ -15,6 +15,7 @@ import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../viewmodel/custom_colors_provider.dart';
 import '../home/user_service.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 /// 마이페이지 메인 화면 위젯
 /// - 상단 앱바, 하단 네비게이션 바, 컨텐츠
@@ -126,12 +127,14 @@ class UserProfileSection extends StatelessWidget {
           width: 100,
           height: 100,
           decoration: ShapeDecoration(
-            image: const DecorationImage(
-              image: NetworkImage("https://via.placeholder.com/100x100"),
-              fit: BoxFit.fill,
-            ),
             shape: CircleBorder(
               side: BorderSide(width: 3, color: customColors.neutral90 ?? Colors.grey[300]!),
+            ),
+          ),
+          child: ClipOval(
+            child: SvgPicture.asset(
+              'assets/images/character.svg',
+              fit: BoxFit.fill, // Ensures the image fills the container without distortion
             ),
           ),
         ),

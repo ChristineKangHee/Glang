@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:readventure/view/community/CM_1depth.dart';
 import 'package:readventure/view/components/custom_app_bar.dart';
 import 'package:readventure/view/feature/after_read/GA_03_01_change_ending/CE_main.dart';
 import 'package:readventure/view/feature/after_read/GA_03_03_debate_activity/DA_main.dart';
 import 'package:readventure/view/feature/after_read/GA_03_04_diagram/diagram_learning.dart';
 import 'package:readventure/view/feature/reading/selectable.dart';
+import 'package:readventure/view/login/interestSelection.dart';
 import 'package:readventure/view/login/tutorial.dart';
 import '../Result_Report.dart';
 import '../reading/quiz_data.dart';
@@ -67,10 +69,10 @@ class ArMain extends StatelessWidget {
                   ),
             ), child: Text("학습 선택")),
             SizedBox(height: 30,),
-            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
-              builder: (context) => DebateActivityMain(),
-            )), child: Text("토론 활동")),
-            SizedBox(height: 30,),
+            // ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
+            //   builder: (context) => DebateActivityMain(),
+            // )), child: Text("토론 활동")),
+            // SizedBox(height: 30,),
             ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
               builder: (context) => ResultReportPage(),
             )), child: Text("리포트")),
@@ -86,6 +88,14 @@ class ArMain extends StatelessWidget {
             ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
               builder: (context) => SelectableTextWithHighlight(),
             )), child: Text("밑줄")),
+            SizedBox(height: 30,),
+            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
+              builder: (context) => InterestSelectionPage(),
+            )), child: Text("관심사")),
+            SizedBox(height: 30,),
+            ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
+              builder: (context) => CommunityMainPage(),
+            )), child: Text("커뮤니티")),
             SizedBox(height: 30,),
           ],
         ),

@@ -22,76 +22,86 @@ class LoginPage extends ConsumerWidget {
     final customColors = ref.watch(customColorsProvider); // CustomColors 가져오기
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              customColors.neutral100 ?? Colors.blue,  // Start color of the gradient
-              customColors.primary10 ?? Colors.green, // End color of the gradient
-            ],
-            begin: Alignment.centerLeft,
-            end: Alignment.bottomRight,
+      body: Stack(
+        children: [
+          // 1. 가장 아래: 그라데이션 배경
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  customColors.neutral100 ?? Colors.blue,  // 시작 색상
+                  customColors.primary10 ?? Colors.green,    // 끝 색상
+                ],
+                begin: Alignment.centerLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
           ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Expanded(
-                  child: Center(
-                    child: SvgPicture.asset("assets/icons/app_login_logo.svg"),
-                  )
-              ),
-              GestureDetector(
-                onTap: () {
-                  authController.signInWithGoogle(
-                    onNicknameRequired: () {
-                      Navigator.pushReplacementNamed(context, '/nickname');
-                    },
-                    onHome: () {
-                      Navigator.pushReplacementNamed(context, '/');
-                      ref.refresh(attendanceProvider);
-                    },
-                  );
-                },
-                child: GoogleLoginButton(customColors: customColors),
-              ),
-              SizedBox(height: 16,),
-              // Apple 로그인 버튼 (수정됨)
-              GestureDetector(
-                onTap: () {
-                  authController.signInWithApple(
-                    onNicknameRequired: () {
-                      Navigator.pushReplacementNamed(context, '/nickname');
-                    },
-                    onHome: () {
-                      Navigator.pushReplacementNamed(context, '/');
-                      ref.refresh(attendanceProvider);
-                    },
-                  );
-                },
-                child: AppleLoginButton(customColors: customColors),
-              ),
-              // Kakao 로그인 버튼
-              SizedBox(height: 16,),
-              GestureDetector(
-                onTap: () {
-                  authController.signInWithKakao(
-                    onNicknameRequired: () {
-                      Navigator.pushReplacementNamed(context, '/nickname');
-                    },
-                    onHome: () {
-                      Navigator.pushReplacementNamed(context, '/');
-                      ref.refresh(attendanceProvider);
-                    },
-                  );
-                },
-                child: KakaoLoginButton(customColors: customColors),
-              ),
-              SizedBox(height: 40,),
-            ],
+          // 2. 그 위에: login_background.svg (화면 너비 전체)
+          Positioned(
+            top: 0,  // 원하는 위치로 조정 가능 (예: 화면 상단)
+            left: 0,
+            right: 0,
+            child: SvgPicture.asset(
+              "assets/images/login_background.svg",
+              width: MediaQuery.of(context).size.width,
+              fit: BoxFit.fitWidth, // 화면 너비에 맞게 조정
+            ),
           ),
-        ),
+          // 3. 그 위에: 로그인 UI (로고, 로그인 버튼 등)
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    authController.signInWithGoogle(
+                      onNicknameRequired: () {
+                        Navigator.pushReplacementNamed(context, '/nickname');
+                      },
+                      onHome: () {
+                        Navigator.pushReplacementNamed(context, '/');
+                        ref.refresh(attendanceProvider);
+                      },
+                    );
+                  },
+                  child: GoogleLoginButton(customColors: customColors),
+                ),
+                SizedBox(height: 16,),
+                GestureDetector(
+                  onTap: () {
+                    authController.signInWithApple(
+                      onNicknameRequired: () {
+                        Navigator.pushReplacementNamed(context, '/nickname');
+                      },
+                      onHome: () {
+                        Navigator.pushReplacementNamed(context, '/');
+                        ref.refresh(attendanceProvider);
+                      },
+                    );
+                  },
+                  child: AppleLoginButton(customColors: customColors),
+                ),
+                SizedBox(height: 16,),
+                GestureDetector(
+                  onTap: () {
+                    authController.signInWithKakao(
+                      onNicknameRequired: () {
+                        Navigator.pushReplacementNamed(context, '/nickname');
+                      },
+                      onHome: () {
+                        Navigator.pushReplacementNamed(context, '/');
+                        ref.refresh(attendanceProvider);
+                      },
+                    );
+                  },
+                  child: KakaoLoginButton(customColors: customColors),
+                ),
+                SizedBox(height: 40,),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

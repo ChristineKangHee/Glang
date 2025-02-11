@@ -1,3 +1,9 @@
+/// File: answer_section_BR.dart
+/// Purpose: 사용자의 답변(제목 및 내용) 입력 필드를 제공하는 위젯
+/// Author: 박민준
+/// Created: 2025-01-0?
+/// Last Modified: 2025-02-05 by 박민준
+
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import '../../../../../theme/theme.dart';

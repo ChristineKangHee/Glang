@@ -1,3 +1,4 @@
+// debate_notifier.dart
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'debate_state.dart';
@@ -45,5 +46,6 @@ class DebateNotifier extends StateNotifier<DebateState> {
     _timer?.cancel(); // 머 해제
     super.dispose();
   }
+
 }
 

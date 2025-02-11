@@ -13,13 +13,43 @@ import '../../../../theme/theme.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
 import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_button.dart';
+import '../choose_activities.dart';
 import '../widget/title_section_learning.dart';
+import 'diagram_main.dart';
 
-// 단어 리스트를 관리하기 위한 StateNotifierProvider 정의
+/// ─────────── 정답 정보 및 제출 상태 Provider ───────────
+/// 각 노드에 들어가야 하는 정답 (노드 생성 순서에 맞게 매핑)
+const Map<String, String> correctAnswers = {
+  'Root': '읽기 시스템',
+  'Child 1': '문제점',
+  'Grandchild 1': '교육 시스템',
+  'Grandchild 2': '피드백 부족',
+  'Child 2': '해결방안',
+  'Grandchild 3': '맞춤형 읽기 도구',
+  'Grandchild 4': '실시간 피드백',
+  'Child 3': '기대효과',
+  'Grandchild 5': '읽기 능력 향상',
+  'Grandchild 6': '자기주도 학습 강화',
+};
+
+/// 제출 여부 (사용자가 제출 버튼을 누른 상태)
+final submissionStatusProvider = StateProvider<bool>((ref) => false);
+/// 모든 노드가 정답일 경우 제출 완료 상태
+final submissionCompleteProvider = StateProvider<bool>((ref) => false);
+
+/// ─────────── 단어 리스트를 관리하기 위한 StateNotifierProvider ───────────
 final wordListProvider = StateNotifierProvider<WordListNotifier, List<String>>((ref) {
   return WordListNotifier([
-    '읽기 시스템', '문제점', '교육 시스템', '피드백 부족', '해결방안',
-    '맞춤형 읽기 도구', '실시간 피드백', '기대효과', '읽기 능력 향상', '자기주도 학습 강화'
+    '읽기 시스템',
+    '문제점',
+    '교육 시스템',
+    '피드백 부족',
+    '해결방안',
+    '맞춤형 읽기 도구',
+    '실시간 피드백',
+    '기대효과',
+    '읽기 능력 향상',
+    '자기주도 학습 강화'
   ]);
 });
 
@@ -33,7 +63,7 @@ class WordListNotifier extends StateNotifier<List<String>> {
   }
 }
 
-// 노드 라벨을 관리하기 위한 StateNotifierProvider 정의
+/// ─────────── 노드 라벨을 관리하기 위한 StateNotifierProvider ───────────
 final nodeLabelProvider = StateNotifierProvider<NodeLabelNotifier, Map<String, String>>((ref) {
   return NodeLabelNotifier();
 });
@@ -61,7 +91,7 @@ class NodeLabelNotifier extends StateNotifier<Map<String, String>> {
   }
 }
 
-// 트리 다이어그램 화면
+/// ─────────── 트리 다이어그램 화면 ───────────
 class RootedTreeScreen extends ConsumerWidget {
   final Graph graph = Graph(); // 트리 구조 정의
   final BuchheimWalkerConfiguration builder = BuchheimWalkerConfiguration(); // 트리 배치 알고리즘 설정
@@ -112,7 +142,6 @@ class RootedTreeScreen extends ConsumerWidget {
     if (parentNode != null) {
       graph.addEdge(parentNode, currentNode);
     }
-
     if (data['children'] != null) {
       for (var child in data['children']) {
         buildTree(graph, child, currentNode);
@@ -120,18 +149,32 @@ class RootedTreeScreen extends ConsumerWidget {
     }
   }
 
+  final dialogShownProvider = StateProvider<bool>((ref) => false);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final customColors = ref.watch(customColorsProvider); // 사용자 정의 색상 가져오기
+    final customColors = ref.watch(customColorsProvider);
+    final dialogShown = ref.watch(dialogShownProvider);
+
+    if (!dialogShown) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return const DiagramMainDialog();
+          },
+        );
+        ref.read(dialogShownProvider.notifier).state = true; // 다이얼로그가 표시되었음을 기록
+      });
+    }
 
     return Scaffold(
       backgroundColor: customColors.neutral90,
       appBar: CustomAppBar_2depth_8(
-        title: '다이어그램', // 화면 제목
+        title: '다이어그램',
       ),
       body: Column(
         children: [
-          // 제목 섹션
           Container(
             decoration: ShapeDecoration(
               color: customColors.neutral100,
@@ -149,9 +192,7 @@ class RootedTreeScreen extends ConsumerWidget {
               ),
             ),
           ),
-          // 트리 다이어그램
           RootedTree(customColors, ref, context),
-          // 단어 리스트 위젯
           WordListWidget(),
           const SizedBox(height: 20),
         ],
@@ -175,9 +216,6 @@ class RootedTreeScreen extends ConsumerWidget {
         child: Center(
           child: InteractiveViewer(
             constrained: false,
-            boundaryMargin: const EdgeInsets.all(4),
-            minScale: 0.1,
-            maxScale: 3.0,
             child: GraphView(
               graph: graph,
               algorithm: BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder)),
@@ -195,35 +233,49 @@ class RootedTreeScreen extends ConsumerWidget {
       ),
     );
   }
-  // 노드 위젯 생성
+
+  // 노드 위젯 생성 – 제출 여부에 따라 색상이 변경됨
   Widget nodeWidget(String nodeId, WidgetRef ref) {
     String label = ref.watch(nodeLabelProvider.select((map) => map[nodeId] ?? ""));
     final customColors = ref.watch(customColorsProvider);
+    final submitted = ref.watch(submissionStatusProvider);
 
-    // 노드 색상 설정
-    Color nodeColor;
-    switch (nodeId) {
-      case 'Root':
-        nodeColor = Colors.redAccent;
-        break;
-      case 'Child 1':
-      case 'Child 2':
-      case 'Child 3':
-        nodeColor = Colors.blueAccent;
-        break;
-      default:
-        nodeColor = Colors.greenAccent;
-        break;
+    Color? nodeColor;
+    if (submitted) {
+      // 제출 후: 정답이면 success40, 오답이면 error40
+      String correctAnswer = correctAnswers[nodeId] ?? "";
+      nodeColor = (label == correctAnswer)
+          ? customColors.success40
+          : customColors.error40;
+    } else {
+      // 제출 전 기본 색상
+      switch (nodeId) {
+        case 'Root':
+          nodeColor = customColors.secondary;
+          break;
+        case 'Child 1':
+        case 'Child 2':
+        case 'Child 3':
+          nodeColor = customColors.primary60;
+          break;
+        default:
+          nodeColor = customColors.primary40;
+          break;
+      }
     }
 
     return GestureDetector(
       onTap: () {
         if (label.isNotEmpty) {
+          // 노드에 배치된 단어를 다시 워드리스트로 돌려보내고 라벨 초기화
           ref.read(wordListProvider.notifier).state = [
             ...ref.read(wordListProvider),
             label
           ];
           ref.read(nodeLabelProvider.notifier).updateNodeLabel(nodeId, "");
+          // 수정 시 제출 상태 초기화 (노드 색상이 기본으로 돌아감)
+          ref.read(submissionStatusProvider.notifier).state = false;
+          ref.read(submissionCompleteProvider.notifier).state = false;
         }
       },
       child: DragTarget<String>(
@@ -231,9 +283,7 @@ class RootedTreeScreen extends ConsumerWidget {
           ref.read(nodeLabelProvider.notifier).updateNodeLabel(nodeId, droppedWord);
           ref.read(wordListProvider.notifier).removeWord(droppedWord);
         },
-        onWillAccept: (data) {
-          return label.isEmpty;
-        },
+        onWillAccept: (data) => label.isEmpty,
         builder: (context, candidateData, rejectedData) {
           return Container(
             width: 80,
@@ -245,7 +295,8 @@ class RootedTreeScreen extends ConsumerWidget {
             ),
             child: Text(
               label.isEmpty ? " " : label,
-              style: body_small_semi(context).copyWith(fontSize: 12, color: customColors.neutral100),
+              style: body_small_semi(context)
+                  .copyWith(fontSize: 12, color: customColors.neutral100),
             ),
           );
         },
@@ -254,25 +305,82 @@ class RootedTreeScreen extends ConsumerWidget {
   }
 }
 
-// 단어 리스트 위젯 정의
+/// ─────────── 단어 리스트 위젯 정의 ───────────
 class WordListWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider);
     final wordList = ref.watch(wordListProvider);
+    final submitted = ref.watch(submissionStatusProvider);
+    final complete = ref.watch(submissionCompleteProvider);
 
+    // 버튼 텍스트: 제출 전 → '제출하기', 제출 후 오답이 있으면 → '수정하기',
+    // 이미 정답이면 → '제출 완료'
+    final buttonTitle = submitted
+        ? (complete ? '제출 완료' : '수정하기')
+        : '제출하기';
+
+    // 모든 단어가 노드에 배치되었을 때 버튼 표시
     return wordList.isEmpty
         ? Container(
       width: MediaQuery.of(context).size.width,
       child: ButtonPrimary(
         function: () {
-          print("제출하기");
-          Navigator.popUntil(
-            context,
-                (route) => route.settings.name == 'LearningActivitiesPage',
-          );
+          final isSubmitted = ref.read(submissionStatusProvider);
+          final isComplete = ref.read(submissionCompleteProvider);
+
+          // 이미 제출 상태이며 모든 노드가 정답인 경우 → 제출 완료 상태이므로 페이지 이동
+          if (isSubmitted && isComplete) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => LearningActivitiesPage()),
+            );
+          }
+          // 제출 전인 경우 → 제출 시 오답 체크 (제출 시도)
+          else if (!isSubmitted) {
+            ref.read(submissionStatusProvider.notifier).state = true;
+            final nodeLabels = ref.read(nodeLabelProvider);
+            bool allCorrect = true;
+            for (var nodeId in correctAnswers.keys) {
+              if (nodeLabels[nodeId] != correctAnswers[nodeId]) {
+                allCorrect = false;
+                break;
+              }
+            }
+            if (allCorrect) {
+              // 모든 노드 정답 → UI에 success40로 표시하고 버튼 텍스트는 '제출 완료'로 변경
+              ref.read(submissionCompleteProvider.notifier).state = true;
+            } else {
+              // 오답이 있을 경우 → 버튼 텍스트를 '수정하기'로 변경
+              ref.read(submissionCompleteProvider.notifier).state = false;
+            }
+          }
+          // 제출 후 오답이 있는 상태에서 '수정하기'를 누른 경우
+          else {
+            final nodeLabels = ref.read(nodeLabelProvider);
+            final wrongNodes = <String>[];
+            correctAnswers.forEach((nodeId, correctAnswer) {
+              final currentLabel = nodeLabels[nodeId] ?? "";
+              if (currentLabel != correctAnswer) {
+                if (currentLabel.isNotEmpty) {
+                  wrongNodes.add(currentLabel);
+                }
+                // 오답인 노드의 라벨 초기화
+                ref.read(nodeLabelProvider.notifier).updateNodeLabel(nodeId, "");
+              }
+            });
+            // 오답 단어들을 워드리스트에 추가
+            final currentWordList = ref.read(wordListProvider);
+            ref.read(wordListProvider.notifier).state = [
+              ...currentWordList,
+              ...wrongNodes
+            ];
+            // 수정 후 제출 상태를 초기화하여 재제출할 수 있도록 함
+            ref.read(submissionStatusProvider.notifier).state = false;
+            ref.read(submissionCompleteProvider.notifier).state = false;
+          }
         },
-        title: '제출하기',
+        title: buttonTitle,
       ),
     )
         : Padding(

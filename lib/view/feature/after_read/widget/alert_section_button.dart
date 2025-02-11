@@ -49,9 +49,14 @@ class AlertSectionButton extends StatelessWidget {
             ),
             child: TextButton(
               onPressed: () {
-                Navigator.popUntil(
+                // Navigator.popUntil(
+                //   context,
+                //       (route) => route.settings.name == 'LearningActivitiesPage',
+                // );
+                // 새로고침을 위해서 우선 땜빵용으로 이렇게 해두었다...
+                Navigator.pushReplacement(
                   context,
-                      (route) => route.settings.name == 'LearningActivitiesPage',
+                  MaterialPageRoute(builder: (context) => LearningActivitiesPage()),
                 );
               },
               child: Text(

@@ -1,9 +1,3 @@
-/// File: tutorial_screen.dart
-/// Purpose: 앱의 튜토리얼 화면을 제공하며, PageView를 활용하여 여러 페이지를 스크롤 가능하도록 구현
-/// Author: 박민준
-/// Created: 2025-01-01
-/// Last Modified: 2025-02-03 by 박민준
-
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -18,6 +12,7 @@ class TutorialScreen extends StatefulWidget {
 
 class _TutorialScreenState extends State<TutorialScreen> {
   final PageController _controller = PageController();
+  int _currentPage = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -26,22 +21,31 @@ class _TutorialScreenState extends State<TutorialScreen> {
       body: Column(
         children: [
           Expanded(
-            child: TutorialPageView(controller: _controller),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: SmoothPageIndicator(
+            child: TutorialPageView(
               controller: _controller,
-              count: 4, // 페이지 수는 5로 변경
-              effect: WormEffect(
-                dotWidth: 10,
-                dotHeight: 10,
-                spacing: 10,
-                dotColor: customColors.primary20!,
-                activeDotColor: customColors.primary!,
-              ),
+              onPageChanged: (page) {
+                setState(() {
+                  _currentPage = page;
+                });
+              },
             ),
           ),
+          // SmoothPageIndicator는 마지막 페이지에서만 숨김
+          if (_currentPage < 3)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: SmoothPageIndicator(
+                controller: _controller,
+                count: 4,
+                effect: WormEffect(
+                  dotWidth: 10,
+                  dotHeight: 10,
+                  spacing: 10,
+                  dotColor: customColors.primary20!,
+                  activeDotColor: customColors.primary!,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -50,13 +54,15 @@ class _TutorialScreenState extends State<TutorialScreen> {
 
 class TutorialPageView extends StatelessWidget {
   final PageController controller;
+  final ValueChanged<int> onPageChanged;
 
-  TutorialPageView({required this.controller});
+  TutorialPageView({required this.controller, required this.onPageChanged});
 
   @override
   Widget build(BuildContext context) {
     return PageView(
       controller: controller,
+      onPageChanged: onPageChanged,
       children: [
         TutorialPage(
           title: '맞춤 코스로\n몰입형 읽기 경험!',
@@ -88,25 +94,23 @@ class TutorialPage extends StatelessWidget {
   final String title;
   final String content;
   final String image;
-  final bool showStartButton; // 시작하기 버튼을 보여줄지 여부
+  final bool showStartButton;
 
   TutorialPage({
     required this.title,
     required this.content,
     required this.image,
-    this.showStartButton = false, // 기본값은 false
+    this.showStartButton = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    // 디바이스 화면 크기 정보 가져오기
     double screenWidth = MediaQuery.of(context).size.width;
-    double imageWidth = screenWidth * 0.8; // 화면 너비의 90%로 이미지 크기 조정
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.end, // 아래쪽 정렬
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Column(
           children: [
@@ -123,27 +127,28 @@ class TutorialPage extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 16,),
+        SizedBox(height: 16),
         ClipRRect(
           child: Image.asset(
             image,
-            width: screenWidth, // 화면 너비에 맞춤
-            height: screenWidth * 1.2, // 적절한 높이 설정 (화면 비율에 따라 조정)
-            fit: BoxFit.cover, // 위쪽을 기준으로 아래쪽이 잘리도록 설정
-            alignment: Alignment.topCenter, // 위쪽 정렬
+            width: screenWidth,
+            height: screenWidth * 1.2,
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
           ),
         ),
-        // 마지막 페이지에서만 "시작하기" 버튼 추가
         if (showStartButton)
-          Container(
-            width: MediaQuery.of(context).size.width,
-            child: ButtonPrimary(
-              function: () {
-                print("시작하기 버튼이 눌렸습니다!");
-                // 시작하기 버튼을 눌렀을 때의 동작을 여기에 정의
-                Navigator.pushNamed(context, '/'); // '/'로 이동
-              },
-              title: '시작하기',
+          Padding(
+            padding: const EdgeInsets.only(bottom: 30.0),  // Adds padding to the bottom
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              child: ButtonPrimary(
+                function: () {
+                  print("시작하기 버튼이 눌렸습니다!");
+                  Navigator.pushNamed(context, '/');
+                },
+                title: '시작하기',
+              ),
             ),
           ),
       ],
