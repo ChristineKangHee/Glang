@@ -10,6 +10,7 @@ import 'package:readventure/view/feature/reading/GA_02/toolbar_component.dart';
 import 'package:readventure/view/home/stage_provider.dart';
 import '../../../../../theme/font.dart';
 import '../../../../../theme/theme.dart';
+import '../../../../model/reading_data.dart';
 import '../../../../model/section_data.dart';
 import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_button.dart';
@@ -173,7 +174,7 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
             SelectableText(
               currentStage.readingData?.textSegments[0] ?? '',
               style: reading_textstyle(context).copyWith(color: customColors.neutral0),
-              selectionControls: Read_Toolbar(customColors: customColors),
+              selectionControls: Read_Toolbar(customColors: customColors, readingData: currentStage.readingData!,),
             ),
             const SizedBox(height: 16),
 
@@ -210,7 +211,7 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
             SelectableText(
               currentStage.readingData?.textSegments[1] ?? '',
               style: reading_textstyle(context).copyWith(color: customColors.neutral0),
-              selectionControls: Read_Toolbar(customColors: customColors),
+              selectionControls: Read_Toolbar(customColors: customColors, readingData: currentStage.readingData!,),
             ),
             const SizedBox(height: 16),
 
@@ -245,7 +246,7 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
             SelectableText(
               currentStage.readingData?.textSegments[2] ?? '',
               style: reading_textstyle(context).copyWith(color: customColors.neutral0),
-              selectionControls: Read_Toolbar(customColors: customColors),
+              selectionControls: Read_Toolbar(customColors: customColors, readingData: currentStage.readingData!,),
             ),
 
             const SizedBox(height: 40),
@@ -281,11 +282,12 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
   }
 }
 
-// 텍스트 선택 툴바를 구현한 클래스
+// Read_Toolbar 클래스 (수정 후)
 class Read_Toolbar extends MaterialTextSelectionControls {
   final customColors;
+  final ReadingData readingData; // 추가: ReadingData 필드
 
-  Read_Toolbar({required this.customColors});
+  Read_Toolbar({required this.customColors, required this.readingData});
 
   @override
   Widget buildToolbar(
@@ -301,16 +303,12 @@ class Read_Toolbar extends MaterialTextSelectionControls {
     const double toolbarHeight = 50;
     const double toolbarWidth = 135;
 
-    // 화면 크기를 구해 툴바의 위치 제한
     final screenSize = MediaQuery.of(context).size;
-
-    // 툴바의 이상적인 위치 계산
     double leftPosition =
         (endpoints.first.point.dx + endpoints.last.point.dx) / 2 - toolbarWidth / 2 + 16;
     double topPosition =
         endpoints.first.point.dy + globalEditableRegion.top - toolbarHeight - 32.0;
 
-    // 툴바가 화면 내부에 있도록 clamp 처리
     leftPosition = leftPosition.clamp(0.0, screenSize.width - toolbarWidth);
     topPosition = topPosition.clamp(0.0, screenSize.height - toolbarHeight);
 
@@ -325,6 +323,7 @@ class Read_Toolbar extends MaterialTextSelectionControls {
             context: context,
             delegate: delegate,
             customColors: customColors,
+            readingData: readingData, // 추가: 현재 읽기 데이터를 전달
           ),
         ),
       ],
