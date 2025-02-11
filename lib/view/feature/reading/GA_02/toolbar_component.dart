@@ -525,7 +525,7 @@ class _ToolbarState extends State<Toolbar> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ChatBot(selectedText: selectedText),
+          builder: (context) => ChatBot(selectedText: selectedText, readingData: widget.readingData,),
         ),
       );
     }
