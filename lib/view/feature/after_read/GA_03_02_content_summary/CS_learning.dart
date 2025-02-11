@@ -3,6 +3,7 @@ import 'package:readventure/theme/font.dart';
 import 'package:readventure/view/components/custom_app_bar.dart';
 import 'package:readventure/view/components/custom_button.dart';
 import 'package:readventure/view/components/my_divider.dart';
+import '../../../../model/stage_data.dart';
 import '../../../../theme/theme.dart';
 import '../../../home/stage_provider.dart';
 import '../widget/answer_section.dart';
@@ -11,7 +12,9 @@ import '../widget/custom_chip.dart';
 import '../widget/text_section.dart';
 import '../widget/title_section_learning.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'CS_main.dart';
+import '../choose_activities.dart';
 
 /// ConsumerStatefulWidget으로 변경하여 Riverpod의 ref 사용
 class CSLearning extends ConsumerStatefulWidget {
@@ -191,7 +194,17 @@ class _CSLearningState extends ConsumerState<CSLearning> {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _isButtonEnabled ? _showAlertDialog : null,
+                  onPressed: _isButtonEnabled
+                      ? () async {
+                    final userId = FirebaseAuth.instance.currentUser?.uid;
+                    if (userId != null) {
+                      // Feature2(내용 요약 게임)는 feature 번호 2에 해당하므로,
+                      // _updateFeatureCompletion 함수를 호출하여 Firestore에 업데이트합니다.
+                      await updateFeatureCompletion(currentStage, 2, true);
+                    }
+                    _showAlertDialog();
+                  }
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: customColors.primary,
                     foregroundColor: Colors.white,
