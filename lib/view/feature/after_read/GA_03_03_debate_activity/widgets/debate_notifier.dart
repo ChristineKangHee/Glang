@@ -1,3 +1,4 @@
+// debate_notifier.dart
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'debate_state.dart';
