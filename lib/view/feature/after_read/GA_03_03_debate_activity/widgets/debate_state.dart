@@ -1,4 +1,4 @@
-
+// debate_state.dart
 /// Debate 상태 관리
 class DebateState {
   final int currentRound;

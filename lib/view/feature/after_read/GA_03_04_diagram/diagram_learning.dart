@@ -13,6 +13,7 @@ import '../../../../theme/theme.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
 import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_button.dart';
+import '../choose_activities.dart';
 import '../widget/title_section_learning.dart';
 import 'diagram_main.dart';
 
@@ -283,9 +284,14 @@ class WordListWidget extends ConsumerWidget {
       child: ButtonPrimary(
         function: () {
           print("제출하기");
-          Navigator.popUntil(
+          // Navigator.popUntil(
+          //   context,
+          //       (route) => route.settings.name == 'LearningActivitiesPage',
+          // );
+          // 새로 고침을 위한 임시 땜빵.
+          Navigator.pushReplacement(
             context,
-                (route) => route.settings.name == 'LearningActivitiesPage',
+            MaterialPageRoute(builder: (context) => LearningActivitiesPage()),
           );
         },
         title: '제출하기',

@@ -93,6 +93,19 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     _stageDataFuture = _loadStageData(userId!, stageId!);
   }
 
+  // /// Firestore 데이터를 다시 불러오는 함수
+  // Future<void> _refreshData() async {
+  //   final userId = ref.read(userIdProvider);
+  //   final stageId = ref.read(selectedStageIdProvider);
+  //
+  //   if (userId != null && stageId != null) {
+  //     final newStageData = await _loadStageData(userId, stageId);
+  //     setState(() {
+  //       _stageDataFuture = Future.value(newStageData); // 🚀 새로운 데이터로 화면 갱신
+  //     });
+  //   }
+  // }
+
   /// Firestore에서 현재 스테이지 데이터를 불러오는 함수
   Future<StageData?> _loadStageData(String userId, String stageId) async {
     final stages = await loadStagesFromFirestore(userId);
@@ -288,6 +301,21 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     );
   }
 
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //
+  //   // Firestore 데이터 다시 불러오기
+  //   final userId = ref.read(userIdProvider);
+  //   final stageId = ref.read(selectedStageIdProvider);
+  //
+  //   if (userId != null && stageId != null) {
+  //     setState(() {
+  //       _stageDataFuture = _loadStageData(userId, stageId);
+  //     });
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     final customColors = ref.watch(customColorsProvider);
@@ -328,7 +356,9 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
             title: '미션 선택',
             automaticallyImplyLeading: false,
             onIconPressed: () {
-              Navigator.pushNamed(context, '/');
+              // 두번 스택 제거해주기.. 이전에는 홈으로 push라서 스택이 계속 생겼음
+              Navigator.pop(context);
+              Navigator.pop(context);
             },
           ),
           body: Column(

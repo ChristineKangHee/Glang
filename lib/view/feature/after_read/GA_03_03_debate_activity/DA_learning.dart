@@ -1,11 +1,16 @@
+// DA_learning.dart
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/view/feature/after_read/GA_03_03_debate_activity/widgets/debate_notifier.dart';
+import '../../../../model/section_data.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
 import '../../../components/message_bubble.dart';
 import 'package:readventure/theme/theme.dart';
 import '../../../../api/debate_chatgpt_service.dart';
+import '../../../home/stage_provider.dart';
+import '../choose_activities.dart';
 import 'widgets/alert_dialog.dart';
 import 'dart:async';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -19,6 +24,19 @@ class DebatePage extends ConsumerWidget {
     final debateState = ref.watch(debateProvider);
     final debateNotifier = ref.read(debateProvider.notifier);
 
+    // 맨 처음 들어왔을때 뜨도록...
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final debateState = ref.read(debateProvider);
+      if (debateState.currentRound == 1 && !debateState.isFinished) {
+        showStartDialog(
+          context,
+          debateState.currentRound,
+          "인공지능이 인간의 일자리를 대체하는 것에 대해 어떻게 생각하십니까?",
+          debateState.isUserPro ? "찬성" : "반대",
+        );
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text("토론", style: heading_xsmall(context).copyWith(color: customColors.neutral30,)),
@@ -26,7 +44,7 @@ class DebatePage extends ConsumerWidget {
         leadingWidth: 90,
         leading: CountdownTimer(
           key: ValueKey(debateState.timerKey), // 타이머 재설정
-          initialSeconds: 180, //타이머 초
+          initialSeconds: 10, //타이머 초
           onTimerComplete: () {
             debateNotifier.nextRound(); // 라운드 전환
             if (!debateNotifier.state.isFinished) {
@@ -67,7 +85,7 @@ class DebateContent extends ConsumerWidget {
     // 라운드 종료 시 결과 다이얼로그 표시
     if (debateState.isFinished) {
       Future.microtask(() {
-        _showResultDialog(context, debateNotifier);
+        _showResultDialog(context, debateNotifier, ref);
       });
     }
 
@@ -107,7 +125,7 @@ class DebateContent extends ConsumerWidget {
     );
   }
   /// 결과 다이얼로그 표시
-  void _showResultDialog(BuildContext context, DebateNotifier debateNotifier) {
+  void _showResultDialog(BuildContext context, DebateNotifier debateNotifier, WidgetRef ref) {
     showDialog(
       context: context,
       barrierDismissible: false, // 다이얼로그 외부 클릭 방지
@@ -194,10 +212,31 @@ class DebateContent extends ConsumerWidget {
                 SizedBox(width: 16,),
                 Expanded(
                   child: TextButton(
-                    onPressed: () {
-                      Navigator.popUntil(
+                    onPressed: ()  async {
+                      // 최신 스테이지 목록을 Firestore에서 다시 불러옴
+                      final freshStages = await ref.refresh(stagesProvider.future);
+                      // 선택한 스테이지 ID를 읽음
+                      final selectedId = ref.read(selectedStageIdProvider);
+                      StageData? freshStage;
+                      if (selectedId != null) {
+                        // 최신 스테이지 목록에서 선택한 스테이지를 찾음
+                        freshStage = freshStages.firstWhereOrNull((stage) => stage.stageId == selectedId);
+                      }
+                      if (freshStage != null) {
+                        // feature3(토론 활동에 해당하는 feature 번호 3)를 완료 처리
+                        await updateFeatureCompletion(freshStage, 3, true);
+                        // stagesProvider를 무효화하여 최신 상태로 갱신
+                        ref.invalidate(stagesProvider);
+                        ref.invalidate(selectedStageIdProvider); // 혹시 모를 캐싱 문제 방지
+                      }
+                      // Navigator.popUntil(
+                      //   context,
+                      //       (route) => route.settings.name == 'LearningActivitiesPage',
+                      // );
+                      // ChooseActivities에서의 새로고침을 위한 땜빵용..
+                      Navigator.pushReplacement(
                         context,
-                            (route) => route.settings.name == 'LearningActivitiesPage',
+                        MaterialPageRoute(builder: (context) => LearningActivitiesPage()),
                       );
                     },
                     style: TextButton.styleFrom(
