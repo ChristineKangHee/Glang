@@ -3,6 +3,7 @@
 /// Author: 강희
 /// Created: 2024-1-19
 /// Last Modified: 2024-1-30 (수정: ChatGPT API 연동 및 DebateGPTService 참고)
+/// 수정: API 응답 파싱 실패나 호출 실패 시 예외 대신 기본값("정보 없음")을 반환하도록 변경
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -124,48 +125,79 @@ class _ToolbarState extends State<Toolbar> {
   Future<Map<String, dynamic>> _fetchWordDetails(String word, List<String> textSegments) async {
     final apiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
     if (apiKey.isEmpty) {
-      throw Exception('API Key가 .env 파일에 설정되어 있지 않습니다.');
+      // API Key가 없으면 바로 기본값 반환
+      return {
+        "dictionaryMeaning": "정보 없음",
+        "contextualMeaning": "정보 없음",
+        "synonyms": [],
+        "antonyms": [],
+      };
     }
 
     const endpoint = 'https://api.openai.com/v1/chat/completions';
     final url = Uri.parse(endpoint);
     final String contextText = textSegments.join("\n");
 
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Authorization': 'Bearer $apiKey',
-      },
-      body: jsonEncode({
-        'model': 'gpt-3.5-turbo',
-        'messages': [
-          {
-            'role': 'system',
-            'content': 'You are a Korean dictionary assistant. For the given word, provide a JSON object with exactly the following keys: "dictionaryMeaning", "contextualMeaning", "synonyms", and "antonyms". "dictionaryMeaning" should be a brief definition of the word in Korean. "contextualMeaning" should explain how the word is used in context based on the following text segments: "$contextText". "synonyms" should be an array of similar words in Korean, and "antonyms" should be an array of opposite words in Korean. If any information is not available, set its value to "정보 없음". 모든 결과는 한국어로 제공하세요. Return only the JSON object with no additional text.'
-          },
-          {
-            'role': 'user',
-            'content': 'Word: "$word"'
-          },
-        ],
-        'max_tokens': 300,
-        'temperature': 0.2,
-        'n': 1,
-      }),
-    );
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: jsonEncode({
+          'model': 'gpt-3.5-turbo',
+          'messages': [
+            {
+              'role': 'system',
+              'content': 'You are a Korean dictionary assistant. For the given word, provide a JSON object with exactly the following keys: "dictionaryMeaning", "contextualMeaning", "synonyms", and "antonyms". "dictionaryMeaning" should be a brief definition of the word in Korean. "contextualMeaning" should explain how the word is used in context based on the following text segments: "$contextText". "synonyms" should be an array of similar words in Korean, and "antonyms" should be an array of opposite words in Korean. If any information is not available, set its value to "정보 없음". 모든 결과는 한국어로 제공하세요. Return only the JSON object with no additional text.'
+            },
+            {
+              'role': 'user',
+              'content': 'Word: "$word"'
+            },
+          ],
+          'max_tokens': 300,
+          'temperature': 0.2,
+          'n': 1,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> resBody = jsonDecode(utf8.decode(response.bodyBytes));
-      final String message = resBody["choices"][0]["message"]["content"];
-      try {
-        final Map<String, dynamic> data = jsonDecode(message);
-        return data;
-      } catch (e) {
-        throw Exception("ChatGPT 응답 파싱 실패: $e");
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> resBody = jsonDecode(utf8.decode(response.bodyBytes));
+        final String message = resBody["choices"][0]["message"]["content"];
+        try {
+          final Map<String, dynamic> data = jsonDecode(message);
+          return data;
+        } catch (e) {
+          // 파싱 실패 시 기본값 반환
+          print("ChatGPT 응답 파싱 실패: $e");
+          return {
+            "dictionaryMeaning": "정보 없음",
+            "contextualMeaning": "정보 없음",
+            "synonyms": [],
+            "antonyms": [],
+          };
+        }
+      } else {
+        // API 호출 실패 시 기본값 반환
+        print("ChatGPT API 호출 실패: ${response.statusCode} ${response.body}");
+        return {
+          "dictionaryMeaning": "정보 없음",
+          "contextualMeaning": "정보 없음",
+          "synonyms": [],
+          "antonyms": [],
+        };
       }
-    } else {
-      throw Exception("ChatGPT API 호출 실패: ${response.statusCode} ${response.body}");
+    } catch (e) {
+      // 네트워크 오류 등 기타 예외 발생 시 기본값 반환
+      print("Exception in _fetchWordDetails: $e");
+      return {
+        "dictionaryMeaning": "정보 없음",
+        "contextualMeaning": "정보 없음",
+        "synonyms": [],
+        "antonyms": [],
+      };
     }
   }
 
@@ -332,52 +364,72 @@ class _ToolbarState extends State<Toolbar> {
       },
     );
   }
+
   /// ChatGPT API를 호출하여 문장 정보를 받아오는 함수
   Future<Map<String, dynamic>> _fetchSentenceDetails(String sentence, List<String> textSegments) async {
     final apiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
     if (apiKey.isEmpty) {
-      throw Exception('API Key가 .env 파일에 설정되어 있지 않습니다.');
+      return {
+        "contextualMeaning": "정보 없음",
+        "summary": "정보 없음",
+      };
     }
 
     const endpoint = 'https://api.openai.com/v1/chat/completions';
     final url = Uri.parse(endpoint);
     final String contextText = textSegments.join("\n");
 
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Authorization': 'Bearer $apiKey',
-      },
-      body: jsonEncode({
-        'model': 'gpt-3.5-turbo',
-        'messages': [
-          {
-            'role': 'system',
-            'content': 'You are a Korean text analysis assistant. For the given sentence, provide a JSON object with exactly the following keys: "contextualMeaning" and "summary". "contextualMeaning" should explain how the sentence is used in context based on the following text segments: "$contextText". "summary" should provide a concise summary of the sentence in Korean. If any information is not available, set its value to "정보 없음". 모든 결과는 한국어로 제공하세요. Return only the JSON object with no additional text.'
-          },
-          {
-            'role': 'user',
-            'content': 'Sentence: "$sentence"'
-          },
-        ],
-        'max_tokens': 200,
-        'temperature': 0.2,
-        'n': 1,
-      }),
-    );
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: jsonEncode({
+          'model': 'gpt-3.5-turbo',
+          'messages': [
+            {
+              'role': 'system',
+              'content': 'You are a Korean text analysis assistant. For the given sentence, provide a JSON object with exactly the following keys: "contextualMeaning" and "summary". "contextualMeaning" should explain how the sentence is used in context based on the following text segments: "$contextText". "summary" should provide a concise summary of the sentence in Korean. If any information is not available, set its value to "정보 없음". 모든 결과는 한국어로 제공하세요. Return only the JSON object with no additional text.'
+            },
+            {
+              'role': 'user',
+              'content': 'Sentence: "$sentence"'
+            },
+          ],
+          'max_tokens': 200,
+          'temperature': 0.2,
+          'n': 1,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> resBody = jsonDecode(utf8.decode(response.bodyBytes));
-      final String message = resBody["choices"][0]["message"]["content"];
-      try {
-        final Map<String, dynamic> data = jsonDecode(message);
-        return data;
-      } catch (e) {
-        throw Exception("ChatGPT 응답 파싱 실패: $e");
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> resBody = jsonDecode(utf8.decode(response.bodyBytes));
+        final String message = resBody["choices"][0]["message"]["content"];
+        try {
+          final Map<String, dynamic> data = jsonDecode(message);
+          return data;
+        } catch (e) {
+          print("ChatGPT 응답 파싱 실패: $e");
+          return {
+            "contextualMeaning": "정보 없음",
+            "summary": "정보 없음",
+          };
+        }
+      } else {
+        print("ChatGPT API 호출 실패: ${response.statusCode} ${response.body}");
+        return {
+          "contextualMeaning": "정보 없음",
+          "summary": "정보 없음",
+        };
       }
-    } else {
-      throw Exception("ChatGPT API 호출 실패: ${response.statusCode} ${response.body}");
+    } catch (e) {
+      print("Exception in _fetchSentenceDetails: $e");
+      return {
+        "contextualMeaning": "정보 없음",
+        "summary": "정보 없음",
+      };
     }
   }
 
@@ -531,6 +583,8 @@ class _ToolbarState extends State<Toolbar> {
     }
   }
 }
+
+
 
 class _NoteDialog extends StatefulWidget {
   final String selectedText;
