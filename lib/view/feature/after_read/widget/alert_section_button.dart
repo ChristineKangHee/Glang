@@ -14,59 +14,63 @@ class AlertSectionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            decoration: ShapeDecoration(
-              color: customColors.neutral90,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+    return Container(
+      color: customColors.neutral100,
+      padding: EdgeInsetsDirectional.fromSTEB(0,16,0,0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              decoration: ShapeDecoration(
+                color: customColors.neutral90,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
-            ),
-            child: TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                "다시 쓰기",
-                style: body_small_semi(context).copyWith(color: customColors.neutral60),
-              ),
-            ),
-          ),
-        ),
-        SizedBox(width: 8), // Optional: Add space between the two buttons
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            decoration: ShapeDecoration(
-              color: customColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            child: TextButton(
-              onPressed: () {
-                // Navigator.popUntil(
-                //   context,
-                //       (route) => route.settings.name == 'LearningActivitiesPage',
-                // );
-                // 새로고침을 위해서 우선 땜빵용으로 이렇게 해두었다...
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => LearningActivitiesPage()),
-                );
-              },
-              child: Text(
-                "완료",
-                style: body_small_semi(context).copyWith(color: customColors.neutral100),
+              child: TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  "다시 쓰기",
+                  style: body_small_semi(context).copyWith(color: customColors.neutral60),
+                ),
               ),
             ),
           ),
-        ),
-      ],
+          SizedBox(width: 8), // Optional: Add space between the two buttons
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              decoration: ShapeDecoration(
+                color: customColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              child: TextButton(
+                onPressed: () {
+                  // Navigator.popUntil(
+                  //   context,
+                  //       (route) => route.settings.name == 'LearningActivitiesPage',
+                  // );
+                  // 새로고침을 위해서 우선 땜빵용으로 이렇게 해두었다...
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => LearningActivitiesPage()),
+                  );
+                },
+                child: Text(
+                  "완료",
+                  style: body_small_semi(context).copyWith(color: customColors.neutral100),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
