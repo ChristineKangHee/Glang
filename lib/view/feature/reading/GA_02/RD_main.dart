@@ -141,10 +141,10 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
     );
 
     // ✅ 저장 완료 후 다음 페이지로 이동
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        settings: RouteSettings(name: 'LearningActivitiesPage'),
+        // settings: RouteSettings(name: 'LearningActivitiesPage'),
         builder: (context) => LearningActivitiesPage(),
       ),
     );
