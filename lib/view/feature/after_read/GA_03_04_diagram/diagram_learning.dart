@@ -2,17 +2,20 @@
 /// Purpose: 사용자가 단어를 트리 구조의 노드에 드래그 앤 드롭하여 트리 구조를 완성하도록 설계되었습니다.
 /// Author: 강희
 /// Created: 2024-1-17
-/// Last Modified: 2024-1-25 by 강희
+/// Last Modified: 2024-02-11 by 박민준
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:graphview/GraphView.dart';
 
+import '../../../../model/section_data.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
 import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_button.dart';
+import '../../../home/stage_provider.dart';
 import '../choose_activities.dart';
 import '../widget/title_section_learning.dart';
 import 'diagram_main.dart';
@@ -325,12 +328,28 @@ class WordListWidget extends ConsumerWidget {
         ? Container(
       width: MediaQuery.of(context).size.width,
       child: ButtonPrimary(
-        function: () {
+        function: () async {
           final isSubmitted = ref.read(submissionStatusProvider);
           final isComplete = ref.read(submissionCompleteProvider);
 
           // 이미 제출 상태이며 모든 노드가 정답인 경우 → 제출 완료 상태이므로 페이지 이동
           if (isSubmitted && isComplete) {
+            final freshStages = await ref.refresh(stagesProvider.future);
+            // 선택한 스테이지 ID를 읽음
+            final selectedId = ref.read(selectedStageIdProvider);
+            StageData? freshStage;
+            if (selectedId != null) {
+              // 최신 스테이지 목록에서 선택한 스테이지를 찾음
+              freshStage = freshStages.firstWhereOrNull((stage) => stage.stageId == selectedId);
+            }
+            if (freshStage != null) {
+              // feature3(토론 활동에 해당하는 feature 번호 3)를 완료 처리
+              await updateFeatureCompletion(freshStage, 4, true);
+              // stagesProvider를 무효화하여 최신 상태로 갱신
+              ref.invalidate(stagesProvider);
+              // ref.invalidate(selectedStageIdProvider); // 혹시 모를 캐싱 문제 방지
+            }
+
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => LearningActivitiesPage()),
