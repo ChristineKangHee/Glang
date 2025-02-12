@@ -123,7 +123,62 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
           "feature2ContentSummary": "내용 요약",
           "feature3Debate": "토론하기",
           "feature3DebateTopic": "환경 보호를 위한 강력한 정책이 더 필요하다",
-          "feature4Diagram": "다이어그램",
+          "feature4Diagram": {
+            "title": "트리 구조에 알맞는 단어를 넣어주세요!",
+            "subtitle": "<읽기의 중요성>",
+            "treeStructure": [
+              {
+                "id": "Root",
+                "children": [
+                  {
+                    "id": "Child 1",
+                    "children": [
+                      {"id": "Grandchild 1"},
+                      {"id": "Grandchild 2"}
+                    ]
+                  },
+                  {
+                    "id": "Child 2",
+                    "children": [
+                      {"id": "Grandchild 3"},
+                      {"id": "Grandchild 4"}
+                    ]
+                  },
+                  {
+                    "id": "Child 3",
+                    "children": [
+                      {"id": "Grandchild 5"},
+                      {"id": "Grandchild 6"}
+                    ]
+                  }
+                ]
+              }
+            ],
+            "correctAnswers": {
+              "Root": "읽기 시스템",
+              "Child 1": "문제점",
+              "Grandchild 1": "교육 시스템",
+              "Grandchild 2": "피드백 부족",
+              "Child 2": "해결방안",
+              "Grandchild 3": "맞춤형 읽기 도구",
+              "Grandchild 4": "실시간 피드백",
+              "Child 3": "기대효과",
+              "Grandchild 5": "읽기 능력 향상",
+              "Grandchild 6": "자기주도 학습 강화"
+            },
+            "wordList": [
+              "읽기 시스템",
+              "문제점",
+              "교육 시스템",
+              "피드백 부족",
+              "해결방안",
+              "맞춤형 읽기 도구",
+              "실시간 피드백",
+              "기대효과",
+              "읽기 능력 향상",
+              "자기주도 학습 강화"
+            ]
+          }
         },
       ),
     ),
