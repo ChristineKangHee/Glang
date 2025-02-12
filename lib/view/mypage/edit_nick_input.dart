@@ -2,7 +2,7 @@
 /// Purpose: 사용자의 별명를 수정할 수 있다.
 /// Author: 윤은서
 /// Created: 2025-01-08
-/// Last Modified: 2025-01-28 by 윤은서
+/// Last Modified: 2025-02-12 by 윤은서
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,21 +13,8 @@ import '../components/custom_button.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../components/custom_textfield.dart';
-import '../home/user_service.dart';
+import '../../viewmodel/user_service.dart' as viewmodel;
 import 'edit_profile.dart';
-
-// StateNotifier와 StateNotifierProvider를 사용하여 별명 상태 관리
-class NicknameNotifier extends StateNotifier<String> {
-  NicknameNotifier() : super('');
-
-  void updateNickname(String newNickname) {
-    state = newNickname;
-  }
-}
-
-final nicknameProvider = StateNotifierProvider<NicknameNotifier, String>((ref) {
-  return NicknameNotifier();
-});
 
 class EditNickInput extends ConsumerStatefulWidget {
   const EditNickInput({super.key});
@@ -42,8 +29,7 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
   @override
   void initState() {
     super.initState();
-    // nicknameProvider의 초기 값으로 TextEditingController 설정
-    final initialNickname = ref.read(nicknameProvider);
+    final initialNickname = ref.read(viewmodel.userNameProvider);
     _controller = TextEditingController(text: initialNickname);
   }
 
@@ -113,8 +99,7 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
                     !_controller.text.contains(' ') &&
                     !existingNicknames.contains(_controller.text)) {
                   // 별명 상태 업데이트
-                  ref.read(nicknameProvider.notifier).updateNickname(_controller.text);
-
+                  ref.read(viewmodel.userNameProvider.notifier).updateUserName(_controller.text);
                   // 이전 페이지로 돌아가기
                   Navigator.pop(context, _controller.text);
                 } else {

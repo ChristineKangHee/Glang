@@ -13,8 +13,9 @@ import '../components/custom_app_bar.dart';
 import '../components/custom_button.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
-import '../home/user_service.dart';
+import '../../viewmodel/user_service.dart' as viewmodel;
 import 'edit_nick_input.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class EditProfile extends ConsumerWidget {
   const EditProfile({super.key});
@@ -22,24 +23,21 @@ class EditProfile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider);
-    final userName = ref.watch(userNameProvider); // 사용자 이름 상태 구독
-
-    if (userName != null) {
-      ref.read(userNameProvider.notifier).fetchUserName(userName);
-    }
+    final userName = ref.watch(viewmodel.userNameProvider);
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_4(
-        title: "내 정보 수정",
-      ),
+      appBar: CustomAppBar_2depth_4(title: "내 정보 수정"),
       backgroundColor: customColors.white,
-      body: const EditInfo(),
+      body: EditInfo(
+        userName: userName,
+      ),
     );
   }
 }
 
 class EditInfo extends StatelessWidget {
-  const EditInfo({super.key});
+  final String userName;
+  const EditInfo({super.key, required this.userName});
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +52,7 @@ class EditInfo extends StatelessWidget {
               children: [
                 const ProfileImage(),
                 const SizedBox(height: 40),
-                const EditNick(),
+                EditNick(name: userName),
               ],
             ),
           ),
@@ -85,7 +83,7 @@ class ProfileImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     return Center(
-      child: Container(
+      child: SizedBox(
         width: 124,
         height: 120,
         child: Stack(
@@ -97,44 +95,19 @@ class ProfileImage extends StatelessWidget {
                 width: 120,
                 height: 120,
                 decoration: ShapeDecoration(
-                  image: const DecorationImage(
-                    image: NetworkImage("https://via.placeholder.com/120x120"),
+                  shape: CircleBorder(
+                    side: BorderSide(
+                      width: 3,
+                      color: customColors.primary ?? Colors.deepPurpleAccent,
+                    ),
+                  ),
+                ),
+                child: ClipOval(
+                  child: SvgPicture.asset(
+                    'assets/images/character.svg',
                     fit: BoxFit.fill,
                   ),
-                  shape: OvalBorder(
-                    side: BorderSide(
-                      width: 3,
-                      color: customColors.primary!,
-                    ),
-                  ),
                 ),
-              ),
-            ),
-            Positioned(
-              left: 92,
-              top: 85,
-              child: Container(
-                width: 32,
-                height: 32,
-                decoration: ShapeDecoration(
-                  color: customColors.primary,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(
-                      width: 3,
-                      color: customColors.white!,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 100,
-              top: 93,
-              child: Icon(
-                Icons.camera_alt,
-                size: 16,
-                color: customColors.white,
               ),
             ),
           ],
@@ -144,8 +117,10 @@ class ProfileImage extends StatelessWidget {
   }
 }
 
+/// 닉네임 편집 섹션
 class EditNick extends ConsumerStatefulWidget {
-  const EditNick({super.key});
+  final String name;
+  const EditNick({super.key, required this.name});
 
   @override
   ConsumerState<EditNick> createState() => _EditNickState();
@@ -154,27 +129,24 @@ class EditNick extends ConsumerStatefulWidget {
 class _EditNickState extends ConsumerState<EditNick> {
   @override
   Widget build(BuildContext context) {
-    final nickname = ref.watch(nicknameProvider); // Read the nickname
-    final customColors = Theme.of(context).extension<CustomColors>()!;
+    final customColors = ref.watch(customColorsProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           '별명',
-          style: body_xsmall(context).copyWith(color: customColors.primary),
+          style: body_xsmall(context).copyWith(
+            color: customColors.primary,
+          ),
         ),
         const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              nickname,
-              style: body_large(context).copyWith(
-                fontWeight: FontWeight.w600,
-                color: customColors.black,
-              ),
+              widget.name,
+              style: heading_small(context),
             ),
             IconButton(
               icon: Icon(Icons.edit, size: 24, color: customColors.neutral30),
@@ -185,7 +157,7 @@ class _EditNickState extends ConsumerState<EditNick> {
                 );
 
                 if (newNickname is String) {
-                  ref.read(nicknameProvider.notifier).state = newNickname;
+                  ref.read(viewmodel.userNameProvider.notifier).updateUserName(newNickname);
                 }
               },
             ),
@@ -196,6 +168,7 @@ class _EditNickState extends ConsumerState<EditNick> {
   }
 }
 
+/// 추가 개인정보
 class MyInfo extends StatelessWidget {
   const MyInfo({super.key});
 
@@ -233,16 +206,16 @@ class InfoRow extends StatelessWidget {
         Text(
           title,
           style: body_small(context).copyWith(
-          color: customColors.neutral30,
-          fontWeight: FontWeight.w400,
-          height: 1.5,
+            color: customColors.neutral30,
+            fontWeight: FontWeight.w400,
+            height: 1.5,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           value,
           style: body_large(context).copyWith(
-          fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ],
