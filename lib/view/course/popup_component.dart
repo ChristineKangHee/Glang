@@ -48,7 +48,7 @@ class SectionPopup extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: BoxShadowStyles.shadow1(context),
+        // boxShadow: BoxShadowStyles.shadow1(context),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
