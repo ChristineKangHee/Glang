@@ -12,14 +12,22 @@ final userIdProvider = StateProvider<String?>((ref) => null);
 /// 1) stagesProvider: userIdProvider를 구독 → userId가 있으면 loadStagesFromFirestore 호출
 final stagesProvider = FutureProvider<List<StageData>>((ref) async {
   final userId = ref.watch(userIdProvider);
+  print("[stagesProvider] userId = $userId");
   if (userId == null) {
-    // 아직 userId가 없으면 빈 리스트 반환 (로그인 전 상태)
+    print("[stagesProvider] userId is null → return []");
     return [];
   }
-
-  // 실제 Firestore 로드
-  return await loadStagesFromFirestore(userId);
+  try {
+    print("[stagesProvider] calling loadStagesFromFirestore...");
+    final data = await loadStagesFromFirestore(userId);
+    print("[stagesProvider] loaded stages: ${data.length}");
+    return data;
+  } catch (e, st) {
+    print("[stagesProvider] error: $e\n$st");
+    rethrow;
+  }
 });
+
 
 /// 2) selectedStageIdProvider: 현재 선택한 스테이지 ID (예: 'stage_001')
 final selectedStageIdProvider = StateProvider<String?>((ref) => null);
