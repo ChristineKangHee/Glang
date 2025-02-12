@@ -92,7 +92,7 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
           ),
           Padding(
             padding: const EdgeInsets.all(20),
-            child: ButtonPrimary(
+            child: ButtonPrimary_noPadding(
               function: () async {
                 if (_controller.text.isNotEmpty &&
                     _controller.text.length <= 8 &&

@@ -120,13 +120,17 @@ class BadgeWidget extends StatelessWidget {
   }
 
   final List<Map<String, dynamic>> _badges = [
-    {'name': '일일 챌린지', 'obtained': true},
-    {'name': '시작이 반이다', 'obtained': true},
-    {'name': '좋아요 누르기', 'obtained': true},
-    {'name': '중급 달성', 'obtained': false},
-    {'name': '주간 챌린지', 'obtained': false},
-    {'name': '댓글 달기', 'obtained': false},
-    {'name': '고급 달성', 'obtained': false},
-    {'name': '피드 올리기', 'obtained': false},
+    {'name': '첫걸음', 'obtained': false},
+    {'name': '3일 연속 출석', 'obtained': false},
+    {'name': '7일 연속 출석', 'obtained': false},
+    {'name': '요약 마스터', 'obtained': false},
+    {'name': '비판적 사고가', 'obtained': false},
+    {'name': '핵심찾기 고수', 'obtained': false},
+    {'name': '창의적 사고가', 'obtained': false},
+    {'name': '첫 글 작성', 'obtained': false},
+    {'name': '소통왕', 'obtained': false},
+    {'name': '글 공유 챔피언', 'obtained': false},
+    {'name': '월간 챌린지 달성', 'obtained': false},
+    {'name': '좋아요 스타', 'obtained': false},
   ];
 }
