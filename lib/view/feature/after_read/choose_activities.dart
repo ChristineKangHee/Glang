@@ -247,6 +247,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
   void _showExplanationPopup() {
     final customColors = ref.read(customColorsProvider);
     showDialog(
+      barrierDismissible: false, // 다이얼로그 외부 클릭 방지
       context: context,
       builder: (BuildContext context) {
         return Dialog(
@@ -301,21 +302,6 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     );
   }
 
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //
-  //   // Firestore 데이터 다시 불러오기
-  //   final userId = ref.read(userIdProvider);
-  //   final stageId = ref.read(selectedStageIdProvider);
-  //
-  //   if (userId != null && stageId != null) {
-  //     setState(() {
-  //       _stageDataFuture = _loadStageData(userId, stageId);
-  //     });
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     final customColors = ref.watch(customColorsProvider);
@@ -340,15 +326,39 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
         // arData.features에 포함된 feature 번호(예: [2,3,4])만 사용
         final allowedFeatures = stageData.arData?.features;
 
-        // activities 리스트의 인덱스+1이 allowedFeatures에 포함된 경우에만 화면에 표시
+        // ✅ [1] DB에서 가져온 featureCompleted / features를 반영한 리스트로 만듦
         final availableActivities = <LearningActivity>[];
-        for (int i = 0; i < activities.length; i++) {
-          if (allowedFeatures!.contains(i + 1)) {
-            availableActivities.add(activities[i]);
+
+        for (final baseActivity in activities) {
+          if (stageData.arData?.features.contains(baseActivity.featureNumber) ?? false) {
+            final completed =
+                stageData.arData?.featuresCompleted[baseActivity.featureNumber.toString()] ?? false;
+
+            availableActivities.add(
+              LearningActivity(
+                title: baseActivity.title,
+                time: baseActivity.time,
+                xp: baseActivity.xp,
+                featureNumber: baseActivity.featureNumber,
+                isCompleted: completed,
+              ),
+            );
           }
         }
-        // 완료된 활동 수 계산 (availableActivities만 사용)
-        final completedCount = availableActivities.where((activity) => activity.isCompleted).length;
+
+        // ✅ [2] 완료된 개수
+        final completedCount =
+            availableActivities.where((activity) => activity.isCompleted).length;
+
+        // ✅ [3] XP 계산
+        final totalXP = availableActivities
+            .where((a) => a.isCompleted)
+            .map((a) => int.parse(a.xp.replaceAll('xp', '')))
+            .fold(0, (prev, e) => prev + e);
+
+        final totalPossibleXP = availableActivities
+            .map((a) => int.parse(a.xp.replaceAll('xp', '')))
+            .fold(0, (prev, e) => prev + e);
 
         return Scaffold(
           backgroundColor: customColors.neutral90,
@@ -369,9 +379,17 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        LearningProgress(completedCount, customColors, context, availableActivities),
+                        // ✅ [4] 진행도 출력 (같은 availableActivities 사용)
+                        LearningProgress(
+                          completedCount,
+                          totalXP,
+                          totalPossibleXP,
+                          customColors,
+                          context,
+                          availableActivities,
+                        ),
                         const SizedBox(height: 20),
-                        ActivityList(context, customColors, stageData),
+                        ActivityList(context, customColors, stageData, availableActivities,),
                       ],
                     ),
                   ),
@@ -386,16 +404,14 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     );
   }
 
-  // 학습 진행 상황
-  Widget LearningProgress(int completedCount, CustomColors customColors, BuildContext context, List<LearningActivity> availableActivities) {
-    int totalXP = availableActivities
-        .where((activity) => activity.isCompleted)
-        .map((activity) => int.parse(activity.xp.replaceAll('xp', '')))
-        .fold(0, (prev, element) => prev + element);
-    int totalPossibleXP = availableActivities
-        .map((activity) => int.parse(activity.xp.replaceAll('xp', '')))
-        .fold(0, (prev, element) => prev + element);
-
+  Widget LearningProgress(
+      int completedCount,
+      int totalXP,
+      int totalPossibleXP,
+      CustomColors customColors,
+      BuildContext context,
+      List<LearningActivity> availableActivities,
+      ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: ShapeDecoration(
@@ -410,48 +426,35 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
             radius: 40.0,
             lineWidth: 10.0,
             animation: true,
-            percent: availableActivities.isEmpty ? 0 : completedCount / availableActivities.length,
-            center: Text('${(availableActivities.isEmpty ? 0 : (completedCount / availableActivities.length * 100)).toStringAsFixed(0)}%', style: body_xsmall_semi(context).copyWith(color: customColors.neutral30)),
+            percent: availableActivities.isEmpty
+                ? 0
+                : completedCount / availableActivities.length,
+            center: Text(
+              '${(availableActivities.isEmpty ? 0 : (completedCount / availableActivities.length * 100)).toStringAsFixed(0)}%',
+              style: body_xsmall_semi(context).copyWith(color: customColors.neutral30),
+            ),
             progressColor: customColors.primary,
             backgroundColor: customColors.neutral80 ?? Colors.grey,
             circularStrokeCap: CircularStrokeCap.round,
           ),
           const SizedBox(width: 16),
-          _buildProgressText(totalXP, totalPossibleXP, completedCount, customColors),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('$totalXP/$totalPossibleXP xp',
+                  style: heading_medium(context).copyWith(color: customColors.neutral30)),
+              const SizedBox(height: 8),
+              Text('$completedCount 미션 완료',
+                  style: body_xsmall(context).copyWith(color: customColors.neutral60)),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  // 학습 진행 텍스트
-  Widget _buildProgressText(int totalXP, int totalPossibleXP, int completedCount, CustomColors customColors) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('$totalXP/$totalPossibleXP xp', style: heading_medium(context).copyWith(color: customColors.neutral30)),
-        const SizedBox(height: 8),
-        Text('$completedCount 미션 완료', style: body_xsmall(context).copyWith(color: customColors.neutral60)),
-      ],
-    );
-  }
-
   // 학습 활동 목록
-  Widget ActivityList(BuildContext context, CustomColors customColors, StageData stageData) {
-    // stageData.arData.features에 포함된 feature 번호만 사용하고,
-    // Firestore의 featuresCompleted 값을 반영하여 각 미션의 isCompleted 값을 초기화
-    final availableActivities = <LearningActivity>[];
-    for (var activity in activities) {
-      if (stageData.arData != null && stageData.arData!.features.contains(activity.featureNumber)) {
-        final completed = stageData.arData!.featuresCompleted[activity.featureNumber.toString()] ?? false;
-        availableActivities.add(LearningActivity(
-          title: activity.title,
-          time: activity.time,
-          xp: activity.xp,
-          featureNumber: activity.featureNumber,
-          isCompleted: completed,
-        ));
-      }
-    }
+  Widget ActivityList(BuildContext context, CustomColors customColors, StageData stageData, List<LearningActivity> availableActivities) {
     // 완료되지 않은 미션이 위쪽에 오도록 정렬
     final sortedActivities = List<LearningActivity>.from(availableActivities)
       ..sort((a, b) => a.isCompleted ? 1 : -1);
@@ -598,4 +601,5 @@ Future<void> updateFeatureCompletion(StageData stage, int featureNumber, bool is
     'arData': stage.arData!.toJson(),
   });
 }
+
 

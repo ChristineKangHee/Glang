@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../../../api/reading_chatbot_service.dart';
+import '../../../../model/reading_data.dart';
 import '../../../../theme/font.dart';
 import '../../../../util/box_shadow_styles.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
@@ -17,109 +18,131 @@ import '../../../components/custom_app_bar.dart';
 
 // 챗봇 화면을 나타내는 위젯
 class ChatBot extends ConsumerStatefulWidget {
-  final String selectedText;  // 선택된 문장을 저장할 변수
+  final String selectedText;
+  final ReadingData readingData; // 전체 글 데이터 추가
 
-  ChatBot({required this.selectedText});
+  ChatBot({required this.selectedText, required this.readingData});
 
   @override
   _ChatBotState createState() => _ChatBotState();
 }
 
-class _ChatBotState extends ConsumerState<ChatBot> {
-  final TextEditingController _controller = TextEditingController();  // 메시지 입력 컨트롤러
-  final List<Map<String, String>> _messages = [
-    {'role': 'assistant', 'content': '어떤 도움이 필요하신가요?'}  // 초기 메시지 설정
-  ];
-  final ChatBotService _chatBotService = ChatBotService();  // 챗봇 서비스 인스턴스
-  bool _isLoading = false;  // 로딩 상태 변수
 
-  // 사용자가 메시지를 보낼 때 호출되는 함수
+class _ChatBotState extends ConsumerState<ChatBot> {
+  final TextEditingController _controller = TextEditingController();
+  final List<Map<String, String>> _messages = [
+    {'role': 'assistant', 'content': '어떤 도움이 필요하신가요?'}
+  ];
+  final ChatBotService _chatBotService = ChatBotService();
+  bool _isLoading = false;
+  final ScrollController _scrollController = ScrollController();  // 스크롤 컨트롤러 추가
+
   void _sendMessage(String message) async {
     if (message.isNotEmpty) {
       setState(() {
-        _messages.add({'role': 'user', 'content': message});  // 사용자의 메시지를 추가
-        _isLoading = true;  // 로딩 상태 활성화
+        _messages.add({'role': 'user', 'content': message});
+        _isLoading = true;
       });
 
-      _controller.clear();  // 메시지 입력창 비우기
+      _controller.clear();
 
       try {
-        // 챗봇 API에 요청하고 응답 받기
-        final response = await _chatBotService.getChatResponse(widget.selectedText, _messages);
+        final response = await _chatBotService.getChatResponse(
+            widget.selectedText,
+            widget.readingData.textSegments,
+            _messages
+        );
+
         setState(() {
-          _messages.add({'role': 'assistant', 'content': response});  // 챗봇의 응답을 추가
+          _messages.add({'role': 'assistant', 'content': response});
         });
+
+        // 메시지 추가 후 스크롤을 아래로 내리기
+        _scrollToBottom();
       } catch (e) {
         setState(() {
-          _messages.add({'role': 'assistant', 'content': '오류가 발생했습니다: $e'});  // 오류 메시지 추가
+          _messages.add({'role': 'assistant', 'content': '오류가 발생했습니다: $e'});
         });
       } finally {
         setState(() {
-          _isLoading = false;  // 로딩 상태 비활성화
+          _isLoading = false;
         });
       }
     }
   }
 
+  // 자동으로 스크롤을 아래로 내리는 함수
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,  // 스크롤의 최대 범위로 이동
+        duration: Duration(milliseconds: 300),  // 300ms 동안 애니메이션
+        curve: Curves.easeInOut,  // 부드러운 애니메이션
+      );
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    final customColors = ref.watch(customColorsProvider);  // 커스텀 색상 가져오기
+    final customColors = ref.watch(customColorsProvider);
     final options = [
       '문장을 쉽게 풀어줘',
       '필요한 배경지식을 알려줘',
       '더 깊이 탐구해야 할 부분은 뭐야?'
-    ];  // 사용자 선택 옵션
+    ];
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_4(title: '챗봇'),  // 앱 바
-      backgroundColor: customColors.neutral90,  // 배경색
+      appBar: CustomAppBar_2depth_4(title: '챗봇'),
+      backgroundColor: customColors.neutral90,
       body: Column(
         children: [
+          // 선택된 문장 영역
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            width: double.infinity,
+            decoration: BoxDecoration(color: customColors.neutral100),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('선택된 문장', style: body_small_semi(context)),
+                SizedBox(height: 4),
+                ExpandableText(
+                  text: widget.selectedText,
+                  style: body_small(context),
+                  maxLines: 2,
+                ),
+              ],
+            ),
+          ),
+
+          // 챗봇 대화 영역
           Expanded(
-            child: SingleChildScrollView(  // 스크롤 가능한 영역
+            child: SingleChildScrollView(
+              controller: _scrollController,  // 스크롤 컨트롤러 추가
               child: Column(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    width: double.infinity,  // 화면 가로 크기
-                    decoration: BoxDecoration(color: customColors.neutral100),  // 배경색
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,  // 왼쪽 정렬
-                      children: [
-                        Text(
-                          '선택된 문장',
-                          style: body_small_semi(context),
-                        ),
-                        SizedBox(height: 4),
-                        ExpandableText(  // 긴 텍스트를 펼칠 수 있는 위젯
-                          text: widget.selectedText,
-                          style: body_small(context),
-                          maxLines: 2,
-                        ),
-                      ],
-                    ),
-                  ),
-                  // 메시지 리스트 표시
                   ..._messages.map((msg) => Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Align(
                       alignment: msg['role'] == 'user'
-                          ? Alignment.centerRight  // 사용자의 메시지는 오른쪽 정렬
-                          : Alignment.centerLeft,  // 챗봇의 메시지는 왼쪽 정렬
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
                       child: _buildMessageContainer(msg, customColors),
                     ),
                   )),
                   if (_isLoading)
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(),  // 로딩 중일 때 표시
+                      child: CircularProgressIndicator(),
                     ),
                 ],
               ),
             ),
           ),
-          _buildOptionsRow(options, customColors),  // 선택 옵션 버튼들
-          _buildMessageInputField(customColors),  // 메시지 입력창
+
+          _buildOptionsRow(options, customColors),
+          _buildMessageInputField(customColors),
         ],
       ),
     );

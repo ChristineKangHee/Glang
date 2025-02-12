@@ -24,14 +24,19 @@ class DebatePage extends ConsumerWidget {
     final debateState = ref.watch(debateProvider);
     final debateNotifier = ref.read(debateProvider.notifier);
 
-    // 맨 처음 들어왔을때 뜨도록...
+    // 현재 스테이지 데이터에서 debate 주제 가져오기
+    final currentStage = ref.watch(currentStageProvider);
+    final debateTopic = currentStage?.arData?.featureData?["feature3DebateTopic"] as String?
+        ?? "기본 토론 주제"; // fallback 값
+
+    // 앱 시작 시 첫 토론 라운드에서 주제 사용,,,맨 처음꺼
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final debateState = ref.read(debateProvider);
       if (debateState.currentRound == 1 && !debateState.isFinished) {
         showStartDialog(
           context,
           debateState.currentRound,
-          "인공지능이 인간의 일자리를 대체하는 것에 대해 어떻게 생각하십니까?",
+          debateTopic, // Firestore에서 가져온 debate 주제 사용
           debateState.isUserPro ? "찬성" : "반대",
         );
       }
@@ -44,14 +49,14 @@ class DebatePage extends ConsumerWidget {
         leadingWidth: 90,
         leading: CountdownTimer(
           key: ValueKey(debateState.timerKey), // 타이머 재설정
-          initialSeconds: 10, //타이머 초
+          initialSeconds: 5, //타이머 초
           onTimerComplete: () {
             debateNotifier.nextRound(); // 라운드 전환
             if (!debateNotifier.state.isFinished) {
               showStartDialog(
                 context,
                 debateState.currentRound + 1, // 다음 라운드 번호
-                "인공지능이 인간의 일자리를 대체하는 것에 대해 어떻게 생각하십니까?",
+                debateTopic,
                 !debateState.isUserPro ? "찬성" : "반대",
               );
             }
@@ -66,36 +71,48 @@ class DebatePage extends ConsumerWidget {
           ),
         ],
       ),
-      body: DebateContent(customColors: customColors),
+      body: DebateContent(customColors: customColors, debateTopic: debateTopic),
     );
   }
 }
 
-class DebateContent extends ConsumerWidget {
+class DebateContent extends ConsumerStatefulWidget {
   final CustomColors customColors;
+  final String debateTopic;
 
-  const DebateContent({super.key, required this.customColors});
+  const DebateContent({
+    super.key,
+    required this.customColors,
+    required this.debateTopic,
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // 상태 구독
+  _DebateContentState createState() => _DebateContentState();
+}
+
+class _DebateContentState extends ConsumerState<DebateContent> {
+  bool _hasShownResultDialog = false;
+
+  @override
+  Widget build(BuildContext context) {
     final debateState = ref.watch(debateProvider);
     final debateNotifier = ref.read(debateProvider.notifier);
 
-    // 라운드 종료 시 결과 다이얼로그 표시
-    if (debateState.isFinished) {
+    // 다이얼로그가 한 번만 보여지도록 플래그 확인
+    if (debateState.isFinished && !_hasShownResultDialog) {
+      _hasShownResultDialog = true;
       Future.microtask(() {
         _showResultDialog(context, debateNotifier, ref);
       });
     }
 
     return Container(
-      color: customColors.neutral90,
+      color: widget.customColors.neutral90,
       child: Column(
         children: [
           // 질문 영역
-          const QuestionSection(
-            data: "맞춤형 읽기 도구와 실시간 피드백 시스템이 전통적인 교육 방식을 대체할 수 있는가?",
+          QuestionSection(
+            data: widget.debateTopic,
           ),
           // 라운드 정보 및 타이머
           Padding(
@@ -105,7 +122,7 @@ class DebateContent extends ConsumerWidget {
                 Text(
                   "ROUND ${debateState.currentRound} | ${debateState.isUserPro ? '찬성' : '반대'}",
                   style: body_small_semi(context).copyWith(
-                    color: customColors.primary,
+                    color: widget.customColors.primary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -115,9 +132,8 @@ class DebateContent extends ConsumerWidget {
           ),
           Expanded(
             child: AIDiscussionSection(
-              customColors: customColors,
-              topic:
-              "맞춤형 읽기 도구와 실시간 피드백 시스템이 전통적인 교육 방식을 대체할 수 있는가?",
+              customColors: widget.customColors,
+              topic: widget.debateTopic,
             ),
           ),
         ],
@@ -148,7 +164,7 @@ class DebateContent extends ConsumerWidget {
                 stance: "찬성",
                 userPercentage: 55,
                 aiPercentage: 45,
-                customColors: customColors,
+                customColors: widget.customColors,
               ),
               const SizedBox(height: 16),
               // ROUND 2
@@ -158,14 +174,14 @@ class DebateContent extends ConsumerWidget {
                 stance: "반대",
                 userPercentage: 80,
                 aiPercentage: 20,
-                customColors: customColors,
+                customColors: widget.customColors,
               ),
               const SizedBox(height: 16),
               // 종합 평가
               Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: customColors.neutral90,
+                  color: widget.customColors.neutral90,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
@@ -200,13 +216,13 @@ class DebateContent extends ConsumerWidget {
                         vertical: 12.0,
                         horizontal: 32.0,
                       ),
-                      backgroundColor: customColors.neutral90,
-                      foregroundColor: customColors.neutral60,
+                      backgroundColor: widget.customColors.neutral90,
+                      foregroundColor: widget.customColors.neutral60,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    child: Text("다시 쓰기", style: body_small_semi(context).copyWith(color: customColors.neutral60),),
+                    child: Text("다시 쓰기", style: body_small_semi(context).copyWith(color: widget.customColors.neutral60),),
                   ),
                 ),
                 SizedBox(width: 16,),
@@ -227,13 +243,14 @@ class DebateContent extends ConsumerWidget {
                         await updateFeatureCompletion(freshStage, 3, true);
                         // stagesProvider를 무효화하여 최신 상태로 갱신
                         ref.invalidate(stagesProvider);
-                        ref.invalidate(selectedStageIdProvider); // 혹시 모를 캐싱 문제 방지
+                        // ref.invalidate(selectedStageIdProvider); // 혹시 모를 캐싱 문제 방지
                       }
                       // Navigator.popUntil(
                       //   context,
                       //       (route) => route.settings.name == 'LearningActivitiesPage',
                       // );
                       // ChooseActivities에서의 새로고침을 위한 땜빵용..
+                      Navigator.pop(context);
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (context) => LearningActivitiesPage()),
@@ -244,13 +261,13 @@ class DebateContent extends ConsumerWidget {
                         vertical: 12.0,
                         horizontal: 32.0,
                       ),
-                      backgroundColor: customColors.primary,
-                      foregroundColor: customColors.neutral100,
+                      backgroundColor: widget.customColors.primary,
+                      foregroundColor: widget.customColors.neutral100,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    child: Text("완료", style: body_small_semi(context).copyWith(color: customColors.neutral100),),
+                    child: Text("완료", style: body_small_semi(context).copyWith(color: widget.customColors.neutral100),),
                   ),
                 ),
               ],
