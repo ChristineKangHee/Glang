@@ -26,7 +26,7 @@ class MyPageMain extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider);
-    final userName = ref.watch(viewmodel.userNameProvider); // 사용자 이름 상태 구독
+    final userName = ref.watch(viewmodel.userNameProvider) ?? 'null'; // 사용자 이름 상태 구독
 
     return Scaffold(
       appBar: CustomAppBar_MyPage(),

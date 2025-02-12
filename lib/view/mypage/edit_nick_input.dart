@@ -29,7 +29,7 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
   @override
   void initState() {
     super.initState();
-    final initialNickname = ref.read(viewmodel.userNameProvider);
+    final initialNickname = ref.read(viewmodel.userNameProvider) ?? 'null';
     _controller = TextEditingController(text: initialNickname);
   }
 
@@ -93,14 +93,13 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
           Padding(
             padding: const EdgeInsets.all(20),
             child: ButtonPrimary(
-              function: () {
+              function: () async {
                 if (_controller.text.isNotEmpty &&
                     _controller.text.length <= 8 &&
                     !_controller.text.contains(' ') &&
                     !existingNicknames.contains(_controller.text)) {
-                  // 별명 상태 업데이트
-                  ref.read(viewmodel.userNameProvider.notifier).updateUserName(_controller.text);
-                  // 이전 페이지로 돌아가기
+                  await ref.read(viewmodel.userNameProvider.notifier).updateUserName(_controller.text);
+                  await ref.read(viewmodel.userNameProvider.notifier).fetchUserName();
                   Navigator.pop(context, _controller.text);
                 } else {
                   setState(() {
