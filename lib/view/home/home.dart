@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/util/gradients.dart';
 import 'package:readventure/view/components/custom_navigation_bar.dart';
-import 'package:readventure/view/home/user_service.dart';
 import 'package:readventure/viewmodel/app_state_controller.dart';
 import 'package:readventure/theme/theme.dart';
 import 'package:readventure/theme/font.dart';
@@ -23,6 +22,7 @@ import '../course/popup_component.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../viewmodel/user_service.dart';
 
 import 'attendance/attendance_model.dart';
 import 'attendance/attendance_provider.dart';
@@ -42,7 +42,7 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
     final sectionAsync = ref.watch(sectionProvider); // ✅ FutureProvider 사용
 
     if (userId != null) {
-      ref.read(userNameProvider.notifier).fetchUserName(userId);
+      ref.read(userNameProvider.notifier).fetchUserName();
     }
 
     return Scaffold(

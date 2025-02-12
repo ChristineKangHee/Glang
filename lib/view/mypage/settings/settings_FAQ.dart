@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../theme/font.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
-import '../../../viewmodel/theme_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
 
+import '../../../viewmodel/user_service.dart';
 import '../../components/custom_app_bar.dart';
-import '../../home/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingsFAQ extends ConsumerWidget {
@@ -20,7 +19,7 @@ class SettingsFAQ extends ConsumerWidget {
 
     // userName이 null이고, userId가 있을 때만 fetch
     if (userId != null && userName == null) {
-      ref.read(userNameProvider.notifier).fetchUserName(userId);
+      ref.read(userNameProvider.notifier).fetchUserName();
     }
 
     final customColors = ref.watch(customColorsProvider);

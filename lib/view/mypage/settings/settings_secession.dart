@@ -5,9 +5,9 @@ import '../../../viewmodel/custom_colors_provider.dart';
 import '../../../viewmodel/theme_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
 
+import '../../../viewmodel/user_service.dart';
 import '../../components/custom_app_bar.dart';
 import '../../components/custom_button.dart';
-import '../../home/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -22,7 +22,7 @@ class SettingsSecession extends ConsumerWidget {
     final customColors = ref.watch(customColorsProvider);
 
     if (userId != null) {
-      ref.read(userNameProvider.notifier).fetchUserName(userId);
+      ref.read(userNameProvider.notifier).fetchUserName();
     }
 
     Future<void> _deleteAccount() async {
