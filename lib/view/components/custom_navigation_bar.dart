@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:readventure/theme/font.dart';
 import '../../viewmodel/navigation_controller.dart';
 import '../../theme/theme.dart';
 
@@ -37,6 +38,8 @@ class CustomNavigationBar extends ConsumerWidget {
         currentIndex: selectedIndex,
         selectedItemColor: customColors.neutral30,
         unselectedItemColor: customColors.neutral60,
+        selectedLabelStyle: body_xsmall_semi(context),
+        unselectedLabelStyle: body_xsmall_semi(context).copyWith(color: customColors.neutral60),
         onTap: (index) => navigationController.navigateToIndex(context, index), // 페이지 전환
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
