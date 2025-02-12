@@ -23,7 +23,7 @@ class EditProfile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider);
-    final userName = ref.watch(viewmodel.userNameProvider);
+    final userName = ref.watch(viewmodel.userNameProvider) ?? 'null';
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(title: "내 정보 수정"),
@@ -179,8 +179,8 @@ class MyInfo extends StatelessWidget {
       children: [
         InfoRow(title: '이름', value: '김민지'),
         const SizedBox(height: 24),
-        InfoRow(title: '생년월일', value: '2000.01.01'),
-        const SizedBox(height: 24),
+        //InfoRow(title: '생년월일', value: '2000.01.01'),
+        //const SizedBox(height: 24),
         InfoRow(title: '이메일', value: '1230@kakao.com'),
       ],
     );
