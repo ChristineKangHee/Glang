@@ -88,6 +88,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                 ),
               ),
             ),
+            // 검색 기록 표시 조건 추가
             if (!_isSearchInitiated && _searchHistory.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -125,11 +126,12 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                   Tab(text: '주제'),
                 ],
               ),
+            // 검색 결과 표시 조건
             Expanded(
-              child: TabBarView(
+              child: _isSearchInitiated
+                  ? TabBarView(
                 controller: _tabController,
                 children: [
-                  // Display posts based on the selected category
                   _buildFilteredPostList(_searchResults, context, customColors), // 전체
                   _buildFilteredPostList(
                       _searchResults.where((post) => post.category == '미션 글').toList(),
@@ -140,6 +142,11 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                       context,
                       customColors), // 주제
                 ],
+              )
+                  : Center(
+                child: _searchHistory.isEmpty
+                    ? Text("최근 검색 기록이 없습니다.", style: body_medium(context).copyWith(color: customColors.neutral60))
+                    : SizedBox.shrink(), // 검색 기록이 있으면 아무것도 안 보이게 처리
               ),
             ),
           ],
@@ -186,7 +193,36 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     });
   }
 
+  Widget _buildRecentSearches() {
+    return _searchHistory.isEmpty
+        ? Center(
+      child: Text("검색어를 입력해주세요.", style: TextStyle(color: Colors.grey)),
+    )
+        : ListView.builder(
+      itemCount: _searchHistory.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(_searchHistory[index]),
+          onTap: () {
+            _searchController.text = _searchHistory[index];
+            _performSearch(_searchHistory[index]);
+          },
+        );
+      },
+    );
+  }
+
+
   Widget _buildFilteredPostList(List<Post> posts, BuildContext context, CustomColors customColors) {
+    if (posts.isEmpty) {
+      return Center(
+        child: Text(
+          "검색 결과가 없습니다.",
+          style: body_medium(context).copyWith(color: customColors.neutral60),
+        ),
+      );
+    }
+
     return ListView.builder(
       itemCount: posts.length,
       itemBuilder: (context, index) {
@@ -199,4 +235,5 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
       },
     );
   }
+
 }

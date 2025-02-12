@@ -12,6 +12,7 @@ class CourseProcessingPage extends ConsumerStatefulWidget {
 class _CourseProcessingPageState extends ConsumerState<CourseProcessingPage> {
   bool _isProcessing = true; // 로딩 상태
   double _progress = 0.0; // 진행 상태
+  int _completedTasks = 0; // 완료된 항목 수
 
   @override
   void initState() {
@@ -25,6 +26,11 @@ class _CourseProcessingPageState extends ConsumerState<CourseProcessingPage> {
       if (_progress < 1.0) {
         setState(() {
           _progress += 0.01;
+          // 진행 상태에 따라 완료된 항목을 더 빨리 나타내도록 3개 항목 중 더 빠르게 완료 상태 반영
+          _completedTasks = (_progress * 3).toInt();
+          if (_progress > 0.5) {
+            _completedTasks++; // 50%가 넘어가면 완료된 항목을 더 빠르게 하나 추가
+          }
         });
         _simulateProgress(); // 재귀 호출로 진행
       } else {
@@ -40,13 +46,12 @@ class _CourseProcessingPageState extends ConsumerState<CourseProcessingPage> {
     final customColors = ref.watch(customColorsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("맞춤 코스 만들기"),
-      ),
-      body: Center(
-        child: _isProcessing
-            ? _buildProcessingBody(customColors) // 로딩 중일 때
-            : _buildCompletionBody(customColors), // 완료 후
+      body: SafeArea(
+        child: Center(
+          child: _isProcessing
+              ? _buildProcessingBody(customColors) // 로딩 중일 때
+              : _buildCompletionBody(customColors), // 완료 후
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -62,13 +67,15 @@ class _CourseProcessingPageState extends ConsumerState<CourseProcessingPage> {
   // 로딩 중일 때의 화면 구성
   Widget _buildProcessingBody(CustomColors customColors) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center, // 중앙 정렬
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Stack(
           alignment: Alignment.center,
           children: [
-            // 동그라미 진행 상태
-            SizedBox(
+            // 동그라미 진행 상태 애니메이션
+            AnimatedContainer(
+              duration: Duration(milliseconds: 500),
               width: 200, // 크기 조정
               height: 200, // 크기 조정
               child: CircularProgressIndicator(
@@ -79,14 +86,17 @@ class _CourseProcessingPageState extends ConsumerState<CourseProcessingPage> {
                 valueColor: AlwaysStoppedAnimation<Color>(customColors.primary!),
               ),
             ),
-            // 진행 상태를 퍼센트로 표시
-            Text(
-              '${(_progress * 100).toStringAsFixed(0)}%',
-              style: heading_large(context).copyWith(color: customColors.neutral30)
+            // 진행 상태를 퍼센트로 표시 애니메이션
+            AnimatedDefaultTextStyle(
+              duration: Duration(milliseconds: 500),
+              style: heading_large(context).copyWith(color: customColors.neutral30),
+              child: Text(
+                '${(_progress * 100).toStringAsFixed(0)}%',
+              ),
             ),
           ],
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 50),
         _buildTitleAndDescription(customColors),
         const SizedBox(height: 55),
         _buildInfoRows(customColors),
@@ -94,23 +104,30 @@ class _CourseProcessingPageState extends ConsumerState<CourseProcessingPage> {
     );
   }
 
-
   // 완료 후의 화면 구성
   Widget _buildCompletionBody(CustomColors customColors) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.check_circle_rounded, size: 50, color: customColors.primary),
+        AnimatedOpacity(
+          duration: Duration(milliseconds: 500),
+          opacity: _isProcessing ? 0.0 : 1.0,
+          child: Icon(Icons.check_circle_rounded, size: 50, color: customColors.primary),
+        ),
         SizedBox(height: 20),
-        Text(
-          "코스 생성 완료!",
+        AnimatedDefaultTextStyle(
+          duration: Duration(milliseconds: 500),
           style: heading_large(context),
+          child: Text("코스 생성 완료!"),
         ),
         SizedBox(height: 12),
-        Text(
-          '모든 설정이 완료되었어요.\n이제 글 읽기를 시작해볼까요?',
-          textAlign: TextAlign.center,
+        AnimatedDefaultTextStyle(
+          duration: Duration(milliseconds: 500),
           style: body_small_semi(context).copyWith(color: customColors.neutral60),
+          child: Text(
+            '모든 설정이 완료되었어요.\n이제 글 읽기를 시작해볼까요?',
+            textAlign: TextAlign.center,
+          ),
         ),
       ],
     );
@@ -122,16 +139,22 @@ class _CourseProcessingPageState extends ConsumerState<CourseProcessingPage> {
       width: double.infinity,
       child: Column(
         children: [
-          Text(
-            '맞춤 코스 만드는 중...',
-            textAlign: TextAlign.center,
+          AnimatedDefaultTextStyle(
+            duration: Duration(milliseconds: 500),
             style: heading_large(context),
+            child: Text(
+              '맞춤 코스 만드는 중...',
+              textAlign: TextAlign.center,
+            ),
           ),
           const SizedBox(height: 6),
-          Text(
-            '제로님께 필요한 코스를 찾고 있어요',
-            textAlign: TextAlign.center,
+          AnimatedDefaultTextStyle(
+            duration: Duration(milliseconds: 500),
             style: body_small_semi(context).copyWith(color: customColors.neutral60),
+            child: Text(
+              '제로님께 필요한 코스를 찾고 있어요',
+              textAlign: TextAlign.center,
+            ),
           ),
         ],
       ),
@@ -144,23 +167,46 @@ class _CourseProcessingPageState extends ConsumerState<CourseProcessingPage> {
 
     return Column(
       children: infoTexts
-          .map((text) => _buildInfoRow(text, customColors))
+          .map((text) {
+        int index = infoTexts.indexOf(text);
+        return Column(
+          children: [
+            _buildInfoRow(text, customColors, index),
+            const SizedBox(height: 20), // 각 항목 간 간격 설정
+          ],
+        );
+      })
           .toList(),
     );
   }
 
   // 항목에 대한 정보 Row 구성
-  Widget _buildInfoRow(String text, CustomColors customColors) {
+  Widget _buildInfoRow(String text, CustomColors customColors, int index) {
+    bool isCompleted = index < _completedTasks; // 완료된 항목인지 확인
+
     return Container(
       width: double.infinity,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center, // Row를 중앙 정렬
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(Icons.check_circle_rounded, color: customColors.neutral80),
+          AnimatedOpacity(
+            duration: Duration(milliseconds: 500),
+            opacity: isCompleted ? 1.0 : 0.3,
+            child: Icon(
+              Icons.check_circle_rounded,
+              color: isCompleted ? customColors.primary : customColors.neutral60,
+            ),
+          ),
           const SizedBox(width: 15),
-          Text(
-            text,
-            style: body_small(context).copyWith(color: customColors.neutral60),
+          AnimatedOpacity(
+            duration: Duration(milliseconds: 500),
+            opacity: isCompleted ? 1.0 : 0.3,
+            child: Text(
+              text,
+              textAlign: TextAlign.left, // 왼쪽 정렬
+              style: body_small(context).copyWith(color: isCompleted ? customColors.primary : customColors.neutral60),
+            ),
           ),
         ],
       ),
