@@ -166,17 +166,25 @@ class UserProfileSection extends StatelessWidget {
 }
 
 /// 사용자 경험치, 코스, 랭킹 통계 표시 섹션
-class UserStatsSection extends StatelessWidget {
+class UserStatsSection extends ConsumerWidget {
   const UserStatsSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final xpAsyncValue = ref.watch(userXPProvider); // Firestore에서 XP 가져오기
+
     return SizedBox(
       height: 50,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(child: StatBox(value: '1100', label: '경험치')),
+          Expanded(
+            child: xpAsyncValue.when(
+              data: (xp) => StatBox(value: xp.toString(), label: '경험치'),
+              loading: () => const StatBox(value: '...', label: '경험치'), // 로딩 중
+              error: (_, __) => const StatBox(value: '오류', label: '경험치'), // 오류 발생 시
+            ),
+          ),
           VerticalDivider(color: Theme.of(context).extension<CustomColors>()?.neutral80),
           Expanded(child: StatBox(value: '중급', label: '코스')),
         ],
@@ -184,6 +192,7 @@ class UserStatsSection extends StatelessWidget {
     );
   }
 }
+
 
 /// 학습 통계 그래프 위젯
 /*

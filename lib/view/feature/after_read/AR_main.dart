@@ -75,7 +75,7 @@ class ArMain extends StatelessWidget {
             // )), child: Text("토론 활동")),
             // SizedBox(height: 30,),
             ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
-              builder: (context) => ResultReportPage(),
+              builder: (context) => ResultReportPage(earnedXP: 180,),
             )), child: Text("리포트")),
             SizedBox(height: 30,),
             ElevatedButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(
