@@ -136,6 +136,7 @@ class AuthController extends StateNotifier<User?> {
           'nicknameSet': false,
           'email': user.email,
           'createdAt': FieldValue.serverTimestamp(),
+          'totalXP': 0,
         });
         onNicknameRequired();
       } else {

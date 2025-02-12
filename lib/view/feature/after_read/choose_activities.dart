@@ -14,6 +14,7 @@ import '../../../model/stage_data.dart';
 import '../../../theme/font.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../../viewmodel/section_provider.dart';
+import '../../../viewmodel/user_service.dart';
 import '../../components/alarm_dialog.dart';
 import '../../components/custom_app_bar.dart';
 import 'package:readventure/theme/theme.dart';
@@ -135,6 +136,40 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     );
     print(">> completeActivityForStage 호출 완료 for activityType 'afterReading'");
 
+    // // 🔹 Firestore에서 현재 유저의 totalXP 가져오기
+    final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
+    // final userSnapshot = await userRef.get();
+    //
+    // int currentTotalXP = 0; // 기본값 설정
+    // if (userSnapshot.exists && userSnapshot.data()!.containsKey('totalXP')) {
+    //   currentTotalXP = userSnapshot.data()!['totalXP'];
+    // }
+
+    // ✅ Provider를 통해 Firestore에서 XP 값을 가져옴
+    final currentTotalXP = ref.read(userXPProvider).value ?? 0;
+
+
+    // 🔹 현재 스테이지에서 완료된 XP 계산 (🔥 새로운 로직 추가)
+    int earnedXP = 0;
+    if (stage.arData?.featuresCompleted != null) {
+      earnedXP = stage.arData!.featuresCompleted.entries
+          .where((entry) => entry.value) // 완료된 미션만 필터링
+          .map((entry) {
+        // 해당 feature의 XP 값을 찾아 더함
+        final featureNumber = int.parse(entry.key);
+        return activities.firstWhere((a) => a.featureNumber == featureNumber).xp;
+      })
+          .map((xp) => int.parse(xp.replaceAll('xp', '')))
+          .fold(0, (prev, e) => prev + e);
+    }
+
+    // 🔹 totalXP 업데이트 (기존 XP + 새로운 XP)
+    final newTotalXP = currentTotalXP + earnedXP;
+    print(">> totalXP 업데이트: $currentTotalXP + $earnedXP = $newTotalXP");
+
+    await userRef.update({'totalXP': newTotalXP});
+    print(">> Firestore totalXP 업데이트 완료!");
+
     // 업데이트가 완료된 후, Firestore에서 다시 현재 스테이지 데이터를 가져옵니다.
     final currentStageRef = FirebaseFirestore.instance
         .collection('users')
@@ -197,7 +232,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
           (ctx) {
         Navigator.pushReplacement(
           ctx,
-          MaterialPageRoute(builder: (ctx) => ResultReportPage()),
+          MaterialPageRoute(builder: (ctx) => ResultReportPage(earnedXP: earnedXP,)),
         );
       },
     );

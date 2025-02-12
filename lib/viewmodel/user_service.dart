@@ -69,3 +69,18 @@ class UserNameNotifier extends StateNotifier<String?> {
 final userNameProvider = StateNotifierProvider<UserNameNotifier, String?>((ref) {
   return UserNameNotifier();
 });
+
+
+/// 사용자의 totalXP를 가져오는 Provider
+final userXPProvider = FutureProvider<int>((ref) async {
+  final userId = FirebaseAuth.instance.currentUser?.uid;
+  if (userId == null) return 0;
+
+  final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
+  final userSnapshot = await userRef.get();
+
+  if (userSnapshot.exists && userSnapshot.data()!.containsKey('totalXP')) {
+    return userSnapshot.data()!['totalXP'] as int;
+  }
+  return 0; // 기본값
+});

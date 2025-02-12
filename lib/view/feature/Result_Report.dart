@@ -1,3 +1,5 @@
+// Result_Report.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../theme/font.dart';
@@ -6,6 +8,10 @@ import '../components/custom_app_bar.dart';
 import '../components/custom_button.dart';
 
 class ResultReportPage extends ConsumerStatefulWidget {
+  final int earnedXP; // ✅ 획득한 XP를 받는 변수 추가
+
+  ResultReportPage({required this.earnedXP}); // ✅ 생성자에서 XP 받기
+
   @override
   _ResultReportPageState createState() => _ResultReportPageState();
 }
@@ -85,7 +91,7 @@ class _ResultReportPageState extends ConsumerState<ResultReportPage> {
                         style: body_small_semi(context),
                       ),
                       Text(
-                        '120xp',
+                        '${widget.earnedXP} xp',
                         textAlign: TextAlign.right,
                         style: body_small(context),
                       ),
