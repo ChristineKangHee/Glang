@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../model/section_data.dart';
-import '../view/home/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 final sectionProvider = FutureProvider<List<SectionData>>((ref) async {
