@@ -190,6 +190,7 @@ class CustomAppBar_Course extends StatelessWidget implements PreferredSizeWidget
       ).tr(),
       centerTitle: true,
       backgroundColor: backgroundColor ?? customColors.neutral100,
+      automaticallyImplyLeading: false,
       elevation: 0,
     );
   }
