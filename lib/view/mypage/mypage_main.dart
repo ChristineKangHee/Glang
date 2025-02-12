@@ -10,12 +10,9 @@ import 'package:readventure/view/components/custom_app_bar.dart';
 import 'package:readventure/view/components/custom_navigation_bar.dart';
 import '../../theme/font.dart';
 import '../../theme/theme.dart';
-import 'package:d_chart/d_chart.dart';
-import 'package:intl/intl.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../../viewmodel/custom_colors_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../viewmodel/user_service.dart' as viewmodel;
+import '../../viewmodel/user_service.dart';
 
 /// 마이페이지 메인 화면 위젯
 /// - 상단 앱바, 하단 네비게이션 바, 컨텐츠
@@ -26,7 +23,7 @@ class MyPageMain extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider);
-    final userName = ref.watch(viewmodel.userNameProvider) ?? 'null'; // 사용자 이름 상태 구독
+    final userName = ref.watch(userNameProvider) ?? 'null'; // 사용자 이름 상태 구독
 
     return Scaffold(
       appBar: CustomAppBar_MyPage(),

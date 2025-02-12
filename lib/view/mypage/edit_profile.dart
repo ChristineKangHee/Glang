@@ -13,7 +13,7 @@ import '../components/custom_app_bar.dart';
 import '../components/custom_button.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
-import '../../viewmodel/user_service.dart' as viewmodel;
+import '../../viewmodel/user_service.dart';
 import 'edit_nick_input.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -23,7 +23,7 @@ class EditProfile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider);
-    final userName = ref.watch(viewmodel.userNameProvider) ?? 'null';
+    final userName = ref.watch(userNameProvider) ?? 'null';
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(title: "내 정보 수정"),
@@ -157,7 +157,7 @@ class _EditNickState extends ConsumerState<EditNick> {
                 );
 
                 if (newNickname is String) {
-                  ref.read(viewmodel.userNameProvider.notifier).updateUserName(newNickname);
+                  ref.read(userNameProvider.notifier).updateUserName(newNickname);
                 }
               },
             ),
