@@ -2,7 +2,7 @@
 /// Purpose: 마이페이지 화면 구현
 /// Author: 박민준
 /// Created: 2025-01-02
-/// Last Modified: 2025-01-28 by 윤은서
+/// Last Modified: 2025-02-12 by 윤은서
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,8 +14,8 @@ import 'package:d_chart/d_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../viewmodel/custom_colors_provider.dart';
-import '../home/user_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../viewmodel/user_service.dart' as viewmodel;
 
 /// 마이페이지 메인 화면 위젯
 /// - 상단 앱바, 하단 네비게이션 바, 컨텐츠
@@ -25,12 +25,8 @@ class MyPageMain extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final customColors =ref.watch(customColorsProvider);
-    final userName = ref.watch(userNameProvider); // 사용자 이름 상태 구독
-
-    if (userName != null) {
-      ref.read(userNameProvider.notifier).fetchUserName(userName);
-    }
+    final customColors = ref.watch(customColorsProvider);
+    final userName = ref.watch(viewmodel.userNameProvider); // 사용자 이름 상태 구독
 
     return Scaffold(
       appBar: CustomAppBar_MyPage(),
@@ -56,7 +52,7 @@ class MyPageMain extends ConsumerWidget {
 
 /// 마이페이지의 컨텐츠 본문
 class MyPageContent extends StatelessWidget {
-  final String? name;
+  final String name;
   const MyPageContent({super.key, required this.name});
 
   @override
@@ -115,7 +111,7 @@ class MyPageContent extends StatelessWidget {
 
 /// 사용자 프로필 섹션
 class UserProfileSection extends StatelessWidget {
-  final String? name;
+  final String name;
   const UserProfileSection({super.key, required this.name});
 
   @override
@@ -143,7 +139,7 @@ class UserProfileSection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('$name', style: heading_small(context)),
+              Text(name, style: heading_small(context)),
               const SizedBox(height: 12),
               InkWell(
                 onTap: () {
