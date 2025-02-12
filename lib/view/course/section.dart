@@ -44,31 +44,46 @@ class Section extends ConsumerWidget {
   }
 
   /// 스테이지 팝업 표시 함수
+  ///
+  /// Scaffold의 persistent bottom sheet를 전체 화면으로 확장한 후,
+  /// 배경을 터치하면 dismiss 되도록 GestureDetector를 적용하였습니다.
   void _showPopup(BuildContext context, int index) {
     final stage = data.stages[index];
+    PersistentBottomSheetController? sheetController;
 
-    showDialog(
-      context: context,
-      barrierColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return Stack(
-          children: [
-            // 뒤쪽 화면도 탭 이벤트가 통과되도록
-            GestureDetector(
-              onTap: () => Navigator.of(context).pop(),
-              behavior: HitTestBehavior.translucent,
+    sheetController = Scaffold.of(context).showBottomSheet(
+          (BuildContext context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height,
+          // 바깥 전체를 감싸는 GestureDetector
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              // 배경 터치 시 dismiss
+              sheetController?.close();
+            },
+            child: Stack(
+              children: [
+                // 화면 하단에 팝업 컨텐츠 배치
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  // 내부 컨텐츠에 GestureDetector를 적용하여 터치 이벤트 전파 방지
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      // margin: const EdgeInsets.only(bottom: 60.0),
+                      padding: const EdgeInsets.all(20.0),
+                      child: SectionPopup(stage: stage),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 60.0),
-                padding: const EdgeInsets.all(20.0),
-                child: SectionPopup(stage: stage)
-              ),
-            ),
-          ],
+          ),
         );
       },
+      backgroundColor: Colors.transparent,
+      elevation: 0,
     );
   }
 
