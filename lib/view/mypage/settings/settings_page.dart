@@ -42,36 +42,36 @@ class SettingsPage extends ConsumerWidget {
       ),
       body: ListView(
         children: [
-          ListTile(title: Text('알림 설정', style: body_xsmall(context).copyWith(color: customColors.neutral30),),),
-          ListTile(
-            title: Text('알림 설정', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
-            trailing: Switch(
-              value: isNotificationEnabled,
-              onChanged: (bool value) {
-                // TODO: 알림 설정 값 변경
-                isNotificationEnabled = value;
-              },
-              activeColor: customColors.neutral100,
-              activeTrackColor: customColors.primary,
-              inactiveThumbColor: customColors.neutral100,
-              inactiveTrackColor: customColors.neutral80,
-            ),
-          ),
-          ListTile(
-            title: Text('마케팅 수신 동의', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
-            trailing: Switch(
-              value: isMarketingAgreement,
-              onChanged: (bool value) {
-                // TODO: 마케팅 동의 값 변경
-                isMarketingAgreement = value;
-              },
-              activeColor: customColors.neutral100,
-              activeTrackColor: customColors.primary,
-              inactiveThumbColor: customColors.neutral100,
-              inactiveTrackColor: customColors.neutral80,
-            ),
-          ),
-          Divider(color: customColors.neutral80,),
+          // ListTile(title: Text('알림 설정', style: body_xsmall(context).copyWith(color: customColors.neutral30),),),
+          // ListTile(
+          //   title: Text('알림 설정', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
+          //   trailing: Switch(
+          //     value: isNotificationEnabled,
+          //     onChanged: (bool value) {
+          //       // TODO: 알림 설정 값 변경
+          //       isNotificationEnabled = value;
+          //     },
+          //     activeColor: customColors.neutral100,
+          //     activeTrackColor: customColors.primary,
+          //     inactiveThumbColor: customColors.neutral100,
+          //     inactiveTrackColor: customColors.neutral80,
+          //   ),
+          // ),
+          // ListTile(
+          //   title: Text('마케팅 수신 동의', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
+          //   trailing: Switch(
+          //     value: isMarketingAgreement,
+          //     onChanged: (bool value) {
+          //       // TODO: 마케팅 동의 값 변경
+          //       isMarketingAgreement = value;
+          //     },
+          //     activeColor: customColors.neutral100,
+          //     activeTrackColor: customColors.primary,
+          //     inactiveThumbColor: customColors.neutral100,
+          //     inactiveTrackColor: customColors.neutral80,
+          //   ),
+          // ),
+          // Divider(color: customColors.neutral80,),
           ListTile(title: Text('도움 및 지원', style: body_xsmall(context).copyWith(color: customColors.neutral30),),),
           ListTile(
             title: Text(
@@ -95,23 +95,23 @@ class SettingsPage extends ConsumerWidget {
             },
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
           ),
-          ListTile(
-            title: Text('언어 설정', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
-            onTap: () {
-              // TODO: 언어 설정 페이지로 이동
-              Navigator.pushNamed(context, '/mypage/settings/language');
-            },
-            trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
-          ),
-          ListTile(
-            title: Text('테마 설정', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
-            trailing: IconButton(
-              icon: Icon(isLightTheme ? Icons.dark_mode : Icons.light_mode),
-              onPressed: () {
-                themeController.toggleTheme(); // 테마 변경
-              },
-            ),
-          ),
+          // ListTile(
+          //   title: Text('언어 설정', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
+          //   onTap: () {
+          //     // TODO: 언어 설정 페이지로 이동
+          //     Navigator.pushNamed(context, '/mypage/settings/language');
+          //   },
+          //   trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
+          // ),
+          // ListTile(
+          //   title: Text('테마 설정', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
+          //   trailing: IconButton(
+          //     icon: Icon(isLightTheme ? Icons.dark_mode : Icons.light_mode),
+          //     onPressed: () {
+          //       themeController.toggleTheme(); // 테마 변경
+          //     },
+          //   ),
+          // ),
           ListTile(
             title: Text(
               '약관 및 정책',
