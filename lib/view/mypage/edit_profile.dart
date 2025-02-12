@@ -83,39 +83,32 @@ class ProfileImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     return Center(
-      child: SizedBox(
-        width: 124,
-        height: 120,
-        child: Stack(
-          children: [
-            Positioned(
-              left: 0,
-              top: 0,
-              child: Container(
-                width: 120,
-                height: 120,
-                decoration: ShapeDecoration(
-                  shape: CircleBorder(
-                    side: BorderSide(
-                      width: 3,
-                      color: customColors.primary ?? Colors.deepPurpleAccent,
-                    ),
-                  ),
-                ),
-                child: ClipOval(
-                  child: SvgPicture.asset(
-                    'assets/images/character.svg',
-                    fit: BoxFit.fill,
-                  ),
+      child: Stack(
+        children: [
+          Container(
+            width: 120,
+            height: 120,
+            decoration: ShapeDecoration(
+              shape: CircleBorder(
+                side: BorderSide(
+                  width: 3,
+                  color: customColors.primary ?? Colors.deepPurpleAccent,
                 ),
               ),
             ),
-          ],
-        ),
+            child: ClipOval(
+              child: SvgPicture.asset(
+                'assets/images/character.svg',
+                fit: BoxFit.fill,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
+
 
 /// 닉네임 편집 섹션
 class EditNick extends ConsumerStatefulWidget {
@@ -205,18 +198,14 @@ class InfoRow extends StatelessWidget {
       children: [
         Text(
           title,
-          style: body_small(context).copyWith(
+          style: body_xsmall(context).copyWith(
             color: customColors.neutral30,
-            fontWeight: FontWeight.w400,
-            height: 1.5,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           value,
-          style: body_large(context).copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: body_large_semi(context),
         ),
       ],
     );

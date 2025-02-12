@@ -51,7 +51,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage> with Single
     final systemNotifications = allNotifications.where((n) => n.category == '시스템').toList();
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_3(
+      appBar: CustomAppBar_2depth_4(
         title: "notification_title",
         bottom: NotificationTabBar(tabController: _tabController),
       ),
