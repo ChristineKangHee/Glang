@@ -262,16 +262,16 @@ class BadgeRow extends StatelessWidget {
       children: [
         BadgeBox(
           label: '첫학습',
-          isUnlocked: true, // 획득한 배지
+          isUnlocked: false, // 획득한 배지
         ),
         const SizedBox(width: 16),
         BadgeBox(
-          label: '7일 연속',
-          isUnlocked: true, // 획득한 배지
+          label: '3일 연속 출석',
+          isUnlocked: false, // 획득한 배지
         ),
         const SizedBox(width: 16),
         BadgeBox(
-          label: '미획득',
+          label: '7일 연속 출석',
           isUnlocked: false, // 미획득 배지
         ),
       ],
@@ -365,7 +365,7 @@ class InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // '학습 통계' 카드 비활성화 여부 확인
-    final bool isDisabled = title == '학습 통계';
+    final bool isDisabled = title == '학습 통계'|| title == '저장' || title == '학습 기록';
 
     return InkWell(
       onTap: isDisabled ? null : onTap, // 비활성화 시 onTap 비활성화
@@ -397,7 +397,7 @@ class InfoCard extends StatelessWidget {
                       Icon(
                         leadingIcon,
                         size: 24,
-                        color: Colors.black,
+                        color: Colors.black54,
                       ),
                       const SizedBox(width: 12),
                     ],
@@ -408,7 +408,7 @@ class InfoCard extends StatelessWidget {
                           title,
                           style: pretendardSemiBold(context).copyWith(
                             fontSize: 18,
-                            color: isDisabled ? Colors.black54 : Colors.black, // 비활성화 시 텍스트 색상 변경
+                            color: Colors.black,
                           ),
                         ),
                         if (description != null) ...[
@@ -417,7 +417,7 @@ class InfoCard extends StatelessWidget {
                             description!,
                             style: pretendardRegular(context).copyWith(
                               fontSize: 16,
-                              color: isDisabled ? Colors.black54 : Colors.black, // 비활성화 시 텍스트 색상 변경
+                              color: Colors.black54,
                             ),
                           ),
                         ],
@@ -427,7 +427,7 @@ class InfoCard extends StatelessWidget {
                 ),
                 if (trailingIcon != null)
                   Icon(
-                    trailingIcon,
+                    isDisabled ? Icons.lock : trailingIcon,
                     size: 20,
                     color: isDisabled ? Colors.grey : Colors.black54, // 비활성화 시 아이콘 색상 변경
                   ),
