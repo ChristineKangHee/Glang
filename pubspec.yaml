@@ -88,12 +88,11 @@ dev_dependencies:
   shimmer: ^3.0.0
 
 # 앱 아이콘 변경 (사용 모르겟어)
-#flutter_launcher_icons:
-#  android: "launcher_icon"
-#  ios: "AppIcon"
-#  image_path_ios: "assets/images/icon.png"
-#  image_path_android: "assets/images/round-icon.png"
-#  remove_alpha_ios: true
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
 
 flutter:
 

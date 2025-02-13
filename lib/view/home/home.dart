@@ -108,7 +108,7 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
 
                       //TODO: 이번달 학습 기록 위젯
                       InkWell(
-                        onTap: () => Navigator.pushNamed(context, "/mypage/statistics"),
+                        onTap: () => Navigator.pushNamed(context, "/mypage/info/statistics"),
                         child: LearningSection(customColors: customColors),
                       ),
 
@@ -116,19 +116,19 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
                       //   onPressed: showNotification,
                       //   child: Text('Show Notification'),
                       // ),
-
-                      ElevatedButton(
-                        onPressed: () => Navigator.pushNamed(context, "/brmain"),
-                        child: Text('읽기 전 코스 이동'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () => Navigator.pushNamed(context, "/rdmain"),
-                        child: Text('읽기 중 코스 이동'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () => Navigator.pushNamed(context, "/armain"),
-                        child: Text('읽기 후 코스 이동'),
-                      ),
+                      //
+                      // ElevatedButton(
+                      //   onPressed: () => Navigator.pushNamed(context, "/brmain"),
+                      //   child: Text('읽기 전 코스 이동'),
+                      // ),
+                      // ElevatedButton(
+                      //   onPressed: () => Navigator.pushNamed(context, "/rdmain"),
+                      //   child: Text('읽기 중 코스 이동'),
+                      // ),
+                      // ElevatedButton(
+                      //   onPressed: () => Navigator.pushNamed(context, "/armain"),
+                      //   child: Text('읽기 후 코스 이동'),
+                      // ),
 
                     ],
                   ),
@@ -244,7 +244,6 @@ class AttendanceDayWidget extends StatelessWidget {
     );
   }
 }
-
 
 class LearningSection extends StatelessWidget {
   LearningSection({
