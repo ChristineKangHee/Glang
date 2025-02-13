@@ -2,12 +2,11 @@
 /// Purpose: 사용자에게 초급, 중급, 고급 코스를 보여주는 메인 화면
 /// Author: 박민준
 /// Created: 2024-12-28
-/// Last Modified: 2025-01-03 by 강희
+/// Last Modified: 2025-01-03 by 강희 (수정: 위치측정 방식 적용)
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-// 수정된 section_data.dart를 반영하여 import
 import '../../model/section_data.dart';
 import '../components/custom_app_bar.dart';
 import '../components/custom_navigation_bar.dart';
@@ -36,8 +35,8 @@ class _CourseMainState extends State<CourseMain> {
   /// 첫 번째 박스(인트로 등) 높이
   final double heightFirstBox = 0.0;
 
-  /// 각 섹션 하나의 대략적인 높이(예시)
-  final double heightSection = 1020.0;
+  /// 각 섹션마다 GlobalKey를 할당하여 위치를 측정
+  List<GlobalKey> _sectionKeys = [];
 
   /// 스크롤 동작을 관리하는 컨트롤러
   final ScrollController scrollCtrl = ScrollController();
@@ -60,15 +59,26 @@ class _CourseMainState extends State<CourseMain> {
 
   /// 스크롤 이벤트를 감지하고 현재 섹션 인덱스를 업데이트
   void scrollListener() {
-    final currentScroll = scrollCtrl.position.pixels;
-    int index = (currentScroll / heightSection).floor();
+    // 임계값(threshold): 화면 상단에서 어느 정도까지 스크롤되면 섹션이 '지나갔다'고 판단할지 결정
+    // (필요에 따라 이 값을 조정하세요)
+    const double topThreshold = 150.0;
 
-    if (index < 0) index = 0;
-    // index가 섹션 개수를 넘어가지 않도록 하려면 이곳에서 추가 로직 작성 가능
-
-    if (index != iCurrentSection) {
+    int newCurrentSection = 0;
+    // 각 섹션의 GlobalKey를 통해 위치를 측정합니다.
+    for (int i = 0; i < _sectionKeys.length; i++) {
+      final key = _sectionKeys[i];
+      if (key.currentContext != null) {
+        final RenderBox box = key.currentContext!.findRenderObject() as RenderBox;
+        final offset = box.localToGlobal(Offset.zero);
+        // offset.dy가 topThreshold보다 작거나 같으면 화면 상단을 지난 것으로 판단
+        if (offset.dy <= topThreshold) {
+          newCurrentSection = i;
+        }
+      }
+    }
+    if (newCurrentSection != iCurrentSection) {
       setState(() {
-        iCurrentSection = index;
+        iCurrentSection = newCurrentSection;
       });
     }
   }
@@ -104,6 +114,11 @@ class _CourseMainState extends State<CourseMain> {
               return const Center(child: Text("표시할 코스가 없습니다."));
             }
 
+            // 섹션 개수와 _sectionKeys 길이가 다르면 새로 생성
+            if (_sectionKeys.length != sections.length) {
+              _sectionKeys = List.generate(sections.length, (_) => GlobalKey());
+            }
+
             // Stack을 써서 하단에 현재 섹션 정보를 겹쳐서 표시
             return Stack(
               children: [
@@ -111,15 +126,17 @@ class _CourseMainState extends State<CourseMain> {
                 ListView.separated(
                   controller: scrollCtrl,
                   itemCount: sections.length + 1,
-                  separatorBuilder: (_, i) =>
-                      SizedBox(height: i == 0 ? 0.0 : 0.0),
+                  separatorBuilder: (_, i) => const SizedBox(height: 0.0),
                   itemBuilder: (_, i) {
                     // 첫 번째 아이템은 빈 박스로 대체
                     if (i == 0) {
                       return SizedBox(height: heightFirstBox);
                     }
-                    // 실제 섹션은 i-1 인덱스를 사용
-                    return Section(data: sections[i - 1]);
+                    // 실제 섹션은 i-1 인덱스를 사용하며, 각 섹션에 GlobalKey 부여
+                    return Section(
+                      key: _sectionKeys[i - 1],
+                      data: sections[i - 1],
+                    );
                   },
                 ),
                 // 현재 섹션 표시 위젯

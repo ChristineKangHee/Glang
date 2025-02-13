@@ -180,19 +180,19 @@ class SectionData {
       SectionData(
         section: 1,
         title: '코스1',
-        sectionDetail: '초급 학습을 위한 코스입니다.',
+        sectionDetail: '짧은 글 읽기',
         stages: stages.sublist(0, 4), // 첫 번째 스테이지
       ),
       SectionData(
         section: 2,
         title: '코스2',
-        sectionDetail: '중급 학습을 위한 코스입니다.',
+        sectionDetail: '중간 길이 글 읽기',
         stages: stages.sublist(4, 8), // 두 번째 스테이지
       ),
       SectionData(
         section: 3,
         title: '코스3',
-        sectionDetail: '고급 학습을 위한 코스입니다.',
+        sectionDetail: '긴 글 읽기',
         stages: stages.sublist(8, 12),
       ),
     ];
