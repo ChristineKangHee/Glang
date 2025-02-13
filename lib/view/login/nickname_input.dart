@@ -66,7 +66,7 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
 
             // 성공 시 홈 화면으로 이동
             if (context.mounted) {
-              Navigator.pushReplacementNamed(context, '/');
+              Navigator.pushReplacementNamed(context, '/tutorial');
             }
           }
         } catch (e) {
