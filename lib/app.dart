@@ -80,7 +80,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
             '/nickname': (context) => const NicknameInput(),
             '/notification': (context) => const NotificationPage(),
             '/course': (context) => CourseMain(),
-            '/community': (context) => const CommunityMain(),
+            '/community': (context) => CommunityMain(),
             '/mypage': (context) => const MyPageMain(),
             '/mypage/settings' : (context) => const SettingsPage(),
             '/mypage/settings/announcement' : (context) => const SettingsAnnouncement(),
