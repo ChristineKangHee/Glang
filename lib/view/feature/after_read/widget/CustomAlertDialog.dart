@@ -44,11 +44,11 @@ class CustomAlertDialog extends StatelessWidget {
                           const SizedBox(height: 16),
 
                           // AI 피드백
-                          _buildInfoBox(context, "AI 피드백", "단어 선택이 매우 정확해요! 핵심 단어 2가지를 모두 포함시켰어요. 하지만 단어의 순서가 달라요. 그래도 잘 하셨어요!"),
+                          _buildInfoBox(context, "AI 피드백", "단어 선택이 매우 정확해요! 핵심 단어 2가지를 모두 포함시켰어요. 하지만 단어의 순서가 달라요. 그래도 잘 하셨어요!", customColors),
                           const SizedBox(height: 16),
 
                           // 다른 유저의 글
-                          _buildInfoBox(context, "다른 유저의 글", "다람쥐는 작은 토끼를 보고 미소 지으며 말했어요. ‘내가 집까지 데려다줄게!’ 작은 토끼는 다람쥐의 도움으로 무사히 집으로 돌아왔어요."),
+                          _buildInfoBox(context, "다른 유저의 글", "다람쥐는 작은 토끼를 보고 미소 지으며 말했어요. ‘내가 집까지 데려다줄게!’ 작은 토끼는 다람쥐의 도움으로 무사히 집으로 돌아왔어요.", customColors),
                           const SizedBox(height: 24),
                         ],
                       ),
@@ -117,11 +117,11 @@ class CustomAlertDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoBox(BuildContext context, String title, String content) {
+  Widget _buildInfoBox(BuildContext context, String title, String content, CustomColors customColors) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: customColors.neutral90,
         borderRadius: BorderRadius.circular(12.0),
       ),
       child: Column(

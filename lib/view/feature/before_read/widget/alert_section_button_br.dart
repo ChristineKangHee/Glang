@@ -20,54 +20,57 @@ class AlertSectionButtonBr extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            decoration: ShapeDecoration(
-              color: customColors.neutral90,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+    return Container(
+      padding: EdgeInsetsDirectional.fromSTEB(0,16,0,0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              decoration: ShapeDecoration(
+                color: customColors.neutral90,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
-            ),
-            child: TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                "다시 쓰기",
-                style: body_small_semi(context).copyWith(color: customColors.neutral60),
-              ),
-            ),
-          ),
-        ),
-        SizedBox(width: 8), // Optional: Add space between the two buttons
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            decoration: ShapeDecoration(
-              color: customColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            child: TextButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => RdBefore()),
-                );
-              },
-              child: Text(
-                "글 읽기",
-                style: body_small_semi(context).copyWith(color: customColors.neutral100),
+              child: TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  "다시 쓰기",
+                  style: body_small_semi(context).copyWith(color: customColors.neutral60),
+                ),
               ),
             ),
           ),
-        ),
-      ],
+          SizedBox(width: 8), // Optional: Add space between the two buttons
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              decoration: ShapeDecoration(
+                color: customColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => RdBefore()),
+                  );
+                },
+                child: Text(
+                  "글 읽기",
+                  style: body_small_semi(context).copyWith(color: customColors.neutral100),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
