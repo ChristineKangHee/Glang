@@ -8,6 +8,7 @@ import '../../../viewmodel/custom_colors_provider.dart';
 import '../../../viewmodel/theme_controller.dart';
 import '../../components/alarm_dialog.dart';
 import '../../components/custom_app_bar.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -135,11 +136,24 @@ class SettingsPage extends ConsumerWidget {
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
           ),
           ListTile(
-            title: Text('최신 버전 업데이트',
+            title: Text(
+              '최신 버전 업데이트',
               style: body_medium_semi(context).copyWith(color: customColors.neutral0),
             ),
-            trailing: Text('v0.7.0',
-              style: body_small_semi(context).copyWith(color: customColors.neutral0),
+            trailing: FutureBuilder<String>(
+              future: _fetchLatestVersion(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                }
+                if (snapshot.hasError) {
+                  return Text('오류', style: body_small_semi(context).copyWith(color: customColors.neutral0));
+                }
+                return Text(
+                  'v${snapshot.data}',
+                  style: body_small_semi(context).copyWith(color: customColors.neutral0),
+                );
+              },
             ),
           ),
           Divider(color: customColors.neutral80,),
@@ -171,5 +185,15 @@ class SettingsPage extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+Future<String> _fetchLatestVersion() async {
+  try {
+    final remoteConfig = FirebaseRemoteConfig.instance;
+    await remoteConfig.fetchAndActivate();
+    return remoteConfig.getString('latest_version');
+  } catch (e) {
+    print('Firebase Remote Config 오류: $e');
+    return '0.0.0';
   }
 }
