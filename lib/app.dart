@@ -17,6 +17,7 @@ import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/home/notification/notification_page.dart';
 import 'package:readventure/view/login/login_main.dart';
 import 'package:readventure/view/login/nickname_input.dart';
+import 'package:readventure/view/login/tutorial.dart';
 import 'package:readventure/view/mypage/edit_nick_input.dart';
 import 'package:readventure/view/mypage/info/info_badge.dart';
 import 'package:readventure/view/mypage/edit_profile.dart';
@@ -71,6 +72,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
           initialRoute: '/login', // 초기 경로 설정 (스플래시 페이지로 변경 예정)
           routes: {
             '/': (context) => const MyHomePage(),
+            '/tutorial': (context) => TutorialScreen(),
             '/armain': (context) => const ArMain(),
             '/brmain': (context) => const BrMain(),
             '/rdmain': (context) => RdMain(),
