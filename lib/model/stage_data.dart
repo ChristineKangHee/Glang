@@ -162,35 +162,32 @@ Future<void> _createDefaultStages(CollectionReference progressRef) async {
                     "id": "Child 3",
                     "children": [
                       {"id": "Grandchild 5"},
-                      {"id": "Grandchild 6"}
                     ]
                   }
                 ]
               }
             ],
             "correctAnswers": {
-              "Root": "읽기 시스템",
-              "Child 1": "문제점",
-              "Grandchild 1": "교육 시스템",
-              "Grandchild 2": "피드백 부족",
-              "Child 2": "해결방안",
-              "Grandchild 3": "맞춤형 읽기 도구",
-              "Grandchild 4": "실시간 피드백",
-              "Child 3": "기대효과",
-              "Grandchild 5": "읽기 능력 향상",
-              "Grandchild 6": "자기주도 학습 강화"
+              "Root": "환경 보호",
+              "Child 1": "자원 절약",
+              "Grandchild 1": "중요성",
+              "Grandchild 2": "기술 발전 지원",
+              "Child 2": "기후 변화 대응",
+              "Grandchild 3": "기업과 국가의 노력",
+              "Grandchild 4": "긍정적인 변화",
+              "Child 3": "지속 가능성",
+              "Grandchild 5": "도전 과제",
             },
             "wordList": [
-              "읽기 시스템",
-              "문제점",
-              "교육 시스템",
-              "피드백 부족",
-              "해결방안",
-              "맞춤형 읽기 도구",
-              "실시간 피드백",
-              "기대효과",
-              "읽기 능력 향상",
-              "자기주도 학습 강화"
+              "환경 보호",
+              "자원 절약",
+              "중요성",
+              "기술 발전 지원",
+              "기후 변화 대응",
+              "기업과 국가의 노력",
+              "긍정적인 변화",
+              "지속 가능성",
+              "도전 과제",
             ]
           }
         },

@@ -43,7 +43,13 @@ class AuthController extends StateNotifier<User?> {
 
       final userCredential = await _auth.signInWithCredential(credential);
       final user = userCredential.user;
+
       if (user != null) {
+        // ✅ Google에서 가져온 displayName을 업데이트
+        if (user.displayName == null) {
+          await user.updateDisplayName(googleUser.displayName);
+        }
+
         await _handleUserState(user, onNicknameRequired, onHome);
         state = user;
       }
@@ -60,12 +66,14 @@ class AuthController extends StateNotifier<User?> {
     try {
       final token = await kakao.UserApi.instance.loginWithKakaoAccount();
       print('카카오 계정으로 로그인 성공');
-      print('idToken: ${token.idToken}');
-      print('accessToken: ${token.accessToken}');
 
       if (token.idToken == null || token.accessToken == null) {
         throw Exception('idToken 또는 accessToken이 null입니다.');
       }
+
+      // ✅ 카카오 사용자 정보 가져오기
+      final kakaoUser = await kakao.UserApi.instance.me();
+      final displayName = kakaoUser.kakaoAccount?.profile?.nickname ?? "사용자";
 
       final credential = OAuthProvider('oidc.kakao').credential(
         idToken: token.idToken,
@@ -76,6 +84,11 @@ class AuthController extends StateNotifier<User?> {
       final user = userCredential.user;
 
       if (user != null) {
+        // ✅ displayName이 없으면 설정
+        if (user.displayName == null) {
+          await user.updateDisplayName(displayName);
+        }
+
         print('Firebase 인증 성공: ${user.uid}');
         await _handleUserState(user, onNicknameRequired, onHome);
       } else {
@@ -110,6 +123,12 @@ class AuthController extends StateNotifier<User?> {
       final userCredential = await _auth.signInWithCredential(oauthCredential);
       final user = userCredential.user;
       if (user != null) {
+        // ✅ Apple의 fullName을 가져오고, 첫 로그인이라면 저장
+        final fullName = appleCredential.givenName ?? "사용자";
+        if (user.displayName == null && fullName.isNotEmpty) {
+          await user.updateDisplayName(fullName);
+        }
+
         await _handleUserState(user, onNicknameRequired, onHome);
         state = user;
       }
@@ -133,6 +152,7 @@ class AuthController extends StateNotifier<User?> {
 
       if (!docSnapshot.exists) {
         await userDoc.set({
+          'name': user.displayName,
           'nicknameSet': false,
           'email': user.email,
           'createdAt': FieldValue.serverTimestamp(),
