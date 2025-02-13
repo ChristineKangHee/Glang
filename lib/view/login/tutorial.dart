@@ -145,7 +145,7 @@ class TutorialPage extends StatelessWidget {
               child: ButtonPrimary(
                 function: () {
                   print("시작하기 버튼이 눌렸습니다!");
-                  Navigator.pushNamed(context, '/');
+                  Navigator.pushReplacementNamed(context, '/');
                 },
                 title: '시작하기',
               ),

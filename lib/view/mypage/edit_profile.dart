@@ -162,23 +162,33 @@ class _EditNickState extends ConsumerState<EditNick> {
 }
 
 /// 추가 개인정보
-class MyInfo extends StatelessWidget {
+class MyInfo extends ConsumerWidget {
   const MyInfo({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final emailAsync = ref.watch(userEmailProvider);
+    final nameAsync = ref.watch(userRealNameProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        InfoRow(title: '이름', value: '김민지'),
+        nameAsync.when(
+          data: (name) => InfoRow(title: '이름', value: name ?? '이름 없음'),
+          loading: () => const CircularProgressIndicator(),
+          error: (err, stack) => InfoRow(title: '이름', value: '불러오기 실패'),
+        ),
         const SizedBox(height: 24),
-        //InfoRow(title: '생년월일', value: '2000.01.01'),
-        //const SizedBox(height: 24),
-        InfoRow(title: '이메일', value: '1230@kakao.com'),
+        emailAsync.when(
+          data: (email) => InfoRow(title: '이메일', value: email ?? '이메일 없음'),
+          loading: () => const CircularProgressIndicator(),
+          error: (err, stack) => InfoRow(title: '이메일', value: '불러오기 실패'),
+        ),
       ],
     );
   }
 }
+
 
 class InfoRow extends StatelessWidget {
   final String title;

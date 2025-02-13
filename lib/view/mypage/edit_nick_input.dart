@@ -94,17 +94,23 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
             padding: const EdgeInsets.all(20),
             child: ButtonPrimary_noPadding(
               function: () async {
-                if (_controller.text.isNotEmpty &&
-                    _controller.text.length <= 8 &&
-                    !_controller.text.contains(' ') &&
-                    !existingNicknames.contains(_controller.text)) {
-                  await ref.read(viewmodel.userNameProvider.notifier).updateUserName(_controller.text);
-                  await ref.read(viewmodel.userNameProvider.notifier).fetchUserName();
-                  Navigator.pop(context, _controller.text);
-                } else {
+                final newNickname = _controller.text.trim();
+
+                if (newNickname.isEmpty || newNickname.length > 8 || newNickname.contains(' ')) {
                   setState(() {
                     errorMessage = '별명은 1-8자 이내로 공백 없이 입력해주세요.';
                   });
+                  return;
+                }
+
+                final result = await ref.read(viewmodel.userNameProvider.notifier).updateUserName(newNickname);
+
+                if (result != null) {
+                  setState(() {
+                    errorMessage = result;
+                  });
+                } else {
+                  Navigator.pop(context, newNickname);
                 }
               },
               title: '완료',
