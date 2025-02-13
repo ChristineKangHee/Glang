@@ -15,8 +15,8 @@
         android:label="글랑 GLANG"
         android:name="${applicationName}"
         android:extractNativeLibs="true"
-        android:icon="@mipmap/ic_launcher">
-<!--        android:icon="@mipmap/ic_launcher">-->
+        android:icon="@mipmap/launcher_icon">
+<!--        android:roundIcon="@mipmap/ic_launcher_round"-->
         <activity
             android:name=".MainActivity"
             android:exported="true"
