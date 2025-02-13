@@ -1,15 +1,12 @@
+// settings_secession.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../theme/font.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
-import '../../../viewmodel/theme_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
-
 import '../../../viewmodel/user_service.dart';
 import '../../components/custom_app_bar.dart';
 import '../../components/custom_button.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SettingsSecession extends ConsumerWidget {
   const SettingsSecession({super.key});
@@ -17,55 +14,8 @@ class SettingsSecession extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userName = ref.watch(userNameProvider); // 사용자 이름 상태 구독
-    final FirebaseAuth _auth = FirebaseAuth.instance;
-    final String? userId = _auth.currentUser?.uid;
     final customColors = ref.watch(customColorsProvider);
-
-    if (userId != null) {
-      ref.read(userNameProvider.notifier).fetchUserName();
-    }
-
-    Future<void> _deleteAccount() async {
-      try {
-        final user = _auth.currentUser;
-        if (user != null) {
-          final userId = user.uid;
-
-          // Firestore에서 사용자 데이터 삭제
-          await FirebaseFirestore.instance.collection('users').doc(userId).delete();
-
-          // Firestore에서 닉네임 데이터 삭제
-          final nicknameSnapshot = await FirebaseFirestore.instance.collection('users').doc(userId).get();
-          final nickname = nicknameSnapshot.data()?['nicknames'];
-          if (nickname != null) {
-            // 닉네임이 존재하면 삭제
-            await FirebaseFirestore.instance.collection('nicknames').doc(nickname).delete();
-          }
-
-          // Firebase Authentication에서 계정 삭제
-          await user.delete();
-
-          // userNameProvider 상태 초기화 (UI 즉시 반영)
-          ref.read(userNameProvider.notifier).state = "";
-
-          // 확인 메시지 표시
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("탈퇴가 완료되었습니다. 다음에 또 만나요.")),
-          );
-
-          // 로그인 화면으로 이동
-          Navigator.of(context).pushReplacementNamed('/login');
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("삭제 중 오류가 발생했습니다: $e")),
-        );
-      }
-    }
-
-
-
-
+    final userService = UserService();
 
     return Scaffold(
       appBar:
@@ -96,7 +46,7 @@ class SettingsSecession extends ConsumerWidget {
         child: SizedBox(
           width: double.infinity, // 버튼이 가득 차도록 설정
           child: ButtonPrimary_noPadding(
-            function: _deleteAccount, // Call the delete function here
+            function: () => userService.deleteAccount(context, ref),
             title: '탈퇴하기',
           ),
         ),

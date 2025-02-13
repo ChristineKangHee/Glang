@@ -74,7 +74,9 @@ class AuthController extends StateNotifier<User?> {
       // ✅ 카카오 사용자 정보 가져오기
       final kakaoUser = await kakao.UserApi.instance.me();
       final displayName = kakaoUser.kakaoAccount?.profile?.nickname ?? "사용자";
+      print('카카오 사용자 닉네임: $displayName');
 
+      // ✅ Firebase OAuth 인증 정보 생성
       final credential = OAuthProvider('oidc.kakao').credential(
         idToken: token.idToken,
         accessToken: token.accessToken,
@@ -84,9 +86,10 @@ class AuthController extends StateNotifier<User?> {
       final user = userCredential.user;
 
       if (user != null) {
-        // ✅ displayName이 없으면 설정
-        if (user.displayName == null) {
+        // ✅ Firebase에서 displayName이 없으면 업데이트
+        if (user.displayName == null || user.displayName!.isEmpty) {
           await user.updateDisplayName(displayName);
+          await user.reload(); // 변경된 정보 즉시 반영
         }
 
         print('Firebase 인증 성공: ${user.uid}');
