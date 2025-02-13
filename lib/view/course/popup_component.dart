@@ -59,28 +59,28 @@ class SectionPopup extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 예: "코스 제목" 대신 stageId나 다른 정보를 표시할 수도 있음
-                    Text(
-                      "스테이지 ID: ${stage.stageId}",
-                      style: body_xsmall_semi(context)
-                          .copyWith(color: titleColor),
-                    ),
-                    Text(
-                      stage.subdetailTitle,
-                      style: body_large_semi(context)
-                          .copyWith(color: subTitleColor),
-                    ),
-                  ],
+                Expanded( // 🔹 Expanded 추가
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "스테이지 ID: ${stage.stageId}",
+                        style: body_xsmall_semi(context).copyWith(color: titleColor),
+                      ),
+                      Text(
+                        stage.subdetailTitle,
+                        style: body_large_semi(context).copyWith(color: subTitleColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
                 // 시작하기 버튼
                 ElevatedButton(
                   onPressed: stage.status == StageStatus.locked
                       ? null
                       : () {
-                    // 코스 상세 화면 이동
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -106,6 +106,7 @@ class SectionPopup extends StatelessWidget {
                 ),
               ],
             ),
+
             const SizedBox(height: 32),
             // 하단: 진행도%, 시간, 난이도 표시
             Row(

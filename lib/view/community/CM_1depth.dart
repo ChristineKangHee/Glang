@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../theme/theme.dart';
 import '../../viewmodel/custom_colors_provider.dart';
 import '../components/custom_app_bar.dart';
+import '../components/custom_navigation_bar.dart';
 import 'Board/CM_2depth_board.dart';
 import 'Board/CM_2depth_boardMain.dart';
 import 'Board/community_searchpage.dart';
@@ -37,6 +38,7 @@ class CommunityMainPage extends ConsumerWidget {
           ],
         ),
       ),
+      bottomNavigationBar: CustomNavigationBar(),
     );
   }
 
