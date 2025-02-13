@@ -7,6 +7,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  /// Firestore에서 닉네임 중복 체크
+  Future<bool> isNicknameAvailable(String nickname) async {
+    final nicknameDoc = await _firestore.collection('nicknames').doc(nickname).get();
+    return !nicknameDoc.exists; // 닉네임이 존재하지 않으면 사용 가능
+  }
+
   /// Firestore에서 사용자 이름(닉네임) 가져오기
   Future<String?> getUserName(String userId) async {
     try {
@@ -27,12 +33,36 @@ class UserService {
     }
   }
 
-  /// Firestore에서 사용자 닉네임 업데이트
-  Future<void> updateUserName(String userId, String newName) async {
+  /// Firestore에서 사용자 닉네임 변경
+  Future<void> updateUserName(String userId, String newName, String oldName) async {
     try {
-      await _firestore.collection('users').doc(userId).update({'nickname': newName});
+      final nicknameRef = _firestore.collection('nicknames').doc(newName);
+      final userRef = _firestore.collection('users').doc(userId);
+      final oldNicknameRef = _firestore.collection('nicknames').doc(oldName);
+
+      await _firestore.runTransaction((transaction) async {
+        // 새 닉네임이 사용 가능한지 다시 확인
+        final nicknameSnapshot = await transaction.get(nicknameRef);
+        if (nicknameSnapshot.exists) {
+          throw Exception('이미 사용 중인 닉네임입니다.');
+        }
+
+        // 기존 닉네임 삭제
+        transaction.delete(oldNicknameRef);
+
+        // 새로운 닉네임 추가
+        transaction.set(nicknameRef, {
+          'uid': userId,
+          'created_at': FieldValue.serverTimestamp(),
+        });
+
+        // 사용자 닉네임 업데이트
+        transaction.update(userRef, {'nickname': newName});
+      });
+
     } catch (e) {
       print('❌ Error updating user name: $e');
+      throw Exception('닉네임 변경 실패');
     }
   }
 }
@@ -56,11 +86,26 @@ class UserNameNotifier extends StateNotifier<String?> {
     }
   }
 
-  Future<void> updateUserName(String newName) async {
+  /// 닉네임 업데이트 (중복 체크 포함)
+  Future<String?> updateUserName(String newName) async {
     final user = _auth.currentUser;
-    if (state != null) {
-      await _userService.updateUserName(user!.uid, newName);
+    if (user == null || state == null) return '오류: 사용자 정보가 없습니다.';
+
+    final oldName = state!;
+
+    // 닉네임 중복 체크
+    final isAvailable = await _userService.isNicknameAvailable(newName);
+    if (!isAvailable) {
+      return '이미 사용 중인 닉네임입니다.';
+    }
+
+    // Firestore에서 닉네임 변경
+    try {
+      await _userService.updateUserName(user.uid, newName, oldName);
       state = newName;
+      return null; // 성공
+    } catch (e) {
+      return '닉네임 변경 실패: ${e.toString()}';
     }
   }
 }
@@ -83,4 +128,32 @@ final userXPProvider = FutureProvider<int>((ref) async {
     return userSnapshot.data()!['totalXP'] as int;
   }
   return 0; // 기본값
+});
+
+/// 사용자의 이메일을 가져오는 Provider
+final userEmailProvider = FutureProvider<String?>((ref) async {
+  final userId = FirebaseAuth.instance.currentUser?.uid;
+  if (userId == null) return null;
+
+  final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
+  final userSnapshot = await userRef.get();
+
+  if (userSnapshot.exists && userSnapshot.data()!.containsKey('email')) {
+    return userSnapshot.data()!['email'] as String;
+  }
+  return null; // 이메일 정보가 없을 경우
+});
+
+/// 사용자의 이름(name)을 가져오는 Provider
+final userRealNameProvider = FutureProvider<String?>((ref) async {
+  final userId = FirebaseAuth.instance.currentUser?.uid;
+  if (userId == null) return null;
+
+  final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
+  final userSnapshot = await userRef.get();
+
+  if (userSnapshot.exists && userSnapshot.data()!.containsKey('name')) {
+    return userSnapshot.data()!['name'] as String;
+  }
+  return null; // 이름 정보가 없을 경우
 });

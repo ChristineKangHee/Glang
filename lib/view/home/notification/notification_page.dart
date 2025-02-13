@@ -74,7 +74,14 @@ class _NotificationPageState extends ConsumerState<NotificationPage> with Single
   Widget _buildRefreshableList(List<NotificationItem> items, TextStyle style) {
     return RefreshIndicator(
       onRefresh: ref.read(notificationProvider.notifier).fetchNotifications,
-      child: ListView.builder(
+      child: items.isEmpty
+          ? Center(
+        child: Text(
+          "받은 알림이 없어요",
+          style: style,
+        ),
+      )
+          : ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(), // 스크롤 가능하도록 설정
         itemCount: items.length,
         itemBuilder: (context, index) {
@@ -90,4 +97,5 @@ class _NotificationPageState extends ConsumerState<NotificationPage> with Single
       ),
     );
   }
+
 }

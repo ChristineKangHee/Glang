@@ -6,7 +6,7 @@ final notificationProvider = StateNotifierProvider<NotificationNotifier, List<No
 });
 
 class NotificationNotifier extends StateNotifier<List<NotificationItem>> {
-  NotificationNotifier() : super(_initialNotifications); // 초기 데이터 설정
+  NotificationNotifier() : super([]); // 초기 데이터 설정
 
   static final _initialNotifications = [
     NotificationItem(
@@ -74,20 +74,20 @@ class NotificationNotifier extends StateNotifier<List<NotificationItem>> {
     // 서버에서 데이터를 가져오거나 로컬에서 새로운 데이터를 추가하는 로직 작성
     await Future.delayed(const Duration(seconds: 2)); // 로딩 시간 시뮬레이션
     final newNotifications = [
-      NotificationItem(
-        title: '새로운 공지',
-        description: '앱 기능이 추가되었습니다.',
-        date: DateTime.now(),
-        category: '시스템',
-        isRead: false,
-      ),
-      NotificationItem(
-        title: '오늘의 읽기 알림',
-        description: '읽기 목표를 달성해 보세요!',
-        date: DateTime.now().subtract(const Duration(hours: 3)),
-        category: '코스',
-        isRead: false,
-      ),
+      // NotificationItem(
+      //   title: '새로운 공지',
+      //   description: '앱 기능이 추가되었습니다.',
+      //   date: DateTime.now(),
+      //   category: '시스템',
+      //   isRead: false,
+      // ),
+      // NotificationItem(
+      //   title: '오늘의 읽기 알림',
+      //   description: '읽기 목표를 달성해 보세요!',
+      //   date: DateTime.now().subtract(const Duration(hours: 3)),
+      //   category: '코스',
+      //   isRead: false,
+      // ),
     ];
 
     // 기존 데이터에 새로운 알림 추가
