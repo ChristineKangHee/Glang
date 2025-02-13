@@ -134,7 +134,7 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
                 function: _saveNickname,
                 title: '완료',
               )
-                  : ButtonPrimary20(
+                  : ButtonPrimary20_noPadding(
                 function: () {
                   setState(() {
                     errorMessage = '별명을 올바르게 입력해주세요.';
