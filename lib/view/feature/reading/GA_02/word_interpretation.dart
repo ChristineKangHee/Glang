@@ -6,21 +6,36 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shimmer/shimmer.dart';
 
 // 프로젝트 내 폰트/스타일 관련 함수 import (경로는 필요에 따라 수정)
 import 'package:readventure/theme/font.dart';
 
+/// 기본 응답 값 (API 호출 실패 시 반환)
+const Map<String, dynamic> defaultResponse = {
+  "dictionaryMeaning": "정보 없음",
+  "contextualMeaning": "정보 없음",
+  "synonyms": [],
+  "antonyms": [],
+};
+
+/// shimmer 효과 위젯 반환 함수
+Widget shimmerLine({
+  required double width,
+  required double height,
+  Color color = Colors.white,
+}) {
+  return Shimmer.fromColors(
+    baseColor: Colors.grey.shade300,
+    highlightColor: Colors.grey.shade100,
+    child: Container(width: width, height: height, color: color),
+  );
+}
+
 /// ChatGPT API를 호출하여 단어 정보를 받아오는 함수
 Future<Map<String, dynamic>> fetchWordDetails(String word, List<String> textSegments) async {
   final apiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
-  if (apiKey.isEmpty) {
-    return {
-      "dictionaryMeaning": "정보 없음",
-      "contextualMeaning": "정보 없음",
-      "synonyms": [],
-      "antonyms": [],
-    };
-  }
+  if (apiKey.isEmpty) return defaultResponse;
 
   const endpoint = 'https://api.openai.com/v1/chat/completions';
   final url = Uri.parse(endpoint);
@@ -56,35 +71,141 @@ Future<Map<String, dynamic>> fetchWordDetails(String word, List<String> textSegm
       final Map<String, dynamic> resBody = jsonDecode(utf8.decode(response.bodyBytes));
       final String message = resBody["choices"][0]["message"]["content"];
       try {
-        final Map<String, dynamic> data = jsonDecode(message);
-        return data;
+        return jsonDecode(message);
       } catch (e) {
         print("ChatGPT 응답 파싱 실패: $e");
-        return {
-          "dictionaryMeaning": "정보 없음",
-          "contextualMeaning": "정보 없음",
-          "synonyms": [],
-          "antonyms": [],
-        };
+        return defaultResponse;
       }
     } else {
       print("ChatGPT API 호출 실패: ${response.statusCode} ${response.body}");
-      return {
-        "dictionaryMeaning": "정보 없음",
-        "contextualMeaning": "정보 없음",
-        "synonyms": [],
-        "antonyms": [],
-      };
+      return defaultResponse;
     }
   } catch (e) {
     print("Exception in fetchWordDetails: $e");
-    return {
-      "dictionaryMeaning": "정보 없음",
-      "contextualMeaning": "정보 없음",
-      "synonyms": [],
-      "antonyms": [],
-    };
+    return defaultResponse;
   }
+}
+
+/// 팝업 상단 헤더 위젯 (타이틀 및 닫기 버튼)
+Widget _buildPopupHeader(BuildContext context, dynamic customColors, {required VoidCallback onClose}) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(
+        '해석',
+        style: body_small_semi(context).copyWith(color: customColors.neutral30),
+      ),
+      IconButton(
+        onPressed: onClose,
+        icon: Icon(Icons.close, color: customColors.neutral30),
+      ),
+    ],
+  );
+}
+
+/// 선택된 단어 표시 위젯
+Widget _buildSelectedWord(BuildContext context, String selectedText, dynamic customColors) {
+  return Align(
+    alignment: Alignment.centerLeft,
+    child: Text(
+      selectedText,
+      style: body_small_semi(context).copyWith(color: customColors.primary),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+    ),
+  );
+}
+
+/// 결과 내용 컨테이너 공통 위젯
+Widget _buildResultContainer(Widget child, dynamic customColors) {
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(16),
+    decoration: ShapeDecoration(
+      color: customColors.neutral90,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+      ),
+    ),
+    child: child,
+  );
+}
+
+/// API 응답 결과를 표시하는 위젯
+Widget _buildResultContent(BuildContext context, Map<String, dynamic> data, dynamic customColors) {
+  final List<dynamic> synonyms = data['synonyms'] is List ? data['synonyms'] : [];
+  final List<dynamic> antonyms = data['antonyms'] is List ? data['antonyms'] : [];
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        '사전적 의미',
+        style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
+      ),
+      Text(
+        data['dictionaryMeaning'] ?? '정보 없음',
+        style: body_small(context),
+      ),
+      const SizedBox(height: 16),
+      Text(
+        '문맥상 의미',
+        style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
+      ),
+      Text(
+        data['contextualMeaning'] ?? '정보 없음',
+        style: body_small(context),
+      ),
+      const SizedBox(height: 16),
+      Text(
+        '유사어',
+        style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
+      ),
+      Text(
+        synonyms.isNotEmpty ? synonyms.join(', ') : '정보 없음',
+        style: body_small(context),
+      ),
+      const SizedBox(height: 16),
+      Text(
+        '반의어',
+        style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
+      ),
+      Text(
+        antonyms.isNotEmpty ? antonyms.join(', ') : '정보 없음',
+        style: body_small(context),
+      ),
+    ],
+  );
+}
+
+/// 로딩 시 shimmer 효과로 API 결과 영역을 표시하는 위젯
+Widget _buildLoadingContent(BuildContext context, dynamic customColors) {
+  return _buildResultContainer(
+    Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 사전적 의미
+        shimmerLine(width: 80, height: 16),
+        const SizedBox(height: 8),
+        shimmerLine(width: double.infinity, height: 16),
+        const SizedBox(height: 16),
+        // 문맥상 의미
+        shimmerLine(width: 80, height: 16),
+        const SizedBox(height: 8),
+        shimmerLine(width: double.infinity, height: 16),
+        const SizedBox(height: 16),
+        // 유사어
+        shimmerLine(width: 60, height: 16),
+        const SizedBox(height: 8),
+        shimmerLine(width: double.infinity, height: 16),
+        const SizedBox(height: 16),
+        // 반의어
+        shimmerLine(width: 60, height: 16),
+        const SizedBox(height: 8),
+        shimmerLine(width: double.infinity, height: 16),
+      ],
+    ),
+    customColors,
+  );
 }
 
 /// 단어 해석 팝업 UI를 표시하는 함수
@@ -96,147 +217,63 @@ void showWordPopup({
 }) {
   showDialog(
     context: context,
-    builder: (BuildContext context) {
+    builder: (BuildContext dialogContext) {
       return Dialog(
         insetPadding: const EdgeInsets.symmetric(horizontal: 16),
         child: FutureBuilder<Map<String, dynamic>>(
           future: fetchWordDetails(selectedText, textSegments),
           builder: (context, snapshot) {
+            Widget content;
+
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Container(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CircularProgressIndicator(),
-                    const SizedBox(height: 20),
-                    Text(
-                      '로딩 중...',
-                      style: body_small_semi(context).copyWith(color: customColors.neutral30),
-                    ),
-                  ],
-                ),
+              content = Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildPopupHeader(context, customColors, onClose: () => Navigator.pop(context)),
+                  const SizedBox(height: 20),
+                  _buildSelectedWord(context, selectedText, customColors),
+                  const SizedBox(height: 20),
+                  _buildLoadingContent(context, customColors),
+                  const SizedBox(height: 20),
+                ],
               );
             } else if (snapshot.hasError) {
-              return Container(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '오류가 발생했습니다.',
-                      style: body_small_semi(context).copyWith(color: customColors.neutral30),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      snapshot.error.toString(),
-                      style: body_small(context),
-                    ),
-                    const SizedBox(height: 20),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: Icon(
-                        Icons.close,
-                        color: customColors.neutral30,
-                      ),
-                    ),
-                  ],
-                ),
+              content = Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '오류가 발생했습니다.',
+                    style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(snapshot.error.toString(), style: body_small(context)),
+                  const SizedBox(height: 20),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icon(Icons.close, color: customColors.neutral30),
+                  ),
+                ],
               );
             } else {
               final data = snapshot.data!;
-              final List<dynamic> synonyms = data['synonyms'] is List ? data['synonyms'] : [];
-              final List<dynamic> antonyms = data['antonyms'] is List ? data['antonyms'] : [];
-              return Container(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // 상단 타이틀 및 닫기 버튼
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '해석',
-                          style: body_small_semi(context).copyWith(color: customColors.neutral30),
-                        ),
-                        IconButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: Icon(
-                            Icons.close,
-                            color: customColors.neutral30,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    // 선택된 단어 표시
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        selectedText,
-                        style: body_small_semi(context).copyWith(color: customColors.primary),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // API에서 받아온 결과 표시
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: ShapeDecoration(
-                        color: customColors.neutral90,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '사전적 의미',
-                            style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
-                          ),
-                          Text(
-                            data['dictionaryMeaning'] ?? '정보 없음',
-                            style: body_small(context),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            '문맥상 의미',
-                            style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
-                          ),
-                          Text(
-                            data['contextualMeaning'] ?? '정보 없음',
-                            style: body_small(context),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            '유사어',
-                            style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
-                          ),
-                          Text(
-                            synonyms.isNotEmpty ? synonyms.join(', ') : '정보 없음',
-                            style: body_small(context),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            '반의어',
-                            style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
-                          ),
-                          Text(
-                            antonyms.isNotEmpty ? antonyms.join(', ') : '정보 없음',
-                            style: body_small(context),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
+              content = Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildPopupHeader(context, customColors, onClose: () => Navigator.pop(context)),
+                  const SizedBox(height: 20),
+                  _buildSelectedWord(context, selectedText, customColors),
+                  const SizedBox(height: 20),
+                  _buildResultContainer(_buildResultContent(context, data, customColors), customColors),
+                  const SizedBox(height: 20),
+                ],
               );
             }
+
+            return Container(
+              padding: const EdgeInsets.all(16),
+              child: content,
+            );
           },
         ),
       );
