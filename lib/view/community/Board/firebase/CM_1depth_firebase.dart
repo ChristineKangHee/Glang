@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:readventure/theme/font.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../theme/theme.dart';
-import '../../viewmodel/custom_colors_provider.dart';
-import '../components/custom_app_bar.dart';
-import '../components/custom_navigation_bar.dart';
-import 'Board/CM_2depth_board.dart';
-import 'Board/CM_2depth_boardMain.dart';
-import 'Board/CM_2depth_boardMain_firebase.dart';
-import 'Board/community_searchpage.dart';
-import 'Board/posting_detail_page.dart';
-import 'Ranking/CM_2depth_ranking.dart';
-import 'Ranking/ranking_component.dart';
-import 'Board/community_data.dart';
+import '../../../../theme/font.dart';
+import '../../../../theme/theme.dart';
+import '../../../../viewmodel/custom_colors_provider.dart';
+import '../../../components/custom_app_bar.dart';
+import '../../../components/custom_navigation_bar.dart';
+import '../CM_2depth_board.dart';
+import '../CM_2depth_boardMain.dart';
+import 'CM_2depth_boardMain_firebase.dart';
+import '../community_searchpage.dart';
+import 'community_data_firebase.dart';
+import 'community_searchpage_firebase.dart';
+import 'posting_detail_page.dart';
+import '../../Ranking/CM_2depth_ranking.dart';
+import '../../Ranking/ranking_component.dart';
+import '../community_data.dart';
 import 'community_service.dart';
 
 class CommunityMainPage extends ConsumerWidget {
-  final CommunityService _communityService = CommunityService();
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider);
+    final communityService = CommunityService(); // CommunityService 인스턴스 생성
 
     return Scaffold(
       backgroundColor: customColors.neutral90,
@@ -28,64 +29,41 @@ class CommunityMainPage extends ConsumerWidget {
         onSearchPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SearchPage()),
+            MaterialPageRoute(builder: (context) => SearchPage()), // 검색 페이지 이동
           );
         },
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<List<Map<String, dynamic>>>(
-              stream: _communityService.getPosts(), // Firestore에서 게시글 가져오기
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text("게시글이 없습니다."));
-                }
+      body: StreamBuilder<List<Post>>(
+        stream: communityService.getPosts(), // Firestore에서 게시글 목록 가져오기
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator()); // 데이터 로딩 중 표시
+          }
 
-                final posts = snapshot.data!;
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text("게시글이 없습니다.")); // 데이터가 없는 경우 처리
+          }
 
-                return ListView.builder(
-                  itemCount: posts.length,
-                  itemBuilder: (context, index) {
-                    final post = posts[index];
+          final posts = snapshot.data!; // Firestore에서 가져온 게시글 리스트
 
-                    return ListTile(
-                      title: Text(post['title'], style: TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(post['content'], maxLines: 2, overflow: TextOverflow.ellipsis),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.favorite, size: 16, color: Colors.red),
-                          SizedBox(width: 4),
-                          Text(post['likes'].toString()),
-                          SizedBox(width: 16),
-                          Icon(Icons.remove_red_eye, size: 16, color: Colors.grey),
-                          SizedBox(width: 4),
-                          Text(post['views'].toString()),
-                        ],
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PostDetailPage(postId: post['id']),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                );
-              },
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: RankingPreview(context, customColors),
+                ),
+                SizedBox(height: 24),
+                CommunityPreview(posts, context, customColors), // 게시글 미리보기
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
       bottomNavigationBar: CustomNavigationBar(),
     );
   }
+
 
   Widget CommunityPreview(posts, BuildContext context, CustomColors customColors) {
     // 게시글을 좋아요 수 기준 내림차순 정렬합니다.
@@ -130,11 +108,14 @@ class CommunityMainPage extends ConsumerWidget {
                           Row(
                             children: post.tags
                                 .map<Widget>((tag) => Padding(
-                              padding: const EdgeInsets.only(right: 8),
+                              padding:
+                              const EdgeInsets.only(right: 8),
                               child: Text(
-                                tag,
+                                '#'+tag,
                                 style: body_xxsmall(context)
-                                    .copyWith(color: customColors.primary60),
+                                    .copyWith(
+                                    color:
+                                    customColors.primary60),
                               ),
                             ))
                                 .toList(),
@@ -172,14 +153,16 @@ class CommunityMainPage extends ConsumerWidget {
                           Row(
                             children: [
                               CircleAvatar(
-                                backgroundImage: NetworkImage(post.profileImage),
+                                backgroundImage:
+                                NetworkImage(post.profileImage),
                                 radius: 12,
                               ),
                               const SizedBox(width: 8),
                               Text(
                                 post.authorName,
                                 style: body_xsmall_semi(context)
-                                    .copyWith(color: customColors.neutral30),
+                                    .copyWith(
+                                    color: customColors.neutral30),
                               ),
                             ],
                           ),
@@ -187,28 +170,37 @@ class CommunityMainPage extends ConsumerWidget {
                             child: Align(
                               alignment: Alignment.centerRight,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisAlignment:
+                                MainAxisAlignment.end,
                                 children: [
                                   Row(
                                     children: [
-                                      Icon(Icons.favorite, size: 16, color: customColors.neutral60),
+                                      Icon(Icons.favorite,
+                                          size: 16,
+                                          color: customColors.neutral60),
                                       const SizedBox(width: 4),
                                       Text(
                                         post.likes.toString(),
                                         style: body_xxsmall_semi(context)
-                                            .copyWith(color: customColors.neutral60),
+                                            .copyWith(
+                                            color: customColors
+                                                .neutral60),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(width: 8),
                                   Row(
                                     children: [
-                                      Icon(Icons.remove_red_eye, size: 16, color: customColors.neutral60),
+                                      Icon(Icons.remove_red_eye,
+                                          size: 16,
+                                          color: customColors.neutral60),
                                       const SizedBox(width: 4),
                                       Text(
                                         post.views.toString(),
                                         style: body_xxsmall_semi(context)
-                                            .copyWith(color: customColors.neutral60),
+                                            .copyWith(
+                                            color: customColors
+                                                .neutral60),
                                       ),
                                     ],
                                   ),
@@ -261,7 +253,8 @@ class CommunityMainPage extends ConsumerWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Cm2depthBoardmain()), // 게시판 페이지로 이동, 첫 번째 게시글을 전달
+            MaterialPageRoute(
+                builder: (context) => Cm2depthBoardmain()),
           );
         },
         child: Row(
@@ -294,7 +287,7 @@ class CommunityMainPage extends ConsumerWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => RankingPage()), // 랭킹 페이지로 이동
+            MaterialPageRoute(builder: (context) => RankingPage()),
           );
         },
         child: Row(
@@ -316,24 +309,19 @@ class CommunityMainPage extends ConsumerWidget {
     );
   }
 
-  String formatPostDate(DateTime? postDate) {
-    if (postDate == null) {
-      return '알 수 없음'; // Handle the case when the postDate is null
-    }
-
+  String formatPostDate(DateTime createdAt) {
     final now = DateTime.now();
-    final difference = now.difference(postDate);
+    final difference = now.difference(createdAt);
 
-    if (difference.inDays > 1) {
-      return '${postDate.month}/${postDate.day}/${postDate.year}';
-    } else if (difference.inDays == 1) {
-      return '어제';
-    } else if (difference.inHours > 1) {
-      return '${difference.inHours}시간 전';
-    } else if (difference.inMinutes > 1) {
-      return '${difference.inMinutes}분 전';
+    if (difference.inMinutes < 1) {
+      return "방금 전";
+    } else if (difference.inMinutes < 60) {
+      return "${difference.inMinutes}분 전";
+    } else if (difference.inHours < 24) {
+      return "${(difference.inMinutes / 60).ceil()}시간 전"; // 79분이면 2시간 전
     } else {
-      return '방금 전';
+      return "${difference.inDays}일 전";
     }
   }
+
 }
