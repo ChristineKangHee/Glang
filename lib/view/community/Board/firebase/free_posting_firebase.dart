@@ -68,7 +68,7 @@ class _FreeWritingPageState extends ConsumerState<FreeWritingPage> {
       discardDraft();
       Navigator.of(context).pop();
     } catch (e) {
-      showResultDialog(
+      showResultSaveDialog(
         context,
         ref.watch(customColorsProvider),
         "게시글 작성 실패",
@@ -91,7 +91,7 @@ class _FreeWritingPageState extends ConsumerState<FreeWritingPage> {
 
   void _handleClose() async {
     if (hasUnsavedChanges()) {
-      showResultDialog(
+      showResultSaveDialog(
         context,
         ref.watch(customColorsProvider),
         "나가시겠습니까?",
@@ -110,7 +110,7 @@ class _FreeWritingPageState extends ConsumerState<FreeWritingPage> {
 
   Future<bool> _onWillPop() async {
     if (hasUnsavedChanges()) {
-      showResultDialog(
+      showResultSaveDialog(
         context,
         ref.watch(customColorsProvider),
         "나가시겠습니까?",

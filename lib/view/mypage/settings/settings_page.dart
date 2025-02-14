@@ -160,7 +160,7 @@ class SettingsPage extends ConsumerWidget {
           ListTile(
             title: Text('로그아웃', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
             onTap: () {
-              showResultDialog(
+              showResultSaveDialog(
                 context,
                 customColors,
                 "로그아웃하시겠습니까?",

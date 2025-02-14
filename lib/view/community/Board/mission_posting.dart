@@ -110,7 +110,7 @@ class _MissionPostPageState extends ConsumerState<MissionPostPage> {
   // close 아이콘 눌렀을 때 처리: 임시저장 여부 확인 후 페이지 종료
   void _handleClose() async {
     if (hasUnsavedChanges()) {
-      showResultDialog(
+      showResultSaveDialog(
         context,
         ref.watch(customColorsProvider),
         "나가시겠습니까?",
@@ -143,7 +143,7 @@ class _MissionPostPageState extends ConsumerState<MissionPostPage> {
   // 시스템 back 버튼 처리
   Future<bool> _onWillPop() async {
     if (hasUnsavedChanges()) {
-      showResultDialog(
+      showResultSaveDialog(
         context,
         ref.watch(customColorsProvider),
         "나가시겠습니까?",

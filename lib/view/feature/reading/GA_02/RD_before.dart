@@ -20,8 +20,8 @@ class RdBefore extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar_2depth_6(title: "읽기의 중요성", automaticallyImplyLeading: false,
         onIconPressed: () {
-          Navigator.pop(context);
-        } ,
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        },
       ),
       body: SafeArea(
         child: LayoutBuilder(

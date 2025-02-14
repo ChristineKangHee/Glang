@@ -109,7 +109,7 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
       // 게시글이 작성되면 페이지를 종료합니다.
       Navigator.of(context).pop();
     } catch (e) {
-      showResultDialog(
+      showResultSaveDialog(
         context,
         ref.watch(customColorsProvider),
         "게시글 작성 실패",
@@ -126,7 +126,7 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
       if (selectedKeyword.isNotEmpty && titleController.text.isEmpty && contentController.text.isEmpty) {
         Navigator.of(context).pop();
       } else {
-        showResultDialog(
+        showResultSaveDialog(
           context,
           ref.watch(customColorsProvider),
           "나가시겠습니까?",
@@ -200,7 +200,7 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
       if (selectedKeyword.isNotEmpty && titleController.text.isEmpty && contentController.text.isEmpty) {
         Navigator.of(context).pop();
       } else {
-        showResultDialog(
+        showResultSaveDialog(
           context,
           ref.watch(customColorsProvider),
           "나가시겠습니까?",

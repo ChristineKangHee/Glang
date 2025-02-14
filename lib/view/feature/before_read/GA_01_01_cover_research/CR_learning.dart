@@ -89,7 +89,7 @@ class _CRLearningState extends ConsumerState<CRLearning> {
         title: "표지 탐구하기",
         automaticallyImplyLeading: false,
         onIconPressed: () {
-          Navigator.pop(context);
+          Navigator.of(context).popUntil((route) => route.isFirst);
         },
       ),
       body: SafeArea(

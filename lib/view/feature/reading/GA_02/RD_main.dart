@@ -12,6 +12,7 @@ import '../../../../../theme/font.dart';
 import '../../../../../theme/theme.dart';
 import '../../../../model/reading_data.dart';
 import '../../../../model/section_data.dart';
+import '../../../components/alarm_dialog.dart';
 import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_button.dart';
 import '../../after_read/choose_activities.dart';
@@ -164,7 +165,22 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
 
     return Scaffold(
       // 제목은 새 모델의 subdetailTitle 사용
-      appBar: CustomAppBar_2depth_8(title: currentStage.subdetailTitle),
+      appBar: CustomAppBar_2depth_8(
+          title: currentStage.subdetailTitle,
+        onClosePressed: () {
+          // 기본 동작: 결과 저장 여부 다이얼로그 표시
+          showResultSaveDialog(
+            context,
+            customColors,
+            "결과를 저장하고 이동할까요?",
+            "아니오",
+            "예",
+                (ctx) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+          );
+        },
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(

@@ -21,7 +21,7 @@ showResultDialog(
 );
  */
 
-class ResultDialog extends StatelessWidget {
+class ResultSaveDialog extends StatelessWidget {
   final VoidCallback onConfirm;
   final VoidCallback onCancel;
   final CustomColors customColors;
@@ -31,7 +31,7 @@ class ResultDialog extends StatelessWidget {
   final void Function(BuildContext) onConfirmNavigation;
   final String? continuationMessage; // continuationMessage는 옵션
 
-  const ResultDialog({
+  const ResultSaveDialog({
     Key? key,
     required this.onConfirm,
     required this.onCancel,
@@ -118,11 +118,11 @@ class ResultDialog extends StatelessWidget {
   }
 }
 
-void showResultDialog(BuildContext context, CustomColors customColors, String message, String cancelText, String confirmText, void Function(BuildContext) onConfirmNavigation, {String? continuationMessage}) {
+void showResultSaveDialog(BuildContext context, CustomColors customColors, String message, String cancelText, String confirmText, void Function(BuildContext) onConfirmNavigation, {String? continuationMessage}) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
-      return ResultDialog(
+      return ResultSaveDialog(
         customColors: customColors,
         onCancel: () => Navigator.pop(context),
         onConfirm: () {
