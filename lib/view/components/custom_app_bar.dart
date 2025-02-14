@@ -642,16 +642,18 @@ class CustomAppBar_2depth_7 extends StatelessWidget implements PreferredSizeWidg
   }
 }
 ////////////////////// 타이머 존재하는 앱바 //////////////////////
+//사용할 때 기본으로 close 버튼 누르면 dialog 뜨고 pop하도록 되어있음.
+//개별 페이지에서 루트 지정 가능
 class CustomAppBar_2depth_8 extends StatefulWidget implements PreferredSizeWidget {
   final String title;
   final Color? backgroundColor;
-  // final Function()? onIconPressed;
+  final VoidCallback? onClosePressed; // 외부에서 close 버튼의 행동을 지정할 수 있도록 추가
 
   const CustomAppBar_2depth_8({
     Key? key,
     required this.title,
     this.backgroundColor,
-    // this.onIconPressed,
+    this.onClosePressed, // 사용자가 행동을 전달할 수 있음
   }) : super(key: key);
 
   @override
@@ -699,10 +701,10 @@ class _CustomAppBar_2depth_8State extends State<CustomAppBar_2depth_8> {
       scrolledUnderElevation: 0,
       leadingWidth: 100,
       leading: Center(
-        // Center를 사용해 leading 영역 내에서 위젯을 가운데 정렬
+        // leading 영역 내에서 위젯을 가운데 정렬
         child: Row(
           children: [
-            SizedBox(width: 16,),
+            const SizedBox(width: 16),
             SizedBox(
               width: 59, // 원하는 너비
               height: 32, // 원하는 높이
@@ -733,26 +735,28 @@ class _CustomAppBar_2depth_8State extends State<CustomAppBar_2depth_8> {
       actions: [
         IconButton(
           icon: Icon(Icons.close, color: customColors.neutral30, size: 28),
-          onPressed: () {
-            showResultDialog(
-              context,
-              customColors,
-              "결과를 저장하고 이동할까요?",
-              "아니오",
-              "예",
-                  (ctx) {
+          onPressed: widget.onClosePressed ??
+                  () {
+                // 기본 동작: 결과 저장 여부 다이얼로그 표시
+                    showResultSaveDialog(
+                  context,
+                  customColors,
+                  "결과를 저장하고 이동할까요?",
+                  "아니오",
+                  "예",
+                      (ctx) {
                     Navigator.pop(context);
+                  },
+                );
               },
-            );
-          },
         ),
       ],
-
       backgroundColor: widget.backgroundColor ?? customColors.neutral100,
       elevation: 0,
     );
   }
 }
+
 
 ////////////////////// 커뮤니티 글쓰기 임시저장 등록 앱바 //////////////////////
 class CustomAppBar_2depth_9 extends StatelessWidget implements PreferredSizeWidget {

@@ -223,7 +223,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     ref.invalidate(sectionProvider);
 
     // 결과 다이얼로그 띄우기
-    showResultDialog(
+    showResultSaveDialog(
       context,
       customColors,
       "결과를 확인하시겠습니까?",
@@ -401,9 +401,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
             title: '미션 선택',
             automaticallyImplyLeading: false,
             onIconPressed: () {
-              // 두번 스택 제거해주기.. 이전에는 홈으로 push라서 스택이 계속 생겼음
-              Navigator.pop(context);
-              Navigator.pop(context);
+              Navigator.of(context).popUntil((route) => route.isFirst);
             },
           ),
           body: Column(
