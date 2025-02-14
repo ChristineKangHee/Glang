@@ -87,12 +87,20 @@ dev_dependencies:
   #shimmer eefect
   shimmer: ^3.0.0
 
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: "assets/icon/icon.png"  # 앱 실행 시 표시될 이미지
+  android: true
+  ios: true
+  fullscreen: true
+
+
 # 앱 아이콘 변경 (사용 모르겟어)
 flutter_launcher_icons:
-  android: "launcher_icon"
+  android: "ic_launcher"
   ios: true
   image_path: "assets/icon/icon.png"
-  min_sdk_android: 21 # android min sdk min:16, default 21
+  min_sdk_android: 23 # android min sdk min:16, default 21
 
 flutter:
 
