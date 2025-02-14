@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/view/community/Ranking/ranking_component.dart';
-import 'package:readventure/view/community/Ranking/ranking_data.dart';
 import '../../../theme/theme.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/custom_app_bar.dart';

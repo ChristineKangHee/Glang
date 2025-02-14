@@ -82,23 +82,60 @@ void showSentencePopup({
   );
 }
 
+/// 로딩 상태: 문맥상 의미와 요약 각각에 shimmer 표시
 Widget _loadingState(dynamic customColors, String selectedText, BuildContext context) {
   return Column(
     mainAxisSize: MainAxisSize.min,
     children: [
       _popupHeader(customColors, context),
       _selectedTextWidget(selectedText, customColors, context),
-      const SizedBox(height: 10),
+      const SizedBox(height: 20),
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: customColors.neutral90,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 문맥상 의미 영역 shimmer
+            _shimmerPlaceholder(),
+            const SizedBox(height: 16),
+            // 요약 영역 shimmer
+            _shimmerPlaceholder(),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+/// shimmer placeholder 위젯 (제목과 내용 모양)
+Widget _shimmerPlaceholder() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // 제목 자리 shimmer
       Shimmer.fromColors(
         baseColor: Colors.grey.shade300,
         highlightColor: Colors.grey.shade100,
         child: Container(
+          height: 16,
+          width: 80,
+          color: Colors.grey.shade300,
+        ),
+      ),
+      const SizedBox(height: 8),
+      // 내용 자리 shimmer
+      Shimmer.fromColors(
+        baseColor: Colors.grey.shade300,
+        highlightColor: Colors.grey.shade100,
+        child: Container(
+          height: 14,
           width: double.infinity,
-          height: 100,
-          decoration: BoxDecoration(
-            color: customColors.neutral100,
-            borderRadius: BorderRadius.circular(14),
-          ),
+          color: Colors.grey.shade300,
         ),
       ),
     ],

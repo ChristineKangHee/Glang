@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
-import 'package:readventure/view/community/Ranking/ranking_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 
