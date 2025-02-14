@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:readventure/view/community/Board/firebase/CM_1depth_firebase.dart';
 import '../view/community/community_main.dart';
 import '../view/course/course_main.dart';
 import '../view/home/home.dart';
@@ -59,7 +60,7 @@ class NavigationController extends StateNotifier<int> {
       case '/course':
         return CourseMain();
       case '/community':
-        return CommunityMain();
+        return CommunityMainPage();
       case '/mypage':
         return const MyPageMain();
       default:

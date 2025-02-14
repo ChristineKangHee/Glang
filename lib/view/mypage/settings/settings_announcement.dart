@@ -88,19 +88,17 @@ class AnnouncementCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider);
 
-    return Container(
-      padding: EdgeInsets.all(16),
-      width: double.infinity,
-      child: Column(
+    return ListTile(
+      title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
             style: body_small_semi(context),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
           Text(
-            DateFormat('yyyy-MM-dd').format(date), // DateTime → yyyy-MM-dd 형식 변환
+            DateFormat('yyyy-MM-dd').format(date),
             style: body_xsmall(context).copyWith(color: customColors.neutral60),
           ),
         ],
@@ -108,6 +106,8 @@ class AnnouncementCard extends ConsumerWidget {
     );
   }
 }
+
+
 
 class Announcement {
   final String title;

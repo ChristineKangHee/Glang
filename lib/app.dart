@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:readventure/view/community/Board/firebase/CM_1depth_firebase.dart';
 import 'package:readventure/view/community/community_main.dart';
 import 'package:readventure/view/course/course_main.dart';
 import 'package:readventure/view/feature/after_read/AR_main.dart';
@@ -80,7 +81,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
             '/nickname': (context) => const NicknameInput(),
             '/notification': (context) => const NotificationPage(),
             '/course': (context) => CourseMain(),
-            '/community': (context) => CommunityMain(),
+            '/community': (context) => CommunityMainPage(),
             '/mypage': (context) => const MyPageMain(),
             '/mypage/settings' : (context) => const SettingsPage(),
             '/mypage/settings/announcement' : (context) => const SettingsAnnouncement(),

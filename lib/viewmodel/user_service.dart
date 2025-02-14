@@ -1,11 +1,13 @@
 // user_service.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-/// 1. Firestore에서 사용자 정보를 가져오는 Service 클래스
+/// Firestore에서 사용자 정보를 관리하는 서비스 클래스
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   /// Firestore에서 닉네임 중복 체크
   Future<bool> isNicknameAvailable(String nickname) async {
@@ -16,15 +18,12 @@ class UserService {
   /// Firestore에서 사용자 이름(닉네임) 가져오기
   Future<String?> getUserName(String userId) async {
     try {
-      // Firestore의 users/{uid} 경로에서 데이터 가져오기
       DocumentSnapshot<Map<String, dynamic>> userDoc =
       await _firestore.collection('users').doc(userId).get();
 
       if (userDoc.exists) {
-        // 사용자 이름(닉네임) 반환
         return userDoc.data()?['nickname'] as String?;
       } else {
-        print('❌ User not found');
         return null;
       }
     } catch (e) {
@@ -41,28 +40,73 @@ class UserService {
       final oldNicknameRef = _firestore.collection('nicknames').doc(oldName);
 
       await _firestore.runTransaction((transaction) async {
-        // 새 닉네임이 사용 가능한지 다시 확인
         final nicknameSnapshot = await transaction.get(nicknameRef);
         if (nicknameSnapshot.exists) {
           throw Exception('이미 사용 중인 닉네임입니다.');
         }
 
-        // 기존 닉네임 삭제
         transaction.delete(oldNicknameRef);
-
-        // 새로운 닉네임 추가
-        transaction.set(nicknameRef, {
-          'uid': userId,
-          'created_at': FieldValue.serverTimestamp(),
-        });
-
-        // 사용자 닉네임 업데이트
+        transaction.set(nicknameRef, {'uid': userId, 'created_at': FieldValue.serverTimestamp()});
         transaction.update(userRef, {'nickname': newName});
       });
 
     } catch (e) {
       print('❌ Error updating user name: $e');
       throw Exception('닉네임 변경 실패');
+    }
+  }
+
+  /// 🔹 Firestore 서브컬렉션 삭제 함수
+  Future<void> deleteSubCollection(CollectionReference collectionRef) async {
+    final querySnapshot = await collectionRef.get();
+    final batch = _firestore.batch();
+
+    for (final doc in querySnapshot.docs) {
+      batch.delete(doc.reference);
+    }
+    if (querySnapshot.docs.isNotEmpty) {
+      await batch.commit();
+    }
+  }
+
+  /// 🔹 사용자 계정 삭제 (Firestore & Authentication)
+  Future<void> deleteAccount(BuildContext context, WidgetRef ref) async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        final userId = user.uid;
+        final userRef = _firestore.collection('users').doc(userId);
+
+        // 1. 사용자 데이터 가져오기 (닉네임 포함)
+        final userSnapshot = await userRef.get();
+        final nickname = userSnapshot.data()?['nickname'];
+
+        // 2. 서브컬렉션 삭제 (attendance, progress)
+        await deleteSubCollection(userRef.collection('attendance'));
+        await deleteSubCollection(userRef.collection('progress'));
+
+        // 3. 닉네임 컬렉션 삭제
+        if (nickname != null && nickname.toString().isNotEmpty) {
+          await _firestore.collection('nicknames').doc(nickname).delete();
+        }
+
+        // 4. 사용자 문서 삭제
+        await userRef.delete();
+
+        // 5. Firebase Authentication에서 계정 삭제
+        await user.delete();
+
+        // 6. 상태 초기화 및 메시지, 네비게이션 처리
+        ref.read(userNameProvider.notifier).state = "";
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("탈퇴가 완료되었습니다. 다음에 또 만나요.")),
+        );
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("삭제 중 오류가 발생했습니다: $e")),
+      );
     }
   }
 }
