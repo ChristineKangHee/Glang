@@ -1,0 +1,2 @@
+/Users/kanghee/IdeaProject/ReadVenture/android/app/.cxx/Debug/3i533p6c/x86/CMakeFiles/edit_cache.dir
+/Users/kanghee/IdeaProject/ReadVenture/android/app/.cxx/Debug/3i533p6c/x86/CMakeFiles/rebuild_cache.dir
