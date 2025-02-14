@@ -165,26 +165,26 @@ class AuthController extends StateNotifier<User?> {
   Future<void> _handleUserState(
       User user, Function onNicknameRequired, Function onHome) async {
     try {
-      // 출석 체크
-      await markTodayAttendanceAsChecked(user.uid);
+      final userRef = _firestore.collection('users').doc(user.uid);
+      final docSnapshot = await userRef.get();
 
-      // DB에서 users/{user.uid} 문서 조회
-      final userDoc = _firestore.collection('users').doc(user.uid);
-      final docSnapshot = await userDoc.get();
-
-      // ✅ 로그인 직후, userIdProvider 업데이트!
+      // 로그인 직후 userIdProvider 업데이트
       ref.read(userIdProvider.notifier).state = user.uid;
 
       if (!docSnapshot.exists) {
-        await userDoc.set({
+        await userRef.set({
           'name': user.displayName,
           'nicknameSet': false,
           'email': user.email,
           'createdAt': FieldValue.serverTimestamp(),
           'totalXP': 0,
         });
+        // 사용자 문서를 생성한 후에 출석 체크 호출
+        await markTodayAttendanceAsChecked(user.uid);
         onNicknameRequired();
       } else {
+        // 이미 문서가 존재하는 경우
+        await markTodayAttendanceAsChecked(user.uid);
         final data = docSnapshot.data()!;
         if (data['nicknameSet'] == true) {
           onHome();

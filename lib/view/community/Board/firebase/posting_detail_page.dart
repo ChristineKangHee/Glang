@@ -27,6 +27,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     super.initState();
     likeCount = widget.post.likes;
     _checkIfLiked();
+    _incrementViewCount(); // Increment the view count when the page is loaded
   }
 
   Future<void> _checkIfLiked() async {
@@ -51,6 +52,14 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     setState(() {
       isLiked = !isLiked;
       likeCount += isLiked ? 1 : -1;
+    });
+  }
+
+  // Function to increment view count
+  Future<void> _incrementViewCount() async {
+    await _communityService.increasePostViews(widget.post.id);
+    setState(() {
+      widget.post.views += 1; // Update the view count in the UI
     });
   }
 
@@ -165,3 +174,4 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     }
   }
 }
+

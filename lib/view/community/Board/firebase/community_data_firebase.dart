@@ -9,7 +9,7 @@ class Post {
   final String profileImage;
   final String nickname;
   final int likes;
-  final int views;
+  late final int views;
   final String category;
 
   Post({

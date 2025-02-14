@@ -12,10 +12,9 @@ import 'package:readventure/view/course/course_main.dart';
 import 'package:readventure/view/feature/after_read/AR_main.dart';
 import 'package:readventure/view/feature/before_read/BR_main.dart';
 import 'package:readventure/view/feature/reading/GA_02/RD_main.dart';
-import 'package:readventure/view/feature/reading/quiz_data.dart';
-import 'package:readventure/view/home/example.dart';
 import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/home/notification/notification_page.dart';
+import 'package:readventure/view/home/stage_provider.dart';
 import 'package:readventure/view/login/login_main.dart';
 import 'package:readventure/view/login/nickname_input.dart';
 import 'package:readventure/view/login/tutorial.dart';
@@ -32,11 +31,14 @@ import 'package:readventure/view/mypage/settings/settings_politics.dart';
 import 'package:readventure/view/mypage/settings/settings_announcement.dart';
 import 'package:readventure/view/mypage/settings/settings_requests.dart';
 import 'package:readventure/view/mypage/settings/settings_secession.dart';
+import 'package:readventure/viewmodel/app_state_controller.dart';
 import 'viewmodel/theme_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/view/mypage/settings/settings_page.dart';
 import 'package:readventure/view/mypage/settings/settings_theme.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
   const MyApp({super.key});
@@ -45,6 +47,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
   Widget build(BuildContext context, WidgetRef ref) {
     final isLightTheme = ref.watch(themeProvider); // 테마 상태를 읽음
     final themeController = ref.read(themeProvider.notifier); // 테마 컨트롤러
+    final user = ref.watch(appStateProvider); // 현재 로그인한 사용자 정보
 
     return ScreenUtilInit(
       // ScreenUtil 사용법
@@ -70,9 +73,10 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
           theme: isLightTheme ? themeController.lightTheme : themeController.darkTheme, // 라이트/다크 테마
           darkTheme: themeController.darkTheme, // 다크 테마
           themeMode: isLightTheme ? ThemeMode.light : ThemeMode.dark, // 테마 모드
-          initialRoute: '/login', // 초기 경로 설정 (스플래시 페이지로 변경 예정)
+          // initialRoute: '/login', // 초기 경로 설정 (스플래시 페이지로 변경 예정)
+          home: const AuthWrapper(), // 초기 화면을 AuthWrapper로 지정
           routes: {
-            '/': (context) => const MyHomePage(),
+            // '/': (context) => const MyHomePage(),
             '/tutorial': (context) => TutorialScreen(),
             '/armain': (context) => const ArMain(),
             '/brmain': (context) => const BrMain(),
@@ -111,6 +115,65 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
           // startLocale: Locale('ko', 'KR')
 
         );
+      },
+    );
+  }
+}
+
+
+
+/// 로그인 상태 및 닉네임 설정 여부를 확인하는 위젯 (ConsumerWidget로 변경)
+class AuthWrapper extends ConsumerWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, authSnapshot) {
+        if (authSnapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (authSnapshot.hasData && authSnapshot.data != null) {
+          final user = authSnapshot.data!;
+
+          // 빌드가 완료된 후에 provider 상태 업데이트
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ref.read(userIdProvider.notifier).state = user.uid;
+          });
+
+          return FutureBuilder<DocumentSnapshot>(
+            future: FirebaseFirestore.instance.collection('users').doc(user.uid).get(),
+            builder: (context, userDocSnapshot) {
+              if (userDocSnapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+              if (userDocSnapshot.hasError) {
+                return Scaffold(
+                  body: Center(child: Text('Error: ${userDocSnapshot.error}')),
+                );
+              }
+              if (userDocSnapshot.hasData) {
+                final data = userDocSnapshot.data?.data();
+                if (data is Map<String, dynamic> && data['nicknameSet'] == true) {
+                  return const MyHomePage();
+                } else {
+                  return const NicknameInput();
+                }
+              }
+              return const NicknameInput();
+            },
+          );
+        }
+
+
+        // 로그인되어 있지 않은 경우 로그인 화면 표시
+        return const LoginPage();
       },
     );
   }
