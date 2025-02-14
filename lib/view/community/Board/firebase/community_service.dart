@@ -19,13 +19,16 @@ class CommunityService {
       final user = _auth.currentUser;
       if (user == null) throw Exception("로그인이 필요합니다.");
 
+      final userDoc = await _firestore.collection('users').doc(user.uid).get();
+      final nickname = userDoc.data()?['nickname'] ?? '익명'; // Firestore에서 닉네임 가져오기
+
       final postRef = _firestore.collection('posts').doc();
       final postData = {
         'id': postRef.id,
         'title': title,
         'content': content,
         'authorId': user.uid,
-        'authorName': user.displayName ?? '익명',
+        'nickname': nickname, // authorName 대신 nickname 저장
         'profileImage': user.photoURL ?? '',
         'tags': tags,
         'likes': 0,
@@ -41,6 +44,7 @@ class CommunityService {
       throw Exception('게시글 작성 실패');
     }
   }
+
 
   Stream<List<Post>> getPosts() {
     return _firestore

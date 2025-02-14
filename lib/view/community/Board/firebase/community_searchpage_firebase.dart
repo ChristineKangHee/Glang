@@ -59,7 +59,7 @@ class _SearchPageState extends State<SearchPage>
             .where((post) =>
         post.title.contains(finalQuery) ||
             post.content.contains(finalQuery) ||
-            post.authorName.contains(finalQuery))
+            post.nickname.contains(finalQuery))
             .toList();
         _isSearchInitiated = true;
       });

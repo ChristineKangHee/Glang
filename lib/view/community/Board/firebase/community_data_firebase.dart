@@ -7,7 +7,7 @@ class Post {
   final List<String> tags;
   final DateTime createdAt;
   final String profileImage;
-  final String authorName;
+  final String nickname;
   final int likes;
   final int views;
   final String category;
@@ -19,7 +19,7 @@ class Post {
     required this.tags,
     required this.createdAt,
     required this.profileImage,
-    required this.authorName,
+    required this.nickname,
     required this.likes,
     required this.views,
     required this.category,
@@ -33,7 +33,7 @@ class Post {
       tags: List<String>.from(data['tags'] ?? []),
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       profileImage: data['profileImage'] ?? '',
-      authorName: data['authorName'] ?? '',
+      nickname: data['nickname'] ?? '익명',
       likes: data['likes'] ?? 0,
       views: data['views'] ?? 0,
       category: data['category'] ?? '',
