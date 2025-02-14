@@ -4,11 +4,13 @@
 /// Created: 2025-01-02
 /// Last Modified: 2025-01-09 by 박민준
 
+import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/util/gradients.dart';
 import 'package:readventure/view/components/custom_navigation_bar.dart';
+import 'package:readventure/view/home/stage_provider.dart';
 import 'package:readventure/viewmodel/app_state_controller.dart';
 import 'package:readventure/theme/theme.dart';
 import 'package:readventure/theme/font.dart';
@@ -23,7 +25,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../viewmodel/user_service.dart';
-
 import 'attendance/attendance_model.dart';
 import 'attendance/attendance_provider.dart';
 
@@ -84,7 +85,28 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
                       SizedBox(height: 24.h,),
 
                       //TODO: 진행 중인 학습 위젯
-                      if (ongoingStage != null) ProgressSection(data: ongoingStage), // 🔹 `ProgressSection`에서 `StageData` 사용
+                      // if (ongoingStage != null) ProgressSection(data: ongoingStage), // 🔹 `ProgressSection`에서 `StageData` 사용
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final stagesStream = ref.watch(stagesStreamProvider);
+                          return stagesStream.when(
+                            data: (stages) {
+                              // 진행 중인 스테이지를 찾습니다.
+                              final ongoingStage = stages.firstWhereOrNull(
+                                    (stage) => stage.status == StageStatus.inProgress,
+                              );
+                              if (ongoingStage != null) {
+                                return ProgressSection(data: ongoingStage);
+                              }
+                              return Container(); // 진행 중인 스테이지가 없으면 빈 컨테이너를 반환
+                            },
+                            loading: () =>
+                                Center(child: CircularProgressIndicator()),
+                            error: (error, stack) =>
+                                Center(child: Text("오류 발생: $error")),
+                          );
+                        },
+                      ),
                       SizedBox(height: 24.h,),
 
                       // HotPostSection(customColors: customColors),
@@ -108,7 +130,7 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
 
                       //TODO: 이번달 학습 기록 위젯
                       InkWell(
-                        onTap: () => Navigator.pushNamed(context, "/mypage/info/statistics"),
+                        // onTap: () => Navigator.pushNamed(context, "/mypage/info/statistics"),
                         child: LearningSection(customColors: customColors),
                       ),
 

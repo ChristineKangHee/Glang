@@ -14,6 +14,7 @@ import 'package:readventure/view/feature/before_read/BR_main.dart';
 import 'package:readventure/view/feature/reading/GA_02/RD_main.dart';
 import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/home/notification/notification_page.dart';
+import 'package:readventure/view/home/stage_provider.dart';
 import 'package:readventure/view/login/login_main.dart';
 import 'package:readventure/view/login/nickname_input.dart';
 import 'package:readventure/view/login/tutorial.dart';
@@ -30,6 +31,7 @@ import 'package:readventure/view/mypage/settings/settings_politics.dart';
 import 'package:readventure/view/mypage/settings/settings_announcement.dart';
 import 'package:readventure/view/mypage/settings/settings_requests.dart';
 import 'package:readventure/view/mypage/settings/settings_secession.dart';
+import 'package:readventure/viewmodel/app_state_controller.dart';
 import 'viewmodel/theme_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -45,6 +47,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
   Widget build(BuildContext context, WidgetRef ref) {
     final isLightTheme = ref.watch(themeProvider); // 테마 상태를 읽음
     final themeController = ref.read(themeProvider.notifier); // 테마 컨트롤러
+    final user = ref.watch(appStateProvider); // 현재 로그인한 사용자 정보
 
     return ScreenUtilInit(
       // ScreenUtil 사용법
@@ -70,9 +73,10 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
           theme: isLightTheme ? themeController.lightTheme : themeController.darkTheme, // 라이트/다크 테마
           darkTheme: themeController.darkTheme, // 다크 테마
           themeMode: isLightTheme ? ThemeMode.light : ThemeMode.dark, // 테마 모드
-          home: const AuthWrapper(),
+          // initialRoute: '/login', // 초기 경로 설정 (스플래시 페이지로 변경 예정)
+          home: const AuthWrapper(), // 초기 화면을 AuthWrapper로 지정
           routes: {
-            '/': (context) => const MyHomePage(),
+            // '/': (context) => const MyHomePage(),
             '/tutorial': (context) => TutorialScreen(),
             '/armain': (context) => const ArMain(),
             '/brmain': (context) => const BrMain(),
@@ -97,6 +101,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
             '/mypage/info/badge' : (context) => const InfoBadge(),
             '/mypage/info/saved' : (context) => const InfoSaved(),
             '/mypage/info/history' : (context) => const InfoHistory(),
+
           },
           localizationsDelegates: context.localizationDelegates, // Localization 설정
           supportedLocales: context.supportedLocales, // 지원 언어
@@ -115,25 +120,31 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
   }
 }
 
-/// 로그인 상태 및 닉네임 설정 여부를 확인하는 위젯
-class AuthWrapper extends StatelessWidget {
+
+
+/// 로그인 상태 및 닉네임 설정 여부를 확인하는 위젯 (ConsumerWidget로 변경)
+class AuthWrapper extends ConsumerWidget {
   const AuthWrapper({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, authSnapshot) {
-        // 인증 상태 확인 중
         if (authSnapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
-        // 로그인 상태인 경우
+
         if (authSnapshot.hasData && authSnapshot.data != null) {
           final user = authSnapshot.data!;
-          // Firestore에서 사용자 문서를 조회하여 닉네임 설정 여부를 확인
+
+          // 빌드가 완료된 후에 provider 상태 업데이트
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ref.read(userIdProvider.notifier).state = user.uid;
+          });
+
           return FutureBuilder<DocumentSnapshot>(
             future: FirebaseFirestore.instance.collection('users').doc(user.uid).get(),
             builder: (context, userDocSnapshot) {
@@ -150,19 +161,18 @@ class AuthWrapper extends StatelessWidget {
               if (userDocSnapshot.hasData) {
                 final data = userDocSnapshot.data?.data();
                 if (data is Map<String, dynamic> && data['nicknameSet'] == true) {
-                  // 닉네임 설정 완료된 경우 홈 화면으로 이동
                   return const MyHomePage();
                 } else {
-                  // 닉네임이 없거나 설정되지 않은 경우 닉네임 입력 화면으로 이동
                   return const NicknameInput();
                 }
               }
-              // 기본값: 닉네임 입력 화면
               return const NicknameInput();
             },
           );
         }
-        // 로그인되어 있지 않은 경우 로그인 화면으로 이동
+
+
+        // 로그인되어 있지 않은 경우 로그인 화면 표시
         return const LoginPage();
       },
     );

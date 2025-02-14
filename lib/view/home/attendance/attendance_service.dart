@@ -8,32 +8,38 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// 오늘 날짜에 해당하는 출석 기록을 Firestore에 등록/업데이트하는 함수
 Future<void> markTodayAttendanceAsChecked(String userId) async {
-  final now = DateTime.now();
-  // 연도, 월, 일을 포함한 문자열 (예: "2025-2-3")
+  final now = DateTime.now().toUtc();
   final dateStr = "${now.year}-${now.month}-${now.day}";
 
-  final attendanceRef = FirebaseFirestore.instance
-      .collection('users')
-      .doc(userId)
-      .collection('attendance')
-      .doc(dateStr);
+  final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
+  final attendanceRef = userRef.collection('attendance').doc(dateStr);
 
-  final docSnapshot = await attendanceRef.get();
+  await FirebaseFirestore.instance.runTransaction((transaction) async {
+    final userDoc = await transaction.get(userRef);
+    final attendanceDoc = await transaction.get(attendanceRef);
 
-  if (!docSnapshot.exists) {
-    await attendanceRef.set({
-      'date': dateStr,
-      'timestamp': Timestamp.fromDate(now), // 타임스탬프 필드 추가
-      'status': 'completed',
-      'xp': 10,
-    });
-  } else {
-    final data = docSnapshot.data();
-    if (data != null && data['status'] != 'completed') {
-      await attendanceRef.update({
+    int currentXP = userDoc.exists ? (userDoc.data()?['totalXP'] ?? 0) : 0;
+
+    if (!attendanceDoc.exists) {
+      // 출석 체크 신규 등록
+      transaction.set(attendanceRef, {
+        'date': dateStr,
+        'timestamp': Timestamp.fromDate(now),
         'status': 'completed',
+        'xp': 10,
       });
-    }
-  }
-}
 
+      // XP 증가
+      transaction.update(userRef, {'totalXP': currentXP + 10});
+    } else {
+      final data = attendanceDoc.data();
+      if (data != null && data['status'] != 'completed') {
+        // 기존 출석 체크를 완료 상태로 변경
+        transaction.update(attendanceRef, {'status': 'completed'});
+
+        // XP 증가
+        transaction.update(userRef, {'totalXP': currentXP + 10});
+      }
+    }
+  });
+}
