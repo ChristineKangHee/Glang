@@ -108,26 +108,38 @@ class AuthController extends StateNotifier<User?> {
     required Function onHome,
   }) async {
     try {
+      print("🛠 Apple 로그인 시작");
+
       final appleCredential = await SignInWithApple.getAppleIDCredential(
         scopes: [
           AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName, // 이름 요청
+          AppleIDAuthorizationScopes.fullName,
         ],
       );
 
+      print("✅ Apple Credential 받음: $appleCredential");
+
+      // ✅ identityToken이 없으면 로그인 불가 → 예외 처리 추가
+      if (appleCredential.identityToken == null) {
+        throw Exception("Apple 로그인 실패: identityToken이 없습니다.");
+      }
+
+      print("✅ Apple identityToken: ${appleCredential.identityToken}");
+
       final oauthCredential = OAuthProvider("apple.com").credential(
-        idToken: appleCredential.identityToken,
-        accessToken: appleCredential.authorizationCode,
+        idToken: appleCredential.identityToken!,
       );
 
       final userCredential = await _auth.signInWithCredential(oauthCredential);
       final user = userCredential.user;
 
       if (user != null) {
-        // ✅ Apple의 fullName이 제공되지 않으면 기존 저장된 이름을 가져옴
-        String? fullName = appleCredential.givenName;
-        if (fullName == null || fullName.isEmpty) {
-          // Firestore 또는 로컬 저장소에서 가져오기 (Firestore 예제)
+        print("✅ Firebase 로그인 성공: ${user.email}");
+
+        // ✅ Firestore에서 fullName 가져오기 (Apple이 fullName을 제공하지 않는 경우 대비)
+        String? fullName = appleCredential.givenName ?? user.displayName ?? "";
+
+        if (fullName.isEmpty) {
           final userDoc = await FirebaseFirestore.instance
               .collection('users')
               .doc(user.uid)
@@ -136,11 +148,11 @@ class AuthController extends StateNotifier<User?> {
           if (userDoc.exists && userDoc.data()!.containsKey('fullName')) {
             fullName = userDoc.data()!['fullName'];
           } else {
-            fullName = " "; // 기본값
+            fullName = "사용자"; // 기본값
           }
         }
 
-        // ✅ 처음 로그인이라면 Firestore에 이름 저장
+        // ✅ Firestore에 이름 저장 (최초 로그인 시)
         if (appleCredential.givenName != null) {
           await FirebaseFirestore.instance
               .collection('users')
@@ -157,10 +169,10 @@ class AuthController extends StateNotifier<User?> {
         state = user;
       }
     } catch (e) {
-      print('Apple 로그인 오류: $e');
+      print('❌ Apple 로그인 오류: $e');
+      throw Exception("Apple 로그인 실패: $e");
     }
   }
-
 
   Future<void> _handleUserState(
       User user, Function onNicknameRequired, Function onHome) async {
