@@ -107,7 +107,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                         radius: 16,
                       ),
                       const SizedBox(width: 8),
-                      Text(widget.post.authorName,
+                      Text(widget.post.nickname,
                           style: body_xsmall_semi(context)
                               .copyWith(color: customColors.neutral30)),
                     ],

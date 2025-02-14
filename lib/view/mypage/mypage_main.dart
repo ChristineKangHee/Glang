@@ -259,7 +259,6 @@ class ProgressChart extends StatelessWidget {
 }
 */
 
-/// 배지 리스트를 표시하는 위젯
 class BadgeRow extends StatelessWidget {
   const BadgeRow({super.key});
 
@@ -268,25 +267,16 @@ class BadgeRow extends StatelessWidget {
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return Row(
-      children: [
-        BadgeBox(
-          label: '첫학습',
-          isUnlocked: false, // 획득한 배지
-        ),
-        const SizedBox(width: 16),
-        BadgeBox(
-          label: '3일 연속 출석',
-          isUnlocked: false, // 획득한 배지
-        ),
-        const SizedBox(width: 16),
-        BadgeBox(
-          label: '7일 연속 출석',
-          isUnlocked: false, // 미획득 배지
-        ),
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: const [
+        Flexible(child: BadgeBox(label: '첫학습', isUnlocked: false)),
+        Flexible(child: BadgeBox(label: '3일 연속 출석', isUnlocked: false)),
+        Flexible(child: BadgeBox(label: '7일 연속 출석', isUnlocked: false)),
       ],
     );
   }
 }
+
 
 /// 배지 박스 위젯
 class BadgeBox extends StatelessWidget {
@@ -301,12 +291,14 @@ class BadgeBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     final customColors = Theme.of(context).extension<CustomColors>()!;
+
     return Column(
       children: [
         Container(
-          width: 94,
-          height: 62,
+          width: screenWidth * 0.25, // 화면 너비의 25%로 조정
+          height: screenWidth * 0.15, // 화면 너비의 15%로 조정
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: isUnlocked ? (customColors.primary ?? Colors.indigoAccent) : (customColors.neutral80 ?? Colors.grey),
@@ -315,7 +307,7 @@ class BadgeBox extends StatelessWidget {
           child: Center(
             child: Icon(
               isUnlocked ? Icons.check : Icons.lock,
-              color: isUnlocked ? (customColors.neutral100 ?? Colors.white) : (customColors.neutral30 ?? Colors.black26)
+              color: isUnlocked ? (customColors.neutral100 ?? Colors.white) : (customColors.neutral30 ?? Colors.black26),
             ),
           ),
         ),
@@ -328,6 +320,7 @@ class BadgeBox extends StatelessWidget {
     );
   }
 }
+
 
 /// 사용자 통계 박스 위젯
 class StatBox extends StatelessWidget {

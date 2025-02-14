@@ -159,7 +159,7 @@ class CommunityMainPage extends ConsumerWidget {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                post.authorName,
+                                post.nickname,
                                 style: body_xsmall_semi(context)
                                     .copyWith(
                                     color: customColors.neutral30),
