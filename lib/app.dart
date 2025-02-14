@@ -12,8 +12,6 @@ import 'package:readventure/view/course/course_main.dart';
 import 'package:readventure/view/feature/after_read/AR_main.dart';
 import 'package:readventure/view/feature/before_read/BR_main.dart';
 import 'package:readventure/view/feature/reading/GA_02/RD_main.dart';
-import 'package:readventure/view/feature/reading/quiz_data.dart';
-import 'package:readventure/view/home/example.dart';
 import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/home/notification/notification_page.dart';
 import 'package:readventure/view/login/login_main.dart';
@@ -37,6 +35,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/view/mypage/settings/settings_page.dart';
 import 'package:readventure/view/mypage/settings/settings_theme.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
   const MyApp({super.key});
@@ -70,7 +70,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
           theme: isLightTheme ? themeController.lightTheme : themeController.darkTheme, // 라이트/다크 테마
           darkTheme: themeController.darkTheme, // 다크 테마
           themeMode: isLightTheme ? ThemeMode.light : ThemeMode.dark, // 테마 모드
-          initialRoute: '/login', // 초기 경로 설정 (스플래시 페이지로 변경 예정)
+          home: const AuthWrapper(),
           routes: {
             '/': (context) => const MyHomePage(),
             '/tutorial': (context) => TutorialScreen(),
@@ -97,7 +97,6 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
             '/mypage/info/badge' : (context) => const InfoBadge(),
             '/mypage/info/saved' : (context) => const InfoSaved(),
             '/mypage/info/history' : (context) => const InfoHistory(),
-
           },
           localizationsDelegates: context.localizationDelegates, // Localization 설정
           supportedLocales: context.supportedLocales, // 지원 언어
@@ -111,6 +110,60 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
           // startLocale: Locale('ko', 'KR')
 
         );
+      },
+    );
+  }
+}
+
+/// 로그인 상태 및 닉네임 설정 여부를 확인하는 위젯
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, authSnapshot) {
+        // 인증 상태 확인 중
+        if (authSnapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        // 로그인 상태인 경우
+        if (authSnapshot.hasData && authSnapshot.data != null) {
+          final user = authSnapshot.data!;
+          // Firestore에서 사용자 문서를 조회하여 닉네임 설정 여부를 확인
+          return FutureBuilder<DocumentSnapshot>(
+            future: FirebaseFirestore.instance.collection('users').doc(user.uid).get(),
+            builder: (context, userDocSnapshot) {
+              if (userDocSnapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+              if (userDocSnapshot.hasError) {
+                return Scaffold(
+                  body: Center(child: Text('Error: ${userDocSnapshot.error}')),
+                );
+              }
+              if (userDocSnapshot.hasData) {
+                final data = userDocSnapshot.data?.data();
+                if (data is Map<String, dynamic> && data['nicknameSet'] == true) {
+                  // 닉네임 설정 완료된 경우 홈 화면으로 이동
+                  return const MyHomePage();
+                } else {
+                  // 닉네임이 없거나 설정되지 않은 경우 닉네임 입력 화면으로 이동
+                  return const NicknameInput();
+                }
+              }
+              // 기본값: 닉네임 입력 화면
+              return const NicknameInput();
+            },
+          );
+        }
+        // 로그인되어 있지 않은 경우 로그인 화면으로 이동
+        return const LoginPage();
       },
     );
   }
