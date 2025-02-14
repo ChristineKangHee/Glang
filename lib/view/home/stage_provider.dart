@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../model/section_data.dart';
 import '../../model/stage_data.dart';
 import 'package:collection/collection.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 // 혹은 stage_data.dart를 import해서 loadStagesFromFirestore를 직접 불러올 수도 있음
 
 /// 0) userIdProvider: 현재 로그인한 유저의 UID를 저장하는 StateProvider
@@ -44,4 +45,19 @@ final currentStageProvider = Provider<StageData?>((ref) {
 
   final allStages = stagesAsync.value ?? [];
   return allStages.firstWhereOrNull((stage) => stage.stageId == stageId);
+});
+
+final stagesStreamProvider = StreamProvider<List<StageData>>((ref) {
+  final userId = ref.watch(userIdProvider);
+  if (userId == null) {
+    return Stream.value([]);
+  }
+  return FirebaseFirestore.instance
+      .collection('users')
+      .doc(userId)
+      .collection('progress')
+      .snapshots()
+      .map((snapshot) => snapshot.docs.map((doc) {
+    return StageData.fromJson(doc.id, doc.data());
+  }).toList());
 });
