@@ -21,7 +21,7 @@ class CommunityMainPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider);
-    final communityService = CommunityService(); // CommunityService 인스턴스 생성
+    final communityService = CommunityService();
 
     return Scaffold(
       backgroundColor: customColors.neutral90,
@@ -29,208 +29,51 @@ class CommunityMainPage extends ConsumerWidget {
         onSearchPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SearchPage()), // 검색 페이지 이동
+            MaterialPageRoute(builder: (context) => SearchPage()),
           );
         },
       ),
       body: StreamBuilder<List<Post>>(
-        stream: communityService.getPosts(), // Firestore에서 게시글 목록 가져오기
+        stream: communityService.getPosts(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator()); // 데이터 로딩 중 표시
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text("게시글이 없습니다.")); // 데이터가 없는 경우 처리
+            return const Center(child: Text("게시글이 없습니다."));
           }
 
-          final posts = snapshot.data!; // Firestore에서 가져온 게시글 리스트
+          final posts = snapshot.data!;
 
           return SingleChildScrollView(
             child: Column(
               children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: RankingPreview(context, customColors),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _buildRankingPreview(context, customColors),
                 ),
-                SizedBox(height: 24),
-                CommunityPreview(posts, context, customColors), // 게시글 미리보기
+                const SizedBox(height: 24),
+                CommunityPreview(posts, context, customColors),
               ],
             ),
           );
         },
       ),
-      bottomNavigationBar: CustomNavigationBar(),
+      bottomNavigationBar: const CustomNavigationBar(),
     );
   }
 
-
-  Widget CommunityPreview(posts, BuildContext context, CustomColors customColors) {
-    // 게시글을 좋아요 수 기준 내림차순 정렬합니다.
-    List<Post> sortedPosts = List.from(posts);
-    sortedPosts.sort((a, b) => b.likes.compareTo(a.likes));
-
-    // 정렬된 게시글 중 상위 3개만 사용합니다.
-    final topPosts = sortedPosts.take(3).toList();
-
+  Widget _buildRankingPreview(BuildContext context, CustomColors customColors) {
     return Column(
       children: [
-        postnavigation(context, customColors),
-        Container(
-          height: 170,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: topPosts.length,
-            itemBuilder: (context, index) {
-              var post = topPosts[index];
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PostDetailPage(post: post),
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 250,
-                  padding: const EdgeInsets.all(16),
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: customColors.neutral100,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Row(
-                            children: post.tags
-                                .map<Widget>((tag) => Padding(
-                              padding:
-                              const EdgeInsets.only(right: 8),
-                              child: Text(
-                                '#'+tag,
-                                style: body_xxsmall(context)
-                                    .copyWith(
-                                    color:
-                                    customColors.primary60),
-                              ),
-                            ))
-                                .toList(),
-                          ),
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                formatPostDate(post.createdAt),
-                                style: body_xxsmall(context)
-                                    .copyWith(color: customColors.neutral60),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        post.title,
-                        style: body_small_semi(context),
-                      ),
-                      const SizedBox(height: 8),
-                      Expanded(
-                        child: Text(
-                          post.content,
-                          style: body_xxsmall(context),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Spacer(),
-                      Row(
-                        children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                backgroundImage:
-                                NetworkImage(post.profileImage),
-                                radius: 12,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                post.nickname,
-                                style: body_xsmall_semi(context)
-                                    .copyWith(
-                                    color: customColors.neutral30),
-                              ),
-                            ],
-                          ),
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.end,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.favorite,
-                                          size: 16,
-                                          color: customColors.neutral60),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        post.likes.toString(),
-                                        style: body_xxsmall_semi(context)
-                                            .copyWith(
-                                            color: customColors
-                                                .neutral60),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Row(
-                                    children: [
-                                      Icon(Icons.remove_red_eye,
-                                          size: 16,
-                                          color: customColors.neutral60),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        post.views.toString(),
-                                        style: body_xxsmall_semi(context)
-                                            .copyWith(
-                                            color: customColors
-                                                .neutral60),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget RankingPreview(BuildContext context, CustomColors customColors) {
-    return Column(
-      children: [
-        rankingnavigation(context, customColors),
+        _buildRankingNavigation(context, customColors),
         Container(
           decoration: BoxDecoration(
             color: customColors.neutral100,
             borderRadius: BorderRadius.circular(16),
           ),
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: [
               buildTopThree(context, customColors),
@@ -242,43 +85,9 @@ class CommunityMainPage extends ConsumerWidget {
     );
   }
 
-  Widget postnavigation(BuildContext context, CustomColors customColors) {
+  Widget _buildRankingNavigation(BuildContext context, CustomColors customColors) {
     return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 16),
-      title: Text(
-        '게시판',
-        style: body_small_semi(context),
-      ),
-      trailing: TextButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => Cm2depthBoardmain()),
-          );
-        },
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '더보기',
-              style: body_xxsmall_semi(context),
-            ),
-            SizedBox(width: 4),
-            Icon(
-              Icons.arrow_forward_ios_rounded,
-              size: 16,
-              color: customColors.neutral0,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget rankingnavigation(BuildContext context, CustomColors customColors) {
-    return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 0),
+      contentPadding: EdgeInsets.zero,
       title: Text(
         '랭킹',
         style: body_small_semi(context),
@@ -297,7 +106,7 @@ class CommunityMainPage extends ConsumerWidget {
               '더보기',
               style: body_xxsmall_semi(context),
             ),
-            SizedBox(width: 4),
+            const SizedBox(width: 4),
             Icon(
               Icons.arrow_forward_ios_rounded,
               size: 16,
@@ -308,8 +117,200 @@ class CommunityMainPage extends ConsumerWidget {
       ),
     );
   }
+}
 
-  String formatPostDate(DateTime createdAt) {
+class CommunityPreview extends StatefulWidget {
+  final List<Post> posts;
+  final BuildContext context;
+  final CustomColors customColors;
+
+  const CommunityPreview(
+      this.posts,
+      this.context,
+      this.customColors, {
+        Key? key,
+      }) : super(key: key);
+
+  @override
+  _CommunityPreviewState createState() => _CommunityPreviewState();
+}
+
+class _CommunityPreviewState extends State<CommunityPreview> {
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(viewportFraction: 0.8);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // 좋아요 수 기준 내림차순 정렬 후 상위 3개의 게시글 선택
+    List<Post> sortedPosts = List.from(widget.posts)
+      ..sort((a, b) => b.likes.compareTo(a.likes));
+    final topPosts = sortedPosts.take(3).toList();
+
+    return Column(
+      children: [
+        _buildPostNavigation(context, widget.customColors),
+        SizedBox(
+          height: 170,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: PageView.builder(
+              padEnds: false,
+              controller: _pageController,
+              itemCount: topPosts.length,
+              itemBuilder: (context, index) {
+                final post = topPosts[index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PostDetailPage(post: post),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(right: 16),
+                    decoration: BoxDecoration(
+                      color: widget.customColors.neutral100,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 태그와 날짜
+                        Row(
+                          children: [
+                            Row(
+                              children: post.tags
+                                  .map<Widget>(
+                                    (tag) => Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: Text(
+                                    '#$tag',
+                                    style: body_xxsmall(context).copyWith(
+                                      color: widget.customColors.primary60,
+                                    ),
+                                  ),
+                                ),
+                              )
+                                  .toList(),
+                            ),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  _formatPostDate(post.createdAt),
+                                  style: body_xxsmall(context).copyWith(
+                                    color: widget.customColors.neutral60,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          post.title,
+                          style: body_small_semi(context),
+                        ),
+                        const SizedBox(height: 8),
+                        Expanded(
+                          child: Text(
+                            post.content,
+                            style: body_xxsmall(context),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Spacer(),
+                        Row(
+                          children: [
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  backgroundImage: NetworkImage(post.profileImage),
+                                  radius: 12,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  post.nickname,
+                                  style: body_xsmall_semi(context).copyWith(
+                                    color: widget.customColors.neutral30,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.favorite,
+                                          size: 16,
+                                          color: widget.customColors.neutral60,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          post.likes.toString(),
+                                          style: body_xxsmall_semi(context).copyWith(
+                                            color: widget.customColors.neutral60,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.remove_red_eye,
+                                          size: 16,
+                                          color: widget.customColors.neutral60,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          post.views.toString(),
+                                          style: body_xxsmall_semi(context).copyWith(
+                                            color: widget.customColors.neutral60,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatPostDate(DateTime createdAt) {
     final now = DateTime.now();
     final difference = now.difference(createdAt);
 
@@ -318,10 +319,42 @@ class CommunityMainPage extends ConsumerWidget {
     } else if (difference.inMinutes < 60) {
       return "${difference.inMinutes}분 전";
     } else if (difference.inHours < 24) {
-      return "${(difference.inMinutes / 60).ceil()}시간 전"; // 79분이면 2시간 전
+      return "${(difference.inMinutes / 60).ceil()}시간 전";
     } else {
       return "${difference.inDays}일 전";
     }
   }
 
+  Widget _buildPostNavigation(BuildContext context, CustomColors customColors) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      title: Text(
+        '게시판',
+        style: body_small_semi(context),
+      ),
+      trailing: TextButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Cm2depthBoardmain()),
+          );
+        },
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '더보기',
+              style: body_xxsmall_semi(context),
+            ),
+            const SizedBox(width: 4),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 16,
+              color: customColors.neutral0,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
