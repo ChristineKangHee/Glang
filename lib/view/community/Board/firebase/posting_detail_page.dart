@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../theme/font.dart';
+import '../../../../theme/theme.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
 import '../../../components/custom_app_bar.dart';
+import '../Component/postaction_bottomsheet.dart';
 import 'CM_2depth_boardMain_firebase.dart';
 import 'community_data_firebase.dart';
 import 'community_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'component_community_post_firebase.dart';
 
 class PostDetailPage extends ConsumerStatefulWidget {
   final Post post;
@@ -66,7 +70,8 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
   @override
   Widget build(BuildContext context) {
     final customColors = ref.watch(customColorsProvider);
-
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final isAuthor = currentUser != null && widget.post.authorId == currentUser.uid;
     return Scaffold(
       appBar: CustomAppBar_2depth_4(title: '게시판'),
       body: Padding(
@@ -100,7 +105,20 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                 ],
               ),
               const SizedBox(height: 16),
-              Text(widget.post.title, style: heading_medium(context)),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(widget.post.title, style: heading_medium(context)),
+                  ),
+                  if (isAuthor)
+                    IconButton(
+                      icon: Icon(Icons.more_vert_rounded, color: customColors.neutral80,),
+                      onPressed: () {
+                        showPostActionBottomSheet(context, widget.post, customColors, context);
+                      },
+                    ),
+                ],
+              ),
               const SizedBox(height: 10),
               Text(widget.post.content, style: reading_exercise(context)),
               const SizedBox(height: 20),
@@ -112,7 +130,10 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                   Row(
                     children: [
                       CircleAvatar(
-                        backgroundImage: NetworkImage(widget.post.profileImage),
+                        backgroundColor: customColors.neutral90, // neutral80 (예제 값, 실제 색상 코드 확인 필요)
+                        backgroundImage: widget.post.profileImage.startsWith('http')
+                            ? NetworkImage(widget.post.profileImage)
+                            : AssetImage(widget.post.profileImage) as ImageProvider,
                         radius: 16,
                       ),
                       const SizedBox(width: 8),
@@ -153,25 +174,15 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
       ),
     );
   }
-
-  String formatPostDate(DateTime? postDate) {
-    if (postDate == null) {
-      return '알 수 없음';
-    }
-    final now = DateTime.now();
-    final difference = now.difference(postDate);
-
-    if (difference.inDays > 1) {
-      return '${postDate.month}/${postDate.day}/${postDate.year}';
-    } else if (difference.inDays == 1) {
-      return '어제';
-    } else if (difference.inHours > 1) {
-      return '${difference.inHours}시간 전';
-    } else if (difference.inMinutes > 1) {
-      return '${difference.inMinutes}분 전';
-    } else {
-      return '방금 전';
-    }
+  void showPostActionBottomSheet(BuildContext context, Post post, CustomColors customColors, BuildContext parentContext) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => PostActionBottomSheet(
+        post: post,
+        customColors: customColors,
+        parentContext: parentContext,
+      ),
+    );
   }
 }
 
