@@ -11,6 +11,7 @@ class Post {
   final int likes;
   late final int views;
   final String category;
+  final String authorId;
 
   Post({
     required this.id,
@@ -23,6 +24,7 @@ class Post {
     required this.likes,
     required this.views,
     required this.category,
+    required this.authorId,
   });
 
   factory Post.fromMap(Map<String, dynamic> data) {
@@ -32,11 +34,14 @@ class Post {
       content: data['content'] ?? '',
       tags: List<String>.from(data['tags'] ?? []),
       createdAt: (data['createdAt'] as Timestamp).toDate(),
-      profileImage: data['profileImage'] ?? '',
+      profileImage: data['profileImage']?.isNotEmpty == true
+          ? data['profileImage']
+          : 'assets/images/default_avatar.png',
       nickname: data['nickname'] ?? '익명',
       likes: data['likes'] ?? 0,
       views: data['views'] ?? 0,
       category: data['category'] ?? '',
+      authorId: data['authorId'] ?? '',
     );
   }
 }

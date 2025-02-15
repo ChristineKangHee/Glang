@@ -113,7 +113,7 @@ class Cm2depthBoardmain extends ConsumerWidget {
               return PostItemContainer(
                 post: post,
                 customColors: customColors,
-                context: context,
+                parentContext: context,
               );
             }
           },

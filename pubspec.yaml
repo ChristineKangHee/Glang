@@ -87,6 +87,12 @@ dev_dependencies:
   #shimmer eefect
   shimmer: ^3.0.0
 
+  #email
+  flutter_email_sender: ^7.0.0
+
+  #share
+  share_plus: ^10.1.4
+
 flutter_native_splash:
   color: "#FFFFFF"
   image: "assets/icon/icon.png"  # 앱 실행 시 표시될 이미지

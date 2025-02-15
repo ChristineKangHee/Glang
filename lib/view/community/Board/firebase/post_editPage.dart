@@ -9,18 +9,21 @@ import '../../../components/custom_app_bar.dart';
 import '../Component/taginput_component.dart';
 import '../Component/writingform_component.dart';
 import 'community_service.dart';
+import 'community_data_firebase.dart'; // Post 모델이 정의되어 있다고 가정
 
-class FreeWritingPage extends ConsumerStatefulWidget {
+class PostEditPage extends ConsumerStatefulWidget {
+  final Post post;
+  const PostEditPage({Key? key, required this.post}) : super(key: key);
+
   @override
-  _FreeWritingPageState createState() => _FreeWritingPageState();
+  _PostEditPageState createState() => _PostEditPageState();
 }
 
-class _FreeWritingPageState extends ConsumerState<FreeWritingPage> {
+class _PostEditPageState extends ConsumerState<PostEditPage> {
   final CommunityService _communityService = CommunityService();
-  String selectedCategory = '';
-  TextEditingController titleController = TextEditingController();
-  TextEditingController contentController = TextEditingController();
-  TextEditingController tagController = TextEditingController();
+  late TextEditingController titleController;
+  late TextEditingController contentController;
+  late TextEditingController tagController;
   List<String> tags = [];
   Timer? _debounce;
 
@@ -30,6 +33,12 @@ class _FreeWritingPageState extends ConsumerState<FreeWritingPage> {
   @override
   void initState() {
     super.initState();
+    // 기존 게시글 데이터를 미리 불러오기
+    titleController = TextEditingController(text: widget.post.title);
+    contentController = TextEditingController(text: widget.post.content);
+    tagController = TextEditingController();
+    tags = List<String>.from(widget.post.tags);
+
     titleController.addListener(() => setState(() {}));
     contentController.addListener(() => setState(() {}));
     tagController.addListener(() => setState(() {}));
@@ -39,8 +48,11 @@ class _FreeWritingPageState extends ConsumerState<FreeWritingPage> {
     return titleController.text.isNotEmpty && contentController.text.isNotEmpty;
   }
 
+  /// 저장되지 않은 변경사항이 있는지 확인
   bool hasUnsavedChanges() {
-    return titleController.text.isNotEmpty || contentController.text.isNotEmpty;
+    return titleController.text != widget.post.title ||
+        contentController.text != widget.post.content ||
+        tags.toString() != widget.post.tags.toString();
   }
 
   void addTag() {
@@ -58,22 +70,21 @@ class _FreeWritingPageState extends ConsumerState<FreeWritingPage> {
     });
   }
 
-  Future<void> submitPost() async {
+  Future<void> submitEdit() async {
     if (!isContentValid()) return;
     try {
-      await _communityService.createPost(
+      await _communityService.updatePost(
+        postId: widget.post.id,
         title: titleController.text,
         content: contentController.text,
-        category: "자유글", // 자동으로 "자유글" 설정
         tags: tags,
       );
-      discardDraft();
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(); // 수정 후 이전 화면으로 돌아감
     } catch (e) {
       showResultSaveDialog(
         context,
         ref.watch(customColorsProvider),
-        "게시글 작성 실패",
+        "게시글 수정 실패",
         "확인",
         "",
             (ctx) => Navigator.of(ctx).pop(),
@@ -81,33 +92,14 @@ class _FreeWritingPageState extends ConsumerState<FreeWritingPage> {
     }
   }
 
-
-  void discardDraft() {
+  /// 변경사항 취소: 기존 게시글 데이터로 되돌림
+  void discardChanges() {
     setState(() {
-      titleController.clear();
-      contentController.clear();
+      titleController.text = widget.post.title;
+      contentController.text = widget.post.content;
+      tags = List<String>.from(widget.post.tags);
       tagController.clear();
-      tags.clear();
     });
-  }
-
-  void _handleClose() async {
-    if (hasUnsavedChanges()) {
-      showResultSaveDialog(
-        context,
-        ref.watch(customColorsProvider),
-        "나가시겠습니까?",
-        "취소",
-        "나가기",
-            (ctx) {
-          discardDraft();
-          Navigator.of(ctx).pop();
-        },
-        continuationMessage: "작성 중인 내용은 저장되지 않습니다.",
-      );
-    } else {
-      Navigator.of(context).pop();
-    }
   }
 
   Future<bool> _onWillPop() async {
@@ -119,7 +111,7 @@ class _FreeWritingPageState extends ConsumerState<FreeWritingPage> {
         "취소",
         "나가기",
             (ctx) {
-          discardDraft();
+          discardChanges();
           Navigator.of(ctx).pop();
         },
         continuationMessage: "작성 중인 내용은 저장되지 않습니다.",
@@ -130,19 +122,31 @@ class _FreeWritingPageState extends ConsumerState<FreeWritingPage> {
   }
 
   @override
+  void dispose() {
+    titleController.dispose();
+    contentController.dispose();
+    tagController.dispose();
+    titleFocusNode.dispose();
+    contentFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final customColors = ref.watch(customColorsProvider);
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: CustomAppBar_2depth_9(
-          title: "자유글",
-          onIconPressed: _handleClose,
+          title: "게시글 수정",
+          onIconPressed: () async {
+            if (await _onWillPop()) Navigator.of(context).pop();
+          },
           actions: [
             TextButton(
-              onPressed: isContentValid() ? submitPost : null,
+              onPressed: isContentValid() ? submitEdit : null,
               child: Text(
-                "등록",
+                "수정",
                 style: body_xsmall_semi(context).copyWith(
                   color: isContentValid() ? customColors.primary : customColors.neutral80,
                 ),

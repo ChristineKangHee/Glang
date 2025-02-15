@@ -6,6 +6,9 @@ import 'package:readventure/theme/theme.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/alarm_dialog.dart';
 import '../../components/custom_app_bar.dart';
+import 'Component/taginput_component.dart';
+import 'Component/writingform_component.dart';
+import 'firebase/community_service.dart';
 import 'missionBottomsheet.dart';
 
 class MissionPostPage extends ConsumerStatefulWidget {
@@ -32,7 +35,7 @@ class _MissionPostPageState extends ConsumerState<MissionPostPage> {
   void initState() {
     super.initState();
 
-    // Automatically show the bottom sheet when the page is loaded
+    // 페이지 로드 후 자동으로 바텀시트 표시
     WidgetsBinding.instance.addPostFrameCallback((_) => showCourseSelectionSheet(context));
 
     void onTextChanged() {
@@ -43,12 +46,13 @@ class _MissionPostPageState extends ConsumerState<MissionPostPage> {
     contentController.addListener(onTextChanged);
     tagController.addListener(() => setState(() {}));
   }
-  // 사용 예시: BottomSheet 띄우기
+
+  // 바텀시트로부터 미션 선택
   void showCourseSelectionSheet(BuildContext context) async {
     final selectedMission = await showModalBottomSheet<String>(
       context: context,
-      isScrollControlled: true,  // Allow custom height
-      isDismissible: false,  // Prevent dismissing by tapping outside
+      isScrollControlled: true,
+      isDismissible: false,
       enableDrag: false,
       builder: (context) => CourseSelectionBottomSheet(),
     );
@@ -56,18 +60,19 @@ class _MissionPostPageState extends ConsumerState<MissionPostPage> {
     if (selectedMission != null) {
       setState(() {
         this.selectedMission = selectedMission;
-        titleController.text = selectedMission;
+        // 제목에 selectedMission을 넣지 않고, selectedKeyword로만 전달합니다.
+        // titleController.text = selectedMission; // 제거
 
         // 미션 내용 자동 입력
         String missionContent = missionContents[selectedMission] ?? "해당 미션에 대한 내용이 없습니다.";
-        contentController.text = "$selectedMission에 관련된 내용입니다. $missionContent"; // 미션 내용 자동 입력
+        contentController.text = "$selectedMission에 관련된 내용입니다. $missionContent";
       });
 
       print("선택된 미션: $selectedMission");
     }
   }
 
-  // essay 작성 시 유효성 검사: 제목과 내용이 있어야 함
+  // 게시글 작성 시 유효성 검사: 제목과 내용이 있어야 함
   bool isContentValid() {
     return titleController.text.isNotEmpty && contentController.text.isNotEmpty;
   }
@@ -92,9 +97,30 @@ class _MissionPostPageState extends ConsumerState<MissionPostPage> {
     });
   }
 
-  void submitPost() {
+  /// 🔹 게시글 등록: Firebase에 게시글을 추가합니다.
+  Future<void> submitPost() async {
     if (!isContentValid()) return;
-    print("Post submitted: title=${titleController.text}, content=${contentController.text}, tags=$tags");
+
+    final communityService = CommunityService();
+    try {
+      // category는 "미션"으로 고정하거나 필요한 값을 넣으세요.
+      final postId = await communityService.createPost(
+        title: titleController.text,
+        content: contentController.text,
+        category: "미션",
+        tags: tags,
+      );
+      print("게시글이 성공적으로 등록되었습니다. ID: $postId");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("게시글이 등록되었습니다.")),
+      );
+      // 등록 후 필요한 동작(페이지 이동 등)을 추가할 수 있습니다.
+    } catch (error) {
+      print("게시글 등록 중 오류 발생: $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("게시글 등록에 실패했습니다.")),
+      );
+    }
   }
 
   // 저장 안 함 선택 시 모든 입력 필드 초기화
@@ -123,7 +149,7 @@ class _MissionPostPageState extends ConsumerState<MissionPostPage> {
         continuationMessage: "작성 중인 내용은 저장되지 않습니다.",
       );
     } else {
-      Navigator.of(context).pop(); // No unsaved changes, just pop the page
+      Navigator.of(context).pop();
     }
   }
 
@@ -137,8 +163,6 @@ class _MissionPostPageState extends ConsumerState<MissionPostPage> {
     contentFocusNode.dispose();
     super.dispose();
   }
-
-  // 에세이 선택 시 키워드 다이얼로그 호출 (삭제됨)
 
   // 시스템 back 버튼 처리
   Future<bool> _onWillPop() async {
@@ -155,9 +179,9 @@ class _MissionPostPageState extends ConsumerState<MissionPostPage> {
         },
         continuationMessage: "작성 중인 내용은 저장되지 않습니다.",
       );
-      return false; // Prevent the default back action until the dialog is handled
+      return false;
     }
-    return true; // No unsaved changes, allow normal back action
+    return true;
   }
 
   @override
@@ -168,7 +192,7 @@ class _MissionPostPageState extends ConsumerState<MissionPostPage> {
       child: Scaffold(
         appBar: CustomAppBar_2depth_9(
           title: "미션 글 업로드",
-          onIconPressed: _handleClose, // close 아이콘 눌렀을 때 unsaved 체크
+          onIconPressed: _handleClose,
           actions: [
             TextButton(
               onPressed: isContentValid() ? submitPost : null,
@@ -186,127 +210,29 @@ class _MissionPostPageState extends ConsumerState<MissionPostPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 글 작성 폼 (제목, 내용)
-              WritingForm(context, customColors),
-              SizedBox(height: 34),
-              // 태그 입력 영역
-              TagInput(context, customColors),
-              SizedBox(height: 20),
+              // WritingFormComponent 사용 (selectedMission은 selectedKeyword로만 전달)
+              WritingFormComponent(
+                titleController: titleController,
+                contentController: contentController,
+                titleFocusNode: titleFocusNode,
+                contentFocusNode: contentFocusNode,
+                customColors: customColors,
+                selectedKeyword: selectedMission,
+              ),
+              const SizedBox(height: 34),
+              // TagInputComponent 사용
+              TagInputComponent(
+                tagController: tagController,
+                tags: tags,
+                onAddTag: addTag,
+                onRemoveTag: removeTag,
+                customColors: customColors,
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget TagInput(BuildContext context, CustomColors customColors) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("태그 (선택)", style: body_small_semi(context).copyWith(color: customColors.neutral30)),
-        SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: tagController,
-                decoration: InputDecoration(
-                  hintText: tags.length == 3 ? "태그 입력 완료" : "최대 3개의 태그를 입력해주세요 (예: 일상)",
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: customColors.primary!,
-                    ),
-                  ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: customColors.neutral80!,
-                    ),
-                  ),
-                  hintStyle: body_small(context).copyWith(
-                    color: customColors.neutral60,
-                  ),
-                ),
-                enabled: tags.length < 3,
-              ),
-            ),
-            ElevatedButton(
-              onPressed: tagController.text.isNotEmpty && tags.length < 3 ? addTag : null,
-              child: Text(
-                "추가",
-                style: body_xsmall_semi(context).copyWith(
-                  color: tagController.text.isNotEmpty && tags.length < 3 ? customColors.primary : customColors.neutral80,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.zero,
-                elevation: 0,
-                backgroundColor: Colors.transparent,
-                shadowColor: Colors.transparent,
-                splashFactory: NoSplash.splashFactory,
-                disabledBackgroundColor: Colors.transparent,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          children: tags.map((tag) {
-            return Chip(
-              label: Text(tag, style: body_small(context).copyWith(color: customColors.primary)),
-              backgroundColor: customColors.neutral100,
-              deleteIcon: Icon(Icons.close, size: 18, color: customColors.primary),
-              onDeleted: () => removeTag(tag),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: customColors.primary!),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget WritingForm(BuildContext context, CustomColors customColors) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          controller: titleController,
-          focusNode: titleFocusNode,
-          decoration: InputDecoration(
-            hintText: "제목을 입력하세요",
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(
-                color: customColors.primary!,
-              ),
-            ),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(
-                color: customColors.neutral80!,
-              ),
-            ),
-            hintStyle: body_medium_semi(context).copyWith(color: customColors.neutral60),
-          ),
-          style: body_medium_semi(context),
-        ),
-        SizedBox(height: 16),
-        TextField(
-          controller: contentController,
-          focusNode: contentFocusNode,
-          maxLines: 15,
-          maxLength: 800,
-          decoration: InputDecoration(
-            hintText: "내용을 입력해주세요.\n1. 타인에게 불쾌감을 주지 않는 내용\n2. 개인정보 보호 규정 준수\n3. 욕설 및 비하 발언 금지",
-            hintStyle: body_small(context).copyWith(
-              color: customColors.neutral60,
-            ),
-            border: InputBorder.none,
-          ),
-          style: body_small(context),
-        ),
-      ],
     );
   }
 }
