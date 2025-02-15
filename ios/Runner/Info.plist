@@ -22,7 +22,20 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>CFBundleVersion</key>
+	<key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLName</key>
+            <string>com.googleusercontent.apps.194910563832-oeh9vurm2s4266av2jhqg6brjsec00lc</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.googleusercontent.apps.194910563832-oeh9vurm2s4266av2jhqg6brjsec00lc</string>
+            </array>
+        </dict>
+    </array>
+    <key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -45,5 +58,16 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSFaceIDUsageDescription</key>
+    <string>이 앱은 Apple 로그인 시 Face ID를 사용할 수 있습니다.</string>
+	<!-- Google Sign-In을 위한 설정 -->
+    <key>GIDClientID</key>
+    <string>194910563832-oeh9vurm2s4266av2jhqg6brjsec00lc.apps.googleusercontent.com</string>
+    <!-- Firebase에서 Google 로그인을 위해 인터넷 연결 허용 -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
 </dict>
 </plist>
