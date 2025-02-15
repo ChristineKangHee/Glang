@@ -98,7 +98,6 @@ class PostItemContainer extends StatelessWidget {
 
 }
 
-
 String formatPostDate(DateTime createdAt) {
   final now = DateTime.now();
   final difference = now.difference(createdAt);
@@ -108,8 +107,10 @@ String formatPostDate(DateTime createdAt) {
   } else if (difference.inMinutes < 60) {
     return "${difference.inMinutes}분 전";
   } else if (difference.inHours < 24) {
-    return "${(difference.inMinutes / 60).ceil()}시간 전"; // 79분이면 2시간 전
-  } else {
+    return "${(difference.inMinutes / 60).ceil()}시간 전";
+  } else if (difference.inDays <= 3) { // 3일 이내
     return "${difference.inDays}일 전";
+  } else { // 3일 초과
+    return "${createdAt.year}.${createdAt.month.toString().padLeft(2, '0')}.${createdAt.day.toString().padLeft(2, '0')}";
   }
 }
