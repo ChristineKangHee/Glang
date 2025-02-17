@@ -6,7 +6,6 @@ import 'package:firebase_core/firebase_core.dart';
 import '../../../theme/theme.dart';
 
 /// Firebase에서 totalXP 기준으로 랭킹을 가져오는 함수
-/// Firebase에서 totalXP 기준으로 랭킹을 가져오는 함수
 Future<List<Map<String, dynamic>>> getRankings() async {
   try {
     final FirebaseFirestore firestore = FirebaseFirestore.instance; // Firestore 인스턴스 선언
@@ -46,6 +45,105 @@ Future<List<Map<String, dynamic>>> getRankings() async {
     rethrow; // 오류를 다시 던져서 FutureBuilder에서 처리하게 함
   }
 }
+Widget buildTopThreeWithPodium(BuildContext context, CustomColors customColors) {
+  double screenWidth = MediaQuery.of(context).size.width;
+
+  return FutureBuilder<List<Map<String, dynamic>>>(
+    future: getRankings(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return CircularProgressIndicator();
+      }
+      if (snapshot.hasError) {
+        return Text('랭킹 정보를 불러오는 데 실패했습니다. 오류: ${snapshot.error}');
+      }
+      if (!snapshot.hasData) {
+        return Text('랭킹 정보를 불러오는 데 실패했습니다.');
+      }
+
+      final rankings = snapshot.data!;
+
+      double getAvatarSize(int rank) {
+        switch (rank) {
+          case 1:
+            return screenWidth * 0.10; // 1등 (가장 큼)
+          case 2:
+            return screenWidth * 0.08; // 2등
+          case 3:
+            return screenWidth * 0.07; // 3등
+          default:
+            return screenWidth * 0.07;
+        }
+      }
+
+      double getPodiumWidth() {
+        return screenWidth * 0.2;
+      }
+
+      double getPodiumHeight(int rank) {
+        switch (rank) {
+          case 1:
+            return 40; // 1등 podium
+          case 2:
+            return 30; // 2등 podium
+          case 3:
+            return 25; // 3등 podium
+          default:
+            return 25;
+        }
+      }
+
+      Widget buildRankSet({
+        required Map<String, dynamic> user,
+        required int rank,
+      }) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            buildRankCard(user, getAvatarSize(rank), customColors, context),
+            SizedBox(height: 8),
+            buildPodiumBlock(rank, getPodiumHeight(rank), getPodiumWidth(), context, customColors),
+          ],
+        );
+      }
+
+      Widget placeholderSet(int rank) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            buildPodiumBlock(rank, getPodiumHeight(rank), getPodiumWidth(), context, customColors),
+            SizedBox(height: 8),
+            CircleAvatar(
+              radius: getAvatarSize(rank),
+              backgroundColor: customColors.neutral80,
+              child: Text('N/A', style: TextStyle(color: Colors.white)),
+            ),
+            SizedBox(height: 5),
+            Text('N/A', style: body_small_semi(context).copyWith(color: customColors.neutral30)),
+            Text('0 xp', style: body_xxsmall(context).copyWith(color: customColors.neutral60)),
+          ],
+        );
+      }
+
+      Widget firstSet = rankings.isNotEmpty ? buildRankSet(user: rankings[0], rank: 1) : placeholderSet(1);
+      Widget secondSet = rankings.length >= 2 ? buildRankSet(user: rankings[1], rank: 2) : placeholderSet(2);
+      Widget thirdSet = rankings.length >= 3 ? buildRankSet(user: rankings[2], rank: 3) : placeholderSet(3);
+
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          secondSet,
+          SizedBox(width: 4),
+          firstSet,
+          SizedBox(width: 4),
+          thirdSet,
+        ],
+      );
+    },
+  );
+}
+
 
 /// 상위 3명의 랭킹 카드
 Widget buildTopThree(BuildContext context, CustomColors customColors) {
@@ -99,9 +197,9 @@ Widget buildTopThree(BuildContext context, CustomColors customColors) {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           secondCard,
-          SizedBox(width: 20),
+          // SizedBox(width: 20),
           firstCard,
-          SizedBox(width: 20),
+          // SizedBox(width: 20),
           thirdCard,
         ],
       );
@@ -194,7 +292,11 @@ Widget buildRankCard(Map<String, dynamic> user, double size, CustomColors custom
         Text(
           user['name'],
           style: body_small_semi(context).copyWith(color: customColors.neutral30),
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
+
         Text(
           '${user['experience']} xp',
           style: body_xxsmall(context).copyWith(color: customColors.neutral60),
@@ -216,25 +318,18 @@ Widget buildRankingList(BuildContext context, CustomColors customColors) {
       if (snapshot.hasError) {
         return Text('랭킹 정보를 불러오는 데 실패했습니다. 오류: ${snapshot.error}');
       }
-      if (!snapshot.hasData) {
-        return Text('랭킹 정보를 불러오는 데 실패했습니다.');
+      if (!snapshot.hasData || snapshot.data!.length <= 3) {
+        return SizedBox.shrink(); // 아무것도 표시하지 않음
       }
 
       final rankings = snapshot.data!;
 
-      // 상위 3명보다 데이터가 적으면 안내 메시지 표시
-      if (rankings.length <= 3) {
-        return Text('랭킹 정보가 충분하지 않습니다.');
-      }
-
       return ListView.builder(
-        shrinkWrap: true, // 내부에서 크기 조절
-        physics: NeverScrollableScrollPhysics(), // 내부 스크롤 방지
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
         itemCount: rankings.length - 3,
         itemBuilder: (context, index) {
-          // 상위 3명은 이미 다른 위젯에서 보여주었으므로 index+3부터 시작
           final user = rankings[index + 3];
-          // 랭킹 번호는 상위 3명을 제외한 index에 4를 더해서 표시 (즉, 4등부터)
           final rank = index + 4;
           return ListTile(
             leading: Row(
@@ -245,7 +340,6 @@ Widget buildRankingList(BuildContext context, CustomColors customColors) {
                   style: body_small_semi(context).copyWith(color: customColors.neutral30),
                 ),
                 SizedBox(width: 20),
-                // user['image']가 없으면 default 이미지와 backgroundColor 지정
                 Builder(builder: (context) {
                   final String imagePath = (user['image'] != null && user['image'].toString().isNotEmpty)
                       ? user['image']
@@ -267,9 +361,9 @@ Widget buildRankingList(BuildContext context, CustomColors customColors) {
               style: body_xxsmall(context).copyWith(color: customColors.neutral60),
             ),
           );
-
         },
       );
     },
   );
 }
+

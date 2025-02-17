@@ -8,6 +8,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
 import '../../../components/alarm_dialog.dart';
 import '../../../components/custom_app_bar.dart';
+import '../Component/keyword_selection.dart';
+import '../Component/taginput_component.dart';
+import '../Component/writingform_component.dart';
 import 'community_service.dart';
 
 class EssayPostPage extends ConsumerStatefulWidget {
@@ -183,7 +186,7 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return _KeywordSelectionDialog(keywordList);
+        return KeywordSelectionDialog(keywordList);
       },
     );
 
@@ -244,300 +247,27 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              WritingForm(context, customColors),
-              SizedBox(height: 34),
-              TagInput(context, customColors),
-              SizedBox(height: 20),
+              WritingFormComponent(
+                titleController: titleController,
+                contentController: contentController,
+                titleFocusNode: titleFocusNode,
+                contentFocusNode: contentFocusNode,
+                customColors: customColors,
+                selectedKeyword: selectedKeyword, // 에세이 전용 키워드 전달
+              ),
+              const SizedBox(height: 34),
+              TagInputComponent(
+                tagController: tagController,
+                tags: tags,
+                onAddTag: addTag,
+                onRemoveTag: removeTag,
+                customColors: customColors,
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget TagInput(BuildContext context, CustomColors customColors) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("태그 (선택)", style: body_small_semi(context).copyWith(color: customColors.neutral30)),
-        SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: tagController,
-                decoration: InputDecoration(
-                  hintText: tags.length == 3 ? "태그 입력 완료" : "최대 3개의 태그를 입력해주세요 (예: 일상)",
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: customColors.primary!,
-                    ),
-                  ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: customColors.neutral80!,
-                    ),
-                  ),
-                  hintStyle: body_small(context).copyWith(
-                    color: customColors.neutral60,
-                  ),
-                ),
-                enabled: tags.length < 3,
-              ),
-            ),
-            ElevatedButton(
-              onPressed: tagController.text.isNotEmpty && tags.length < 3 ? addTag : null,
-              child: Text(
-                "추가",
-                style: body_xsmall_semi(context).copyWith(
-                  color: tagController.text.isNotEmpty && tags.length < 3 ? customColors.primary : customColors.neutral80,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.zero,
-                elevation: 0,
-                backgroundColor: Colors.transparent,
-                shadowColor: Colors.transparent,
-                splashFactory: NoSplash.splashFactory,
-                disabledBackgroundColor: Colors.transparent,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          children: tags.map((tag) {
-            return Chip(
-              label: Text(tag, style: body_small(context).copyWith(color: customColors.primary)),
-              backgroundColor: customColors.neutral100,
-              deleteIcon: Icon(Icons.close, size: 18, color: customColors.primary),
-              onDeleted: () => removeTag(tag),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: customColors.primary!),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
-  // 글 작성 폼: 에세이일 경우 selectedKeyword가 있으면 [키워드]와 제목 입력 필드 함께 표시
-  Widget WritingForm(BuildContext context, CustomColors customColors) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            selectedKeyword.isNotEmpty
-                ? Row(
-              children: [
-                Text(
-                  "[$selectedKeyword]",
-                  style: body_medium_semi(context).copyWith(color: customColors.primary),
-                ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: TextField(
-                    controller: titleController,
-                    focusNode: titleFocusNode,
-                    decoration: InputDecoration(
-                      hintText: "제목을 입력하세요",
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: customColors.primary!,
-                        ),
-                      ),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: customColors.neutral80!,
-                        ),
-                      ),
-                      hintStyle: body_medium_semi(context)
-                          .copyWith(color: customColors.neutral60),
-                    ),
-                    style: body_medium_semi(context),
-                  ),
-                ),
-              ],
-            )
-                : TextField(
-              controller: titleController,
-              focusNode: titleFocusNode,
-              decoration: InputDecoration(
-                hintText: "제목을 입력하세요",
-                border: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                    color: titleFocusNode.hasFocus ? customColors.primary! : customColors.neutral80!,
-                  ),
-                ),
-                hintStyle: body_medium_semi(context).copyWith(color: customColors.neutral60),
-              ),
-              style: body_medium_semi(context),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: contentController,
-              focusNode: contentFocusNode,
-              maxLines: 15,
-              maxLength: 800,
-              decoration: InputDecoration(
-                hintText:
-                "내용을 입력해주세요.\n1. 타인에게 불쾌감을 주지 않는 내용\n2. 개인정보 보호 규정 준수\n3. 욕설 및 비하 발언 금지",
-                hintStyle: body_small(context).copyWith(
-                  color: customColors.neutral60,
-                ),
-                border: InputBorder.none,
-              ),
-              style: body_small(context),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-// 에세이 전용 키워드 선택 다이얼로그
-class _KeywordSelectionDialog extends ConsumerStatefulWidget {
-  final List<String> keywordList;
-  _KeywordSelectionDialog(this.keywordList);
-
-  @override
-  _KeywordSelectionDialogState createState() => _KeywordSelectionDialogState();
-}
-
-class _KeywordSelectionDialogState extends ConsumerState<_KeywordSelectionDialog> {
-  bool isSpinning = false;
-  bool isStarted = false;
-  int currentIndex = 0;
-  String selectedKeyword = '';
-  Timer? _timer;
-
-  void startSpinning() {
-    setState(() {
-      isStarted = true;
-      isSpinning = true;
-    });
-
-    _timer = Timer.periodic(Duration(milliseconds: 80), (timer) {
-      setState(() {
-        currentIndex = (currentIndex + 1) % widget.keywordList.length;
-      });
-    });
-
-    Future.delayed(Duration(seconds: 1), () {
-      _timer?.cancel();
-      setState(() {
-        isSpinning = false;
-        selectedKeyword = widget.keywordList[currentIndex];
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final customColors = ref.watch(customColorsProvider);
-    return AlertDialog(
-      contentPadding: EdgeInsets.all(16),
-      title: Text(
-        "랜덤 키워드 뽑기",
-        style: body_medium_semi(context),
-        textAlign: TextAlign.center,
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (!isStarted) ...[
-            Column(
-              children: [
-                SvgPicture.asset("assets/images/randombox.svg", height: 180),
-                SizedBox(height: 24),
-                Text(
-                  '뽑기 통을 돌려서\n에세이 주제를 선정해보아요',
-                  style: body_small(context).copyWith(color: customColors.neutral30),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 24),
-                ButtonPrimary_noPadding(
-                  function: startSpinning,
-                  title: '돌리기',
-                ),
-              ],
-            ),
-          ] else ...[
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 124),
-              child: AnimatedSwitcher(
-                duration: Duration(milliseconds: 100),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    widget.keywordList[currentIndex],
-                    style: body_large_semi(context).copyWith(color: customColors.primary),
-                    key: ValueKey<int>(currentIndex),
-                  ),
-                ),
-              ),
-            ),
-            Row(
-              children: [
-                if (!isSpinning) ...[
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: startSpinning,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        decoration: ShapeDecoration(
-                          color: customColors.neutral90,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        ),
-                        child: Center(
-                          child: Text(
-                            '다시 돌리기',
-                            textAlign: TextAlign.center,
-                            style: body_small_semi(context).copyWith(color: customColors.neutral60),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: selectedKeyword.isEmpty ? null : () => Navigator.of(context).pop(selectedKeyword),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        decoration: ShapeDecoration(
-                          color: customColors.primary,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        ),
-                        child: Center(
-                          child: Text(
-                            '작성하기',
-                            textAlign: TextAlign.center,
-                            style: body_small_semi(context).copyWith(color: customColors.neutral100),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ]
-        ],
-      ),
-      backgroundColor: customColors.neutral100,
     );
   }
 }

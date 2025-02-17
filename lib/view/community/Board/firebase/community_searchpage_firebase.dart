@@ -117,7 +117,7 @@ class _SearchPageState extends State<SearchPage>
         return PostItemContainer(
           post: post,
           customColors: customColors,
-          context: context,
+          parentContext: context,
         );
       },
     );

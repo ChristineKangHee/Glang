@@ -83,6 +83,15 @@ class MyPageContent extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             InfoCard(
+              leadingIcon: Icons.article_rounded,
+              title: '커뮤니티 작성글',
+              trailingIcon: Icons.arrow_forward_ios,
+              onTap: () {
+                Navigator.pushNamed(context, '/mypage/info/mycommunitypost');
+              },
+            ),
+            const SizedBox(height: 16),
+            InfoCard(
               leadingIcon: Icons.bookmark_rounded,
               title: '저장',
               trailingIcon: Icons.arrow_forward_ios,
