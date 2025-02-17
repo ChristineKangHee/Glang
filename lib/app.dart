@@ -22,6 +22,7 @@ import 'package:readventure/view/mypage/edit_nick_input.dart';
 import 'package:readventure/view/mypage/info/info_badge.dart';
 import 'package:readventure/view/mypage/edit_profile.dart';
 import 'package:readventure/view/mypage/info/info_history.dart';
+import 'package:readventure/view/mypage/info/info_mycommunitypost.dart';
 import 'package:readventure/view/mypage/info/info_statistics.dart';
 import 'package:readventure/view/mypage/mypage_main.dart';
 import 'package:readventure/view/mypage/info/info_saved.dart';
@@ -101,6 +102,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
             '/mypage/info/badge' : (context) => const InfoBadge(),
             '/mypage/info/saved' : (context) => const InfoSaved(),
             '/mypage/info/history' : (context) => const InfoHistory(),
+            '/mypage/info/mycommunitypost' : (context) => MyPostsPage(),
 
           },
           localizationsDelegates: context.localizationDelegates, // Localization 설정

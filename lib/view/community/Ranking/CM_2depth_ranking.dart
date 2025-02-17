@@ -15,8 +15,7 @@ class RankingPage extends ConsumerWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            buildTopThree(context, customColors),
-            buildPodium(context, customColors),
+            buildTopThreeWithPodium(context, customColors),
             buildRankingList(context, customColors),
           ],
         ),

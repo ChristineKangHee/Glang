@@ -7,10 +7,13 @@ import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_navigation_bar.dart';
 import '../CM_2depth_board.dart';
 import '../CM_2depth_boardMain.dart';
+import '../Component/postHeader.dart';
+import '../Component/postfooter.dart';
 import 'CM_2depth_boardMain_firebase.dart';
 import '../community_searchpage.dart';
 import 'community_data_firebase.dart';
 import 'community_searchpage_firebase.dart';
+import 'component_community_post_firebase.dart';
 import 'posting_detail_page.dart';
 import '../../Ranking/CM_2depth_ranking.dart';
 import '../../Ranking/ranking_component.dart';
@@ -76,8 +79,7 @@ class CommunityMainPage extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              buildTopThree(context, customColors),
-              buildPodium(context, customColors),
+              buildTopThreeWithPodium(context, customColors),
             ],
           ),
         ),
@@ -161,7 +163,7 @@ class _CommunityPreviewState extends State<CommunityPreview> {
       children: [
         _buildPostNavigation(context, widget.customColors),
         SizedBox(
-          height: 170,
+          height: 190,
           child: Padding(
             padding: const EdgeInsets.only(left: 16),
             child: PageView.builder(
@@ -189,41 +191,14 @@ class _CommunityPreviewState extends State<CommunityPreview> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 태그와 날짜
-                        Row(
-                          children: [
-                            Row(
-                              children: post.tags
-                                  .map<Widget>(
-                                    (tag) => Padding(
-                                  padding: const EdgeInsets.only(right: 8),
-                                  child: Text(
-                                    '#$tag',
-                                    style: body_xxsmall(context).copyWith(
-                                      color: widget.customColors.primary60,
-                                    ),
-                                  ),
-                                ),
-                              )
-                                  .toList(),
-                            ),
-                            Expanded(
-                              child: Align(
-                                alignment: Alignment.centerRight,
-                                child: Text(
-                                  _formatPostDate(post.createdAt),
-                                  style: body_xxsmall(context).copyWith(
-                                    color: widget.customColors.neutral60,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        // 헤더: 태그와 날짜 표시
+                        PostHeader(post: post, customColors: widget.customColors),
                         const SizedBox(height: 8),
                         Text(
                           post.title,
                           style: body_small_semi(context),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                         const SizedBox(height: 8),
                         Expanded(
@@ -235,69 +210,8 @@ class _CommunityPreviewState extends State<CommunityPreview> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Spacer(),
-                        Row(
-                          children: [
-                            Row(
-                              children: [
-                                CircleAvatar(
-                                  backgroundImage: NetworkImage(post.profileImage),
-                                  radius: 12,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  post.nickname,
-                                  style: body_xsmall_semi(context).copyWith(
-                                    color: widget.customColors.neutral30,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Expanded(
-                              child: Align(
-                                alignment: Alignment.centerRight,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.favorite,
-                                          size: 16,
-                                          color: widget.customColors.neutral60,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          post.likes.toString(),
-                                          style: body_xxsmall_semi(context).copyWith(
-                                            color: widget.customColors.neutral60,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.remove_red_eye,
-                                          size: 16,
-                                          color: widget.customColors.neutral60,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          post.views.toString(),
-                                          style: body_xxsmall_semi(context).copyWith(
-                                            color: widget.customColors.neutral60,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
+                        // 풋터: 작성자, 좋아요, 조회수 표시
+                        PostFooter(post: post, customColors: widget.customColors),
                       ],
                     ),
                   ),
@@ -308,21 +222,6 @@ class _CommunityPreviewState extends State<CommunityPreview> {
         ),
       ],
     );
-  }
-
-  String _formatPostDate(DateTime createdAt) {
-    final now = DateTime.now();
-    final difference = now.difference(createdAt);
-
-    if (difference.inMinutes < 1) {
-      return "방금 전";
-    } else if (difference.inMinutes < 60) {
-      return "${difference.inMinutes}분 전";
-    } else if (difference.inHours < 24) {
-      return "${(difference.inMinutes / 60).ceil()}시간 전";
-    } else {
-      return "${difference.inDays}일 전";
-    }
   }
 
   Widget _buildPostNavigation(BuildContext context, CustomColors customColors) {
