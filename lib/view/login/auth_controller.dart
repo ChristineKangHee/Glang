@@ -4,6 +4,7 @@
 /// Created: 2025-01-07
 /// Last Modified: 2025-02-03 by 박민준
 
+import 'package:flutter/material.dart'; // AlertDialog를 사용하기 위해 추가
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,8 +18,7 @@ final authControllerProvider =
 StateNotifierProvider<AuthController, User?>((ref) => AuthController(ref));
 
 class AuthController extends StateNotifier<User?> {
-  final Ref ref; // ⬅️ Riverpod의 Ref
-
+  final Ref ref;
   AuthController(this.ref) : super(null);
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -26,99 +26,102 @@ class AuthController extends StateNotifier<User?> {
 
   /// Google 로그인
   Future<void> signInWithGoogle({
+    required BuildContext context,
     required Function onNicknameRequired,
     required Function onHome,
   }) async {
     try {
       await GoogleSignIn().signOut();
-
       final googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) return; // 로그인 취소
       final googleAuth = await googleUser.authentication;
-
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-
       final userCredential = await _auth.signInWithCredential(credential);
       final user = userCredential.user;
 
       if (user != null) {
-        // ✅ Google에서 가져온 displayName을 업데이트
         if (user.displayName == null) {
           await user.updateDisplayName(googleUser.displayName);
         }
-
         await _handleUserState(user, onNicknameRequired, onHome);
         state = user;
       }
     } catch (e) {
-      print('Google 로그인 오류: $e');
+      _showErrorDialog(context, 'Google 로그인 오류', e.toString());
     }
   }
 
   /// 카카오 로그인
   Future<void> signInWithKakao({
+    required BuildContext context,
     required Function onNicknameRequired,
     required Function onHome,
   }) async {
     try {
-      final token = await kakao.UserApi.instance.loginWithKakaoAccount();
-      print('카카오 계정으로 로그인 성공');
+      final isKakaoTalkInstalled = await kakao.isKakaoTalkInstalled();
+      kakao.OAuthToken token;
+
+      if (isKakaoTalkInstalled) {
+        try {
+          token = await kakao.UserApi.instance.loginWithKakaoTalk();
+        } catch (error) {
+          print('카카오톡 앱 로그인 실패, 웹으로 재시도: $error');
+          token = await kakao.UserApi.instance.loginWithKakaoAccount();
+        }
+      } else {
+        token = await kakao.UserApi.instance.loginWithKakaoAccount();
+      }
 
       if (token.idToken == null || token.accessToken == null) {
         throw Exception('idToken 또는 accessToken이 null입니다.');
       }
 
-      // ✅ 카카오 사용자 정보 가져오기
       final kakaoUser = await kakao.UserApi.instance.me();
       final displayName = kakaoUser.kakaoAccount?.profile?.nickname ?? "사용자";
       print('카카오 사용자 닉네임: $displayName');
 
-      // ✅ Firebase OAuth 인증 정보 생성
       final credential = OAuthProvider('oidc.kakao').credential(
         idToken: token.idToken,
         accessToken: token.accessToken,
       );
 
-      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final userCredential =
+      await FirebaseAuth.instance.signInWithCredential(credential);
       final user = userCredential.user;
 
       if (user != null) {
-        // ✅ Firebase에서 displayName이 없으면 업데이트
         if (user.displayName == null || user.displayName!.isEmpty) {
           await user.updateDisplayName(displayName);
-          await user.reload(); // 변경된 정보 즉시 반영
+          await user.reload();
         }
-
         print('Firebase 인증 성공: ${user.uid}');
         await _handleUserState(user, onNicknameRequired, onHome);
       } else {
         throw Exception('Firebase 인증 실패');
       }
     } catch (e) {
-      print('카카오 로그인 오류: $e');
+      _showErrorDialog(context, '카카오 로그인 오류', e.toString());
     }
   }
 
-  // Apple 로그인
+  /// Apple 로그인
   Future<void> signInWithApple({
+    required BuildContext context,
     required Function onNicknameRequired,
     required Function onHome,
   }) async {
     try {
-      // Apple ID 자격 증명 요청
       final appleCredential = await SignInWithApple.getAppleIDCredential(
         scopes: [
           AppleIDAuthorizationScopes.email,
           AppleIDAuthorizationScopes.fullName,
         ],
       );
-      // Firebase용 OAuth 자격 증명 생성
       final oauthCredential = OAuthProvider("apple.com").credential(
         idToken: appleCredential.identityToken,
-        // authorizationCode를 accessToken 자리로 사용합니다.
         accessToken: appleCredential.authorizationCode,
       );
       final userCredential = await _auth.signInWithCredential(oauthCredential);
@@ -128,7 +131,7 @@ class AuthController extends StateNotifier<User?> {
         state = user;
       }
     } catch (e) {
-      print('Apple 로그인 오류: $e');
+      _showErrorDialog(context, 'Apple 로그인 오류', e.toString());
     }
   }
 
@@ -137,8 +140,6 @@ class AuthController extends StateNotifier<User?> {
     try {
       final userRef = _firestore.collection('users').doc(user.uid);
       final docSnapshot = await userRef.get();
-
-      // 로그인 직후 userIdProvider 업데이트
       ref.read(userIdProvider.notifier).state = user.uid;
 
       if (!docSnapshot.exists) {
@@ -149,11 +150,9 @@ class AuthController extends StateNotifier<User?> {
           'createdAt': FieldValue.serverTimestamp(),
           'totalXP': 0,
         });
-        // 사용자 문서를 생성한 후에 출석 체크 호출
         await markTodayAttendanceAsChecked(user.uid);
         onNicknameRequired();
       } else {
-        // 이미 문서가 존재하는 경우
         await markTodayAttendanceAsChecked(user.uid);
         final data = docSnapshot.data()!;
         if (data['nicknameSet'] == true) {
@@ -163,8 +162,25 @@ class AuthController extends StateNotifier<User?> {
         }
       }
     } catch (e) {
+      // _handleUserState 내부 에러도 AlertDialog로 보여주기
+      // 이 경우 context가 없으므로, 간단하게 print와 별도 처리를 할 수도 있음.
       print('사용자 상태 확인 오류: $e');
     }
   }
 
+  void _showErrorDialog(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            child: const Text("확인"),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
 }
