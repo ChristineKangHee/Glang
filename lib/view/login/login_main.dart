@@ -56,6 +56,7 @@ class LoginPage extends ConsumerWidget {
                 GestureDetector(
                   onTap: () {
                     authController.signInWithGoogle(
+                      context: context,
                       onNicknameRequired: () {
                         Navigator.pushReplacementNamed(context, '/nickname');
                       },
@@ -71,6 +72,7 @@ class LoginPage extends ConsumerWidget {
                 GestureDetector(
                   onTap: () {
                     authController.signInWithApple(
+                      context: context,
                       onNicknameRequired: () {
                         Navigator.pushReplacementNamed(context, '/nickname');
                       },
@@ -86,6 +88,7 @@ class LoginPage extends ConsumerWidget {
                 GestureDetector(
                   onTap: () {
                     authController.signInWithKakao(
+                      context: context,
                       onNicknameRequired: () {
                         Navigator.pushReplacementNamed(context, '/nickname');
                       },
