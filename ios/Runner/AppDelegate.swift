@@ -9,21 +9,22 @@ import GoogleSignIn
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-
+    
     // ✅ Firebase 초기화
     FirebaseApp.configure()
-
-    // ✅ Google 로그인 설정
-    guard let clientID = FirebaseApp.app()?.options.clientID else {
-        fatalError("Google Client ID가 설정되지 않았습니다.")
-    }
-
-    let signInConfig = GIDConfiguration(clientID: clientID)
-    GIDSignIn.sharedInstance.configuration = signInConfig
-
-    // ✅ Flutter 플러그인 등록
-    GeneratedPluginRegistrant.register(with: self)
-
+    
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  // ✅ Google 로그인 URL 처리 (Google 로그인 사용 시 유지)
+  override func application(
+    _ app: UIApplication,
+    open url: URL,
+    options: [UIApplication.OpenURLOptionsKey : Any] = [:]
+  ) -> Bool {
+    if GIDSignIn.sharedInstance.handle(url) {
+      return true
+    }
+    return super.application(app, open: url, options: options)
   }
 }

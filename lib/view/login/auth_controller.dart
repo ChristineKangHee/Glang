@@ -102,75 +102,33 @@ class AuthController extends StateNotifier<User?> {
     }
   }
 
-  /// 애플 로그인
+  // Apple 로그인
   Future<void> signInWithApple({
     required Function onNicknameRequired,
     required Function onHome,
   }) async {
     try {
-      print("🛠 Apple 로그인 시작");
-
+      // Apple ID 자격 증명 요청
       final appleCredential = await SignInWithApple.getAppleIDCredential(
         scopes: [
           AppleIDAuthorizationScopes.email,
           AppleIDAuthorizationScopes.fullName,
         ],
       );
-
-      print("✅ Apple Credential 받음: $appleCredential");
-
-      // ✅ identityToken이 없으면 로그인 불가 → 예외 처리 추가
-      if (appleCredential.identityToken == null) {
-        throw Exception("Apple 로그인 실패: identityToken이 없습니다.");
-      }
-
-      print("✅ Apple identityToken: ${appleCredential.identityToken}");
-
+      // Firebase용 OAuth 자격 증명 생성
       final oauthCredential = OAuthProvider("apple.com").credential(
-        idToken: appleCredential.identityToken!,
+        idToken: appleCredential.identityToken,
+        // authorizationCode를 accessToken 자리로 사용합니다.
+        accessToken: appleCredential.authorizationCode,
       );
-
       final userCredential = await _auth.signInWithCredential(oauthCredential);
       final user = userCredential.user;
-
       if (user != null) {
-        print("✅ Firebase 로그인 성공: ${user.email}");
-
-        // ✅ Firestore에서 fullName 가져오기 (Apple이 fullName을 제공하지 않는 경우 대비)
-        String? fullName = appleCredential.givenName ?? user.displayName ?? "";
-
-        if (fullName.isEmpty) {
-          final userDoc = await FirebaseFirestore.instance
-              .collection('users')
-              .doc(user.uid)
-              .get();
-
-          if (userDoc.exists && userDoc.data()!.containsKey('fullName')) {
-            fullName = userDoc.data()!['fullName'];
-          } else {
-            fullName = "사용자"; // 기본값
-          }
-        }
-
-        // ✅ Firestore에 이름 저장 (최초 로그인 시)
-        if (appleCredential.givenName != null) {
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(user.uid)
-              .set({'fullName': appleCredential.givenName}, SetOptions(merge: true));
-        }
-
-        // ✅ Firebase Auth의 Display Name 업데이트
-        if (user.displayName == null || user.displayName!.isEmpty) {
-          await user.updateDisplayName(fullName);
-        }
-
         await _handleUserState(user, onNicknameRequired, onHome);
         state = user;
       }
     } catch (e) {
-      print('❌ Apple 로그인 오류: $e');
-      throw Exception("Apple 로그인 실패: $e");
+      print('Apple 로그인 오류: $e');
     }
   }
 

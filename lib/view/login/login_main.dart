@@ -67,7 +67,7 @@ class LoginPage extends ConsumerWidget {
                   },
                   child: GoogleLoginButton(customColors: customColors),
                 ),
-                SizedBox(height: 16,),
+                SizedBox(height: 16),
                 GestureDetector(
                   onTap: () {
                     authController.signInWithApple(
@@ -82,7 +82,7 @@ class LoginPage extends ConsumerWidget {
                   },
                   child: AppleLoginButton(customColors: customColors),
                 ),
-                SizedBox(height: 16,),
+                SizedBox(height: 16),
                 GestureDetector(
                   onTap: () {
                     authController.signInWithKakao(
@@ -97,7 +97,7 @@ class LoginPage extends ConsumerWidget {
                   },
                   child: KakaoLoginButton(customColors: customColors),
                 ),
-                SizedBox(height: 40,),
+                SizedBox(height: 40),
               ],
             ),
           ),
@@ -135,7 +135,7 @@ class GoogleLoginButton extends StatelessWidget {
               height: 32,
               child: Image.asset("assets/icons/google.png"),
             ),
-            SizedBox(width: 16,),
+            SizedBox(width: 16),
             Text("Google로 계속하기", style: body_medium_semi(context).copyWith(color: customColors.neutral30),)
           ],
         ),
@@ -172,7 +172,7 @@ class AppleLoginButton extends StatelessWidget {
               height: 24,
               child: Image.asset("assets/icons/apple_icon_white.png"),
             ),
-            SizedBox(width: 16,),
+            SizedBox(width: 16),
             Text("Apple로 계속하기", style: body_medium_semi(context).copyWith(color: customColors.neutral100),)
           ],
         ),
