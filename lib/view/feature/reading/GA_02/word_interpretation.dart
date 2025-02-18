@@ -11,6 +11,8 @@ import 'package:shimmer/shimmer.dart';
 // 프로젝트 내 폰트/스타일 관련 함수 import (경로는 필요에 따라 수정)
 import 'package:readventure/theme/font.dart';
 
+import '../../../../viewmodel/bookmark_interpretation.dart';
+
 /// 기본 응답 값 (API 호출 실패 시 반환)
 const Map<String, dynamic> defaultResponse = {
   "dictionaryMeaning": "정보 없음",
@@ -86,9 +88,14 @@ Future<Map<String, dynamic>> fetchWordDetails(String word, List<String> textSegm
   }
 }
 
-/// 팝업 상단 헤더 위젯 (타이틀 및 닫기 버튼)
-/// 팝업 상단 헤더 위젯 (타이틀 및 닫기 버튼, 북마크 아이콘 추가)
-Widget _buildPopupHeader(BuildContext context, dynamic customColors, {required VoidCallback onClose}) {
+/// 팝업 상단 헤더 위젯 (타이틀 및 닫기, 북마크 아이콘 포함)
+Widget _buildPopupHeader(
+    BuildContext context,
+    dynamic customColors, {
+      required VoidCallback onClose,
+      VoidCallback? onBookmark,
+      required bool isBookmarked,
+    }) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
@@ -99,8 +106,11 @@ Widget _buildPopupHeader(BuildContext context, dynamic customColors, {required V
       Row(
         children: [
           IconButton(
-            onPressed: (){},
-            icon: Icon(Icons.bookmark_border, color: customColors.neutral30),
+            onPressed: onBookmark,
+            icon: Icon(
+              isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border,
+              color: customColors.neutral30,
+            ),
           ),
           IconButton(
             onPressed: onClose,
@@ -111,7 +121,6 @@ Widget _buildPopupHeader(BuildContext context, dynamic customColors, {required V
     ],
   );
 }
-
 
 /// 선택된 단어 표시 위젯
 Widget _buildSelectedWord(BuildContext context, String selectedText, dynamic customColors) {
@@ -223,66 +232,109 @@ void showWordPopup({
   required BuildContext context,
   required String selectedText,
   required List<String> textSegments,
-  required dynamic customColors, // 예: Theme의 CustomColors 확장
+  required dynamic customColors,
+  required String stageId,
+  required String subdetailTitle,
 }) {
+  // Future를 한 번만 생성해서 재사용합니다.
+  final futureData = fetchWordDetails(selectedText, textSegments);
+
   showDialog(
     context: context,
     builder: (BuildContext dialogContext) {
+      bool isBookmarked = false;
       return Dialog(
         insetPadding: const EdgeInsets.symmetric(horizontal: 16),
-        child: FutureBuilder<Map<String, dynamic>>(
-          future: fetchWordDetails(selectedText, textSegments),
-          builder: (context, snapshot) {
-            Widget content;
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return FutureBuilder<Map<String, dynamic>>(
+              future: futureData, // setState 호출 시 재생성되지 않습니다.
+              builder: (context, snapshot) {
+                Widget content;
+                VoidCallback? onBookmarkCallback;
 
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              content = Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildPopupHeader(context, customColors, onClose: () => Navigator.pop(context)),
-                  const SizedBox(height: 20),
-                  _buildSelectedWord(context, selectedText, customColors),
-                  const SizedBox(height: 20),
-                  _buildLoadingContent(context, customColors),
-                  const SizedBox(height: 20),
-                ],
-              );
-            } else if (snapshot.hasError) {
-              content = Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '오류가 발생했습니다.',
-                    style: body_small_semi(context).copyWith(color: customColors.neutral30),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(snapshot.error.toString(), style: body_small(context)),
-                  const SizedBox(height: 20),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.close, color: customColors.neutral30),
-                  ),
-                ],
-              );
-            } else {
-              final data = snapshot.data!;
-              content = Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildPopupHeader(context, customColors, onClose: () => Navigator.pop(context)),
-                  const SizedBox(height: 20),
-                  _buildSelectedWord(context, selectedText, customColors),
-                  const SizedBox(height: 20),
-                  _buildResultContainer(_buildResultContent(context, data, customColors), customColors),
-                  const SizedBox(height: 20),
-                ],
-              );
-            }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  onBookmarkCallback = null;
+                  content = Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildPopupHeader(
+                        context,
+                        customColors,
+                        onClose: () => Navigator.pop(context),
+                        onBookmark: onBookmarkCallback,
+                        isBookmarked: isBookmarked,
+                      ),
+                      const SizedBox(height: 20),
+                      _buildSelectedWord(context, selectedText, customColors),
+                      const SizedBox(height: 20),
+                      _buildLoadingContent(context, customColors),
+                      const SizedBox(height: 20),
+                    ],
+                  );
+                } else if (snapshot.hasError) {
+                  onBookmarkCallback = null;
+                  content = Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '오류가 발생했습니다.',
+                        style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(snapshot.error.toString(), style: body_small(context)),
+                      const SizedBox(height: 20),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(Icons.close, color: customColors.neutral30),
+                      ),
+                    ],
+                  );
+                } else {
+                  final data = snapshot.data!;
+                  onBookmarkCallback = () async {
+                    await saveBookmarkInterpretation(
+                      stageId: stageId,
+                      subdetailTitle: subdetailTitle,
+                      selectedText: selectedText,
+                      interpretationData: data,
+                    );
+                    setState(() {
+                      isBookmarked = true;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("해석이 저장되었습니다.")),
+                    );
+                  };
 
-            return Container(
-              padding: const EdgeInsets.all(16),
-              child: content,
+                  content = Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildPopupHeader(
+                        context,
+                        customColors,
+                        onClose: () => Navigator.pop(context),
+                        onBookmark: onBookmarkCallback,
+                        isBookmarked: isBookmarked,
+                      ),
+                      const SizedBox(height: 20),
+                      _buildSelectedWord(context, selectedText, customColors),
+                      const SizedBox(height: 20),
+                      _buildResultContainer(
+                        _buildResultContent(context, data, customColors),
+                        customColors,
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  );
+                }
+
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  child: content,
+                );
+              },
             );
           },
         ),
