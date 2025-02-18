@@ -116,6 +116,8 @@ class _ToolbarState extends State<Toolbar> {
         selectedText: selectedText,
         textSegments: widget.readingData.textSegments,
         customColors: widget.customColors,
+        stageId: widget.stageId,
+        subdetailTitle: widget.subdetailTitle,
       );
     } else {
       showSentencePopup(
@@ -123,6 +125,8 @@ class _ToolbarState extends State<Toolbar> {
         selectedText: selectedText,
         textSegments: widget.readingData.textSegments,
         customColors: widget.customColors,
+        stageId: widget.stageId,
+        subdetailTitle: widget.subdetailTitle,
       );
     }
   }

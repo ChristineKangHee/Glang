@@ -13,6 +13,7 @@ import '../../theme/theme.dart';
 import '../../viewmodel/custom_colors_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../viewmodel/user_service.dart';
+import '../community/Ranking/ranking_component.dart';
 import '../widgets/DoubleBackToExitWrapper.dart';
 
 /// 마이페이지 메인 화면 위젯
@@ -99,7 +100,16 @@ class MyPageContent extends StatelessWidget {
               title: '메모',
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
-                Navigator.pushNamed(context, '/mypage/info/saved');
+                Navigator.pushNamed(context, '/mypage/info/memo');
+              },
+            ),
+            const SizedBox(height: 16),
+            InfoCard(
+              leadingIcon: Icons.bookmark_rounded,
+              title: '해석',
+              trailingIcon: Icons.arrow_forward_ios,
+              onTap: () {
+                Navigator.pushNamed(context, '/mypage/info/interpretation');
               },
             ),
             const SizedBox(height: 16),
@@ -176,6 +186,16 @@ class UserProfileSection extends StatelessWidget {
     );
   }
 }
+// 상단 import 구문 아래에 provider 추가
+final myRankingProvider = FutureProvider<int>((ref) async {
+  final rankings = await getRankings();
+  // 사용자 이름은 userNameProvider로부터 가져옵니다.
+  final userName = ref.watch(userNameProvider) ?? '';
+  // 랭킹 리스트에서 사용자 이름과 일치하는 항목의 인덱스를 찾습니다.
+  final index = rankings.indexWhere((user) => user['name'] == userName);
+  // 인덱스는 0부터 시작하므로 +1 해서 랭킹으로 표시 (만약 찾지 못하면 0)
+  return index == -1 ? 0 : index + 1;
+});
 
 /// 사용자 경험치, 코스, 랭킹 통계 표시 섹션
 class UserStatsSection extends ConsumerWidget {
@@ -183,8 +203,9 @@ class UserStatsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final xpAsyncValue = ref.watch(userXPProvider); // Firestore에서 XP 가져오기
-    final courseAsyncValue = ref.watch(userCourseProvider); // Firestore에서 currentCourse 가져오기
+    final xpAsyncValue = ref.watch(userXPProvider); // 경험치
+    final courseAsyncValue = ref.watch(userCourseProvider); // 코스
+    final rankingAsyncValue = ref.watch(myRankingProvider); // 내 랭킹
 
     return SizedBox(
       height: 50,
@@ -194,8 +215,8 @@ class UserStatsSection extends ConsumerWidget {
           Expanded(
             child: xpAsyncValue.when(
               data: (xp) => StatBox(value: xp.toString(), label: '경험치'),
-              loading: () => const StatBox(value: '...', label: '경험치'), // 로딩 중
-              error: (_, __) => const StatBox(value: '오류', label: '경험치'), // 오류 발생 시
+              loading: () => const StatBox(value: '...', label: '경험치'),
+              error: (_, __) => const StatBox(value: '오류', label: '경험치'),
             ),
           ),
           VerticalDivider(color: Theme.of(context).extension<CustomColors>()?.neutral80),
@@ -206,11 +227,20 @@ class UserStatsSection extends ConsumerWidget {
               error: (_, __) => const StatBox(value: '오류', label: '코스'),
             ),
           ),
+          VerticalDivider(color: Theme.of(context).extension<CustomColors>()?.neutral80),
+          Expanded(
+            child: rankingAsyncValue.when(
+              data: (rank) => StatBox(value: rank.toString()+'위', label: '랭킹'),
+              loading: () => const StatBox(value: '...', label: '랭킹'),
+              error: (_, __) => const StatBox(value: '오류', label: '랭킹'),
+            ),
+          ),
         ],
       ),
     );
   }
 }
+
 
 
 /// 학습 통계 그래프 위젯
