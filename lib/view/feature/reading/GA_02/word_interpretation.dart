@@ -54,7 +54,7 @@ Future<Map<String, dynamic>> fetchWordDetails(String word, List<String> textSegm
           {
             'role': 'system',
             'content':
-            'You are a Korean dictionary assistant. For the given word, provide a JSON object with exactly the following keys: "dictionaryMeaning", "contextualMeaning", "synonyms", and "antonyms". "dictionaryMeaning" should be a brief definition of the word in Korean. "contextualMeaning" should explain how the word is used in context based on the following text segments: "$contextText". "synonyms" should be an array of similar words in Korean, and "antonyms" should be an array of opposite words in Korean. If any information is not available, set its value to "정보 없음". 모든 결과는 한국어로 제공하세요. Return only the JSON object with no additional text.'
+            'You are a Korean dictionary assistant. For the given word, provide a JSON object with exactly the following keys: "dictionaryMeaning", "contextualMeaning", "synonyms", and "antonyms". "dictionaryMeaning" should be a brief definition of the word in Korean. "contextualMeaning" should explain, based on the following text segments: "$contextText", which among the dictionary definitions is intended in the given sentence, and provide a detailed explanation of that particular meaning. "synonyms" should be an array of similar words in Korean, and "antonyms" should be an array of opposite words in Korean. If any information is not available, set its value to "정보 없음". 모든 결과는 한국어로 제공하세요. Return only the JSON object with no additional text.'
           },
           {
             'role': 'user',
