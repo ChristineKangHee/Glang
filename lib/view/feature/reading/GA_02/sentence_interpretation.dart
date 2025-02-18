@@ -172,9 +172,17 @@ Widget _popupHeader(dynamic customColors, BuildContext context) {
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       Text('해석', style: body_small_semi(context).copyWith(color: customColors.neutral30)),
-      IconButton(
-        onPressed: () => Navigator.pop(context),
-        icon: Icon(Icons.close, color: customColors.neutral30),
+      Row(
+        children: [
+          IconButton(
+            onPressed: (){},
+            icon: Icon(Icons.bookmark_border, color: customColors.neutral30),
+          ),
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(Icons.close, color: customColors.neutral30),
+          ),
+        ],
       ),
     ],
   );

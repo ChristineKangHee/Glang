@@ -6,8 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:readventure/view/community/Board/firebase/CM_1depth_firebase.dart';
-import '../view/community/community_main.dart';
+import 'package:readventure/view/community/Board/CM_1depth_firebase.dart';
 import '../view/course/course_main.dart';
 import '../view/home/home.dart';
 import '../view/mypage/mypage_main.dart';

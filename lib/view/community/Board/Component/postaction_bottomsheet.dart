@@ -13,15 +13,13 @@ void showPostActionBottomSheet(BuildContext context, Post post, CustomColors cus
 */
 
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:readventure/view/community/Board/firebase/post_editPage.dart';
+import 'package:readventure/view/community/Board/post_editPage.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../../../components/alarm_dialog.dart';
-import '../community_data.dart';
-import '../firebase/community_data_firebase.dart';
-import '../firebase/community_service.dart';
+import '../community_data_firebase.dart';
+import '../community_service.dart';
 
 class PostActionBottomSheet extends StatelessWidget {
   final Post post;

@@ -6,8 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:readventure/view/community/Board/firebase/CM_1depth_firebase.dart';
-import 'package:readventure/view/community/community_main.dart';
+import 'package:readventure/view/community/Board/CM_1depth_firebase.dart';
 import 'package:readventure/view/course/course_main.dart';
 import 'package:readventure/view/feature/after_read/AR_main.dart';
 import 'package:readventure/view/feature/before_read/BR_main.dart';

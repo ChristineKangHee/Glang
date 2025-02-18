@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../theme/font.dart';
-import '../../../../theme/theme.dart';
-import '../../../../viewmodel/custom_colors_provider.dart';
-import '../../../components/custom_app_bar.dart';
-import '../Component/postaction_bottomsheet.dart';
+import '../../../theme/font.dart';
+import '../../../theme/theme.dart';
+import '../../../viewmodel/custom_colors_provider.dart';
+import '../../components/custom_app_bar.dart';
+import 'Component/postaction_bottomsheet.dart';
 import 'CM_2depth_boardMain_firebase.dart';
 import 'community_data_firebase.dart';
 import 'community_service.dart';

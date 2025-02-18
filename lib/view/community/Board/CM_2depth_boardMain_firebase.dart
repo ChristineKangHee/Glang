@@ -2,21 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../../theme/font.dart';
-import '../../../../theme/theme.dart';
-import '../../../../viewmodel/custom_colors_provider.dart';
-import '../../../components/custom_app_bar.dart';
-import '../../../components/my_divider.dart';
+import '../../../theme/font.dart';
+import '../../../theme/theme.dart';
+import '../../../viewmodel/custom_colors_provider.dart';
+import '../../components/custom_app_bar.dart';
+import '../../components/my_divider.dart';
 import 'community_data_firebase.dart';
 import 'community_searchpage_firebase.dart';
 import 'community_service.dart';
-import '../Component/component_communitypostlist.dart';
-import '../community_searchpage.dart';
-import '../essay_posting.dart';
 import 'component_community_post_firebase.dart';
 import 'essay_posting_firebase.dart';
 import 'free_posting_firebase.dart';
-import '../mission_posting.dart';
+import 'mission_posting.dart';
 
 class Cm2depthBoardmain extends ConsumerWidget {
   final CommunityService _communityService = CommunityService();
