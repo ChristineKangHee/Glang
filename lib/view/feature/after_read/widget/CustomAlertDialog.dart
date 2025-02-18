@@ -48,7 +48,7 @@ class CustomAlertDialog extends StatelessWidget {
                           const SizedBox(height: 16),
 
                           // 다른 유저의 글
-                          _buildInfoBox(context, "다른 유저의 글", "다람쥐는 작은 토끼를 보고 미소 지으며 말했어요. ‘내가 집까지 데려다줄게!’ 작은 토끼는 다람쥐의 도움으로 무사히 집으로 돌아왔어요.", customColors),
+                          _buildInfoBox(context, "모범답안", "다람쥐는 작은 토끼를 보고 미소 지으며 말했어요. ‘내가 집까지 데려다줄게!’ 작은 토끼는 다람쥐의 도움으로 무사히 집으로 돌아왔어요.", customColors),
                           const SizedBox(height: 24),
                         ],
                       ),
