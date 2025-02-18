@@ -149,6 +149,7 @@ class AuthController extends StateNotifier<User?> {
           'email': user.email,
           'createdAt': FieldValue.serverTimestamp(),
           'totalXP': 0,
+          'currentCourse': '코스1', // 기본 코스 설정
         });
         await markTodayAttendanceAsChecked(user.uid);
         onNicknameRequired();
