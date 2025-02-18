@@ -5,6 +5,7 @@ import 'package:readventure/view/components/custom_button.dart';
 import 'package:readventure/view/components/my_divider.dart';
 import '../../../../model/stage_data.dart';
 import '../../../../theme/theme.dart';
+import '../../../../viewmodel/user_service.dart';
 import '../../../home/stage_provider.dart';
 import '../widget/answer_section.dart';
 import '../widget/CustomAlertDialog.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'CS_main.dart';
 import '../choose_activities.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// ConsumerStatefulWidget으로 변경하여 Riverpod의 ref 사용
 class CSLearning extends ConsumerStatefulWidget {
@@ -28,6 +30,10 @@ class _CSLearningState extends ConsumerState<CSLearning> {
   final TextEditingController _controller = TextEditingController();
   bool _isButtonEnabled = false;
   List<String> _keywords = [];
+
+  // GlobalKey 추가: CustomAppBar_2depth_8의 state에 접근할 수 있음.
+  final GlobalKey<CustomAppBar_2depth_8State> _appBarKey = GlobalKey<CustomAppBar_2depth_8State>();
+
 
   @override
   void initState() {
@@ -99,7 +105,7 @@ class _CSLearningState extends ConsumerState<CSLearning> {
     // 아직 데이터가 없으면 로딩 인디케이터 표시
     if (currentStage == null) {
       return Scaffold(
-        appBar: CustomAppBar_2depth_8(title: "내용 요약 게임"),
+        appBar: CustomAppBar_2depth_8(title: "내용 요약 게임", key: _appBarKey,),
         body: Center(child: CircularProgressIndicator()),
       );
     }
@@ -112,7 +118,7 @@ class _CSLearningState extends ConsumerState<CSLearning> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: CustomAppBar_2depth_8(title: "내용 요약 게임"),
+      appBar: CustomAppBar_2depth_8(title: "내용 요약 게임", key: _appBarKey,),
       floatingActionButton: Container(
         margin: const EdgeInsets.only(bottom: 70),
         child: FloatingActionButton(
@@ -201,7 +207,15 @@ class _CSLearningState extends ConsumerState<CSLearning> {
                 child: ElevatedButton(
                   onPressed: _isButtonEnabled
                       ? () async {
+                    // 앱바에서 측정한 타이머 값을 가져옴
+                    final elapsedSeconds = _appBarKey.currentState?.elapsedSeconds ?? 0;
+
+                    // 사용자 학습 시간 업데이트
                     final userId = FirebaseAuth.instance.currentUser?.uid;
+                    if (userId != null) {
+                      await UserService().updateLearningTime(elapsedSeconds);
+                    }
+
                     if (userId != null) {
                       // Feature2(내용 요약 게임)는 feature 번호 2에 해당하므로,
                       // _updateFeatureCompletion 함수를 호출하여 Firestore에 업데이트합니다.
