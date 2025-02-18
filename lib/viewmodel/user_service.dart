@@ -84,7 +84,6 @@ class UserService {
         // 2. 서브컬렉션 삭제 (attendance, progress)
         await deleteSubCollection(userRef.collection('attendance'));
         await deleteSubCollection(userRef.collection('progress'));
-        await deleteSubCollection(userRef.collection('memos'));
 
         // 3. 닉네임 컬렉션 삭제
         if (nickname != null && nickname.toString().isNotEmpty) {
@@ -201,4 +200,21 @@ final userRealNameProvider = FutureProvider<String?>((ref) async {
     return userSnapshot.data()!['name'] as String;
   }
   return null; // 이름 정보가 없을 경우
+});
+
+
+Future<void> updateUserCourse(String userId, String newCourse) async {
+  final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
+  await userRef.update({'currentCourse': newCourse});
+}
+
+final userCourseProvider = FutureProvider<String>((ref) async {
+  final userId = FirebaseAuth.instance.currentUser?.uid;
+  if (userId == null) return '미설정';
+  final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+  if (userDoc.exists) {
+    final data = userDoc.data();
+    return data?['currentCourse'] as String? ?? '미설정';
+  }
+  return '미설정';
 });
