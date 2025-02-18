@@ -216,6 +216,22 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
       } else {
         print("⚠️ 다음 스테이지 ID를 계산할 수 없습니다. (현재 stageId: ${stage.stageId})");
       }
+      // 현재 스테이지가 마지막 스테이지인지 확인 (각 섹션 4개 스테이지 기준)
+      final currentStageNumber = int.tryParse(stage.stageId.split('_')[1]);
+      if (currentStageNumber != null && currentStageNumber % 4 == 0) {
+        String newCourse;
+        if (currentStageNumber == 4) {
+          newCourse = '코스2';
+        } else if (currentStageNumber == 8) {
+          newCourse = '코스3';
+        } else if (currentStageNumber >= 12) {
+          newCourse = '최종 완료';
+        } else {
+          newCourse = '코스1'; // 기본값, 필요시 조정
+        }
+        await updateUserCourse(userId, newCourse);
+        print(">> 사용자 currentCourse 업데이트: $newCourse");
+      }
     } else {
       print(">> 현재 스테이지가 아직 완료되지 않았습니다. (status: ${updatedStage.status})");
     }

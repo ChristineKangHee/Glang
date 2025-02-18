@@ -181,6 +181,7 @@ class UserStatsSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final xpAsyncValue = ref.watch(userXPProvider); // Firestore에서 XP 가져오기
+    final courseAsyncValue = ref.watch(userCourseProvider); // Firestore에서 currentCourse 가져오기
 
     return SizedBox(
       height: 50,
@@ -195,7 +196,13 @@ class UserStatsSection extends ConsumerWidget {
             ),
           ),
           VerticalDivider(color: Theme.of(context).extension<CustomColors>()?.neutral80),
-          Expanded(child: StatBox(value: '중급', label: '코스')),
+          Expanded(
+            child: courseAsyncValue.when(
+              data: (course) => StatBox(value: course, label: '코스'),
+              loading: () => const StatBox(value: '...', label: '코스'),
+              error: (_, __) => const StatBox(value: '오류', label: '코스'),
+            ),
+          ),
         ],
       ),
     );
