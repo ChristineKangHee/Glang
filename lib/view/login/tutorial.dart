@@ -4,6 +4,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../theme/theme.dart';
 import '../components/custom_button.dart';
+import '../widgets/DoubleBackToExitWrapper.dart';
 
 class TutorialScreen extends StatefulWidget {
   @override
@@ -17,36 +18,38 @@ class _TutorialScreenState extends State<TutorialScreen> {
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: TutorialPageView(
-              controller: _controller,
-              onPageChanged: (page) {
-                setState(() {
-                  _currentPage = page;
-                });
-              },
-            ),
-          ),
-          // SmoothPageIndicator는 마지막 페이지에서만 숨김
-          if (_currentPage < 3)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: SmoothPageIndicator(
+    return DoubleBackToExitWrapper(
+      child: Scaffold(
+        body: Column(
+          children: [
+            Expanded(
+              child: TutorialPageView(
                 controller: _controller,
-                count: 4,
-                effect: WormEffect(
-                  dotWidth: 10,
-                  dotHeight: 10,
-                  spacing: 10,
-                  dotColor: customColors.primary20!,
-                  activeDotColor: customColors.primary!,
-                ),
+                onPageChanged: (page) {
+                  setState(() {
+                    _currentPage = page;
+                  });
+                },
               ),
             ),
-        ],
+            // SmoothPageIndicator는 마지막 페이지에서만 숨김
+            if (_currentPage < 3)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: SmoothPageIndicator(
+                  controller: _controller,
+                  count: 4,
+                  effect: WormEffect(
+                    dotWidth: 10,
+                    dotHeight: 10,
+                    spacing: 10,
+                    dotColor: customColors.primary20!,
+                    activeDotColor: customColors.primary!,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

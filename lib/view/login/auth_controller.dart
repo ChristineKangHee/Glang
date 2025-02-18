@@ -154,8 +154,11 @@ class AuthController extends StateNotifier<User?> {
         await markTodayAttendanceAsChecked(user.uid);
         onNicknameRequired();
       } else {
-        await markTodayAttendanceAsChecked(user.uid);
         final data = docSnapshot.data()!;
+        if (!data.containsKey('currentCourse')) {
+          await userRef.update({'currentCourse': '코스1'});
+        }
+        await markTodayAttendanceAsChecked(user.uid);
         if (data['nicknameSet'] == true) {
           onHome();
         } else {

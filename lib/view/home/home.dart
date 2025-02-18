@@ -25,6 +25,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../viewmodel/user_service.dart';
+import '../widgets/DoubleBackToExitWrapper.dart';
 import 'attendance/attendance_model.dart';
 import 'attendance/attendance_provider.dart';
 
@@ -46,122 +47,124 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
       ref.read(userNameProvider.notifier).fetchUserName();
     }
 
-    return Scaffold(
-      backgroundColor: customColors.neutral90,
-      appBar: CustomAppBar_Logo(),
-      body: SafeArea(
-        child: userId == null
-          ? Center(child: Text("로그인이 필요합니다"),)
-        :  sectionAsync.when(
-          data: (sections){
-            StageData? findFirstInProgress(List<SectionData> sections) {
-              try {
-                // 조건을 만족하는 첫 번째 StageData 반환
-                return sections
-                    .expand((s) => s.stages)
-                    .firstWhere((stage) => stage.status == StageStatus.inProgress);
-              } catch (e) {
-                // StateError가 발생하면, 진행 중인 스테이지가 없다는 뜻이므로 null 반환
-                return null;
+    return DoubleBackToExitWrapper(
+      child: Scaffold(
+        backgroundColor: customColors.neutral90,
+        appBar: CustomAppBar_Logo(),
+        body: SafeArea(
+          child: userId == null
+            ? Center(child: Text("로그인이 필요합니다"),)
+          :  sectionAsync.when(
+            data: (sections){
+              StageData? findFirstInProgress(List<SectionData> sections) {
+                try {
+                  // 조건을 만족하는 첫 번째 StageData 반환
+                  return sections
+                      .expand((s) => s.stages)
+                      .firstWhere((stage) => stage.status == StageStatus.inProgress);
+                } catch (e) {
+                  // StateError가 발생하면, 진행 중인 스테이지가 없다는 뜻이므로 null 반환
+                  return null;
+                }
               }
-            }
-            final ongoingStage = findFirstInProgress(sections);
-            if (ongoingStage != null) {
-              // 진행 중인 스테이지 표시
-            } else {
-              // 없음
-            }
+              final ongoingStage = findFirstInProgress(sections);
+              if (ongoingStage != null) {
+                // 진행 중인 스테이지 표시
+              } else {
+                // 없음
+              }
 
-            return SingleChildScrollView(
-                child: Container(
-                  padding: EdgeInsets.all(16.0.r),
-                  decoration: BoxDecoration(gradient: AppGradients.whiteToGrey(customColors)),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      //TODO: 인사말 위젯
-                      GreetingSection(name: userName),
-                      SizedBox(height: 24.h,),
+              return SingleChildScrollView(
+                  child: Container(
+                    padding: EdgeInsets.all(16.0.r),
+                    decoration: BoxDecoration(gradient: AppGradients.whiteToGrey(customColors)),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        //TODO: 인사말 위젯
+                        GreetingSection(name: userName),
+                        SizedBox(height: 24.h,),
 
-                      //TODO: 진행 중인 학습 위젯
-                      // if (ongoingStage != null) ProgressSection(data: ongoingStage), // 🔹 `ProgressSection`에서 `StageData` 사용
-                      Consumer(
-                        builder: (context, ref, child) {
-                          final stagesStream = ref.watch(stagesStreamProvider);
-                          return stagesStream.when(
-                            data: (stages) {
-                              // 진행 중인 스테이지를 찾습니다.
-                              final ongoingStage = stages.firstWhereOrNull(
-                                    (stage) => stage.status == StageStatus.inProgress,
-                              );
-                              if (ongoingStage != null) {
-                                return ProgressSection(data: ongoingStage);
-                              }
-                              return Container(); // 진행 중인 스테이지가 없으면 빈 컨테이너를 반환
-                            },
-                            loading: () =>
-                                Center(child: CircularProgressIndicator()),
-                            error: (error, stack) =>
-                                Center(child: Text("오류 발생: $error")),
-                          );
-                        },
-                      ),
-                      SizedBox(height: 24.h,),
+                        //TODO: 진행 중인 학습 위젯
+                        // if (ongoingStage != null) ProgressSection(data: ongoingStage), // 🔹 `ProgressSection`에서 `StageData` 사용
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final stagesStream = ref.watch(stagesStreamProvider);
+                            return stagesStream.when(
+                              data: (stages) {
+                                // 진행 중인 스테이지를 찾습니다.
+                                final ongoingStage = stages.firstWhereOrNull(
+                                      (stage) => stage.status == StageStatus.inProgress,
+                                );
+                                if (ongoingStage != null) {
+                                  return ProgressSection(data: ongoingStage);
+                                }
+                                return Container(); // 진행 중인 스테이지가 없으면 빈 컨테이너를 반환
+                              },
+                              loading: () =>
+                                  Center(child: CircularProgressIndicator()),
+                              error: (error, stack) =>
+                                  Center(child: Text("오류 발생: $error")),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 24.h,),
 
-                      // HotPostSection(customColors: customColors),
-                      //TODO: 출석체크 위젯
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("출석 체크", style: body_small_semi(context),),
-                          SizedBox(height: 12,),
-                          Container(
-                              padding: EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: customColors.neutral100,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: AttendanceWidget()
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 24.h,),
+                        // HotPostSection(customColors: customColors),
+                        //TODO: 출석체크 위젯
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("출석 체크", style: body_small_semi(context),),
+                            SizedBox(height: 12,),
+                            Container(
+                                padding: EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: customColors.neutral100,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: AttendanceWidget()
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 24.h,),
 
-                      //TODO: 이번달 학습 기록 위젯
-                      InkWell(
-                        // onTap: () => Navigator.pushNamed(context, "/mypage/info/statistics"),
-                        child: LearningSection(customColors: customColors),
-                      ),
+                        //TODO: 이번달 학습 기록 위젯
+                        InkWell(
+                          // onTap: () => Navigator.pushNamed(context, "/mypage/info/statistics"),
+                          child: LearningSection(customColors: customColors),
+                        ),
 
-                      // ElevatedButton(
-                      //   onPressed: showNotification,
-                      //   child: Text('Show Notification'),
-                      // ),
-                      //
-                      // ElevatedButton(
-                      //   onPressed: () => Navigator.pushNamed(context, "/brmain"),
-                      //   child: Text('읽기 전 코스 이동'),
-                      // ),
-                      // ElevatedButton(
-                      //   onPressed: () => Navigator.pushNamed(context, "/rdmain"),
-                      //   child: Text('읽기 중 코스 이동'),
-                      // ),
-                      // ElevatedButton(
-                      //   onPressed: () => Navigator.pushNamed(context, "/armain"),
-                      //   child: Text('읽기 후 코스 이동'),
-                      // ),
+                        // ElevatedButton(
+                        //   onPressed: showNotification,
+                        //   child: Text('Show Notification'),
+                        // ),
+                        //
+                        // ElevatedButton(
+                        //   onPressed: () => Navigator.pushNamed(context, "/brmain"),
+                        //   child: Text('읽기 전 코스 이동'),
+                        // ),
+                        // ElevatedButton(
+                        //   onPressed: () => Navigator.pushNamed(context, "/rdmain"),
+                        //   child: Text('읽기 중 코스 이동'),
+                        // ),
+                        // ElevatedButton(
+                        //   onPressed: () => Navigator.pushNamed(context, "/armain"),
+                        //   child: Text('읽기 후 코스 이동'),
+                        // ),
 
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-          },
-          loading: () => Center(child: CircularProgressIndicator()), // ✅ 로딩 중
-          error: (error, stack) => Center(child: Text("데이터 로딩 실패: $error")), // ✅ 에러 처리
+                );
+            },
+            loading: () => Center(child: CircularProgressIndicator()), // ✅ 로딩 중
+            error: (error, stack) => Center(child: Text("데이터 로딩 실패: $error")), // ✅ 에러 처리
+          ),
         ),
+        bottomNavigationBar: const CustomNavigationBar(), // 네비게이션 바
       ),
-      bottomNavigationBar: const CustomNavigationBar(), // 네비게이션 바
     );
   }
 }

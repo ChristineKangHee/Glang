@@ -14,6 +14,8 @@ import '../../../../theme/theme.dart';
 import '../components/custom_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../widgets/DoubleBackToExitWrapper.dart';
+
 //TODO: Error Message 출력(닉네임 겹칠)시 버튼 색 바뀌게하기
 
 class NicknameInput extends ConsumerStatefulWidget {
@@ -86,64 +88,66 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
       }
     }
 
-    return Scaffold(
-      appBar: CustomAppBar_Logo(),
-      resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '별명을 입력해주세요',
-                        style: heading_medium(context),
-                      ),
-                      const SizedBox(height: 24),
-                      NicknameTextField(
-                        controller: _controller,
-                        existingNicknames: [], // Firestore에서 가져오기 때문에 불필요
-                        onChanged: (text, error) {
-                          setState(() {
-                            errorMessage = null; // 입력 중 에러 메시지 초기화
-                          });
-                        },
-                      ),
-                      if (errorMessage != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Text(
-                            errorMessage!,
-                            style: body_xsmall(context).copyWith(color: customColors.error),
-                          ),
+    return DoubleBackToExitWrapper(
+      child: Scaffold(
+        appBar: CustomAppBar_Logo(),
+        resizeToAvoidBottomInset: false,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '별명을 입력해주세요',
+                          style: heading_medium(context),
                         ),
-                    ],
+                        const SizedBox(height: 24),
+                        NicknameTextField(
+                          controller: _controller,
+                          existingNicknames: [], // Firestore에서 가져오기 때문에 불필요
+                          onChanged: (text, error) {
+                            setState(() {
+                              errorMessage = null; // 입력 중 에러 메시지 초기화
+                            });
+                          },
+                        ),
+                        if (errorMessage != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(
+                              errorMessage!,
+                              style: body_xsmall(context).copyWith(color: customColors.error),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              padding: const EdgeInsets.all(20),
-              child: isInputValid && !isLoading
-                  ? ButtonPrimary_noPadding(
-                function: _saveNickname,
-                title: '완료',
-              )
-                  : ButtonPrimary20_noPadding(
-                function: () {
-                  setState(() {
-                    errorMessage = '별명을 올바르게 입력해주세요.';
-                  });
-                },
-                title: '완료',
+              Container(
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.all(20),
+                child: isInputValid && !isLoading
+                    ? ButtonPrimary_noPadding(
+                  function: _saveNickname,
+                  title: '완료',
+                )
+                    : ButtonPrimary20_noPadding(
+                  function: () {
+                    setState(() {
+                      errorMessage = '별명을 올바르게 입력해주세요.';
+                    });
+                  },
+                  title: '완료',
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
