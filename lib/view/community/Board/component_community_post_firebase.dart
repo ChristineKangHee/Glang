@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:readventure/view/community/Board/firebase/post_editPage.dart';
-import '../../../../theme/font.dart';
-import '../../../../theme/theme.dart';
-import '../../../components/alarm_dialog.dart';
-import '../CM_2depth_board.dart';
-import '../Component/postHeader.dart';
-import '../Component/postaction_bottomsheet.dart';
-import '../Component/postfooter.dart';
-import '../firebase/CM_2depth_boardMain_firebase.dart';
-import '../community_data.dart';
-import '../firebase/posting_detail_page.dart';
+import '../../../theme/font.dart';
+import '../../../theme/theme.dart';
+import 'Component/postHeader.dart';
+import 'Component/postaction_bottomsheet.dart';
+import 'Component/postfooter.dart';
+import 'posting_detail_page.dart';
 import 'community_data_firebase.dart';
-import 'community_service.dart'; // 삭제/수정 기능 사용을 위한 서비스
-import 'package:share_plus/share_plus.dart';
 
 class PostItemContainer extends StatelessWidget {
   final Post post;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
-import '../firebase/community_data_firebase.dart';
-import '../firebase/component_community_post_firebase.dart';
+import '../community_data_firebase.dart';
+import '../component_community_post_firebase.dart';
 
 class PostHeader extends StatelessWidget {
   final Post post;

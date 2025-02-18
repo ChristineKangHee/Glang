@@ -87,6 +87,7 @@ Future<Map<String, dynamic>> fetchWordDetails(String word, List<String> textSegm
 }
 
 /// 팝업 상단 헤더 위젯 (타이틀 및 닫기 버튼)
+/// 팝업 상단 헤더 위젯 (타이틀 및 닫기 버튼, 북마크 아이콘 추가)
 Widget _buildPopupHeader(BuildContext context, dynamic customColors, {required VoidCallback onClose}) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -95,13 +96,22 @@ Widget _buildPopupHeader(BuildContext context, dynamic customColors, {required V
         '해석',
         style: body_small_semi(context).copyWith(color: customColors.neutral30),
       ),
-      IconButton(
-        onPressed: onClose,
-        icon: Icon(Icons.close, color: customColors.neutral30),
+      Row(
+        children: [
+          IconButton(
+            onPressed: (){},
+            icon: Icon(Icons.bookmark_border, color: customColors.neutral30),
+          ),
+          IconButton(
+            onPressed: onClose,
+            icon: Icon(Icons.close, color: customColors.neutral30),
+          ),
+        ],
       ),
     ],
   );
 }
+
 
 /// 선택된 단어 표시 위젯
 Widget _buildSelectedWord(BuildContext context, String selectedText, dynamic customColors) {

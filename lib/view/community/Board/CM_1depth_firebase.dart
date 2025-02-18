@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../theme/font.dart';
-import '../../../../theme/theme.dart';
-import '../../../../viewmodel/custom_colors_provider.dart';
-import '../../../components/custom_app_bar.dart';
-import '../../../components/custom_navigation_bar.dart';
-import '../CM_2depth_board.dart';
-import '../CM_2depth_boardMain.dart';
-import '../Component/postHeader.dart';
-import '../Component/postfooter.dart';
+import 'package:readventure/view/community/Board/posting_detail_page.dart';
+import '../../../theme/font.dart';
+import '../../../theme/theme.dart';
+import '../../../viewmodel/custom_colors_provider.dart';
+import '../../components/custom_app_bar.dart';
+import '../../components/custom_navigation_bar.dart';
+import 'Component/postHeader.dart';
+import 'Component/postfooter.dart';
 import 'CM_2depth_boardMain_firebase.dart';
-import '../community_searchpage.dart';
 import 'community_data_firebase.dart';
 import 'community_searchpage_firebase.dart';
-import 'component_community_post_firebase.dart';
-import 'posting_detail_page.dart';
-import '../../Ranking/CM_2depth_ranking.dart';
-import '../../Ranking/ranking_component.dart';
-import '../community_data.dart';
+import '../Ranking/CM_2depth_ranking.dart';
+import '../Ranking/ranking_component.dart';
 import 'community_service.dart';
 
 class CommunityMainPage extends ConsumerWidget {

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';
-import '../../../../viewmodel/custom_colors_provider.dart';
-import '../../../components/alarm_dialog.dart';
-import '../../../components/custom_app_bar.dart';
-import '../Component/taginput_component.dart';
-import '../Component/writingform_component.dart';
+import '../../../viewmodel/custom_colors_provider.dart';
+import '../../components/alarm_dialog.dart';
+import '../../components/custom_app_bar.dart';
+import 'Component/taginput_component.dart';
+import 'Component/writingform_component.dart';
 import 'community_service.dart';
 
 class FreeWritingPage extends ConsumerStatefulWidget {

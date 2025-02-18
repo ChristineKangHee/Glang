@@ -5,12 +5,12 @@ import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';
 import 'package:readventure/view/components/custom_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../viewmodel/custom_colors_provider.dart';
-import '../../../components/alarm_dialog.dart';
-import '../../../components/custom_app_bar.dart';
-import '../Component/keyword_selection.dart';
-import '../Component/taginput_component.dart';
-import '../Component/writingform_component.dart';
+import '../../../viewmodel/custom_colors_provider.dart';
+import '../../components/alarm_dialog.dart';
+import '../../components/custom_app_bar.dart';
+import 'Component/keyword_selection.dart';
+import 'Component/taginput_component.dart';
+import 'Component/writingform_component.dart';
 import 'community_service.dart';
 
 class EssayPostPage extends ConsumerStatefulWidget {

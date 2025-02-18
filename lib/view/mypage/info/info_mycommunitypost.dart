@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../community/Board/firebase/community_data_firebase.dart';
-import '../../community/Board/firebase/community_service.dart';
-import '../../community/Board/firebase/component_community_post_firebase.dart';
+import '../../community/Board/community_data_firebase.dart';
+import '../../community/Board/community_service.dart';
+import '../../community/Board/component_community_post_firebase.dart';
 import '../../components/custom_app_bar.dart';
 import '../../components/my_divider.dart';
 import '../../../../theme/font.dart';

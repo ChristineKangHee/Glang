@@ -8,7 +8,7 @@ import '../../components/alarm_dialog.dart';
 import '../../components/custom_app_bar.dart';
 import 'Component/taginput_component.dart';
 import 'Component/writingform_component.dart';
-import 'firebase/community_service.dart';
+import 'community_service.dart';
 import 'missionBottomsheet.dart';
 
 class MissionPostPage extends ConsumerStatefulWidget {

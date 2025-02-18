@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
-import '../firebase/community_data_firebase.dart';
+import '../community_data_firebase.dart';
 
 class PostFooter extends StatelessWidget {
   final Post post;
