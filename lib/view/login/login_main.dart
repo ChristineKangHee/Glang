@@ -10,6 +10,7 @@ import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';
 import '../../viewmodel/custom_colors_provider.dart';
 import '../home/attendance/attendance_provider.dart';
+import '../widgets/DoubleBackToExitWrapper.dart';
 import 'auth_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -21,90 +22,92 @@ class LoginPage extends ConsumerWidget {
     final authController = ref.watch(authControllerProvider.notifier);
     final customColors = ref.watch(customColorsProvider); // CustomColors 가져오기
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          // 1. 가장 아래: 그라데이션 배경
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  customColors.neutral100 ?? Colors.blue,  // 시작 색상
-                  customColors.primary10 ?? Colors.green,    // 끝 색상
-                ],
-                begin: Alignment.centerLeft,
-                end: Alignment.bottomRight,
+    return DoubleBackToExitWrapper(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            // 1. 가장 아래: 그라데이션 배경
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    customColors.neutral100 ?? Colors.blue,  // 시작 색상
+                    customColors.primary10 ?? Colors.green,    // 끝 색상
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.bottomRight,
+                ),
               ),
             ),
-          ),
-          // 2. 그 위에: login_background.svg (화면 너비 전체)
-          Positioned(
-            top: 0,  // 원하는 위치로 조정 가능 (예: 화면 상단)
-            left: 0,
-            right: 0,
-            child: SvgPicture.asset(
-              "assets/images/login_background.svg",
-              width: MediaQuery.of(context).size.width,
-              fit: BoxFit.fitWidth, // 화면 너비에 맞게 조정
+            // 2. 그 위에: login_background.svg (화면 너비 전체)
+            Positioned(
+              top: 0,  // 원하는 위치로 조정 가능 (예: 화면 상단)
+              left: 0,
+              right: 0,
+              child: SvgPicture.asset(
+                "assets/images/login_background.svg",
+                width: MediaQuery.of(context).size.width,
+                fit: BoxFit.fitWidth, // 화면 너비에 맞게 조정
+              ),
             ),
-          ),
-          // 3. 그 위에: 로그인 UI (로고, 로그인 버튼 등)
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    authController.signInWithGoogle(
-                      context: context,
-                      onNicknameRequired: () {
-                        Navigator.pushReplacementNamed(context, '/nickname');
-                      },
-                      onHome: () {
-                        Navigator.pushReplacementNamed(context, '/');
-                        ref.refresh(attendanceProvider);
-                      },
-                    );
-                  },
-                  child: GoogleLoginButton(customColors: customColors),
-                ),
-                SizedBox(height: 16),
-                GestureDetector(
-                  onTap: () {
-                    authController.signInWithApple(
-                      context: context,
-                      onNicknameRequired: () {
-                        Navigator.pushReplacementNamed(context, '/nickname');
-                      },
-                      onHome: () {
-                        Navigator.pushReplacementNamed(context, '/');
-                        ref.refresh(attendanceProvider);
-                      },
-                    );
-                  },
-                  child: AppleLoginButton(customColors: customColors),
-                ),
-                SizedBox(height: 16),
-                GestureDetector(
-                  onTap: () {
-                    authController.signInWithKakao(
-                      context: context,
-                      onNicknameRequired: () {
-                        Navigator.pushReplacementNamed(context, '/nickname');
-                      },
-                      onHome: () {
-                        Navigator.pushReplacementNamed(context, '/');
-                        ref.refresh(attendanceProvider);
-                      },
-                    );
-                  },
-                  child: KakaoLoginButton(customColors: customColors),
-                ),
-                SizedBox(height: 40),
-              ],
+            // 3. 그 위에: 로그인 UI (로고, 로그인 버튼 등)
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      authController.signInWithGoogle(
+                        context: context,
+                        onNicknameRequired: () {
+                          Navigator.pushReplacementNamed(context, '/nickname');
+                        },
+                        onHome: () {
+                          Navigator.pushReplacementNamed(context, '/');
+                          ref.refresh(attendanceProvider);
+                        },
+                      );
+                    },
+                    child: GoogleLoginButton(customColors: customColors),
+                  ),
+                  SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () {
+                      authController.signInWithApple(
+                        context: context,
+                        onNicknameRequired: () {
+                          Navigator.pushReplacementNamed(context, '/nickname');
+                        },
+                        onHome: () {
+                          Navigator.pushReplacementNamed(context, '/');
+                          ref.refresh(attendanceProvider);
+                        },
+                      );
+                    },
+                    child: AppleLoginButton(customColors: customColors),
+                  ),
+                  SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () {
+                      authController.signInWithKakao(
+                        context: context,
+                        onNicknameRequired: () {
+                          Navigator.pushReplacementNamed(context, '/nickname');
+                        },
+                        onHome: () {
+                          Navigator.pushReplacementNamed(context, '/');
+                          ref.refresh(attendanceProvider);
+                        },
+                      );
+                    },
+                    child: KakaoLoginButton(customColors: customColors),
+                  ),
+                  SizedBox(height: 40),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

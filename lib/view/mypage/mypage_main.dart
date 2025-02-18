@@ -13,6 +13,7 @@ import '../../theme/theme.dart';
 import '../../viewmodel/custom_colors_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../viewmodel/user_service.dart';
+import '../widgets/DoubleBackToExitWrapper.dart';
 
 /// 마이페이지 메인 화면 위젯
 /// - 상단 앱바, 하단 네비게이션 바, 컨텐츠
@@ -25,24 +26,26 @@ class MyPageMain extends ConsumerWidget {
     final customColors = ref.watch(customColorsProvider);
     final userName = ref.watch(userNameProvider) ?? 'null'; // 사용자 이름 상태 구독
 
-    return Scaffold(
-      appBar: CustomAppBar_MyPage(),
-      body: SafeArea(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                customColors.neutral100 ?? Colors.white, // 위쪽 흰색
-                customColors.neutral90 ?? Colors.grey[300]!, // 아래쪽 회색
-              ],
+    return DoubleBackToExitWrapper(
+      child: Scaffold(
+        appBar: CustomAppBar_MyPage(),
+        body: SafeArea(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  customColors.neutral100 ?? Colors.white, // 위쪽 흰색
+                  customColors.neutral90 ?? Colors.grey[300]!, // 아래쪽 회색
+                ],
+              ),
             ),
+            child: MyPageContent(name: userName), // 실제 화면 컨텐츠에 이름 전달
           ),
-          child: MyPageContent(name: userName), // 실제 화면 컨텐츠에 이름 전달
         ),
+        bottomNavigationBar: CustomNavigationBar(),
       ),
-      bottomNavigationBar: CustomNavigationBar(),
     );
   }
 }

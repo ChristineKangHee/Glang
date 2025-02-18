@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../model/section_data.dart';
 import '../components/custom_app_bar.dart';
 import '../components/custom_navigation_bar.dart';
+import '../widgets/DoubleBackToExitWrapper.dart';
 import 'section.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
@@ -92,62 +93,64 @@ class _CourseMainState extends State<CourseMain> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar_Course(),
-      body: SafeArea(
-        child: FutureBuilder<List<SectionData>>(
-          future: sectionsFuture,
-          builder: (context, snapshot) {
-            // 로딩 중
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            // 에러 발생
-            if (snapshot.hasError) {
-              return Center(child: Text("데이터 로딩 실패: ${snapshot.error}"));
-            }
+    return DoubleBackToExitWrapper(
+      child: Scaffold(
+        appBar: CustomAppBar_Course(),
+        body: SafeArea(
+          child: FutureBuilder<List<SectionData>>(
+            future: sectionsFuture,
+            builder: (context, snapshot) {
+              // 로딩 중
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              // 에러 발생
+              if (snapshot.hasError) {
+                return Center(child: Text("데이터 로딩 실패: ${snapshot.error}"));
+              }
 
-            // 정상 로딩 완료
-            final sections = snapshot.data!;
-            if (sections.isEmpty) {
-              // 섹션이 하나도 없을 경우
-              return const Center(child: Text("표시할 코스가 없습니다."));
-            }
+              // 정상 로딩 완료
+              final sections = snapshot.data!;
+              if (sections.isEmpty) {
+                // 섹션이 하나도 없을 경우
+                return const Center(child: Text("표시할 코스가 없습니다."));
+              }
 
-            // 섹션 개수와 _sectionKeys 길이가 다르면 새로 생성
-            if (_sectionKeys.length != sections.length) {
-              _sectionKeys = List.generate(sections.length, (_) => GlobalKey());
-            }
+              // 섹션 개수와 _sectionKeys 길이가 다르면 새로 생성
+              if (_sectionKeys.length != sections.length) {
+                _sectionKeys = List.generate(sections.length, (_) => GlobalKey());
+              }
 
-            // Stack을 써서 하단에 현재 섹션 정보를 겹쳐서 표시
-            return Stack(
-              children: [
-                // 섹션 목록 표시
-                ListView.separated(
-                  controller: scrollCtrl,
-                  itemCount: sections.length + 1,
-                  separatorBuilder: (_, i) => const SizedBox(height: 0.0),
-                  itemBuilder: (_, i) {
-                    // 첫 번째 아이템은 빈 박스로 대체
-                    if (i == 0) {
-                      return SizedBox(height: heightFirstBox);
-                    }
-                    // 실제 섹션은 i-1 인덱스를 사용하며, 각 섹션에 GlobalKey 부여
-                    return Section(
-                      key: _sectionKeys[i - 1],
-                      data: sections[i - 1],
-                    );
-                  },
-                ),
-                // 현재 섹션 표시 위젯
-                if (sections.isNotEmpty)
-                  CurrentSection(data: sections[iCurrentSection]),
-              ],
-            );
-          },
+              // Stack을 써서 하단에 현재 섹션 정보를 겹쳐서 표시
+              return Stack(
+                children: [
+                  // 섹션 목록 표시
+                  ListView.separated(
+                    controller: scrollCtrl,
+                    itemCount: sections.length + 1,
+                    separatorBuilder: (_, i) => const SizedBox(height: 0.0),
+                    itemBuilder: (_, i) {
+                      // 첫 번째 아이템은 빈 박스로 대체
+                      if (i == 0) {
+                        return SizedBox(height: heightFirstBox);
+                      }
+                      // 실제 섹션은 i-1 인덱스를 사용하며, 각 섹션에 GlobalKey 부여
+                      return Section(
+                        key: _sectionKeys[i - 1],
+                        data: sections[i - 1],
+                      );
+                    },
+                  ),
+                  // 현재 섹션 표시 위젯
+                  if (sections.isNotEmpty)
+                    CurrentSection(data: sections[iCurrentSection]),
+                ],
+              );
+            },
+          ),
         ),
+        bottomNavigationBar: const CustomNavigationBar(),
       ),
-      bottomNavigationBar: const CustomNavigationBar(),
     );
   }
 }

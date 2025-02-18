@@ -6,6 +6,7 @@ import '../../../theme/theme.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/custom_app_bar.dart';
 import '../../components/custom_navigation_bar.dart';
+import '../../widgets/DoubleBackToExitWrapper.dart';
 import 'Component/postHeader.dart';
 import 'Component/postfooter.dart';
 import 'CM_2depth_boardMain_firebase.dart';
@@ -21,44 +22,46 @@ class CommunityMainPage extends ConsumerWidget {
     final customColors = ref.watch(customColorsProvider);
     final communityService = CommunityService();
 
-    return Scaffold(
-      backgroundColor: customColors.neutral90,
-      appBar: CustomAppBar_Community(
-        onSearchPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SearchPage()),
-          );
-        },
+    return DoubleBackToExitWrapper(
+      child: Scaffold(
+        backgroundColor: customColors.neutral90,
+        appBar: CustomAppBar_Community(
+          onSearchPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SearchPage()),
+            );
+          },
+        ),
+        body: StreamBuilder<List<Post>>(
+          stream: communityService.getPosts(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text("게시글이 없습니다."));
+            }
+
+            final posts = snapshot.data!;
+
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: _buildRankingPreview(context, customColors),
+                  ),
+                  const SizedBox(height: 24),
+                  CommunityPreview(posts, context, customColors),
+                ],
+              ),
+            );
+          },
+        ),
+        bottomNavigationBar: const CustomNavigationBar(),
       ),
-      body: StreamBuilder<List<Post>>(
-        stream: communityService.getPosts(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("게시글이 없습니다."));
-          }
-
-          final posts = snapshot.data!;
-
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _buildRankingPreview(context, customColors),
-                ),
-                const SizedBox(height: 24),
-                CommunityPreview(posts, context, customColors),
-              ],
-            ),
-          );
-        },
-      ),
-      bottomNavigationBar: const CustomNavigationBar(),
     );
   }
 
