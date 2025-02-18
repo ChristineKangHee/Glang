@@ -1,31 +1,25 @@
-/// File: toolbar_component.dart
-/// Purpose: 읽기 중 드래그 후 나타나는 툴바 및 단어/문장 해석 팝업 처리
-/// Author: 강희
-/// Created: 2024-1-19
-/// Last Modified: 2024-1-30 (수정: ChatGPT API 연동 및 DebateGPTService 참고)
-/// 수정: API 응답 파싱 실패나 호출 실패 시 예외 대신 기본값("정보 없음")을 반환하도록 변경
-
-import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
+import 'package:readventure/model/reading_data.dart';
+import 'package:readventure/theme/font.dart';
+import 'package:readventure/theme/theme.dart';
 import 'package:readventure/view/feature/reading/GA_02/sentence_interpretation.dart';
 import 'package:readventure/view/feature/reading/GA_02/word_interpretation.dart';
-
-import '../../../../theme/theme.dart';
-import 'reading_chatbot.dart';
-import '../../../../theme/font.dart';
+import '../../../../viewmodel/memo_notifier.dart';
 import '../../after_read/widget/answer_section.dart';
-// ReadingData의 경로에 맞게 import 수정
-import 'package:readventure/model/reading_data.dart';
+import 'reading_chatbot.dart';
 
 class Toolbar extends StatefulWidget {
   final double toolbarWidth;
   final double toolbarHeight;
   final BuildContext context;
   final TextSelectionDelegate delegate;
-  final customColors;
-  final ReadingData readingData; // 추가: 현재 읽기 데이터를 전달
+  final dynamic customColors;
+  final String stageId;           // 현재 스테이지의 ID
+  final String subdetailTitle;    // StageData의 subdetailTitle (메모 목록에 보여질 제목)
+  final ReadingData readingData;  // 읽기 화면 관련 데이터 (예: textSegments 등)
 
   const Toolbar({
     Key? key,
@@ -34,6 +28,8 @@ class Toolbar extends StatefulWidget {
     required this.context,
     required this.delegate,
     required this.customColors,
+    required this.stageId,
+    required this.subdetailTitle,
     required this.readingData,
   }) : super(key: key);
 
@@ -92,19 +88,6 @@ class _ToolbarState extends State<Toolbar> {
     );
   }
 
-  // void _highlightText(BuildContext context, TextSelectionDelegate delegate) {
-  //   final String selectedText =
-  //   delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
-  //   if (selectedText.isNotEmpty) {
-  //     final TextStyle highlightedStyle = TextStyle(
-  //       color: Colors.yellow,
-  //       backgroundColor: Colors.yellow.withOpacity(0.3),
-  //       decoration: TextDecoration.underline,
-  //     );
-  //     // 하이라이트 적용 로직 추가 가능
-  //   }
-  // }
-
   void _showNoteDialog(BuildContext context, TextSelectionDelegate delegate) {
     final String selectedText =
     delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
@@ -117,6 +100,8 @@ class _ToolbarState extends State<Toolbar> {
           selectedText: selectedText,
           noteController: _noteController,
           customColors: widget.customColors,
+          stageId: widget.stageId,
+          subdetailTitle: widget.subdetailTitle,
         );
       },
     );
@@ -126,7 +111,6 @@ class _ToolbarState extends State<Toolbar> {
     final String selectedText =
     delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
     if (_isWordSelected(selectedText)) {
-      // 읽기 데이터의 textSegments와 customColors를 전달합니다.
       showWordPopup(
         context: context,
         selectedText: selectedText,
@@ -154,7 +138,10 @@ class _ToolbarState extends State<Toolbar> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ChatBot(selectedText: selectedText, readingData: widget.readingData,),
+          builder: (context) => ChatBot(
+            selectedText: selectedText,
+            readingData: widget.readingData,
+          ),
         ),
       );
     }
@@ -164,13 +151,17 @@ class _ToolbarState extends State<Toolbar> {
 class _NoteDialog extends StatefulWidget {
   final String selectedText;
   final TextEditingController noteController;
-  final customColors;
+  final dynamic customColors;
+  final String stageId;
+  final String subdetailTitle;
 
   const _NoteDialog({
     Key? key,
     required this.selectedText,
     required this.noteController,
     required this.customColors,
+    required this.stageId,
+    required this.subdetailTitle,
   }) : super(key: key);
 
   @override
@@ -179,14 +170,12 @@ class _NoteDialog extends StatefulWidget {
 
 class _NoteDialogState extends State<_NoteDialog> {
   late Color saveButtonColor;
-  bool isQuestionIncluded = false; // 질문 포함 여부 상태
+  bool isQuestionIncluded = false;
 
   @override
   void initState() {
     super.initState();
     saveButtonColor = widget.customColors.primary20;
-
-    // TextField 변경에 따라 버튼 색상 업데이트
     widget.noteController.addListener(() {
       setState(() {
         saveButtonColor = widget.noteController.text.isNotEmpty
@@ -246,36 +235,10 @@ class _NoteDialogState extends State<_NoteDialog> {
                   ),
                 ),
               ),
+              // 메모 입력 영역 (프로젝트에 맞게 커스텀 위젯 적용)
               Answer_Section_No_Title(
                 controller: widget.noteController,
                 customColors: widget.customColors,
-              ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    isQuestionIncluded = !isQuestionIncluded;
-                  });
-                },
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.check_circle_rounded,
-                      color: isQuestionIncluded
-                          ? widget.customColors.primary
-                          : widget.customColors.neutral80,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '질문 포함',
-                      style: body_xsmall(context).copyWith(
-                        color: isQuestionIncluded
-                            ? widget.customColors.primary
-                            : widget.customColors.neutral30,
-                      ),
-                    ),
-                  ],
-                ),
               ),
               const SizedBox(height: 20),
               Row(
@@ -312,11 +275,19 @@ class _NoteDialogState extends State<_NoteDialog> {
                       child: TextButton(
                         onPressed: saveButtonColor == widget.customColors.primary20
                             ? null
-                            : () {
+                            : () async {
                           final note = widget.noteController.text.trim();
                           if (note.isNotEmpty) {
+                            // memoProvider를 통해 Firestore의 subcollection에 메모 저장
+                            await ProviderScope.containerOf(context)
+                                .read(memoProvider.notifier)
+                                .addMemo(
+                              stageId: widget.stageId,
+                              subdetailTitle: widget.subdetailTitle,
+                              selectedText: widget.selectedText,
+                              note: note,
+                            );
                             debugPrint('메모 저장: $note');
-                            debugPrint('질문 포함 상태: $isQuestionIncluded');
                           }
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -346,11 +317,6 @@ class _NoteDialogState extends State<_NoteDialog> {
                               behavior: SnackBarBehavior.floating,
                               backgroundColor: Colors.transparent,
                               elevation: 0,
-                              onVisible: () {
-                                Future.delayed(const Duration(seconds: 1), () {
-                                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                                });
-                              },
                             ),
                           );
                           Navigator.pop(context);
@@ -369,6 +335,67 @@ class _NoteDialogState extends State<_NoteDialog> {
           ),
         ),
       ),
+    );
+  }
+}
+
+///
+/// Read_Toolbar: MaterialTextSelectionControls를 상속하여 텍스트 선택 시 나타나는 툴바를 커스터마이징
+/// stageId와 subdetailTitle을 추가 매개변수로 받아 Toolbar에 전달합니다.
+///
+class Read_Toolbar extends MaterialTextSelectionControls {
+  final dynamic customColors;
+  final ReadingData readingData;
+  final String stageId;
+  final String subdetailTitle;
+
+  Read_Toolbar({
+    required this.customColors,
+    required this.readingData,
+    required this.stageId,
+    required this.subdetailTitle,
+  });
+
+  @override
+  Widget buildToolbar(
+      BuildContext context,
+      Rect globalEditableRegion,
+      double textLineHeight,
+      Offset position,
+      List<TextSelectionPoint> endpoints,
+      TextSelectionDelegate delegate,
+      ValueListenable<ClipboardStatus>? clipboardStatus,
+      Offset? lastSecondaryTapDownPosition,
+      ) {
+    const double toolbarHeight = 50;
+    const double toolbarWidth = 135;
+
+    final screenSize = MediaQuery.of(context).size;
+    double leftPosition =
+        (endpoints.first.point.dx + endpoints.last.point.dx) / 2 - toolbarWidth / 2 + 16;
+    double topPosition =
+        endpoints.first.point.dy + globalEditableRegion.top - toolbarHeight - 32.0;
+
+    leftPosition = leftPosition.clamp(0.0, screenSize.width - toolbarWidth);
+    topPosition = topPosition.clamp(0.0, screenSize.height - toolbarHeight);
+
+    return Stack(
+      children: [
+        Positioned(
+          left: leftPosition,
+          top: topPosition,
+          child: Toolbar(
+            toolbarWidth: toolbarWidth,
+            toolbarHeight: toolbarHeight,
+            context: context,
+            delegate: delegate,
+            customColors: customColors,
+            readingData: readingData,
+            stageId: stageId,
+            subdetailTitle: subdetailTitle,
+          ),
+        ),
+      ],
     );
   }
 }
