@@ -190,8 +190,14 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
             SelectableText(
               currentStage.readingData?.textSegments[0] ?? '',
               style: reading_textstyle(context).copyWith(color: customColors.neutral0),
-              selectionControls: Read_Toolbar(customColors: customColors, readingData: currentStage.readingData!,),
+              selectionControls: Read_Toolbar(
+                customColors: customColors,
+                readingData: currentStage.readingData!,
+                stageId: currentStage.stageId,
+                subdetailTitle: currentStage.subdetailTitle,
+              ),
             ),
+
             const SizedBox(height: 16),
 
             // 📌 사지선다(MCQ) 퀴즈
@@ -227,8 +233,14 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
             SelectableText(
               currentStage.readingData?.textSegments[1] ?? '',
               style: reading_textstyle(context).copyWith(color: customColors.neutral0),
-              selectionControls: Read_Toolbar(customColors: customColors, readingData: currentStage.readingData!,),
+              selectionControls: Read_Toolbar(
+                customColors: customColors,
+                readingData: currentStage.readingData!,
+                stageId: currentStage.stageId,
+                subdetailTitle: currentStage.subdetailTitle,
+              ),
             ),
+
             const SizedBox(height: 16),
 
             // 📌 OX 퀴즈
@@ -262,8 +274,14 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
             SelectableText(
               currentStage.readingData?.textSegments[2] ?? '',
               style: reading_textstyle(context).copyWith(color: customColors.neutral0),
-              selectionControls: Read_Toolbar(customColors: customColors, readingData: currentStage.readingData!,),
+              selectionControls: Read_Toolbar(
+                customColors: customColors,
+                readingData: currentStage.readingData!,
+                stageId: currentStage.stageId,
+                subdetailTitle: currentStage.subdetailTitle,
+              ),
             ),
+
 
             const SizedBox(height: 40),
 
@@ -294,55 +312,6 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
         'Q',
         style: body_small_semi(context).copyWith(color: customColors.secondary),
       ),
-    );
-  }
-}
-
-// Read_Toolbar 클래스 (수정 후)
-class Read_Toolbar extends MaterialTextSelectionControls {
-  final customColors;
-  final ReadingData readingData; // 추가: ReadingData 필드
-
-  Read_Toolbar({required this.customColors, required this.readingData});
-
-  @override
-  Widget buildToolbar(
-      BuildContext context,
-      Rect globalEditableRegion,
-      double textLineHeight,
-      Offset position,
-      List<TextSelectionPoint> endpoints,
-      TextSelectionDelegate delegate,
-      ValueListenable<ClipboardStatus>? clipboardStatus,
-      Offset? lastSecondaryTapDownPosition,
-      ) {
-    const double toolbarHeight = 50;
-    const double toolbarWidth = 135;
-
-    final screenSize = MediaQuery.of(context).size;
-    double leftPosition =
-        (endpoints.first.point.dx + endpoints.last.point.dx) / 2 - toolbarWidth / 2 + 16;
-    double topPosition =
-        endpoints.first.point.dy + globalEditableRegion.top - toolbarHeight - 32.0;
-
-    leftPosition = leftPosition.clamp(0.0, screenSize.width - toolbarWidth);
-    topPosition = topPosition.clamp(0.0, screenSize.height - toolbarHeight);
-
-    return Stack(
-      children: [
-        Positioned(
-          left: leftPosition,
-          top: topPosition,
-          child: Toolbar(
-            toolbarWidth: toolbarWidth,
-            toolbarHeight: toolbarHeight,
-            context: context,
-            delegate: delegate,
-            customColors: customColors,
-            readingData: readingData, // 추가: 현재 읽기 데이터를 전달
-          ),
-        ),
-      ],
     );
   }
 }

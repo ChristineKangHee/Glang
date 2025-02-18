@@ -84,6 +84,7 @@ class UserService {
         // 2. 서브컬렉션 삭제 (attendance, progress)
         await deleteSubCollection(userRef.collection('attendance'));
         await deleteSubCollection(userRef.collection('progress'));
+        await deleteSubCollection(userRef.collection('memos'));
 
         // 3. 닉네임 컬렉션 삭제
         if (nickname != null && nickname.toString().isNotEmpty) {

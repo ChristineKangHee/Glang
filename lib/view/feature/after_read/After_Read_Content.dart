@@ -21,7 +21,7 @@ class _AfterReadContentState extends State<AfterReadContent> {
         title: "읽기 도구의 필요성",
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
