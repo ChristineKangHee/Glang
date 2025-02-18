@@ -58,11 +58,16 @@ class _CSLearningState extends ConsumerState<CSLearning> {
     });
   }
 
-  void _showAlertDialog() {
+  // answerText, readingText, activityType를 전달하는 _showAlertDialog 함수로 변경
+  void _showAlertDialog(String answerText, String readingText, String activityType) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return const CustomAlertDialog();
+        return CustomAlertDialog(
+          answerText: answerText,
+          readingText: readingText,
+          activityType: activityType,
+        );
       },
     );
   }
@@ -202,7 +207,8 @@ class _CSLearningState extends ConsumerState<CSLearning> {
                       // _updateFeatureCompletion 함수를 호출하여 Firestore에 업데이트합니다.
                       await updateFeatureCompletion(currentStage, 2, true);
                     }
-                    _showAlertDialog();
+                    // '요약하기' 활동 유형을 전달하면서 제출: answerText, readingText, activityType
+                    _showAlertDialog(_controller.text, readingText, "요약하기");
                   }
                       : null,
                   style: ElevatedButton.styleFrom(

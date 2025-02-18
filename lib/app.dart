@@ -79,7 +79,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
           routes: {
             // '/': (context) => const MyHomePage(),
             '/tutorial': (context) => TutorialScreen(),
-            '/armain': (context) => const ArMain(),
+            // '/armain': (context) => const ArMain(),
             '/brmain': (context) => const BrMain(),
             '/rdmain': (context) => RdMain(),
             '/login': (context) => const LoginPage(),

@@ -46,6 +46,7 @@ class _CRLearningState extends ConsumerState<CRLearning> {
 
   // 진행도 업데이트 + 결과창
   Future<void> _onSubmit(StageData stage) async {
+    final brData = stage.brData;
     // 실제 유저 ID 가져오기
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) {
@@ -60,10 +61,16 @@ class _CRLearningState extends ConsumerState<CRLearning> {
     );
 
     // 결과 다이얼로그 띄우기
+    // 예시: 사용자가 제출 버튼을 누른 후
     showDialog(
       context: context,
-      builder: (BuildContext context) => const AlertDialogBR(),
+      builder: (BuildContext context) => AlertDialogBR(
+        answerText: _controller.text,
+        coverImageUrl: brData?.coverImageUrl ?? "assets/images/cover.png",
+        keywords: brData?.keywords ?? [],
+      ),
     );
+
   }
 
 

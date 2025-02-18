@@ -608,7 +608,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
   Widget _getActivityPage(String title) {
     switch (title) {
       case '결말 바꾸기':
-        return ChangeEndingMain();
+        // return ChangeEndingMain();
       case '요약':
         return CSLearning();
       case '토론':
@@ -618,9 +618,9 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
       case '문장 구조':
         return WritingFormMain();
       case '에세이 작성':
-        return WritingEssayMain();
+        // return WritingEssayMain();
       case '형식 변환하기':
-        return FormatConversionMain();
+        // return FormatConversionMain();
       case '주제 추출':
         return ParagraphAnalysisMain();
       case '자유 소감':
