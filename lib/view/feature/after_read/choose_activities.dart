@@ -631,24 +631,45 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
   }
 }
 
-/// 지정된 feature의 완료 상태를 업데이트하는 함수
 Future<void> updateFeatureCompletion(StageData stage, int featureNumber, bool isCompleted) async {
   final userId = FirebaseAuth.instance.currentUser?.uid;
-  if (userId == null || stage.arData == null) return;
+  if (userId == null) {
+    print("updateFeatureCompletion: userId is null");
+    return;
+  }
+  if (stage.arData == null) {
+    print("updateFeatureCompletion: stage.arData is null");
+    return;
+  }
 
-  // StageData 내에서 AR feature 완료 상태 업데이트
-  stage.updateArFeatureCompletion(featureNumber, isCompleted);
+  try {
+    print("updateFeatureCompletion: 시작 - featureNumber: $featureNumber, isCompleted: $isCompleted");
 
-  // Firestore에 반영 (전체 arData를 업데이트)
-  final stageRef = FirebaseFirestore.instance
-      .collection('users')
-      .doc(userId)
-      .collection('progress')
-      .doc(stage.stageId);
+    // 1. 로컬 stage 객체 업데이트
+    stage.updateArFeatureCompletion(featureNumber, isCompleted);
+    print("updateFeatureCompletion: stage.arData.featuresCompleted = ${stage.arData!.featuresCompleted}");
 
-  await stageRef.update({
-    'arData': stage.arData!.toJson(),
-  });
+    // 2. Firestore progress 문서 업데이트 (해당 스테이지의 arData 업데이트)
+    final stageRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('progress')
+        .doc(stage.stageId);
+    await stageRef.update({
+      'arData': stage.arData!.toJson(),
+    });
+    print("updateFeatureCompletion: Firestore progress 업데이트 완료 (stageId: ${stage.stageId})");
+
+    // 3. 미션 하나 완료 시, 사용자 문서의 completedMissionCount 원자적 증가
+    final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
+    await userRef.update({
+      'completedMissionCount': FieldValue.increment(1),
+    });
+    print("updateFeatureCompletion: 사용자 문서 업데이트 완료 - completedMissionCount 증가");
+
+  } catch (e, stack) {
+    print("updateFeatureCompletion: 에러 발생 - $e");
+    print("Stacktrace: $stack");
+  }
 }
-
 

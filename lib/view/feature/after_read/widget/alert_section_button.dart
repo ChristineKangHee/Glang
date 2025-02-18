@@ -57,6 +57,8 @@ class AlertSectionButton extends StatelessWidget {
                   //       (route) => route.settings.name == 'LearningActivitiesPage',
                   // );
                   // 새로고침을 위해서 우선 땜빵용으로 이렇게 해두었다...
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => LearningActivitiesPage()),

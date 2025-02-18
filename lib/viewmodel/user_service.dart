@@ -84,6 +84,8 @@ class UserService {
         // 2. 서브컬렉션 삭제 (attendance, progress)
         await deleteSubCollection(userRef.collection('attendance'));
         await deleteSubCollection(userRef.collection('progress'));
+        await deleteSubCollection(userRef.collection('memos'));
+        await deleteSubCollection(userRef.collection('bookmarks'));
 
         // 3. 닉네임 컬렉션 삭제
         if (nickname != null && nickname.toString().isNotEmpty) {
@@ -108,6 +110,21 @@ class UserService {
         SnackBar(content: Text("삭제 중 오류가 발생했습니다: $e")),
       );
     }
+  }
+
+  // 학습 시간 저장 메소드
+  Future<void> updateLearningTime(int sessionSeconds) async {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) return;
+    final userDoc = _firestore.collection('users').doc(userId);
+
+    // 기존 값을 누적하고 싶다면 FieldValue.increment 사용
+    await userDoc.update({
+      'learningTime': FieldValue.increment(sessionSeconds),
+    });
+
+    // 만약 세션 시간만 저장하려면 아래와 같이 설정할 수도 있습니다.
+    // await userDoc.update({'learningTime': sessionSeconds});
   }
 }
 
@@ -217,4 +234,13 @@ final userCourseProvider = FutureProvider<String>((ref) async {
     return data?['currentCourse'] as String? ?? '미설정';
   }
   return '미설정';
+});
+
+final userLearningStatsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
+  final userId = FirebaseAuth.instance.currentUser?.uid;
+  if (userId == null) {
+    return {};
+  }
+  final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+  return doc.data() ?? {};
 });
