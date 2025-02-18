@@ -54,9 +54,9 @@ class MyPageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      child: SingleChildScrollView(
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -376,7 +376,7 @@ class InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // '학습 통계' 카드 비활성화 여부 확인
-    final bool isDisabled = title == '학습 통계'|| title == '저장' || title == '학습 기록';
+    final bool isDisabled = title == '학습 통계' ||title == '저장' || title == '학습 기록';
 
     return InkWell(
       onTap: isDisabled ? null : onTap, // 비활성화 시 onTap 비활성화

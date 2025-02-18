@@ -250,33 +250,6 @@ class _NoteDialogState extends State<_NoteDialog> {
                 controller: widget.noteController,
                 customColors: widget.customColors,
               ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    isQuestionIncluded = !isQuestionIncluded;
-                  });
-                },
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.check_circle_rounded,
-                      color: isQuestionIncluded
-                          ? widget.customColors.primary
-                          : widget.customColors.neutral80,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '질문 포함',
-                      style: body_xsmall(context).copyWith(
-                        color: isQuestionIncluded
-                            ? widget.customColors.primary
-                            : widget.customColors.neutral30,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               const SizedBox(height: 20),
               Row(
                 children: [
