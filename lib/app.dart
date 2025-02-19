@@ -11,6 +11,7 @@ import 'package:readventure/view/course/course_main.dart';
 import 'package:readventure/view/feature/after_read/AR_main.dart';
 import 'package:readventure/view/feature/before_read/BR_main.dart';
 import 'package:readventure/view/feature/reading/GA_02/RD_main.dart';
+import 'package:readventure/view/home/attendance/attendance_service.dart';
 import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/home/notification/notification_page.dart';
 import 'package:readventure/view/home/stage_provider.dart';
@@ -164,6 +165,12 @@ class AuthWrapper extends ConsumerWidget {
               }
               if (userDocSnapshot.hasData) {
                 final data = userDocSnapshot.data?.data();
+
+                // 출석체크 함수 호출 (단, 여러 번 호출되지 않도록 주의)
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  markTodayAttendanceAsChecked(user.uid);
+                });
+
                 if (data is Map<String, dynamic> && data['nicknameSet'] == true) {
                   return const MyHomePage();
                 } else {
