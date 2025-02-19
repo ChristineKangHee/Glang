@@ -170,6 +170,7 @@ class AuthController extends StateNotifier<User?> {
       if (!docSnapshot.exists) {
         await userRef.set({
           'name': user.displayName,
+          'photoURL': user.photoURL, // <-- 신규 사용자 생성 시 프로필 사진 URL 저장
           'nicknameSet': false,
           'email': user.email,
           'createdAt': FieldValue.serverTimestamp(),
@@ -193,11 +194,10 @@ class AuthController extends StateNotifier<User?> {
         }
       }
     } catch (e) {
-      // _handleUserState 내부 에러도 AlertDialog로 보여주기
-      // 이 경우 context가 없으므로, 간단하게 print와 별도 처리를 할 수도 있음.
       print('사용자 상태 확인 오류: $e');
     }
   }
+
 
   void _showErrorDialog(BuildContext context, String title, String message) {
     showDialog(

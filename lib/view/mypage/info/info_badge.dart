@@ -61,7 +61,7 @@ class BadgeWidget extends StatelessWidget {
                     final starColor = isObtained ? customColors.secondary : customColors.neutral80;
                     final description = isObtained
                         ? badge['description']
-                        : '이 배지를 얻으려면\n${badge['howToEarn']}을 시도해 보세요!';
+                        : '이 배지를 얻으려면\n${badge['howToEarn']}를 시도해 보세요!';
 
                     return GestureDetector(
                       onTap: () => _showBadgePopup(context, badge, description, customColors),
@@ -80,12 +80,15 @@ class BadgeWidget extends StatelessWidget {
                               ),
                               child: Center(
                                 child: badge['imageUrl'] != null
-                                    ? Image.asset(
-                                  badge['imageUrl'],
-                                  fit: BoxFit.cover,
+                                    ? Opacity(
+                                  opacity: isObtained ? 1.0 : 0.3, // 획득 여부에 따라 투명도 조절
+                                  child: Image.asset(
+                                    badge['imageUrl'],
+                                    fit: BoxFit.cover,
+                                  ),
                                 )
                                     : Icon(
-                                  Icons.star, // 아이콘을 원하는 다른 것으로 변경 가능
+                                  Icons.star,
                                   color: starColor,
                                   size: badgeSize * 0.3,
                                 ),
@@ -139,9 +142,12 @@ class BadgeWidget extends StatelessWidget {
                 ),
                 child: Center(
                   child: badge['imageUrl'] != null
-                      ? Image.asset(
-                    badge['imageUrl'],
-                    fit: BoxFit.cover,
+                      ? Opacity(
+                    opacity: isObtained ? 1.0 : 0.3,
+                    child: Image.asset(
+                      badge['imageUrl'],
+                      fit: BoxFit.cover,
+                    ),
                   )
                       : Icon(
                     Icons.star,
@@ -194,10 +200,10 @@ class BadgeWidget extends StatelessWidget {
     {'name': '비판적 사고가', 'obtained': false, 'description': '깊이 있는 질문을 던지는 능력이 돋보이네요!', 'howToEarn': '챗봇에게 질문하기'},
     {'name': '핵심찾기 고수', 'obtained': false, 'description': '텍스트 속에서 중요한 부분을 정확히 찾아내는 능력이 뛰나요!', 'howToEarn': '다지선다 미션 완수하기'},
     {'name': '창의적 사고가', 'obtained': false, 'description': '남다른 시각으로 세상을 바라보는 능력을 키워가고 있어요!', 'howToEarn': '결말 바꾸기 미션 완수하기'},
-    {'name': '첫 글 작성', 'obtained': false, 'description': '처음으로 자신의 생각을 글로 표현했어요. 앞으로 더 많은 이야기를 들려주세요!', 'howToEarn': '첫 번째 글 작성'},
+    {'name': '첫 글 작성', 'obtained': false, 'description': '처음으로 자신의 생각을 글로 표현했어요. 앞으로 더 많은 이야기를 들려주세요!', 'howToEarn': '첫 번째 글 작성하기'},
     {'name': '소통왕', 'obtained': false, 'description': '다른 사람과 활발하게 소통하며 생각을 나누고 있어요!', 'howToEarn': '토론 미션 완수하기'},
     {'name': '글 공유 챔피언', 'obtained': false, 'description': '좋은 글은 함께 나눠야 하죠! 여러분의 공유가 더 많은 배움을 만듭니다.', 'howToEarn': '에세이 글 올리기'},
     {'name': '월간 챌린지', 'obtained': false, 'description': '이달의 목표를 달성했어요! 꾸준한 도전을 응원합니다.', 'howToEarn': '월간 목표 완료'},
-    {'name': '좋아요 스타', 'obtained': false, 'description': '사람들의 공감을 얻는 멋진 글을 작성하고 있어요!', 'howToEarn': '좋아요를 많이 받은 글 작성'},
+    {'name': '좋아요 스타', 'obtained': false, 'description': '사람들의 공감을 얻는 멋진 글을 작성하고 있어요!', 'howToEarn': '좋아요를 많이 받은 글 작성하기'},
   ];
 }
