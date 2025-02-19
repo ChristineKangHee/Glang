@@ -11,6 +11,8 @@ import 'package:readventure/theme/font.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../../viewmodel/bookmark_interpretation.dart';
+
 /// ChatGPT API를 호출하여 문장 정보를 받아오는 함수
 Future<Map<String, dynamic>> fetchSentenceDetails(String sentence, List<String> textSegments) async {
   final apiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
@@ -53,37 +55,6 @@ Future<Map<String, dynamic>> fetchSentenceDetails(String sentence, List<String> 
   } catch (_) {
     return {"contextualMeaning": "정보 없음", "summary": "정보 없음"};
   }
-}
-
-/// 북마크 저장 (문장 해석용)
-Future<void> saveBookmarkSentenceInterpretation({
-  required String stageId,
-  required String subdetailTitle,
-  required String selectedText,
-  required Map<String, dynamic> interpretationData,
-}) async {
-  final userId = FirebaseAuth.instance.currentUser?.uid;
-  if (userId == null) return;
-
-  final doc = {
-    // 문장 해석의 경우 단어 해석과 달리 사전적 의미/유사어/반의어는 해당되지 않으므로 기본값 처리
-    'dictionaryMeaning': "정보 없음",
-    'contextualMeaning': interpretationData['contextualMeaning'],
-    'synonyms': [],
-    'antonyms': [],
-    'summary': interpretationData['summary'],
-    'createdAt': FieldValue.serverTimestamp(),
-    'selectedText': selectedText,
-    'stageId': stageId,
-    'subdetailTitle': subdetailTitle,
-    'type': 'sentence',
-  };
-
-  await FirebaseFirestore.instance
-      .collection('users')
-      .doc(userId)
-      .collection('bookmarks')
-      .add(doc);
 }
 
 /// shimmer 효과 위젯 (단순 선 형태)
