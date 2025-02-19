@@ -94,6 +94,10 @@ dev_dependencies:
   #share
   share_plus: ^10.1.4
 
+  #image_picker
+  image_picker: ^1.1.2
+  cached_network_image: ^3.4.1
+
 flutter_native_splash:
   color: "#FFFFFF"
   image: "assets/icon/icon.png"  # 앱 실행 시 표시될 이미지

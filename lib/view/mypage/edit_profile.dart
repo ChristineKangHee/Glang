@@ -6,16 +6,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../viewmodel/theme_controller.dart';
-import 'package:easy_localization/easy_localization.dart';
 import '../../viewmodel/custom_colors_provider.dart';
+import '../../viewmodel/user_photo_url_provider.dart';
 import '../components/custom_app_bar.dart';
-import '../components/custom_button.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../../viewmodel/user_service.dart';
-import 'edit_nick_input.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EditProfile extends ConsumerWidget {
   const EditProfile({super.key});
@@ -75,13 +76,55 @@ class EditInfo extends StatelessWidget {
     );
   }
 }
+class ProfileImage extends ConsumerStatefulWidget {
+  const ProfileImage({Key? key}) : super(key: key);
 
-class ProfileImage extends StatelessWidget {
-  const ProfileImage({super.key});
+  @override
+  ConsumerState<ProfileImage> createState() => _ProfileImageState();
+}
+
+class _ProfileImageState extends ConsumerState<ProfileImage> {
+  Future<void> _pickAndUploadImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      final file = File(pickedFile.path);
+
+      try {
+        // Firebase Storage에 업로드 (예: profile_images/{uid}.jpg)
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child("profile_images")
+            .child("${user.uid}.jpg");
+        final uploadTask = storageRef.putFile(file);
+        final snapshot = await uploadTask.whenComplete(() => null);
+        final downloadUrl = await snapshot.ref.getDownloadURL();
+
+        // FirebaseAuth의 photoURL 업데이트
+        await user.updatePhotoURL(downloadUrl);
+
+        // Firestore 사용자 문서에 photoURL 업데이트
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .update({'photoURL': downloadUrl});
+
+        // Provider 상태 업데이트
+        ref.read(userPhotoUrlProvider.notifier).updatePhotoUrl(downloadUrl);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("프로필 사진 업데이트 오류: $e")),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
+    final photoUrl = ref.watch(userPhotoUrlProvider);
     return Center(
       child: Stack(
         children: [
@@ -89,17 +132,38 @@ class ProfileImage extends StatelessWidget {
             width: 120,
             height: 120,
             decoration: ShapeDecoration(
-              shape: CircleBorder(
-                side: BorderSide(
-                  width: 3,
-                  color: customColors.primary ?? Colors.deepPurpleAccent,
+              shape: const CircleBorder(side: BorderSide(width: 3)),
+              color: customColors.neutral0,
+              shadows: [
+                BoxShadow(
+                  color: customColors.primary!,
+                  spreadRadius: 1,
                 ),
-              ),
+              ],
             ),
             child: ClipOval(
-              child: SvgPicture.asset(
-                'assets/images/character.svg',
-                fit: BoxFit.fill,
+              child: photoUrl != null && photoUrl.isNotEmpty
+                  ? Image.network(photoUrl, fit: BoxFit.cover)
+                  : Image.asset('assets/images/default_avatar.png', fit: BoxFit.cover),
+            ),
+          ),
+          // 오른쪽 하단의 수정 아이콘
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: InkWell(
+              onTap: _pickAndUploadImage,
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: customColors.primary ?? Colors.deepPurpleAccent,
+                ),
+                padding: const EdgeInsets.all(4),
+                child: const Icon(
+                  Icons.camera_alt_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
             ),
           ),

@@ -52,14 +52,14 @@ class MemoListPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '생성일: $formattedDate',
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  formattedDate,
+                  style: body_xxsmall(context).copyWith(color: customColors.neutral60),
                 ),
               ],
             ),
             // 기존 PopupMenuButton 대신 IconButton를 사용하여 바텀시트 호출
             trailing: IconButton(
-              icon: const Icon(Icons.more_vert),
+              icon: Icon(Icons.more_vert, color: customColors.neutral80,),
               onPressed: () {
                 showMemoActionBottomSheet(context, memo, customColors, ref);
               },

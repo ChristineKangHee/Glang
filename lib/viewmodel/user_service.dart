@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:readventure/viewmodel/user_photo_url_provider.dart';
 
 /// Firestore에서 사용자 정보를 관리하는 서비스 클래스
 class UserService {
@@ -81,7 +82,7 @@ class UserService {
         final userSnapshot = await userRef.get();
         final nickname = userSnapshot.data()?['nickname'];
 
-        // 2. 서브컬렉션 삭제 (attendance, progress)
+        // 2. 서브컬렉션 삭제 (attendance, progress, memos, bookmarks)
         await deleteSubCollection(userRef.collection('attendance'));
         await deleteSubCollection(userRef.collection('progress'));
         await deleteSubCollection(userRef.collection('memos'));
@@ -98,8 +99,11 @@ class UserService {
         // 5. Firebase Authentication에서 계정 삭제
         await user.delete();
 
-        // 6. 상태 초기화 및 메시지, 네비게이션 처리
-        ref.read(userNameProvider.notifier).state = "";
+        // 6. 상태 초기화 (프로필 사진, 닉네임 등)
+        ref.read(userPhotoUrlProvider.notifier).updatePhotoUrl(null); // 🔹 프로필 사진 초기화
+        ref.read(userNameProvider.notifier).state = ""; // 🔹 닉네임 초기화
+
+        // 7. 메시지 및 화면 전환
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("탈퇴가 완료되었습니다. 다음에 또 만나요.")),
         );
@@ -111,6 +115,7 @@ class UserService {
       );
     }
   }
+
 
   // 학습 시간 저장 메소드
   Future<void> updateLearningTime(int sessionSeconds) async {

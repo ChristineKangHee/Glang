@@ -43,8 +43,19 @@ class AuthController extends StateNotifier<User?> {
       final user = userCredential.user;
 
       if (user != null) {
-        if (user.displayName == null) {
-          await user.updateDisplayName(googleUser.displayName);
+        // Firestore에서 사용자 문서 가져오기
+        final userDoc = await _firestore.collection('users').doc(user.uid).get();
+        if (userDoc.exists && userDoc.data()?['photoURL'] != null) {
+          // 이미 커스텀 프로필 사진이 저장되어 있다면 이를 사용
+          final customPhotoUrl = userDoc.data()!['photoURL'];
+          if (user.photoURL != customPhotoUrl) {
+            await user.updatePhotoURL(customPhotoUrl);
+          }
+        } else {
+          // 저장된 커스텀 사진이 없다면, 소셜 로그인 시 받은 사진을 사용
+          if (googleUser.photoUrl != null) {
+            await user.updatePhotoURL(googleUser.photoUrl);
+          }
         }
         await _handleUserState(user, onNicknameRequired, onHome);
         state = user;
@@ -81,6 +92,7 @@ class AuthController extends StateNotifier<User?> {
 
       final kakaoUser = await kakao.UserApi.instance.me();
       final displayName = kakaoUser.kakaoAccount?.profile?.nickname ?? "사용자";
+      final photoUrl = kakaoUser.kakaoAccount?.profile?.profileImageUrl;
       print('카카오 사용자 닉네임: $displayName');
 
       final credential = OAuthProvider('oidc.kakao').credential(
@@ -93,13 +105,25 @@ class AuthController extends StateNotifier<User?> {
       final user = userCredential.user;
 
       if (user != null) {
-        if (user.displayName == null || user.displayName!.isEmpty) {
-          await user.updateDisplayName(displayName);
-          await user.reload();
+        // Firestore에서 사용자 문서 가져오기
+        final userDoc = await _firestore.collection('users').doc(user.uid).get();
+
+        if (userDoc.exists && userDoc.data()?['photoURL'] != null) {
+          // 이미 저장된 custom 프로필 사진이 있다면 이를 사용
+          final customPhotoUrl = userDoc.data()!['photoURL'];
+          if (user.photoURL != customPhotoUrl) {
+            await user.updatePhotoURL(customPhotoUrl);
+          }
+        } else {
+          // 저장된 커스텀 사진이 없다면, Kakao에서 받아온 사진을 사용
+          if (photoUrl != null) {
+            await user.updatePhotoURL(photoUrl);
+          }
         }
-        print('Firebase 인증 성공: ${user.uid}');
+
         await _handleUserState(user, onNicknameRequired, onHome);
-      } else {
+      }
+      else {
         throw Exception('Firebase 인증 실패');
       }
     } catch (e) {
@@ -107,7 +131,7 @@ class AuthController extends StateNotifier<User?> {
     }
   }
 
-  /// Apple 로그인
+  /// Apple 로그인 (프로필 사진은 제공되지 않으므로 업데이트하지 않음)
   Future<void> signInWithApple({
     required BuildContext context,
     required Function onNicknameRequired,
@@ -134,6 +158,7 @@ class AuthController extends StateNotifier<User?> {
       _showErrorDialog(context, 'Apple 로그인 오류', e.toString());
     }
   }
+
 
   Future<void> _handleUserState(
       User user, Function onNicknameRequired, Function onHome) async {

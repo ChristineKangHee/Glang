@@ -12,9 +12,11 @@ import '../../theme/font.dart';
 import '../../theme/theme.dart';
 import '../../viewmodel/custom_colors_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../viewmodel/user_photo_url_provider.dart';
 import '../../viewmodel/user_service.dart';
 import '../community/Ranking/ranking_component.dart';
 import '../widgets/DoubleBackToExitWrapper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 /// 마이페이지 메인 화면 위젯
 /// - 상단 앱바, 하단 네비게이션 바, 컨텐츠
@@ -128,14 +130,15 @@ class MyPageContent extends StatelessWidget {
   }
 }
 
-/// 사용자 프로필 섹션
-class UserProfileSection extends StatelessWidget {
+/// 사용자 프로필 섹션 (Firebase 사용자 프로필 사진 표시)
+class UserProfileSection extends ConsumerWidget {
   final String name;
   const UserProfileSection({super.key, required this.name});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
+    final photoUrl = ref.watch(userPhotoUrlProvider);
     return Row(
       children: [
         Container(
@@ -143,13 +146,28 @@ class UserProfileSection extends StatelessWidget {
           height: 100,
           decoration: ShapeDecoration(
             shape: CircleBorder(
-              side: BorderSide(width: 3, color: customColors.neutral90 ?? Colors.grey[300]!),
+              side: BorderSide(
+                width: 3,
+                color: customColors.neutral90 ?? Colors.grey[300]!,
+              ),
             ),
           ),
           child: ClipOval(
-            child: SvgPicture.asset(
+            child: photoUrl != null
+                ? Image.network(
+              photoUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                // 이미지 로딩 실패 시 fallback 이미지
+                return SvgPicture.asset(
+                  'assets/images/character.svg',
+                  fit: BoxFit.fill,
+                );
+              },
+            )
+                : SvgPicture.asset(
               'assets/images/character.svg',
-              fit: BoxFit.fill, // Ensures the image fills the container without distortion
+              fit: BoxFit.fill,
             ),
           ),
         ),
@@ -165,7 +183,8 @@ class UserProfileSection extends StatelessWidget {
                   Navigator.pushNamed(context, '/mypage/edit_profile');
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                   decoration: BoxDecoration(
                     color: customColors.neutral90,
                     borderRadius: BorderRadius.circular(12),
@@ -186,6 +205,7 @@ class UserProfileSection extends StatelessWidget {
     );
   }
 }
+
 // 상단 import 구문 아래에 provider 추가
 final myRankingProvider = FutureProvider<int>((ref) async {
   final rankings = await getRankings();

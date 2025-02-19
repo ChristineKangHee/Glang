@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';
+import '../../components/my_divider.dart';
 import 'CM_2depth_boardMain_firebase.dart';
 import 'community_data_firebase.dart';
 import 'community_service.dart';
@@ -111,17 +112,22 @@ class _SearchPageState extends State<SearchPage>
     }
 
     return ListView.builder(
-      itemCount: posts.length,
+      itemCount: posts.length * 2 - 1, // 각 아이템 사이에 Divider 추가
       itemBuilder: (context, index) {
-        var post = posts[index];
-        return PostItemContainer(
-          post: post,
-          customColors: customColors,
-          parentContext: context,
-        );
+        if (index.isOdd) {
+          return BigDivider();
+        } else {
+          var post = posts[index ~/ 2];
+          return PostItemContainer(
+            post: post,
+            customColors: customColors,
+            parentContext: context,
+          );
+        }
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {

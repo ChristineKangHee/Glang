@@ -41,7 +41,7 @@ class BookmarksPage extends ConsumerWidget {
           }
           final docs = snapshot.data!.docs;
           if (docs.isEmpty) {
-            return const Center(child: Text("저장된 해석이 없습니다."));
+            return Center(child: Text("저장된 해석이 없습니다.", style: body_small(context).copyWith(color: customColors.neutral60),));
           }
           return ListView.builder(
             itemCount: docs.length,
@@ -80,7 +80,7 @@ class BookmarksPage extends ConsumerWidget {
                   isThreeLine: true,
                   // 기존의 article, delete IconButton 대신 more_vert 아이콘으로 액션 바텀시트 호출
                   trailing: IconButton(
-                    icon: const Icon(Icons.more_vert),
+                    icon: Icon(Icons.more_vert,color: customColors.neutral80),
                     onPressed: () {
                       showBookmarkActionBottomSheet(
                         context: context,
