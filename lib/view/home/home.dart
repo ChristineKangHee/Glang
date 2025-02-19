@@ -270,35 +270,68 @@ class AttendanceDayWidget extends StatelessWidget {
   }
 }
 
-class LearningSection extends StatelessWidget {
-  LearningSection({
+class LearningSection extends ConsumerWidget {
+  const LearningSection({
     super.key,
     required this.customColors,
   });
   final CustomColors customColors;
-  final imageLink_1 = "assets/icons/record_time.svg";
-  final imageLink_2 = "assets/icons/record_mission.svg";
+  final String imageLink_1 = "assets/icons/record_time.svg";
+  final String imageLink_2 = "assets/icons/record_mission.svg";
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("이번달 기록", style: body_small_semi(context),),
-        SizedBox(height: 12.h,),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statsAsync = ref.watch(userLearningStatsProvider);
+
+    return statsAsync.when(
+      data: (data) {
+        // Firestore에 저장된 학습 시간(초)와 미션 완료 개수를 가져옴
+        final int learningTimeSeconds = data['learningTime'] ?? 0;
+        final int completedMissionCount = data['completedMissionCount'] ?? 0;
+
+        // 초 단위를 시간과 분으로 변환
+        final hours = learningTimeSeconds ~/ 3600;
+        final minutes = (learningTimeSeconds % 3600) ~/ 60;
+        final formattedTime = "$hours시간 ${minutes}분";
+
+        final formattedMissionCount = "$completedMissionCount개";
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(child: LearningSection_Card(customColors: customColors, imageLink: imageLink_1, title: "4시간 30분", subtitle: "읽은 시간",)),
-            SizedBox(width: 16,),
-            Expanded(child: LearningSection_Card(customColors: customColors, imageLink: imageLink_2, title: "32개", subtitle: "완료한 미션",)),
+            Text("이번달 기록", style: body_small_semi(context)),
+            SizedBox(height: 12.h,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: LearningSection_Card(
+                    customColors: customColors,
+                    imageLink: imageLink_1,
+                    title: formattedTime,
+                    subtitle: "읽은 시간",
+                  ),
+                ),
+                SizedBox(width: 16,),
+                Expanded(
+                  child: LearningSection_Card(
+                    customColors: customColors,
+                    imageLink: imageLink_2,
+                    title: formattedMissionCount,
+                    subtitle: "완료한 미션",
+                  ),
+                ),
+              ],
+            ),
           ],
-        ),
-      ],
+        );
+      },
+      loading: () => Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Text("Error loading stats"),
     );
   }
 }
+
 
 class LearningSection_Card extends StatelessWidget {
   const LearningSection_Card({

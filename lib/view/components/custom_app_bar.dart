@@ -75,7 +75,8 @@ import '../../theme/font.dart';
 import '../../viewmodel/custom_colors_provider.dart';
 import 'dart:async';
 import 'package:flutter_svg/flutter_svg.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../viewmodel/user_service.dart';
 import 'alarm_dialog.dart';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -657,15 +658,18 @@ class CustomAppBar_2depth_8 extends StatefulWidget implements PreferredSizeWidge
   }) : super(key: key);
 
   @override
-  _CustomAppBar_2depth_8State createState() => _CustomAppBar_2depth_8State();
+  CustomAppBar_2depth_8State createState() => CustomAppBar_2depth_8State();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class _CustomAppBar_2depth_8State extends State<CustomAppBar_2depth_8> {
+class CustomAppBar_2depth_8State extends State<CustomAppBar_2depth_8> {
   late Timer _timer;
   int _elapsedSeconds = 0; // 학습 시간 초기화
+
+  // 외부에서 타이머 값을 읽기 위한 getter 추가
+  int get elapsedSeconds => _elapsedSeconds;
 
   @override
   void initState() {
@@ -736,9 +740,14 @@ class _CustomAppBar_2depth_8State extends State<CustomAppBar_2depth_8> {
         IconButton(
           icon: Icon(Icons.close, color: customColors.neutral30, size: 28),
           onPressed: widget.onClosePressed ??
-                  () {
-                // 기본 동작: 결과 저장 여부 다이얼로그 표시
-                    showResultSaveDialog(
+                  () async {
+                final userId = FirebaseAuth.instance.currentUser?.uid;
+                if (userId != null) {
+                  // 학습 시간 업데이트 (초 단위)
+                  await UserService().updateLearningTime(_elapsedSeconds);
+                }
+                // 기존 동작: 결과 저장 여부 다이얼로그 표시
+                showResultSaveDialog(
                   context,
                   customColors,
                   "결과를 저장하고 이동할까요?",

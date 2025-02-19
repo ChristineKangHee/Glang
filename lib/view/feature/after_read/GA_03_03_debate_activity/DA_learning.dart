@@ -49,7 +49,7 @@ class DebatePage extends ConsumerWidget {
         leadingWidth: 90,
         leading: CountdownTimer(
           key: ValueKey(debateState.timerKey), // 타이머 재설정
-          initialSeconds: 180, //타이머 초
+          initialSeconds: 5, //타이머 초
           onTimerComplete: () {
             debateNotifier.nextRound(); // 라운드 전환
             if (!debateNotifier.state.isFinished) {
