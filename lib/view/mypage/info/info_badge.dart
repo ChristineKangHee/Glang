@@ -79,8 +79,13 @@ class BadgeWidget extends StatelessWidget {
                                 shape: BoxShape.circle,
                               ),
                               child: Center(
-                                child: Icon(
-                                  Icons.star,
+                                child: badge['imageUrl'] != null
+                                    ? Image.asset(
+                                  badge['imageUrl'],
+                                  fit: BoxFit.cover,
+                                )
+                                    : Icon(
+                                  Icons.star, // 아이콘을 원하는 다른 것으로 변경 가능
                                   color: starColor,
                                   size: badgeSize * 0.3,
                                 ),
@@ -112,28 +117,55 @@ class BadgeWidget extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) {
+        final bool isObtained = badge['obtained'] as bool;
+        final Color backgroundColor = isObtained ? customColors.primary! : customColors.neutral60!;
+        final Color starColor = isObtained ? customColors.secondary! : customColors.neutral80!;
+
         return AlertDialog(
           title: Text(
             badge['name'] as String,
             style: body_medium_semi(context),
-            textAlign: TextAlign.center, // 중앙 정렬
+            textAlign: TextAlign.center,
           ),
-          content: Text(
-            description,
-            style: body_small(context).copyWith(color: customColors.neutral30),
-            textAlign: TextAlign.center, // 중앙 정렬
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: backgroundColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: badge['imageUrl'] != null
+                      ? Image.asset(
+                    badge['imageUrl'],
+                    fit: BoxFit.cover,
+                  )
+                      : Icon(
+                    Icons.star,
+                    color: starColor,
+                    size: 40,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                description,
+                style: body_small(context).copyWith(color: customColors.neutral30),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
           actions: [
             Align(
-              alignment: Alignment.center, // 버튼 중앙 정렬
-              child: Container(
-                child: ButtonPrimary_noPadding(
-                  function: () {
-                    Navigator.of(context).pop();
-                    print("확인");
-                  },
-                  title: '확인',
-                ),
+              alignment: Alignment.center,
+              child: ButtonPrimary_noPadding(
+                function: () {
+                  Navigator.of(context).pop();
+                },
+                title: '확인',
               ),
             ),
           ],
@@ -156,9 +188,8 @@ class BadgeWidget extends StatelessWidget {
       'obtained': false,
       'description': '꾸준한 학습 습관이 시작되었어요!',
       'howToEarn': '3일 연속 출석하기',
-      'imageUrl': 'assets/images/three_day_badge.png', // 이미지 경로 지정
     },
-    {'name': '7일 연속 출석', 'obtained': false, 'description': '일주일 동안 쉬지 않고 학습을 이어갔어요! 앞으로도 계속 도전해 보세요.', 'howToEarn': '7일 연속 출석하기'},
+    {'name': '7일 연속 출석', 'obtained': false, 'description': '일주일 동안 쉬지 않고 학습을 이어갔어요! 앞으로도 계속 도전해 보세요.', 'howToEarn': '7일 연속 출석하기', 'imageUrl': 'assets/images/seven_day_badge.png',},
     {'name': '요약 마스터', 'obtained': false, 'description': '핵심을 짚어내는 능력이 뛰어나군요! 요약 실력이 날로 성장하고 있어요.', 'howToEarn': '요약 미션 완수하기'},
     {'name': '비판적 사고가', 'obtained': false, 'description': '깊이 있는 질문을 던지는 능력이 돋보이네요!', 'howToEarn': '챗봇에게 질문하기'},
     {'name': '핵심찾기 고수', 'obtained': false, 'description': '텍스트 속에서 중요한 부분을 정확히 찾아내는 능력이 뛰나요!', 'howToEarn': '다지선다 미션 완수하기'},
