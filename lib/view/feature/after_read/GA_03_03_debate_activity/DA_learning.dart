@@ -6,6 +6,7 @@ import 'package:readventure/theme/font.dart';
 import 'package:readventure/view/feature/after_read/GA_03_03_debate_activity/widgets/debate_notifier.dart';
 import '../../../../model/section_data.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
+import '../../../../viewmodel/user_service.dart';
 import '../../../components/message_bubble.dart';
 import 'package:readventure/theme/theme.dart';
 import '../../../../api/debate_chatgpt_service.dart';
@@ -16,6 +17,7 @@ import 'dart:async';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'widgets/debate_provider.dart';
 import 'widgets/debate_state.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DebatePage extends ConsumerWidget {
   @override
@@ -245,6 +247,12 @@ class _DebateContentState extends ConsumerState<DebateContent> {
                         ref.invalidate(stagesProvider);
                         // ref.invalidate(selectedStageIdProvider); // 혹시 모를 캐싱 문제 방지
                       }
+
+                      final userId = ref.watch(userIdProvider);
+                      if (userId != null) {
+                        await ref.read(userServiceProvider).updateLearningTime(720);
+                      }
+
                       // Navigator.popUntil(
                       //   context,
                       //       (route) => route.settings.name == 'LearningActivitiesPage',

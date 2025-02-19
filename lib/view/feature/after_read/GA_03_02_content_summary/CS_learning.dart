@@ -211,9 +211,9 @@ class _CSLearningState extends ConsumerState<CSLearning> {
                     final elapsedSeconds = _appBarKey.currentState?.elapsedSeconds ?? 0;
 
                     // 사용자 학습 시간 업데이트
-                    final userId = FirebaseAuth.instance.currentUser?.uid;
+                    final userId = ref.watch(userIdProvider);
                     if (userId != null) {
-                      await UserService().updateLearningTime(elapsedSeconds);
+                      await ref.read(userServiceProvider).updateLearningTime(elapsedSeconds);
                     }
 
                     if (userId != null) {
