@@ -292,7 +292,7 @@ class LearningSection extends ConsumerWidget {
         // 초 단위를 시간과 분으로 변환
         final hours = learningTimeSeconds ~/ 3600;
         final minutes = (learningTimeSeconds % 3600) ~/ 60;
-        final formattedTime = "$hours시간 ${minutes}분";
+        final formattedTime = hours > 0 ? "$hours시간 ${minutes}분" : "$minutes분";
 
         final formattedMissionCount = "$completedMissionCount개";
 

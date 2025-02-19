@@ -241,13 +241,27 @@ final userCourseProvider = FutureProvider<String>((ref) async {
   return '미설정';
 });
 
-final userLearningStatsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
+// 이전 버전. FutureProvider로 가져옴으로써, 최초 한번만 가져오게 됌.
+// final userLearningStatsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
+//   final userId = FirebaseAuth.instance.currentUser?.uid;
+//   if (userId == null) {
+//     return {};
+//   }
+//   final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+//   return doc.data() ?? {};
+// });
+
+// StreamProvider를 사용해서 값이 바뀔때마다 바뀌게함.
+final userLearningStatsProvider = StreamProvider<Map<String, dynamic>>((ref) {
   final userId = FirebaseAuth.instance.currentUser?.uid;
   if (userId == null) {
-    return {};
+    return Stream.value({});
   }
-  final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
-  return doc.data() ?? {};
+  return FirebaseFirestore.instance
+      .collection('users')
+      .doc(userId)
+      .snapshots()
+      .map((snapshot) => snapshot.data() ?? {});
 });
 
 final userServiceProvider = Provider<UserService>((ref) {
