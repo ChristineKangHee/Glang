@@ -51,7 +51,7 @@ class DebatePage extends ConsumerWidget {
         leadingWidth: 90,
         leading: CountdownTimer(
           key: ValueKey(debateState.timerKey), // 타이머 재설정
-          initialSeconds: 5, //타이머 초
+          initialSeconds: 180, //타이머 초
           onTimerComplete: () {
             debateNotifier.nextRound(); // 라운드 전환
             if (!debateNotifier.state.isFinished) {
@@ -394,16 +394,16 @@ class _AIDiscussionSectionState extends ConsumerState<AIDiscussionSection> {
     _controller.clear();
 
     try {
-      // AI 응답 요청
-      final aiRole = isUserPro ? '반대' : '찬성'; // AI는 반대 역할
-      final response = await _debateService.getDebateResponse(
-        widget.topic,
-        "$aiRole 관점에서 대답해주세요: $userMessage",
+      // 기존 대화 내역(_messages) 전체와 함께 AI 응답 요청
+      final aiResponse = await _debateService.getDebateResponse(
+        topic: widget.topic,
+        conversationHistory: _messages.where((msg) => msg['role'] != 'error').toList(),
+        userInput: "[${!isUserPro ? '찬성' : '반대'}] $userMessage",
       );
 
       // AI 메시지 추가
       setState(() {
-        _messages.add({'role': 'assistant', 'content': "[${aiRole}] $response"});
+        _messages.add({'role': 'assistant', 'content': aiResponse});
       });
     } catch (e) {
       setState(() {
