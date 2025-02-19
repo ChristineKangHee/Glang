@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';
+import '../../../restart_widget.dart';
 import '../../../viewmodel/app_state_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -19,6 +20,7 @@ class SettingsPage extends ConsumerWidget {
       await FirebaseAuth.instance.signOut(); // Firebase 인증 상태 초기화
       ref.read(appStateProvider.notifier).clearUser(); // 전역 상태 초기화
       Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false); // 로그인 화면으로 이동
+      RestartWidget.restartApp(context);
     } catch (e) {
       print('로그아웃 오류: $e');
       ScaffoldMessenger.of(context).showSnackBar(
