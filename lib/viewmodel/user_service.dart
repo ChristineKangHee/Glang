@@ -244,3 +244,8 @@ final userLearningStatsProvider = FutureProvider<Map<String, dynamic>>((ref) asy
   final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
   return doc.data() ?? {};
 });
+
+final userServiceProvider = Provider<UserService>((ref) {
+  return UserService();
+});
+

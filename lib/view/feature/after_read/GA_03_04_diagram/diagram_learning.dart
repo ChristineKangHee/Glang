@@ -9,11 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:graphview/GraphView.dart';
 import 'package:readventure/view/feature/after_read/GA_03_04_diagram/submission_notifier.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../model/section_data.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
+import '../../../../viewmodel/user_service.dart';
 import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_button.dart';
 import '../../../home/stage_provider.dart';
@@ -90,6 +91,8 @@ class RootedTreeScreen extends ConsumerWidget {
     }
   }
 
+  final GlobalKey<CustomAppBar_2depth_8State> _appBarKey = GlobalKey<CustomAppBar_2depth_8State>();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // 1) 현재 스테이지 데이터 구독
@@ -147,9 +150,17 @@ class RootedTreeScreen extends ConsumerWidget {
       });
     }
     // SubmissionNotifier의 상태를 listen 합니다.
-    ref.listen<SubmissionStatus>(submissionNotifierProvider, (prev, next) {
+    ref.listen<SubmissionStatus>(submissionNotifierProvider, (prev, next) async {
       if (next == SubmissionStatus.success) {
         // 제출 성공 시 안전하게 네비게이션 실행
+        final elapsedSeconds = _appBarKey.currentState?.elapsedSeconds ?? 0;
+
+        // 사용자 학습시간 업데이트
+        final userId = ref.watch(userIdProvider);
+        if (userId != null) {
+          await ref.read(userServiceProvider).updateLearningTime(elapsedSeconds);
+        }
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => LearningActivitiesPage()),
@@ -159,7 +170,7 @@ class RootedTreeScreen extends ConsumerWidget {
     });
     return Scaffold(
       backgroundColor: customColors.neutral90,
-      appBar: CustomAppBar_2depth_8(title: '다이어그램'),
+      appBar: CustomAppBar_2depth_8(title: '다이어그램', key: _appBarKey,),
       body: Column(
         children: [
           // 상단 안내영역
