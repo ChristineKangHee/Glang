@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:readventure/viewmodel/user_photo_url_provider.dart';
 
+import '../restart_widget.dart';
+
 /// Firestore에서 사용자 정보를 관리하는 서비스 클래스
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -107,7 +109,8 @@ class UserService {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("탈퇴가 완료되었습니다. 다음에 또 만나요.")),
         );
-        Navigator.of(context).pushReplacementNamed('/login');
+        Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+        RestartWidget.restartApp(context);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

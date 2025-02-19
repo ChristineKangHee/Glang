@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:readventure/restart_widget.dart';
 import 'app.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -60,8 +61,10 @@ void main() async {
       supportedLocales: const [Locale('en'), Locale('ko')], // 지원 언어
       path: 'lib/localization/l10n', // JSON 파일 경로
       fallbackLocale: const Locale('ko'), // 기본 언어
-      child: const ProviderScope(
-        child: MyApp(),
+      child: const RestartWidget(
+        child: ProviderScope(
+          child: MyApp(),
+        ),
       ),
     ),
   );
