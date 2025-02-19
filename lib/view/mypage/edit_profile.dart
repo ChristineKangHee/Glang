@@ -17,6 +17,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class EditProfile extends ConsumerWidget {
   const EditProfile({super.key});
@@ -93,25 +94,35 @@ class _ProfileImageState extends ConsumerState<ProfileImage> {
       final file = File(pickedFile.path);
 
       try {
-        // Firebase Storage에 업로드 (예: profile_images/{uid}.jpg)
+        // 1. 파일을 읽어 원본 이미지 바이트 가져오기
+        final imageBytes = await file.readAsBytes();
+
+        // 2. flutter_image_compress를 사용해 이미지 압축/리사이즈 (예: 가로세로 300px)
+        final compressedImageBytes = await FlutterImageCompress.compressWithList(
+          imageBytes,
+          minWidth: 300,
+          minHeight: 300,
+          quality: 85, // 품질 조절 (0~100)
+          format: CompressFormat.jpeg,
+        );
+
+        // 3. Firebase Storage에 압축된 이미지 업로드 (예: profile_images/{uid}.jpg)
         final storageRef = FirebaseStorage.instance
             .ref()
             .child("profile_images")
             .child("${user.uid}.jpg");
-        final uploadTask = storageRef.putFile(file);
+        final uploadTask = storageRef.putData(compressedImageBytes);
         final snapshot = await uploadTask.whenComplete(() => null);
         final downloadUrl = await snapshot.ref.getDownloadURL();
 
-        // FirebaseAuth의 photoURL 업데이트
+        // 4. FirebaseAuth의 photoURL과 Firestore 사용자 문서 업데이트
         await user.updatePhotoURL(downloadUrl);
-
-        // Firestore 사용자 문서에 photoURL 업데이트
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
             .update({'photoURL': downloadUrl});
 
-        // Provider 상태 업데이트
+        // 5. Provider 상태 업데이트
         ref.read(userPhotoUrlProvider.notifier).updatePhotoUrl(downloadUrl);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
