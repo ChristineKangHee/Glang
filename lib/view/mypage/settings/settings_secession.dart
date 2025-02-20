@@ -8,45 +8,61 @@ import '../../../viewmodel/user_service.dart';
 import '../../components/custom_app_bar.dart';
 import '../../components/custom_button.dart';
 
-class SettingsSecession extends ConsumerWidget {
-  const SettingsSecession({super.key});
+class SettingsSecession extends ConsumerStatefulWidget {
+  const SettingsSecession({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final userName = ref.watch(userNameProvider); // 사용자 이름 상태 구독
+  _SettingsSecessionState createState() => _SettingsSecessionState();
+}
+
+class _SettingsSecessionState extends ConsumerState<SettingsSecession> {
+  bool _isDeleting = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final userName = ref.watch(userNameProvider);
     final customColors = ref.watch(customColorsProvider);
     final userService = UserService();
 
     return Scaffold(
-      appBar:
-      CustomAppBar_2depth_4(
+      appBar: CustomAppBar_2depth_4(
         title: '탈퇴하기'.tr(),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Align(
-              alignment: Alignment.centerLeft, // Aligning the text to the left
-              child: Text("$userName님,\n정말 탈퇴하시나요?", style: heading_large(context)),
-            ),
-            SizedBox(height: 8,),
-            Align(
-              alignment: Alignment.centerLeft, // Aligning the text to the left
-              child: Text(
-                "탈퇴 시 모든 데이터가 삭제되며 복구가 불가능합니다",
-                style: body_small(context).copyWith(color: customColors.neutral60),
-              ),
+            Text("$userName님,\n정말 탈퇴하시나요?", style: heading_large(context)),
+            SizedBox(height: 8),
+            Text(
+              "탈퇴 시 모든 데이터가 삭제되며 복구가 불가능합니다",
+              style: body_small(context).copyWith(color: customColors.neutral60),
             ),
           ],
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0), // 하단 여백 추가
+        padding: const EdgeInsets.all(16.0),
         child: SizedBox(
-          width: double.infinity, // 버튼이 가득 차도록 설정
+          width: double.infinity,
           child: ButtonPrimary_noPadding(
-            function: () => userService.deleteAccount(context, ref),
+            // _isDeleting가 true이면 버튼 비활성화 (혹은 함수 내에서 아무 작업도 하지 않도록)
+            function: _isDeleting
+                ? () {}
+                : () async {
+              setState(() {
+                _isDeleting = true;
+              });
+              await userService.deleteAccount(context, ref);
+              // 탈퇴 후에는 Navigator로 이동되지만,
+              // 혹시 모를 에러나 후처리를 위해 _isDeleting 상태 복구
+              if (mounted) {
+                setState(() {
+                  _isDeleting = false;
+                });
+              }
+            },
             title: '탈퇴하기',
           ),
         ),
@@ -54,3 +70,4 @@ class SettingsSecession extends ConsumerWidget {
     );
   }
 }
+
