@@ -44,6 +44,7 @@ class WritingFormComponent extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: TextField(
+                  maxLength: 100,
                   controller: titleController, // 제목 입력을 위한 컨트롤러
                   focusNode: titleFocusNode, // 제목 입력 포커스를 관리하는 FocusNode
                   decoration: InputDecoration(

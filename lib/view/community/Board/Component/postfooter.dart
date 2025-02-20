@@ -101,19 +101,20 @@ class PostFooter extends StatelessWidget {
 
   /// 작성자 정보를 표시하는 위젯
   ///
-  /// Firebase Firestore에서 작성자 정보를 가져와 프로필 이미지를 표시합니다.
+  /// Firestore의 사용자 문서를 실시간으로 구독하여
+  /// 프로필 이미지와 최신 닉네임을 표시합니다.
   Widget _buildWriterInformation(BuildContext context) {
-    return FutureBuilder<DocumentSnapshot>(
-      future: FirebaseFirestore.instance
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance
           .collection('users')
           .doc(post.authorId)
-          .get(),
+          .snapshots(),
       builder: (context, snapshot) {
-        // 기본 아바타 이미지 경로
         String imageUrl = 'assets/images/default_avatar.png';
+        // 기본적으로 post.nickname을 사용하지만, Firestore에서 업데이트된 값이 있으면 대체함.
+        String nickname = post.nickname;
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          /// 로딩 중이면 기본 아바타와 로딩 인디케이터를 표시
           return Row(
             children: [
               CircleAvatar(
@@ -123,7 +124,7 @@ class PostFooter extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                post.nickname,
+                nickname,
                 style: body_xsmall_semi(context)
                     .copyWith(color: customColors.neutral30),
               ),
@@ -131,13 +132,17 @@ class PostFooter extends StatelessWidget {
           );
         }
 
-        // 데이터 로드 성공 시 프로필 이미지 적용
-        if (snapshot.hasData) {
+        if (snapshot.hasData && snapshot.data!.exists) {
           final userData = snapshot.data!.data() as Map<String, dynamic>?;
-          if (userData != null &&
-              userData['photoURL'] != null &&
-              userData['photoURL'].toString().isNotEmpty) {
-            imageUrl = userData['photoURL'];
+          if (userData != null) {
+            if (userData['photoURL'] != null &&
+                userData['photoURL'].toString().isNotEmpty) {
+              imageUrl = userData['photoURL'];
+            }
+            if (userData['nickname'] != null &&
+                userData['nickname'].toString().isNotEmpty) {
+              nickname = userData['nickname'];
+            }
           }
         }
 
@@ -152,7 +157,7 @@ class PostFooter extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              post.nickname,
+              nickname,
               style: body_xsmall_semi(context)
                   .copyWith(color: customColors.neutral30),
             ),
@@ -161,4 +166,5 @@ class PostFooter extends StatelessWidget {
       },
     );
   }
+
 }
