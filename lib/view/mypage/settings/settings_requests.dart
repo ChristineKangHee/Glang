@@ -16,8 +16,8 @@ class SettingsRequests extends ConsumerWidget {
       scheme: 'mailto',
       path: 'hgu.zero24@gmail.com',
       queryParameters: {
-        'subject': '[문의] 앱 사용 중 불편 사항',
-        'body': '안녕하세요,\n\n아래 내용을 작성하여 문의해 주세요:\n\n- 발생한 문제:\n- 기기 및 OS 정보:\n- 추가 의견:\n\n감사합니다.',
+        'subject': '[문의]앱_사용_중_불편_사항',
+        'body': '안녕하세요,\n\n아래_내용을_작성하여_문의해_주세요:\n\n-발생한_문제:\n-기기_및_OS_정보:\n-추가_의견:\n\n감사합니다.',
       },
     );
 
