@@ -124,24 +124,66 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
               const SizedBox(height: 20),
 
               // 🔹 좋아요 & 조회수 UI
+              // 🔹 좋아요 & 조회수 UI 부분의 수정 예시
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: customColors.neutral90, // neutral80 (예제 값, 실제 색상 코드 확인 필요)
-                        backgroundImage: widget.post.profileImage.startsWith('http')
-                            ? NetworkImage(widget.post.profileImage)
-                            : AssetImage(widget.post.profileImage) as ImageProvider,
-                        radius: 16,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(widget.post.nickname,
-                          style: body_xsmall_semi(context)
-                              .copyWith(color: customColors.neutral30)),
-                    ],
+                  // 작성자 프로필 정보: FutureBuilder를 통해 동적 조회
+                  FutureBuilder<DocumentSnapshot>(
+                    future: FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(widget.post.authorId)
+                        .get(),
+                    builder: (context, snapshot) {
+                      String imageUrl = 'assets/images/default_avatar.png';
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Row(
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: customColors.neutral90,
+                              radius: 16,
+                              child: const CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              widget.post.nickname,
+                              style: body_xsmall_semi(context)
+                                  .copyWith(color: customColors.neutral30),
+                            ),
+                          ],
+                        );
+                      } else if (snapshot.hasError) {
+                        // 에러 발생 시 기본 이미지 사용
+                        imageUrl = 'assets/images/default_avatar.png';
+                      } else if (snapshot.hasData) {
+                        final userData =
+                        snapshot.data!.data() as Map<String, dynamic>?;
+                        if (userData != null &&
+                            userData['photoURL'] != null &&
+                            userData['photoURL'].toString().isNotEmpty) {
+                          imageUrl = userData['photoURL'];
+                        }
+                      }
+                      return Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: customColors.neutral90,
+                            backgroundImage: imageUrl.startsWith('http')
+                                ? NetworkImage(imageUrl)
+                                : AssetImage(imageUrl) as ImageProvider,
+                            radius: 16,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            widget.post.nickname,
+                            style: body_xsmall_semi(context)
+                                .copyWith(color: customColors.neutral30),
+                          ),
+                        ],
+                      );
+                    },
                   ),
+                  // 좋아요 및 조회수 표시
                   Row(
                     children: [
                       IconButton(
@@ -157,7 +199,8 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                             .copyWith(color: customColors.neutral60),
                       ),
                       const SizedBox(width: 16),
-                      Icon(Icons.remove_red_eye, size: 20, color: customColors.neutral60),
+                      Icon(Icons.remove_red_eye,
+                          size: 20, color: customColors.neutral60),
                       const SizedBox(width: 6),
                       Text(
                         widget.post.views.toString(),
@@ -167,7 +210,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                     ],
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),

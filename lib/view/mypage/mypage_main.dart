@@ -159,16 +159,10 @@ class UserProfileSection extends ConsumerWidget {
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 // 이미지 로딩 실패 시 fallback 이미지
-                return SvgPicture.asset(
-                  'assets/images/character.svg',
-                  fit: BoxFit.fill,
-                );
+                return Image.asset('assets/images/default_avatar.png', fit: BoxFit.cover);
               },
             )
-                : SvgPicture.asset(
-              'assets/images/character.svg',
-              fit: BoxFit.fill,
-            ),
+                : Image.asset('assets/images/default_avatar.png', fit: BoxFit.cover),
           ),
         ),
         const SizedBox(width: 24),
