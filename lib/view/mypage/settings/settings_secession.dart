@@ -13,13 +13,18 @@ import '../../../viewmodel/user_service.dart';
 import '../../components/custom_app_bar.dart';
 import '../../components/custom_button.dart';
 
-// 설정 - 회원 탈퇴 화면 위젯
-class SettingsSecession extends ConsumerWidget {
-  const SettingsSecession({super.key});
+class SettingsSecession extends ConsumerStatefulWidget {
+  const SettingsSecession({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // 사용자 이름 상태 구독
+  _SettingsSecessionState createState() => _SettingsSecessionState();
+}
+
+class _SettingsSecessionState extends ConsumerState<SettingsSecession> {
+  bool _isDeleting = false;
+
+  @override
+  Widget build(BuildContext context) {
     final userName = ref.watch(userNameProvider);
     // 커스텀 색상 테마 상태 구독
     final customColors = ref.watch(customColorsProvider);
@@ -27,13 +32,14 @@ class SettingsSecession extends ConsumerWidget {
     final userService = UserService();
 
     return Scaffold(
-      // 커스텀 앱 바 적용 (2단계, 4종류)
+    // 커스텀 앱 바 적용 (2단계, 4종류)
       appBar: CustomAppBar_2depth_4(
-        title: '탈퇴하기'.tr(), // 다국어 처리된 제목
+        title: '탈퇴하기'.tr(),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 사용자 이름을 포함한 탈퇴 확인 메시지
             Align(
@@ -61,7 +67,22 @@ class SettingsSecession extends ConsumerWidget {
         child: SizedBox(
           width: double.infinity,
           child: ButtonPrimary_noPadding(
-            function: () => userService.deleteAccount(context, ref), // 계정 삭제 기능 실행
+            // _isDeleting가 true이면 버튼 비활성화 (혹은 함수 내에서 아무 작업도 하지 않도록)
+            function: _isDeleting
+                ? () {}
+                : () async {
+              setState(() {
+                _isDeleting = true;
+              });
+              await userService.deleteAccount(context, ref);
+              // 탈퇴 후에는 Navigator로 이동되지만,
+              // 혹시 모를 에러나 후처리를 위해 _isDeleting 상태 복구
+              if (mounted) {
+                setState(() {
+                  _isDeleting = false;
+                });
+              }
+            },
             title: '탈퇴하기',
           ),
         ),
@@ -69,3 +90,4 @@ class SettingsSecession extends ConsumerWidget {
     );
   }
 }
+
