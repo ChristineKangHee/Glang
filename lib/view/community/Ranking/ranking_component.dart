@@ -28,13 +28,15 @@ Future<List<Map<String, dynamic>>> getRankings() async {
         userData['totalXP'] = 0;
       }
 
-      rankings.add({
-        'id': doc.id,
-        'name': userData['nickname'] ?? userData['email'] ?? 'Unknown',
-        'experience': userData['totalXP'] ?? 0,
-        // Firestore에 저장된 사진 URL (업데이트되었으면 Firebase Cloud Storage의 URL)
-        'image': userData['photoURL'] ?? 'assets/images/default_avatar.png',
-      });
+      // Check if the user's email is "hgu.zero24@gmail.com"
+      if (userData['email'] != 'hgu.zero24@gmail.com') {
+        rankings.add({
+          'id': doc.id,
+          'name': userData['nickname'] ?? userData['email'] ?? 'Unknown',
+          'experience': userData['totalXP'] ?? 0,
+          'image': userData['photoURL'] ?? 'assets/images/default_avatar.png',
+        });
+      }
     }
 
     rankings.sort((a, b) {
@@ -50,6 +52,7 @@ Future<List<Map<String, dynamic>>> getRankings() async {
     rethrow;
   }
 }
+
 
 
 /// 랭킹 카드 (프로필 사진 포함)
