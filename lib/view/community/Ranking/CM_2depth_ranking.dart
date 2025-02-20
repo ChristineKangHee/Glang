@@ -1,3 +1,9 @@
+/// File: CM_2detph_ranking.dart
+/// Purpose: 랭킹 페이지를 구성하는 화면
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
+
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

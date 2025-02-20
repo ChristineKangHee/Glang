@@ -1,3 +1,8 @@
+/// File: postaction_bottomsheet.dart
+/// Purpose: 게시글에 대한 여러 가지 액션(편집, 삭제, 공유)을 선택할 수 있는 BottomSheet 위젯.
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
 /*
 // PostActionBottomSheet: 게시글의 편집, 삭제, 공유 등의 액션을 제공하는 BottomSheet 위젯입니다.
 // 사용 예시:

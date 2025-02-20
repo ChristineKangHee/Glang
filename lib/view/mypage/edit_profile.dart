@@ -2,7 +2,7 @@
 /// Purpose: 사용자의 정보를 수정할 수 있다.
 /// Author: 윤은서
 /// Created: 2025-01-08
-/// Last Modified: 2025-01-29 by 윤은서
+/// Last Modified: 2025-02-17 by 강희
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

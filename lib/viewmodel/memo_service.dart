@@ -1,3 +1,8 @@
+/// File: memo_service.dart
+/// Purpose: memo service 함수
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../model/memo_model.dart';

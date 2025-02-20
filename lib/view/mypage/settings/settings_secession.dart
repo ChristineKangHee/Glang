@@ -1,4 +1,8 @@
-// settings_secession.dart
+/// File: settings_secession.dart
+/// Purpose: 설정 - 회원 탈퇴 화면 위젯
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

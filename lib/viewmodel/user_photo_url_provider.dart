@@ -1,3 +1,8 @@
+/// File: user_photo_url_provider.dart
+/// Purpose: 현재 사용자의 프로필 사진 URL을 관리하는 상태 프로바이더
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
 // user_photo_url_provider.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';

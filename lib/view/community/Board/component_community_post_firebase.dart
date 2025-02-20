@@ -1,3 +1,10 @@
+/// File: component_community_post_firebase.dart
+/// Purpose: 게시물 아이템을 표시하는 위젯
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
+
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../theme/font.dart';

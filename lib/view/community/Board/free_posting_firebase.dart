@@ -1,3 +1,9 @@
+/// File: free_posting_firebase.dart
+/// Purpose: 자유글 작성 페이지 클래스
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

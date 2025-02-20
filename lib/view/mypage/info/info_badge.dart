@@ -1,3 +1,8 @@
+/// File: info_badge.dart
+/// Purpose: 뱃지 리스트 구성화면
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
