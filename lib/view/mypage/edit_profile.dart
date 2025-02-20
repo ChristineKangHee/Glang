@@ -94,19 +94,15 @@ class _ProfileImageState extends ConsumerState<ProfileImage> {
       final file = File(pickedFile.path);
 
       try {
-        // 1. 파일을 읽어 원본 이미지 바이트 가져오기
         final imageBytes = await file.readAsBytes();
-
-        // 2. flutter_image_compress를 사용해 이미지 압축/리사이즈 (예: 가로세로 300px)
         final compressedImageBytes = await FlutterImageCompress.compressWithList(
           imageBytes,
           minWidth: 300,
           minHeight: 300,
-          quality: 85, // 품질 조절 (0~100)
+          quality: 85,
           format: CompressFormat.jpeg,
         );
 
-        // 3. Firebase Storage에 압축된 이미지 업로드 (예: profile_images/{uid}.jpg)
         final storageRef = FirebaseStorage.instance
             .ref()
             .child("profile_images")
@@ -115,14 +111,12 @@ class _ProfileImageState extends ConsumerState<ProfileImage> {
         final snapshot = await uploadTask.whenComplete(() => null);
         final downloadUrl = await snapshot.ref.getDownloadURL();
 
-        // 4. FirebaseAuth의 photoURL과 Firestore 사용자 문서 업데이트
         await user.updatePhotoURL(downloadUrl);
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
             .update({'photoURL': downloadUrl});
 
-        // 5. Provider 상태 업데이트
         ref.read(userPhotoUrlProvider.notifier).updatePhotoUrl(downloadUrl);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -137,33 +131,33 @@ class _ProfileImageState extends ConsumerState<ProfileImage> {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     final photoUrl = ref.watch(userPhotoUrlProvider);
     return Center(
-      child: Stack(
-        children: [
-          Container(
-            width: 120,
-            height: 120,
-            decoration: ShapeDecoration(
-              shape: const CircleBorder(side: BorderSide(width: 3)),
-              color: customColors.neutral0,
-              shadows: [
-                BoxShadow(
-                  color: customColors.primary!,
-                  spreadRadius: 1,
-                ),
-              ],
+      child: InkWell(
+        onTap: _pickAndUploadImage,
+        borderRadius: BorderRadius.circular(60), // 동그란 모양 유지
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              decoration: ShapeDecoration(
+                shape: const CircleBorder(),
+                shadows: [
+                  BoxShadow(
+                    color: customColors.primary!,
+                    spreadRadius: 4,
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: photoUrl != null && photoUrl.isNotEmpty
+                    ? Image.network(photoUrl, fit: BoxFit.cover)
+                    : Image.asset('assets/images/default_avatar.png', fit: BoxFit.cover),
+              ),
             ),
-            child: ClipOval(
-              child: photoUrl != null && photoUrl.isNotEmpty
-                  ? Image.network(photoUrl, fit: BoxFit.cover)
-                  : Image.asset('assets/images/default_avatar.png', fit: BoxFit.cover),
-            ),
-          ),
-          // 오른쪽 하단의 수정 아이콘
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: InkWell(
-              onTap: _pickAndUploadImage,
+            Positioned(
+              bottom: 0,
+              right: 0,
               child: Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -177,13 +171,12 @@ class _ProfileImageState extends ConsumerState<ProfileImage> {
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
-
 
 /// 닉네임 편집 섹션
 class EditNick extends ConsumerStatefulWidget {
