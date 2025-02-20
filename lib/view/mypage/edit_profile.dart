@@ -29,7 +29,7 @@ class EditProfile extends ConsumerWidget {
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(title: "내 정보 수정"),
-      backgroundColor: customColors.white,
+      backgroundColor: customColors.neutral100,
       body: EditInfo(
         userName: userName,
       ),
@@ -164,9 +164,9 @@ class _ProfileImageState extends ConsumerState<ProfileImage> {
                   color: customColors.primary ?? Colors.deepPurpleAccent,
                 ),
                 padding: const EdgeInsets.all(4),
-                child: const Icon(
+                child: Icon(
                   Icons.camera_alt_rounded,
-                  color: Colors.white,
+                  color: customColors.neutral100,
                   size: 20,
                 ),
               ),

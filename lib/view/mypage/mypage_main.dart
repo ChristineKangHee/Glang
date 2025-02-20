@@ -220,6 +220,7 @@ class UserStatsSection extends ConsumerWidget {
     final xpAsyncValue = ref.watch(userXPProvider); // 경험치
     final courseAsyncValue = ref.watch(userCourseProvider); // 코스
     final rankingAsyncValue = ref.watch(myRankingProvider); // 내 랭킹
+    final customColors = ref.watch(customColorsProvider);
 
     return SizedBox(
       height: 50,
@@ -233,7 +234,7 @@ class UserStatsSection extends ConsumerWidget {
               error: (_, __) => const StatBox(value: '오류', label: '경험치'),
             ),
           ),
-          VerticalDivider(color: Theme.of(context).extension<CustomColors>()?.neutral80),
+          VerticalDivider(color: customColors.neutral80),
           Expanded(
             child: courseAsyncValue.when(
               data: (course) => StatBox(value: course, label: '코스'),
@@ -241,7 +242,7 @@ class UserStatsSection extends ConsumerWidget {
               error: (_, __) => const StatBox(value: '오류', label: '코스'),
             ),
           ),
-          VerticalDivider(color: Theme.of(context).extension<CustomColors>()?.neutral80),
+          VerticalDivider(color: customColors.neutral80),
           Expanded(
             child: rankingAsyncValue.when(
               data: (rank) => StatBox(value: rank.toString()+'위', label: '랭킹'),
