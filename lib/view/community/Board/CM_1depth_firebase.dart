@@ -172,60 +172,60 @@ class _CommunityPreviewState extends State<CommunityPreview> {
         _buildPostNavigation(context, widget.customColors),  // 게시판 내비게이션
         SizedBox(
           height: 190,  // 게시글 미리보기 높이 설정
-          child: Padding(
-            padding: const EdgeInsets.only(left: 16),
-            child: PageView.builder(
-              padEnds: false,
-              controller: _pageController,  // 페이지 컨트롤러 연결
-              itemCount: topPosts.length,  // 상위 3개 게시글만 표시
-              itemBuilder: (context, index) {
-                final post = topPosts[index];  // 각 게시글 가져오기
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PostDetailPage(post: post),  // 게시글 상세 페이지로 이동
-                      ),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    margin: const EdgeInsets.only(right: 16),
-                    decoration: BoxDecoration(
-                      color: widget.customColors.neutral100,  // 배경 색상 설정
-                      borderRadius: BorderRadius.circular(20),  // 둥근 모서리
+          child: PageView.builder(
+            padEnds: false,
+            controller: _pageController,
+            itemCount: topPosts.length,
+            itemBuilder: (context, index) {
+              final post = topPosts[index];
+              // 첫번째는 왼쪽 마진 16, 나머지는 8; 마지막은 오른쪽 마진 16, 나머지는 8
+              final double leftMargin = index == 0 ? 16.0 : 8.0;
+              final double rightMargin = index == topPosts.length - 1 ? 16.0 : 8.0;
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PostDetailPage(post: post),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 헤더: 태그와 날짜 표시
-                        PostHeader(post: post, customColors: widget.customColors),
-                        const SizedBox(height: 8),
-                        Text(
-                          post.title,  // 게시글 제목
-                          style: body_small_semi(context),
-                          overflow: TextOverflow.ellipsis,  // 제목이 길어지면 생략 표시
-                          maxLines: 1,
-                        ),
-                        const SizedBox(height: 8),
-                        Expanded(
-                          child: Text(
-                            post.content,  // 게시글 내용
-                            style: body_xxsmall(context),
-                            maxLines: 2,  // 내용 최대 2줄 표시
-                            overflow: TextOverflow.ellipsis,  // 내용이 길어지면 생략 표시
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        // 풋터: 작성자, 좋아요, 조회수 표시
-                        PostFooter(post: post, customColors: widget.customColors),
-                      ],
-                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  margin: EdgeInsets.only(left: leftMargin, right: rightMargin),
+                  decoration: BoxDecoration(
+                    color: widget.customColors.neutral100,
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                );
-              },
-            ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 헤더: 태그와 날짜 표시
+                      PostHeader(post: post, customColors: widget.customColors),
+                      const SizedBox(height: 8),
+                      Text(
+                        post.title,  // 게시글 제목
+                        style: body_small_semi(context),
+                        overflow: TextOverflow.ellipsis,  // 제목이 길어지면 생략 표시
+                        maxLines: 1,
+                      ),
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: Text(
+                          post.content,  // 게시글 내용
+                          style: body_xxsmall(context),
+                          maxLines: 2,  // 내용 최대 2줄 표시
+                          overflow: TextOverflow.ellipsis,  // 내용이 길어지면 생략 표시
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      // 풋터: 작성자, 좋아요, 조회수 표시
+                      PostFooter(post: post, customColors: widget.customColors),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ],

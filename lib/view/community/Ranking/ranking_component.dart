@@ -323,14 +323,22 @@ Widget buildRankingList(BuildContext context, CustomColors customColors) {
             leading: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  '$rank',
-                  style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                Container(
+                  width: 30,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      '$rank',
+                      textAlign: TextAlign.center,
+                      style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 20),
-                // 현재 사용자의 경우 provider를 사용하도록 Consumer로 감쌈
+                const SizedBox(width: 16),
+                // 이미지 위젯 부분
                 Consumer(
                   builder: (context, ref, child) {
+                    // 현재 사용자 및 이미지 경로 처리
                     final currentUser = FirebaseAuth.instance.currentUser;
                     String imagePath;
                     if (currentUser != null && user['id'] == currentUser.uid) {
