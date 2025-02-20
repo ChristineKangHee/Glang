@@ -133,7 +133,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
               .map<Widget>((tag) => Padding(
             padding: const EdgeInsets.only(right: 8),
             child: Text(
-              '#'+tag,
+              '#' + tag,
               style: body_xxsmall(context).copyWith(color: customColors.primary60),
             ),
           ))
@@ -157,14 +157,15 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // 작성자 프로필 정보: FutureBuilder를 통해 동적 조회
-        FutureBuilder<DocumentSnapshot>(
-          future: FirebaseFirestore.instance
+        // 작성자 프로필 정보: StreamBuilder를 통해 실시간 업데이트
+        StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance
               .collection('users')
               .doc(widget.post.authorId)
-              .get(),
+              .snapshots(),
           builder: (context, snapshot) {
             String imageUrl = 'assets/images/default_avatar.png'; // 기본 이미지 설정
+            String nickname = widget.post.nickname;
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Row(
                 children: [
@@ -175,21 +176,21 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    widget.post.nickname,
-                    style: body_xsmall_semi(context)
-                        .copyWith(color: customColors.neutral30),
+                    nickname,
+                    style: body_xsmall_semi(context).copyWith(color: customColors.neutral30),
                   ),
                 ],
               );
-            } else if (snapshot.hasError) {
-              imageUrl = 'assets/images/default_avatar.png'; // 에러 발생 시 기본 이미지
-            } else if (snapshot.hasData) {
-              final userData =
-              snapshot.data!.data() as Map<String, dynamic>?;
-              if (userData != null &&
-                  userData['photoURL'] != null &&
-                  userData['photoURL'].toString().isNotEmpty) {
-                imageUrl = userData['photoURL']; // 프로필 이미지 URL
+            }
+            if (snapshot.hasData && snapshot.data!.exists) {
+              final userData = snapshot.data!.data() as Map<String, dynamic>?;
+              if (userData != null) {
+                if (userData['photoURL'] != null && userData['photoURL'].toString().isNotEmpty) {
+                  imageUrl = userData['photoURL'];
+                }
+                if (userData['nickname'] != null && userData['nickname'].toString().isNotEmpty) {
+                  nickname = userData['nickname'];
+                }
               }
             }
             return Row(
@@ -203,9 +204,8 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  widget.post.nickname,
-                  style: body_xsmall_semi(context)
-                      .copyWith(color: customColors.neutral30),
+                  nickname,
+                  style: body_xsmall_semi(context).copyWith(color: customColors.neutral30),
                 ),
               ],
             );
@@ -230,17 +230,14 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
         ),
         Text(
           likeCount.toString(),
-          style: body_small_semi(context)
-              .copyWith(color: customColors.neutral60),
+          style: body_small_semi(context).copyWith(color: customColors.neutral60),
         ),
         const SizedBox(width: 16),
-        Icon(Icons.remove_red_eye,
-            size: 20, color: customColors.neutral60),
+        Icon(Icons.remove_red_eye, size: 20, color: customColors.neutral60),
         const SizedBox(width: 6),
         Text(
           widget.post.views.toString(),
-          style: body_small_semi(context)
-              .copyWith(color: customColors.neutral60),
+          style: body_small_semi(context).copyWith(color: customColors.neutral60),
         ),
       ],
     );
