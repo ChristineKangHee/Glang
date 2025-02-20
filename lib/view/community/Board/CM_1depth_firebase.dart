@@ -1,3 +1,9 @@
+/// File: CM_1depth_firebase.dart
+/// Purpose: 커뮤니티 메인 페이지
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/view/community/Board/posting_detail_page.dart';

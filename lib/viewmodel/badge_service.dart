@@ -1,3 +1,8 @@
+/// File: badge_service.dart
+/// Purpose: 사용자가 획득한 배지를 실시간으로 제공하는 StreamProvider
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

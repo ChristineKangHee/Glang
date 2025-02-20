@@ -1,3 +1,8 @@
+/// File: ranking_component.dart
+/// Purpose: 랭킹 페이지를 component
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

@@ -1,3 +1,8 @@
+/// File: settings_requests.dart
+/// Purpose: 설정 화면에서 '문의 및 개선 사항 요청'을 위한 위젯
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';

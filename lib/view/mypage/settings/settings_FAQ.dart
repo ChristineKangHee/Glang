@@ -1,3 +1,8 @@
+/// File: settings_FAQ.dart
+/// Purpose: FAQ 페이지를 구성하는 화면
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

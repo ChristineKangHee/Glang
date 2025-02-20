@@ -1,3 +1,8 @@
+/// File: settings_politics.dart
+/// Purpose: 약관 및 정책 화면을 표시하는 위젯
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

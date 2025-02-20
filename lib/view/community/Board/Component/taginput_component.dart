@@ -1,3 +1,8 @@
+/// File: keyword_selection.dart
+/// Purpose: TagInputComponent: 태그 입력 및 관리 컴포넌트
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';

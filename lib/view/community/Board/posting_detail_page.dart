@@ -1,3 +1,9 @@
+/// File: posting_detail_page.dart
+/// Purpose: 게시글 상세 페이지
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../theme/font.dart';

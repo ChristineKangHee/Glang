@@ -1,3 +1,9 @@
+/// File: post_editPage.dart
+/// Purpose: 게시글 수정 화면을 담당하는 위젯
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

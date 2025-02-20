@@ -1,3 +1,8 @@
+/// File: badge_provider.dart
+/// Purpose: 배지 데이터를 스트리밍으로 제공하는 Provider
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/badge_data.dart'; // AppBadge가 정의된 파일

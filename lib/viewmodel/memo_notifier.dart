@@ -1,3 +1,8 @@
+/// File: memo_notifier.dart
+/// Purpose:  메모 목록을 관리하는 StateNotifierProvider 정의
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../model/memo_model.dart';

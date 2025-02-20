@@ -1,3 +1,9 @@
+/// File: essay_posting_firebase.dart
+/// Purpose: 에세이 게시 페이지 클래스
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
+
 // 필요한 패키지들 임포트
 import 'dart:async';
 import 'dart:math';

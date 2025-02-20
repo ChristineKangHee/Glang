@@ -1,3 +1,9 @@
+/// File: CM_2depth_boardMain_firebase.dart
+/// Purpose: 커뮤니티 게시판 화면 (Cm2depthBoardmain)
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
+
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

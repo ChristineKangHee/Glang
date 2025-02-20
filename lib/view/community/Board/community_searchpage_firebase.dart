@@ -1,3 +1,10 @@
+/// File: community_searchpage_firebase.dart
+/// Purpose: 검색 페이지 위젯 클래스
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
+
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';

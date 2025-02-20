@@ -1,3 +1,9 @@
+/// File: keyword_selection.dart
+/// Purpose: WritingFormComponent 위젯은 글 제목과 내용을 입력받는 폼을 구성한다.
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
+
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';
