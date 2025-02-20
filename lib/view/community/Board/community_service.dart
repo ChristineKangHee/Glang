@@ -20,7 +20,7 @@ class CommunityService {
       if (user == null) throw Exception("로그인이 필요합니다.");
 
       final userDoc = await _firestore.collection('users').doc(user.uid).get();
-      final nickname = userDoc.data()?['nickname'] ?? '익명'; // Firestore에서 닉네임 가져오기
+      final nickname = userDoc.data()?['nickname'] ?? '익명';
 
       final postRef = _firestore.collection('posts').doc();
       final postData = {
@@ -28,8 +28,11 @@ class CommunityService {
         'title': title,
         'content': content,
         'authorId': user.uid,
-        'nickname': nickname, // authorName 대신 nickname 저장
-        'profileImage': user.photoURL ?? '',
+        'nickname': nickname,
+        // photoURL이 유효하면 사용, 그렇지 않으면 기본 아바타 지정
+        'profileImage': (user.photoURL != null && user.photoURL!.isNotEmpty)
+            ? user.photoURL
+            : 'assets/images/default_avatar.png',
         'tags': tags,
         'likes': 0,
         'views': 0,
