@@ -15,18 +15,19 @@ import 'essay_posting_firebase.dart';
 import 'free_posting_firebase.dart';
 import 'mission_posting.dart';
 
+/// 🔹 커뮤니티 게시판 화면 (Cm2depthBoardmain)
 class Cm2depthBoardmain extends ConsumerWidget {
-  final CommunityService _communityService = CommunityService();
+  final CommunityService _communityService = CommunityService(); // 🔹 커뮤니티 서비스 인스턴스
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final customColors = ref.watch(customColorsProvider);
-    final isDialOpen = ValueNotifier(false);
+    final customColors = ref.watch(customColorsProvider); // 🔹 사용자 정의 색상
+    final isDialOpen = ValueNotifier(false); // 🔹 플로팅 액션 버튼 상태
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_5(
-        title: '게시판',
-        onIconPressed: () {
+      appBar: CustomAppBar_2depth_5( // 🔹 커스텀 앱바
+        title: '게시판', // 🔹 제목
+        onIconPressed: () { // 🔹 아이콘 클릭 시 검색 페이지로 이동
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => SearchPage()),
@@ -34,48 +35,48 @@ class Cm2depthBoardmain extends ConsumerWidget {
         },
       ),
       body: DefaultTabController(
-        length: 3,
+        length: 3, // 🔹 탭 개수
         child: Column(
           children: [
             TabBar(
-              labelStyle: body_small_semi(context),
-              indicatorColor: customColors.primary,
-              dividerColor: customColors.neutral80,
+              labelStyle: body_small_semi(context), // 🔹 탭 라벨 스타일
+              indicatorColor: customColors.primary, // 🔹 탭 선택 색상
+              dividerColor: customColors.neutral80, // 🔹 탭 구분선 색상
               tabs: const [
-                Tab(text: '전체'),
-                Tab(text: '에세이'),
-                Tab(text: '자유글'),
+                Tab(text: '전체'), // 🔹 전체 탭
+                Tab(text: '에세이'), // 🔹 에세이 탭
+                Tab(text: '자유글'), // 🔹 자유글 탭
               ],
             ),
             Expanded(
               child: TabBarView(
                 children: [
-                  _buildPostList(context, customColors, category: null), // 전체
-                  _buildPostList(context, customColors, category: '에세이'), // 코스
-                  _buildPostList(context, customColors, category: '자유글'), // 주제
+                  _buildPostList(context, customColors, category: null), // 🔹 전체 게시글 리스트
+                  _buildPostList(context, customColors, category: '에세이'), // 🔹 에세이 게시글 리스트
+                  _buildPostList(context, customColors, category: '자유글'), // 🔹 자유글 게시글 리스트
                 ],
               ),
             ),
           ],
         ),
       ),
-      floatingActionButton: _buildSpeedDial(context, isDialOpen, customColors),
+      floatingActionButton: _buildSpeedDial(context, isDialOpen, customColors), // 🔹 플로팅 액션 버튼
     );
   }
 
   /// 🔹 Firestore에서 게시글을 가져와 표시하는 위젯
   Widget _buildPostList(BuildContext context, CustomColors customColors, {dynamic category}) {
     return StreamBuilder<List<Post>>(
-      stream: _communityService.getPosts(),
+      stream: _communityService.getPosts(), // 🔹 게시글 데이터 스트림
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (snapshot.connectionState == ConnectionState.waiting) { // 🔹 데이터 로딩 중
           return Center(child: CircularProgressIndicator());
         }
-        if (snapshot.hasError) {
+        if (snapshot.hasError) { // 🔹 에러 발생 시
           return SizedBox.shrink();
         }
 
-        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        if (!snapshot.hasData || snapshot.data!.isEmpty) { // 🔹 데이터가 없을 경우
           return Center(
             child: Text(
               '게시글이 없습니다.',
@@ -91,7 +92,7 @@ class Cm2depthBoardmain extends ConsumerWidget {
           return post.category == category;
         }).toList();
 
-        if (posts.isEmpty) {
+        if (posts.isEmpty) { // 🔹 필터링된 게시글이 없을 경우
           return Center(
             child: Text(
               '해당 카테고리에 게시글이 없습니다.',
@@ -101,12 +102,12 @@ class Cm2depthBoardmain extends ConsumerWidget {
         }
 
         return ListView.builder(
-          itemCount: posts.length * 2 - 1,
+          itemCount: posts.length * 2 - 1, // 🔹 게시글 항목 개수
           itemBuilder: (context, index) {
-            if (index.isOdd) {
+            if (index.isOdd) { // 🔹 짝수 번째는 구분선
               return BigDivider();
             } else {
-              var post = posts[index ~/ 2];
+              var post = posts[index ~/ 2]; // 🔹 게시글 항목
               return PostItemContainer(
                 post: post,
                 customColors: customColors,
@@ -119,23 +120,21 @@ class Cm2depthBoardmain extends ConsumerWidget {
     );
   }
 
-
-
   /// 🔹 플로팅 버튼 (글쓰기 기능)
   Widget _buildSpeedDial(BuildContext context, ValueNotifier<bool> isDialOpen, CustomColors customColors) {
     return ValueListenableBuilder<bool>(
       valueListenable: isDialOpen,
       builder: (context, isOpen, _) {
         return SpeedDial(
-          icon: isOpen ? Icons.close : Icons.create,
-          backgroundColor: customColors.primary,
-          overlayColor: customColors.neutral0,
-          overlayOpacity: 0.5,
-          onOpen: () => isDialOpen.value = true,
-          onClose: () => isDialOpen.value = false,
+          icon: isOpen ? Icons.close : Icons.create, // 🔹 버튼 아이콘
+          backgroundColor: customColors.primary, // 🔹 버튼 배경색
+          overlayColor: customColors.neutral0, // 🔹 오버레이 색상
+          overlayOpacity: 0.5, // 🔹 오버레이 투명도
+          onOpen: () => isDialOpen.value = true, // 🔹 버튼 열기
+          onClose: () => isDialOpen.value = false, // 🔹 버튼 닫기
           children: [
             SpeedDialChild(
-              child: Icon(Icons.article, color: customColors.neutral30),
+              child: Icon(Icons.article, color: customColors.neutral30), // 🔹 자유글 아이콘
               label: '자유글',
               onTap: () {
                 Navigator.push(
@@ -150,7 +149,7 @@ class Cm2depthBoardmain extends ConsumerWidget {
               backgroundColor: customColors.primary20,
             ),
             SpeedDialChild(
-              child: Icon(Icons.lightbulb, color: customColors.neutral30),
+              child: Icon(Icons.lightbulb, color: customColors.neutral30), // 🔹 에세이 아이콘
               label: '에세이',
               onTap: () {
                 Navigator.push(

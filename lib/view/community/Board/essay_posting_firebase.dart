@@ -1,4 +1,6 @@
+// 필요한 패키지들 임포트
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';
@@ -13,40 +15,47 @@ import 'Component/taginput_component.dart';
 import 'Component/writingform_component.dart';
 import 'community_service.dart';
 
+// 에세이 게시 페이지 클래스
 class EssayPostPage extends ConsumerStatefulWidget {
   @override
   _EssayPostPageState createState() => _EssayPostPageState();
 }
 
 class _EssayPostPageState extends ConsumerState<EssayPostPage> {
-  final CommunityService _communityService = CommunityService();
-  final List<String> keywordList = [
+  final CommunityService _communityService = CommunityService(); // 커뮤니티 서비스 인스턴스
+  final List<String> keywordList = [ // 키워드 목록
     '자기 개발', '창의성', '성장', '행복', '도전', '미래', '인간 관계', '건강',
     '목표 설정', '열정', '긍정적 사고', '자아 실현', '자기 관리'
   ];
 
-  String selectedKeyword = ''; // 에세이 전용 키워드
-  bool isSpinning = false;
-  late Timer _timer;
-  TextEditingController titleController = TextEditingController();
-  TextEditingController contentController = TextEditingController();
-  TextEditingController tagController = TextEditingController();
-  List<String> tags = [];
-  Timer? _debounce;
-  int currentIndex = 0;
+  String selectedKeyword = ''; // 선택된 키워드
+  bool isSpinning = false; // 회전 애니메이션 여부
+  late Timer _timer; // 타이머
+  TextEditingController titleController = TextEditingController(); // 제목 입력 컨트롤러
+  TextEditingController contentController = TextEditingController(); // 내용 입력 컨트롤러
+  TextEditingController tagController = TextEditingController(); // 태그 입력 컨트롤러
+  List<String> tags = []; // 태그 목록
+  Timer? _debounce; // 디바운스 타이머
+  int currentIndex = 0; // 현재 인덱스
 
-  // FocusNode
+  // FocusNode 선언 (제목, 내용 입력 필드에서의 포커스 관리)
   FocusNode titleFocusNode = FocusNode();
   FocusNode contentFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    // 자동으로 키워드 선택 다이얼로그 띄우기
+
+    // 랜덤 키워드 선택
+    final random = Random();
+    selectedKeyword = keywordList[random.nextInt(keywordList.length)];
+
+    // 프레임 이후에 키워드 선택 다이얼로그 표시
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showKeywordSelectionDialog(context);
     });
 
+    // 입력 필드의 텍스트가 변경될 때마다 화면 갱신
     void onTextChanged() {
       setState(() {});
     }
@@ -56,19 +65,20 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
     tagController.addListener(() => setState(() {}));
   }
 
-  // essay 작성 시 유효성 검사: 키워드 또는 제목이 있고, 내용이 있어야 함
+  // 에세이 작성 시 유효성 검사: 키워드 또는 제목이 있고, 내용이 있어야 함
   bool isContentValid() {
     return (((selectedKeyword.isNotEmpty) || titleController.text.isNotEmpty) &&
         contentController.text.isNotEmpty);
   }
 
-  // 작성 중인 내용이 있는지 확인 (essay 전용 키워드, 제목, 내용)
+  // 작성 중인 내용이 있는지 확인 (에세이 전용 키워드, 제목, 내용)
   bool hasUnsavedChanges() {
     return selectedKeyword.isNotEmpty ||
         titleController.text.isNotEmpty ||
         contentController.text.isNotEmpty;
   }
 
+  // 태그 추가 함수
   void addTag() {
     if (tagController.text.isNotEmpty && tags.length < 3) {
       setState(() {
@@ -78,6 +88,7 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
     }
   }
 
+  // 태그 삭제 함수
   void removeTag(String tag) {
     setState(() {
       tags.remove(tag);
@@ -102,6 +113,7 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
         ? "[$selectedKeyword] ${titleController.text}"
         : titleController.text;
     try {
+      // 커뮤니티 서비스에 게시글 작성 요청
       await _communityService.createPost(
         title: fullTitle,
         content: contentController.text,
@@ -109,9 +121,10 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
         tags: tags,
       );
       discardDraft();
-      // 게시글이 작성되면 페이지를 종료합니다.
+      // 게시글 작성 후 페이지 종료
       Navigator.of(context).pop();
     } catch (e) {
+      // 게시글 작성 실패 시 알림 다이얼로그 표시
       showResultSaveDialog(
         context,
         ref.watch(customColorsProvider),
@@ -149,8 +162,8 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
 
   @override
   void dispose() {
-    if (isSpinning) _timer.cancel();
-    _debounce?.cancel();
+    if (isSpinning) _timer.cancel(); // 타이머 취소
+    _debounce?.cancel(); // 디바운스 타이머 취소
     titleController.dispose();
     contentController.dispose();
     tagController.dispose();
@@ -231,6 +244,7 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
           title: "에세이",
           onIconPressed: _handleClose,
           actions: [
+            // 등록 버튼
             TextButton(
               onPressed: isContentValid() ? submitPost : null,
               child: Text(
