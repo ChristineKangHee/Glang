@@ -1,4 +1,7 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+
+import '../../viewmodel/custom_colors_provider.dart';
 
 /*
   아래와 같이 사용
@@ -6,7 +9,7 @@ import 'package:flutter/material.dart';
   SmallDivider()
  */
 
-class BigDivider extends StatelessWidget {
+class BigDivider extends ConsumerWidget {
   final double thickness;
   final double height;
 
@@ -17,16 +20,16 @@ class BigDivider extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final customColors = ref.watch(customColorsProvider);
     return Divider(
-      // color: Color(0xFFF8F9FE),
-      color: Color(0xFFEAEBF3),
-      // color: Theme.of(context).colorScheme.outline,
+      color: customColors.neutral90,
       thickness: thickness,
       height: height,
     );
   }
 }
+
 
 class SmallDivider extends StatelessWidget {
   final double thickness;

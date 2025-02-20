@@ -1,3 +1,10 @@
+/// File: community_searchpage_firebase.dart
+/// Purpose: 검색 페이지 위젯 클래스
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
+
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
@@ -8,6 +15,7 @@ import 'community_data_firebase.dart';
 import 'community_service.dart';
 import 'component_community_post_firebase.dart';
 
+// 검색 페이지 위젯 클래스
 class SearchPage extends StatefulWidget {
   @override
   _SearchPageState createState() => _SearchPageState();
@@ -15,19 +23,30 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage>
     with SingleTickerProviderStateMixin {
+  // 검색어 입력을 위한 텍스트 컨트롤러
   TextEditingController _searchController = TextEditingController();
+  // 최근 검색 기록을 저장할 리스트
   List<String> _searchHistory = [];
+  // 검색 결과를 저장할 리스트
   List<Post> _searchResults = [];
+  // 전체 게시글 리스트
   List<Post> _allPosts = [];
+  // 현재 검색어
   String _searchQuery = "";
+  // 검색이 시작되었는지 여부
   bool _isSearchInitiated = false;
+  // 탭 컨트롤러
   late TabController _tabController;
+  // 커뮤니티 서비스 인스턴스
   final CommunityService _communityService = CommunityService();
+  // 게시글 스트림 구독
   StreamSubscription<List<Post>>? _postSubscription;
 
+  // 페이지 초기화 시 호출
   @override
   void initState() {
     super.initState();
+    // 탭 컨트롤러 초기화
     _tabController = TabController(length: 3, vsync: this);
     // Firestore에서 전체 게시글 구독 (검색에 사용)
     _postSubscription = _communityService.getPosts().listen((posts) {
@@ -37,18 +56,21 @@ class _SearchPageState extends State<SearchPage>
     });
   }
 
+  // 페이지 종료 시 호출
   @override
   void dispose() {
-    _searchController.dispose();
-    _tabController.dispose();
-    _postSubscription?.cancel();
+    _searchController.dispose(); // 텍스트 컨트롤러 해제
+    _tabController.dispose(); // 탭 컨트롤러 해제
+    _postSubscription?.cancel(); // 게시글 스트림 구독 해제
     super.dispose();
   }
 
+  // 검색을 수행하는 메서드
   void _performSearch([String query = '']) {
     String finalQuery = query.isNotEmpty ? query : _searchQuery;
 
     if (finalQuery.isNotEmpty) {
+      // 검색어가 검색 기록에 없다면 추가
       if (!_searchHistory.contains(finalQuery)) {
         setState(() {
           _searchHistory.insert(0, finalQuery);
@@ -56,21 +78,23 @@ class _SearchPageState extends State<SearchPage>
       }
 
       setState(() {
+        // 게시글 제목, 내용, 닉네임에서 검색어를 포함하는 게시글 찾기
         _searchResults = _allPosts
             .where((post) =>
         post.title.contains(finalQuery) ||
             post.content.contains(finalQuery) ||
             post.nickname.contains(finalQuery))
             .toList();
-        _isSearchInitiated = true;
+        _isSearchInitiated = true; // 검색이 시작되었음을 표시
       });
     } else {
       setState(() {
-        _searchResults.clear();
+        _searchResults.clear(); // 검색어가 없으면 결과를 초기화
       });
     }
   }
 
+  // 검색어를 지우는 메서드
   void _clearSearch() {
     setState(() {
       _searchController.clear();
@@ -80,6 +104,7 @@ class _SearchPageState extends State<SearchPage>
     });
   }
 
+  // 최근 검색 기록을 보여주는 위젯
   Widget _buildRecentSearches() {
     return _searchHistory.isEmpty
         ? Center(
@@ -100,6 +125,7 @@ class _SearchPageState extends State<SearchPage>
     );
   }
 
+  // 필터링된 게시글 리스트를 보여주는 위젯
   Widget _buildFilteredPostList(
       List<Post> posts, BuildContext context, CustomColors customColors) {
     if (posts.isEmpty) {
@@ -128,7 +154,6 @@ class _SearchPageState extends State<SearchPage>
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
@@ -137,6 +162,7 @@ class _SearchPageState extends State<SearchPage>
       body: SafeArea(
         child: Column(
           children: [
+            // 검색어 입력 필드
             Container(
               color: customColors.neutral100,
               child: Padding(
@@ -147,7 +173,7 @@ class _SearchPageState extends State<SearchPage>
                       icon: Icon(Icons.navigate_before,
                           color: customColors.neutral30),
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pop(context); // 뒤로 가기
                       },
                     ),
                     Expanded(
@@ -180,22 +206,23 @@ class _SearchPageState extends State<SearchPage>
                         ),
                         onChanged: (query) {
                           setState(() {
-                            _searchQuery = query;
+                            _searchQuery = query; // 실시간 검색어 업데이트
                           });
                         },
                         onSubmitted: (query) {
-                          _performSearch(query);
+                          _performSearch(query); // 검색어 제출 시 검색 수행
                         },
                       ),
                     ),
                     IconButton(
                       icon: Icon(Icons.search),
-                      onPressed: _performSearch,
+                      onPressed: _performSearch, // 검색 버튼 클릭 시 검색 수행
                     ),
                   ],
                 ),
               ),
             ),
+            // 검색 기록이 있을 때만 표시
             if (!_isSearchInitiated && _searchHistory.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -214,7 +241,7 @@ class _SearchPageState extends State<SearchPage>
                           title: Text(_searchHistory[index]),
                           onTap: () {
                             _searchController.text = _searchHistory[index];
-                            _performSearch(_searchHistory[index]);
+                            _performSearch(_searchHistory[index]); // 검색 기록 클릭 시 검색 수행
                           },
                         );
                       },
@@ -222,6 +249,7 @@ class _SearchPageState extends State<SearchPage>
                   ],
                 ),
               ),
+            // 검색이 시작되었을 때 탭바 및 결과 표시
             if (_isSearchInitiated)
               TabBar(
                 labelStyle: body_small_semi(context),

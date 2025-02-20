@@ -1,8 +1,12 @@
-// import 'package:flutter/material.dart'; (Material의 Badge와 충돌하지 않으므로 이름 변경한 모델 사용)
+/// File: info_badge.dart
+/// Purpose: 뱃지 리스트 구성화면
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../viewmodel/theme_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../../../viewmodel/theme_controller.dart';
 import '../../../model/badge_data.dart';
 import '../../../theme/font.dart';
 import '../../../theme/theme.dart';
@@ -22,7 +26,7 @@ class InfoBadge extends ConsumerWidget {
     return Scaffold(
       appBar: CustomAppBar_2depth_4(title: "배지"),
       backgroundColor: customColors.neutral90,
-      body: SingleChildScrollView(
+      body: const SingleChildScrollView(
         child: BadgeWidget(),
       ),
     );
@@ -30,7 +34,7 @@ class InfoBadge extends ConsumerWidget {
 }
 
 class BadgeWidget extends ConsumerWidget {
-  BadgeWidget({Key? key}) : super(key: key);
+  const BadgeWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -50,7 +54,7 @@ class BadgeWidget extends ConsumerWidget {
           const SizedBox(height: 20),
           badgesAsync.when(
             data: (badges) {
-              // earnedBadgesAsync가 로드되었는지 확인하고, 없으면 빈 리스트로 사용
+              // 사용자가 획득한 배지 리스트 가져오기
               final earnedBadges = earnedBadgesAsync.when(
                 data: (data) => data,
                 loading: () => <String>[],
@@ -93,6 +97,7 @@ class BadgeWidget extends ConsumerWidget {
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
+                                // 배지 아이콘 표시
                                 Container(
                                   width: badgeSize * 0.6,
                                   height: badgeSize * 0.6,
@@ -142,16 +147,14 @@ class BadgeWidget extends ConsumerWidget {
     );
   }
 
-
+  /// 배지 팝업을 표시하는 함수
   void _showBadgePopup(
       BuildContext context, AppBadge badge, bool isObtained, String description, CustomColors customColors) {
     showDialog(
       context: context,
       builder: (context) {
-        final Color backgroundColor =
-        isObtained ? customColors.primary! : customColors.neutral60!;
-        final Color starColor =
-        isObtained ? customColors.secondary! : customColors.neutral80!;
+        final Color backgroundColor = isObtained ? customColors.primary! : customColors.neutral60!;
+        final Color starColor = isObtained ? customColors.secondary! : customColors.neutral80!;
         return AlertDialog(
           title: Text(
             badge.name,
@@ -161,6 +164,7 @@ class BadgeWidget extends ConsumerWidget {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // 배지 이미지 또는 아이콘 표시
               Container(
                 width: 80,
                 height: 80,
@@ -187,8 +191,7 @@ class BadgeWidget extends ConsumerWidget {
               const SizedBox(height: 12),
               Text(
                 description,
-                style: body_small(context)
-                    .copyWith(color: customColors.neutral30),
+                style: body_small(context).copyWith(color: customColors.neutral30),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -197,9 +200,7 @@ class BadgeWidget extends ConsumerWidget {
             Align(
               alignment: Alignment.center,
               child: ButtonPrimary_noPadding(
-                function: () {
-                  Navigator.of(context).pop();
-                },
+                function: () => Navigator.of(context).pop(),
                 title: '확인',
               ),
             ),

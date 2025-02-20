@@ -1,3 +1,10 @@
+/// File: community_service.dart
+/// Purpose: communityservice
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -9,6 +16,16 @@ class CommunityService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   /// 🔹 게시글 추가
+  ///
+  /// 주어진 제목, 내용, 카테고리 및 태그를 사용하여 새로운 게시글을 작성합니다.
+  /// 작성된 게시글은 Firestore에 저장되며, 작성자의 닉네임과 기본 프로필 이미지도 함께 저장됩니다.
+  ///
+  /// [title] : 게시글 제목
+  /// [content] : 게시글 내용
+  /// [category] : 게시글 카테고리
+  /// [tags] : 게시글 태그 목록
+  ///
+  /// 반환값: 생성된 게시글의 ID
   Future<String> createPost({
     required String title,
     required String content,
@@ -49,6 +66,11 @@ class CommunityService {
   }
 
 
+  /// 🔹 게시글 목록 가져오기
+  ///
+  /// Firestore에서 게시글 목록을 최신 순으로 가져옵니다.
+  ///
+  /// 반환값: 게시글 목록의 스트림
   Stream<List<Post>> getPosts() {
     return _firestore
         .collection('posts')
@@ -60,6 +82,12 @@ class CommunityService {
   }
 
   /// 🔹 특정 게시글 가져오기
+  ///
+  /// 주어진 게시글 ID에 해당하는 게시글을 Firestore에서 가져옵니다.
+  ///
+  /// [postId] : 게시글 ID
+  ///
+  /// 반환값: 게시글 데이터 또는 null
   Future<Map<String, dynamic>?> getPostById(String postId) async {
     try {
       final postDoc = await _firestore.collection('posts').doc(postId).get();
@@ -71,6 +99,14 @@ class CommunityService {
   }
 
   /// 🔹 게시글 수정
+  ///
+  /// 주어진 게시글 ID에 해당하는 게시글을 수정합니다.
+  /// 수정할 내용은 제목, 내용, 태그이며, 작성자만 수정할 수 있습니다.
+  ///
+  /// [postId] : 수정할 게시글 ID
+  /// [title] : 수정할 제목
+  /// [content] : 수정할 내용
+  /// [tags] : 수정할 태그 목록
   Future<void> updatePost({
     required String postId,
     required String title,
@@ -100,6 +136,11 @@ class CommunityService {
   }
 
   /// 🔹 게시글 삭제
+  ///
+  /// 주어진 게시글 ID에 해당하는 게시글을 삭제합니다.
+  /// 삭제는 작성자만 할 수 있습니다.
+  ///
+  /// [postId] : 삭제할 게시글 ID
   Future<void> deletePost(String postId) async {
     try {
       final user = _auth.currentUser;
@@ -117,7 +158,12 @@ class CommunityService {
       throw Exception('게시글 삭제 실패');
     }
   }
+
   /// 🔹 조회수 증가
+  ///
+  /// 주어진 게시글 ID에 해당하는 게시글의 조회수를 1 증가시킵니다.
+  ///
+  /// [postId] : 조회수를 증가시킬 게시글 ID
   Future<void> increasePostViews(String postId) async {
     try {
       final postRef = _firestore.collection('posts').doc(postId);
@@ -128,7 +174,13 @@ class CommunityService {
       print('❌ 조회수 증가 오류: $e');
     }
   }
+
   /// 🔹 좋아요 토글
+  ///
+  /// 주어진 게시글에 좋아요를 추가하거나 제거합니다.
+  /// 사용자가 이미 좋아요를 눌렀다면 취소하고, 그렇지 않으면 좋아요를 추가합니다.
+  ///
+  /// [postId] : 좋아요를 토글할 게시글 ID
   Future<void> toggleLike(String postId) async {
     try {
       final user = _auth.currentUser;
@@ -160,5 +212,4 @@ class CommunityService {
       print('❌ 좋아요 오류: $e');
     }
   }
-
 }

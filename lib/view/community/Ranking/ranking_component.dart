@@ -1,3 +1,8 @@
+/// File: ranking_component.dart
+/// Purpose: 랭킹 페이지를 component
+/// Author: 강희
+/// Created: 2024-12-28
+/// Last Modified: 2024-12-28 by 강희
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -23,13 +28,15 @@ Future<List<Map<String, dynamic>>> getRankings() async {
         userData['totalXP'] = 0;
       }
 
-      rankings.add({
-        'id': doc.id,
-        'name': userData['nickname'] ?? userData['email'] ?? 'Unknown',
-        'experience': userData['totalXP'] ?? 0,
-        // Firestore에 저장된 사진 URL (업데이트되었으면 Firebase Cloud Storage의 URL)
-        'image': userData['photoURL'] ?? 'assets/images/default_avatar.png',
-      });
+      // Check if the user's email is "hgu.zero24@gmail.com"
+      if (userData['email'] != 'hgu.zero24@gmail.com') {
+        rankings.add({
+          'id': doc.id,
+          'name': userData['nickname'] ?? userData['email'] ?? 'Unknown',
+          'experience': userData['totalXP'] ?? 0,
+          'image': userData['photoURL'] ?? 'assets/images/default_avatar.png',
+        });
+      }
     }
 
     rankings.sort((a, b) {
@@ -45,6 +52,7 @@ Future<List<Map<String, dynamic>>> getRankings() async {
     rethrow;
   }
 }
+
 
 
 /// 랭킹 카드 (프로필 사진 포함)
@@ -318,14 +326,22 @@ Widget buildRankingList(BuildContext context, CustomColors customColors) {
             leading: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  '$rank',
-                  style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                Container(
+                  width: 30,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      '$rank',
+                      textAlign: TextAlign.center,
+                      style: body_small_semi(context).copyWith(color: customColors.neutral30),
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 20),
-                // 현재 사용자의 경우 provider를 사용하도록 Consumer로 감쌈
+                const SizedBox(width: 16),
+                // 이미지 위젯 부분
                 Consumer(
                   builder: (context, ref, child) {
+                    // 현재 사용자 및 이미지 경로 처리
                     final currentUser = FirebaseAuth.instance.currentUser;
                     String imagePath;
                     if (currentUser != null && user['id'] == currentUser.uid) {
