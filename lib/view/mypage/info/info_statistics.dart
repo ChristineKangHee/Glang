@@ -27,11 +27,49 @@ class InfoStatistics extends ConsumerWidget {
     return Scaffold(
       appBar: CustomAppBar_2depth_2(
         title: "통계",
+        onIconPressed: () => _showDatePicker(context), // 람다 함수로 감싸기
       ),
       backgroundColor: customColors.neutral90,
       body: const StatisticsWidget(),
     );
   }
+
+  void _showDatePicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // 키보드가 올라와도 화면이 자동으로 조정됨
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView( // 스크롤 가능하게 변경
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "날짜 선택",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 250, // CalendarDatePicker의 크기를 명시적으로 설정
+                  child: CalendarDatePicker(
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                    onDateChanged: (selectedDate) {
+                      Navigator.pop(context);
+                      // 선택한 날짜 처리 로직 추가
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 }
 
 class StatisticsWidget extends StatelessWidget {
