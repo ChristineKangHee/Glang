@@ -10,6 +10,8 @@ import 'package:readventure/view/components/custom_app_bar.dart';
 import 'package:readventure/view/components/custom_navigation_bar.dart';
 import '../../theme/font.dart';
 import '../../theme/theme.dart';
+import '../../viewmodel/badge_provider.dart';
+import '../../viewmodel/badge_service.dart';
 import '../../viewmodel/custom_colors_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../viewmodel/user_photo_url_provider.dart';
@@ -20,7 +22,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 /// 마이페이지 메인 화면 위젯
 /// - 상단 앱바, 하단 네비게이션 바, 컨텐츠
-/// 마이페이지 메인 화면 위젯
 class MyPageMain extends ConsumerWidget {
   const MyPageMain({super.key});
 
@@ -81,7 +82,7 @@ class MyPageContent extends StatelessWidget {
             const SizedBox(height: 16),
             InfoCard(
               title: '뱃지',
-              child: const BadgeRow(),
+              child: BadgeRow(), // 수정: const 제거
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/badge');
@@ -158,7 +159,6 @@ class UserProfileSection extends ConsumerWidget {
               photoUrl,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
-                // 이미지 로딩 실패 시 fallback 이미지
                 return Image.asset('assets/images/default_avatar.png', fit: BoxFit.cover);
               },
             )
@@ -177,8 +177,7 @@ class UserProfileSection extends ConsumerWidget {
                   Navigator.pushNamed(context, '/mypage/edit_profile');
                 },
                 child: Container(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                   decoration: BoxDecoration(
                     color: customColors.neutral90,
                     borderRadius: BorderRadius.circular(12),
@@ -323,33 +322,16 @@ class ProgressChart extends StatelessWidget {
 }
 */
 
-class BadgeRow extends StatelessWidget {
-  const BadgeRow({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final customColors = Theme.of(context).extension<CustomColors>()!;
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: const [
-        Flexible(child: BadgeBox(label: '첫학습', isUnlocked: false)),
-        Flexible(child: BadgeBox(label: '3일 연속 출석', isUnlocked: false)),
-        Flexible(child: BadgeBox(label: '7일 연속 출석', isUnlocked: false)),
-      ],
-    );
-  }
-}
-
-
-/// 배지 박스 위젯
+/// 수정된 BadgeBox 위젯
 class BadgeBox extends StatelessWidget {
   final String label;
   final bool isUnlocked;
+  final String? imageUrl; // 배지 이미지 URL 추가
 
   const BadgeBox({
     required this.label,
     required this.isUnlocked,
+    this.imageUrl,
     super.key,
   });
 
@@ -361,26 +343,67 @@ class BadgeBox extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: screenWidth * 0.25, // 화면 너비의 25%로 조정
-          height: screenWidth * 0.15, // 화면 너비의 15%로 조정
+          width: screenWidth * 0.25,
+          height: screenWidth * 0.25,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: isUnlocked ? (customColors.primary ?? Colors.indigoAccent) : (customColors.neutral80 ?? Colors.grey),
-            borderRadius: BorderRadius.circular(16),
+            color: isUnlocked
+                ? (customColors.neutral60 ?? Colors.indigoAccent)
+                : (customColors.primary ?? Colors.grey),
+            borderRadius: BorderRadius.circular(100),
           ),
           child: Center(
-            child: Icon(
-              isUnlocked ? Icons.check : Icons.lock,
-              color: isUnlocked ? (customColors.neutral100 ?? Colors.white) : (customColors.neutral30 ?? Colors.black26),
+            child: imageUrl != null
+                ? Image.asset(
+              imageUrl!,
+              fit: BoxFit.contain,
+            )
+                : Icon(
+              Icons.star,
+              size: screenWidth * 0.15,
+              color: isUnlocked
+                  ? (customColors.neutral80 ?? Colors.white)
+                  : (customColors.neutral100 ?? Colors.black26),
             ),
           ),
         ),
         const SizedBox(height: 8),
         Text(
           label,
-          style: pretendardRegular(context).copyWith(fontSize: 12),
+          style: body_small_semi(context),
         ),
       ],
+    );
+  }
+}
+
+class BadgeRow extends ConsumerWidget {
+  const BadgeRow({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final badgesAsync = ref.watch(badgesProvider);
+
+    return badgesAsync.when(
+      data: (badges) {
+        // 전체 배지 컬렉션에서 3개만 표시
+        final displayBadges = badges.take(3).toList();
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: displayBadges.map((badge) {
+            return Flexible(
+              child: BadgeBox(
+                label: badge.name,
+                isUnlocked: true, // earned 여부와 관계없이 unlocked 상태로 표시
+                imageUrl: badge.imageUrl,
+              ),
+            );
+          }).toList(),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stackTrace) =>
+          Center(child: Text('배지 로딩 중 오류가 발생했습니다.')),
     );
   }
 }
