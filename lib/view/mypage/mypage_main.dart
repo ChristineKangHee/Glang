@@ -343,8 +343,8 @@ class BadgeBox extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: screenWidth * 0.25,
-          height: screenWidth * 0.25,
+          width: screenWidth * 0.18,
+          height: screenWidth * 0.18,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: isUnlocked
@@ -360,7 +360,7 @@ class BadgeBox extends StatelessWidget {
             )
                 : Icon(
               Icons.star,
-              size: screenWidth * 0.15,
+              size: screenWidth * 0.10,
               color: isUnlocked
                   ? (customColors.neutral80 ?? Colors.white)
                   : (customColors.neutral100 ?? Colors.black26),
