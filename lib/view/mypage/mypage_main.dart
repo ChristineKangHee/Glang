@@ -80,7 +80,7 @@ class MyPageContent extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             InfoCard(
-              title: '획득한 배지',
+              title: '뱃지',
               child: const BadgeRow(),
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {

@@ -75,7 +75,7 @@ class BadgeWidget extends ConsumerWidget {
                     return Wrap(
                       spacing: spacing,
                       runSpacing: spacing,
-                      alignment: WrapAlignment.center,
+                      alignment: WrapAlignment.start,
                       children: badges.map((AppBadge badge) {
                         final isObtained = earnedBadges.contains(badge.id);
                         final backgroundColor = isObtained

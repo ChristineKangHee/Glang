@@ -270,7 +270,7 @@ class _CSLearningState extends ConsumerState<CSLearning> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "힌트 2가지 중 하나를 선택해주세요",
+                          "힌트를 선택해주세요",
                           style: body_large_semi(context)
                               .copyWith(color: customColors.neutral30),
                         ),
