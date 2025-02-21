@@ -4,6 +4,11 @@
 /// Created: 2024-12-28
 /// Last Modified: 2024-12-30 by 박민준
 
+/*
+  Comment by 민준
+  - 아직 제대로 활용 못함. 추후 업데이트하면 될 듯하다.
+ */
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
