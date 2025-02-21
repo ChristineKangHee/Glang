@@ -1,3 +1,9 @@
+/// File: notedialog.dart
+/// Purpose: 사용자가 선택한 문장을 기반으로 메모를 작성할 수 있는 다이얼로그 위젯
+/// Author: 강희
+/// Created: 2024-1-19
+/// Last Modified: 2024-1-30 by 강희
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,12 +17,13 @@ import '../../../../viewmodel/memo_notifier.dart';
 import '../../after_read/widget/answer_section.dart';
 import 'reading_chatbot.dart';
 
+/// 사용자가 선택한 문장을 기반으로 메모를 작성할 수 있는 다이얼로그 위젯
 class NoteDialog extends StatefulWidget {
-  final String selectedText;
-  final TextEditingController noteController;
-  final dynamic customColors;
-  final String stageId;
-  final String subdetailTitle;
+  final String selectedText; // 사용자가 선택한 문장
+  final TextEditingController noteController; // 메모 입력을 위한 컨트롤러
+  final dynamic customColors; // 사용자 지정 색상 테마
+  final String stageId; // 해당 코스 레벨(stage)의 ID
+  final String subdetailTitle; // 세부 타이틀 정보
 
   const NoteDialog({
     Key? key,
@@ -32,13 +39,15 @@ class NoteDialog extends StatefulWidget {
 }
 
 class NoteDialogState extends State<NoteDialog> {
-  late Color saveButtonColor;
-  bool isQuestionIncluded = false;
+  late Color saveButtonColor; // 저장 버튼 색상 (입력 여부에 따라 변경)
+  bool isQuestionIncluded = false; // 질문 포함 여부 (미사용 변수)
 
   @override
   void initState() {
     super.initState();
-    saveButtonColor = widget.customColors.primary20;
+    saveButtonColor = widget.customColors.primary20; // 초기 저장 버튼 색상 설정
+
+    // 메모 입력 감지하여 저장 버튼 색상 변경
     widget.noteController.addListener(() {
       setState(() {
         saveButtonColor = widget.noteController.text.isNotEmpty
@@ -51,19 +60,20 @@ class NoteDialogState extends State<NoteDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16), // 다이얼로그 여백 설정
       child: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: ShapeDecoration(
-            color: widget.customColors.neutral100,
+            color: widget.customColors.neutral100, // 배경색
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(20), // 모서리 둥글게 설정
             ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // 제목 텍스트
               Text(
                 '메모',
                 textAlign: TextAlign.center,
@@ -72,6 +82,8 @@ class NoteDialogState extends State<NoteDialog> {
                 ),
               ),
               const SizedBox(height: 24),
+
+              // 선택된 문장 제목
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -80,6 +92,8 @@ class NoteDialogState extends State<NoteDialog> {
                 ),
               ),
               const SizedBox(height: 12),
+
+              // 선택된 문장 표시 박스
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                 decoration: ShapeDecoration(
@@ -94,18 +108,22 @@ class NoteDialogState extends State<NoteDialog> {
                     widget.selectedText,
                     style: body_xsmall(context),
                     maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                    overflow: TextOverflow.ellipsis, // 길면 말줄임표 처리
                   ),
                 ),
               ),
-              // 메모 입력 영역 (프로젝트에 맞게 커스텀 위젯 적용)
+
+              // 메모 입력 영역 (커스텀 위젯 적용)
               Answer_Section_No_Title(
                 controller: widget.noteController,
                 customColors: widget.customColors,
               ),
               const SizedBox(height: 20),
+
+              // 취소 및 저장 버튼 영역
               Row(
                 children: [
+                  // 취소 버튼
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -116,7 +134,7 @@ class NoteDialogState extends State<NoteDialog> {
                         ),
                       ),
                       child: TextButton(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => Navigator.pop(context), // 다이얼로그 닫기
                         child: Text(
                           '취소',
                           style: body_small_semi(context)
@@ -126,6 +144,8 @@ class NoteDialogState extends State<NoteDialog> {
                     ),
                   ),
                   const SizedBox(width: 16),
+
+                  // 저장 버튼
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -152,6 +172,8 @@ class NoteDialogState extends State<NoteDialog> {
                             );
                             debugPrint('메모 저장: $note');
                           }
+
+                          // 저장 완료 스낵바 표시
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Container(
@@ -182,6 +204,8 @@ class NoteDialogState extends State<NoteDialog> {
                               elevation: 0,
                             ),
                           );
+
+                          // 다이얼로그 닫기
                           Navigator.pop(context);
                         },
                         child: Text(

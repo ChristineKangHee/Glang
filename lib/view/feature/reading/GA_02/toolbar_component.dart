@@ -1,3 +1,8 @@
+/// File: toolbar_component.dart
+/// Purpose: 읽기 화면에서 텍스트를 선택할 때 나타나는 툴바 위젯
+/// Author: 강희
+/// Created: 2024-1-19
+/// Last Modified: 2025-02-07 by 강희
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,15 +17,16 @@ import '../../after_read/widget/answer_section.dart';
 import 'notedialog.dart';
 import 'reading_chatbot.dart';
 
+/// 읽기 화면에서 텍스트를 선택할 때 나타나는 툴바 위젯
 class Toolbar extends StatefulWidget {
-  final double toolbarWidth;
-  final double toolbarHeight;
+  final double toolbarWidth; // 툴바의 너비
+  final double toolbarHeight; // 툴바의 높이
   final BuildContext context;
   final TextSelectionDelegate delegate;
   final dynamic customColors;
-  final String stageId;           // 현재 스테이지의 ID
-  final String subdetailTitle;    // StageData의 subdetailTitle (메모 목록에 보여질 제목)
-  final ReadingData readingData;  // 읽기 화면 관련 데이터 (예: textSegments 등)
+  final String stageId; // 현재 스테이지 ID
+  final String subdetailTitle; // 메모 목록에 표시될 제목
+  final ReadingData readingData; // 읽기 관련 데이터
 
   const Toolbar({
     Key? key,
@@ -67,6 +73,7 @@ class _ToolbarState extends State<Toolbar> {
     );
   }
 
+  /// 툴바 버튼을 생성하는 메서드
   Widget _buildToolbarButton(String label, VoidCallback onPressed, bool isLast) {
     return GestureDetector(
       onTap: onPressed,
@@ -89,6 +96,7 @@ class _ToolbarState extends State<Toolbar> {
     );
   }
 
+  /// 메모 다이얼로그 표시 메서드
   void _showNoteDialog(BuildContext context, TextSelectionDelegate delegate) {
     final String selectedText =
     delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
@@ -108,6 +116,7 @@ class _ToolbarState extends State<Toolbar> {
     );
   }
 
+  /// 단어 또는 문장 해석 팝업 표시 메서드
   void _showWordOrSentencePopup(BuildContext context, TextSelectionDelegate delegate) {
     final String selectedText =
     delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
@@ -132,10 +141,12 @@ class _ToolbarState extends State<Toolbar> {
     }
   }
 
+  /// 선택된 텍스트가 단어인지 확인하는 메서드
   bool _isWordSelected(String selectedText) {
     return selectedText.split(' ').length == 1;
   }
 
+  /// 챗봇 화면으로 이동하는 메서드
   void _navigateToChatbot(BuildContext context, TextSelectionDelegate delegate) {
     final String selectedText =
     delegate.textEditingValue.selection.textInside(delegate.textEditingValue.text);
@@ -154,8 +165,8 @@ class _ToolbarState extends State<Toolbar> {
 }
 
 ///
-/// Read_Toolbar: MaterialTextSelectionControls를 상속하여 텍스트 선택 시 나타나는 툴바를 커스터마이징
-/// stageId와 subdetailTitle을 추가 매개변수로 받아 Toolbar에 전달합니다.
+/// Read_Toolbar: 텍스트 선택 시 나타나는 툴바를 커스터마이징하는 클래스
+/// stageId와 subdetailTitle을 추가로 받아 Toolbar에 전달합니다.
 ///
 class Read_Toolbar extends MaterialTextSelectionControls {
   final dynamic customColors;
