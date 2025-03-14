@@ -33,15 +33,19 @@ class Section extends ConsumerWidget {
   const Section({super.key, required this.data});
 
   /// index별 margin 계산 로직 (기존 로직 그대로)
+  /// index별 margin 계산 로직 (좌우 마진 뒤집기)
   double _getMargin(int index, {bool isLeft = true}) {
     const margin = 72.0;
     int pos = index % 9;
     if (isLeft) {
-      return (pos == 1 || pos == 3) ? margin : (pos == 2 ? margin * 2 : 0.0);
-    } else {
+      // 기존의 오른쪽 마진 로직을 왼쪽으로 이동
       return (pos == 5 || pos == 7) ? margin : (pos == 6 ? margin * 2 : 0.0);
+    } else {
+      // 기존의 왼쪽 마진 로직을 오른쪽으로 이동
+      return (pos == 1 || pos == 3) ? margin : (pos == 2 ? margin * 2 : 0.0);
     }
   }
+
 
   /// 스테이지 팝업 표시 함수
   ///

@@ -174,6 +174,7 @@ class RootedTreeScreen extends ConsumerWidget {
       body: Column(
         children: [
           // 상단 안내영역
+          // ✅ RootedTreeScreen에서 TitleSection_withIcon 호출 시 stageId, subdetailTitle 추가
           Container(
             decoration: ShapeDecoration(
               color: customColors.neutral100,
@@ -185,7 +186,9 @@ class RootedTreeScreen extends ConsumerWidget {
                 customColors: Theme.of(context).extension<CustomColors>()!,
                 title: diagramTitle,
                 subtitle: diagramSubtitle,
-                author: " ",
+                author: "작성자 없음",
+                stageId: stage.stageId, // ✅ stageId 추가
+                subdetailTitle: stage.subdetailTitle, // ✅ subdetailTitle 추가
               ),
             ),
           ),
