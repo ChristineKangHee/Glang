@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';
-
 import '../After_Read_Content.dart';
 
 class TitleSection_withIcon extends StatelessWidget {
@@ -11,6 +10,8 @@ class TitleSection_withIcon extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.author,
+    required this.stageId, // ✅ stageId 추가
+    required this.subdetailTitle, // ✅ subdetailTitle 추가
     this.icon = Icons.import_contacts_outlined,
   });
 
@@ -18,12 +19,14 @@ class TitleSection_withIcon extends StatelessWidget {
   final String title;
   final String subtitle;
   final String author;
+  final String stageId; // ✅ 추가된 매개변수
+  final String subdetailTitle; // ✅ 추가된 매개변수
   final IconData icon;
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start, // 아이콘과 텍스트의 수직 정렬
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Column(
@@ -57,7 +60,7 @@ class TitleSection_withIcon extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 16), // 텍스트와 아이콘 간 간격
+        const SizedBox(width: 16),
         _buildIcon(customColors, context),
       ],
     );
@@ -68,7 +71,12 @@ class TitleSection_withIcon extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => AfterReadContent()),
+          MaterialPageRoute(
+            builder: (context) => AfterReadContent(
+              stageId: stageId, // ✅ stageId 전달
+              subdetailTitle: subdetailTitle, // ✅ subdetailTitle 전달
+            ),
+          ),
         );
       },
       child: Container(

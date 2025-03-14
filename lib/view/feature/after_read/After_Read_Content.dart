@@ -3,33 +3,73 @@ import 'package:readventure/view/feature/reading/quiz_data.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../../components/custom_app_bar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../model/stage_data.dart';
+import '../../mypage/info/memo_list_page.dart';
 
-class AfterReadContent extends StatefulWidget {
+class AfterReadContent extends ConsumerWidget {
+  final String stageId;
+  final String subdetailTitle;
+
+  const AfterReadContent({
+    Key? key,
+    required this.stageId,
+    required this.subdetailTitle,
+  }) : super(key: key);
+
   @override
-  _AfterReadContentState createState() => _AfterReadContentState();
-}
-
-
-class _AfterReadContentState extends State<AfterReadContent> {
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
+    final stageDataMapAsync = ref.watch(stageDataProvider);
 
-    return Scaffold(
-      appBar: CustomAppBar_2depth_4(
-        title: "읽기 도구의 필요성",
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '현대 사회에서 읽기 능력은 지식 습득과 의사소통의 기본이지만, 학습자가 자신의 수준과 흥미에 맞는 텍스트를 접할 기회는 제한적이다. 기존의 교육 시스템은 주로 일률적인 교재와 평가 방식을 사용하며, 이는 학습 동기를 저하시킬 위험이 있다. 또한, 읽기 과정에서 즉각적인 피드백을 제공하는 시스템이 부족하여 학습자는 자신의 약점이나 강점을 파악하기 어렵다. 맞춤형 읽기 도구와 실시간 피드백 시스템은 학습자가 적합한 자료를 통해 능동적으로 읽기 능력을 향상시키고, 스스로 학습 과정을 조율할 수 있는 환경을 제공할 잠재력이 있다. 또한, 맞춤형 읽기 도구는 학습자의 수준과 흥미를 고려하여 적합한 자료를 제공할 수 있다. 이러한 도구의 개발과 보급은 개인화된 학습의 미래를 열어갈 중요한 과제가 될 것이다.',
-              style: reading_textstyle(context).copyWith(color: customColors.neutral0),
+    return stageDataMapAsync.when(
+      data: (stageMap) {
+        final stageData = stageMap[stageId];
+        if (stageData == null) {
+          return Scaffold(
+            appBar: CustomAppBar_2depth_4(title: subdetailTitle),
+            body: const Center(
+              child: Text("해당 코스를 찾을 수 없습니다."),
             ),
-          ],
+          );
+        }
+
+        final textSegments = stageData.readingData?.textSegments ?? [];
+
+        if (textSegments.isEmpty) {
+          return Scaffold(
+            appBar: CustomAppBar_2depth_4(title: subdetailTitle),
+            body: const Center(
+              child: Text("표시할 본문이 없습니다."),
+            ),
+          );
+        }
+
+        return Scaffold(
+          appBar: CustomAppBar_2depth_4(title: subdetailTitle),
+          body: ListView.builder(
+            padding: const EdgeInsets.all(16.0),
+            itemCount: textSegments.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: Text(
+                  textSegments[index],
+                  style: reading_textstyle(context).copyWith(color: customColors.neutral0),
+                ),
+              );
+            },
+          ),
+        );
+      },
+      loading: () => Scaffold(
+        appBar: CustomAppBar_2depth_4(title: subdetailTitle),
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, stackTrace) => Scaffold(
+        appBar: CustomAppBar_2depth_4(title: subdetailTitle),
+        body: Center(
+          child: Text('오류 발생: $error'),
         ),
       ),
     );

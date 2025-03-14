@@ -26,6 +26,7 @@ class MemoListPage extends ConsumerWidget {
     final memos = ref.watch(memoProvider);
     final customColors = ref.watch(customColorsProvider);
     return Scaffold(
+      backgroundColor: customColors.neutral90,
       appBar: CustomAppBar_2depth_4(title: '메모'),
       body: memos.isEmpty
           ? Center(
@@ -39,30 +40,64 @@ class MemoListPage extends ConsumerWidget {
         itemBuilder: (context, index) {
           final memo = memos[index];
           final formattedDate = DateFormat('yyyy.MM.dd').format(memo.createdAt);
-          return ListTile(
-            title: Text(memo.selectedText),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(memo.note),
-                const SizedBox(height: 4),
-                Text(
-                  '원문: ${memo.subdetailTitle}',
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  formattedDate,
-                  style: body_xxsmall(context).copyWith(color: customColors.neutral60),
-                ),
-              ],
+
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-            // 기존 PopupMenuButton 대신 IconButton를 사용하여 바텀시트 호출
-            trailing: IconButton(
-              icon: Icon(Icons.more_vert, color: customColors.neutral80,),
-              onPressed: () {
-                showMemoActionBottomSheet(context, memo, customColors, ref);
-              },
+            color: customColors.neutral100,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  Text(
+                    '<${memo.subdetailTitle}>',
+                    style: body_xsmall(context).copyWith(color: customColors.neutral60),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Selected Text
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded( // overflow 방지용 추가
+                        child: Text(
+                          memo.selectedText,
+                          style: body_medium_semi(context),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.more_vert, color: customColors.neutral30),
+                        onPressed: () {
+                          showMemoActionBottomSheet(context, memo, customColors, ref);
+                        },
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // Memo label and note
+                  Text("메모", style: body_xsmall_semi(context)),
+                  const SizedBox(height: 4),
+                  Text(
+                    memo.note,
+                    style: body_small(context),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Date and Action Button
+                  Text(
+                    formattedDate,
+                    style: body_xsmall(context).copyWith(color: customColors.neutral60),
+                  ),
+                ],
+              ),
             ),
           );
         },

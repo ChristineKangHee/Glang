@@ -9,6 +9,15 @@ import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/custom_app_bar.dart';
 import 'memo_list_page.dart';
 import '../../../theme/font.dart'; // body_large 등 텍스트 스타일 관련
+import 'package:intl/intl.dart'; // 날짜 형식을 위해 필요
+
+// 날짜 변환 함수 추가
+String formatDate(Timestamp? timestamp) {
+  if (timestamp == null) return '';
+  final dateTime = timestamp.toDate(); // Timestamp를 DateTime으로 변환
+  return DateFormat('yyyy.MM.dd').format(dateTime);
+}
+
 
 // BookmarksPage를 ConsumerWidget으로 변경하여 ref 사용
 class BookmarksPage extends ConsumerWidget {
@@ -32,6 +41,7 @@ class BookmarksPage extends ConsumerWidget {
     final customColors = ref.watch(customColorsProvider);
 
     return Scaffold(
+      backgroundColor: customColors.neutral90,
       appBar: CustomAppBar_2depth_4(title: '해석'),
       body: StreamBuilder<QuerySnapshot>(
         stream: bookmarksQuery.snapshots(),
@@ -51,46 +61,74 @@ class BookmarksPage extends ConsumerWidget {
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
-                  title: Text(data['selectedText'] ?? ''),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween, // 요소를 양 끝에 정렬
+                    children: [
+                      Expanded( // 줄바꿈 시 텍스트가 잘 보이게 하기 위함
+                        child: Text(
+                          '<${data['subdetailTitle']}>' ?? '',
+                          style: body_xsmall(context).copyWith(color: customColors.neutral60),
+                          overflow: TextOverflow.ellipsis, // 텍스트가 길면 생략 표시
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.more_vert, color: customColors.neutral30),
+                        onPressed: () {
+                          showBookmarkActionBottomSheet(
+                            context: context,
+                            data: data,
+                            docReference: docs[index].reference,
+                            customColors: customColors,
+                            parentContext: context,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                   subtitle: isSentence
                       ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(data['subdetailTitle'] ?? ''),
                       const SizedBox(height: 4),
-                      Text("문맥상 의미: ${data['contextualMeaning'] ?? ''}"),
-                      Text("요약: ${data['summary'] ?? ''}"),
+                      Text(data['selectedText'] ?? '', style: body_medium_semi(context)),
+                      const SizedBox(height: 8),
+                      Text("문맥상 의미", style: body_xsmall_semi(context)),
+                      const SizedBox(height: 4),
+                      Text(data['contextualMeaning'] ?? '', style: body_small(context)),
+                      const SizedBox(height: 8),
+                      Text("요약", style: body_xsmall_semi(context)),
+                      const SizedBox(height: 4),
+                      Text(data['summary'] ?? '', style: body_small(context)),
+                      const SizedBox(height: 8),
+                      Text(formatDate(data['createdAt']), style: body_xsmall(context).copyWith(color: customColors.neutral60)),
                     ],
                   )
                       : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(data['subdetailTitle'] ?? ''),
                       const SizedBox(height: 4),
-                      Text("Dictionary Meaning: ${data['dictionaryMeaning'] ?? ''}"),
-                      Text("Contextual Meaning: ${data['contextualMeaning'] ?? ''}"),
-                      Text(
-                        "Synonyms: ${data['synonyms'] is List ? (data['synonyms'] as List).join(', ') : data['synonyms'] ?? ''}",
-                      ),
-                      Text(
-                        "Antonyms: ${data['antonyms'] is List ? (data['antonyms'] as List).join(', ') : data['antonyms'] ?? ''}",
-                      ),
+                      Text(data['selectedText'] ?? '', style: body_medium_semi(context)),
+                      const SizedBox(height: 8),
+                      Text("사전적 의미", style: body_xsmall_semi(context)),
+                      const SizedBox(height: 4),
+                      Text(data['dictionaryMeaning'] ?? '', style: body_small(context)),
+                      const SizedBox(height: 8),
+                      Text("문맥상 의미", style: body_xsmall_semi(context)),
+                      const SizedBox(height: 4),
+                      Text(data['contextualMeaning'] ?? '', style: body_small(context)),
+                      const SizedBox(height: 8),
+                      Text("유사어", style: body_xsmall_semi(context)),
+                      const SizedBox(height: 4),
+                      Text(data['synonyms'] is List ? (data['synonyms'] as List).join(', ') : data['synonyms'] ?? '', style: body_small(context)),
+                      const SizedBox(height: 8),
+                      Text("반의어", style: body_xsmall_semi(context)),
+                      const SizedBox(height: 4),
+                      Text(data['antonyms'] is List ? (data['antonyms'] as List).join(', ') : data['antonyms'] ?? '', style: body_small(context)),
+                      const SizedBox(height: 8),
+                      Text(formatDate(data['createdAt']), style: body_xsmall(context).copyWith(color: customColors.neutral60)),
                     ],
                   ),
                   isThreeLine: true,
-                  // 기존의 article, delete IconButton 대신 more_vert 아이콘으로 액션 바텀시트 호출
-                  trailing: IconButton(
-                    icon: Icon(Icons.more_vert,color: customColors.neutral80),
-                    onPressed: () {
-                      showBookmarkActionBottomSheet(
-                        context: context,
-                        data: data,
-                        docReference: docs[index].reference,
-                        customColors: customColors,
-                        parentContext: context,
-                      );
-                    },
-                  ),
                 ),
               );
             },
