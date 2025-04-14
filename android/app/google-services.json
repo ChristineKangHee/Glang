@@ -38,6 +38,22 @@
           }
         },
         {
+          "client_id": "194910563832-q7ep0r38739gf216091v9glpf9t7m595.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zero.glang",
+            "certificate_hash": "4175e36bdcf82d47b3fac3ba3b4c69d0f5320634"
+          }
+        },
+        {
+          "client_id": "194910563832-u0n50onu2gmfkk5vkaq0ho96sdp8h5v3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zero.glang",
+            "certificate_hash": "62abb6c410b0c8ef823f35ba9eec70eec81f8ce5"
+          }
+        },
+        {
           "client_id": "194910563832-rcd51ljo4ou93l4ooiinu7mmt41o64in.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -55,10 +71,11 @@
               "client_type": 3
             },
             {
-              "client_id": "194910563832-epg4uecivnmc7fl219fqjep0r9stsc8u.apps.googleusercontent.com",
+              "client_id": "194910563832-81q7mf4c284fcqn2q21rukie7qbq5oba.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.zero.glang"
+                "bundle_id": "com.zero.glang2025",
+                "app_store_id": "6740841063"
               }
             }
           ]

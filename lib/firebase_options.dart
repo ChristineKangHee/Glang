@@ -60,12 +60,13 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBHY6zKwK70eyWNIMh9Db11QWMJDv5qv5I',
-    appId: '1:194910563832:ios:facfee0cfdcde896c5fa0d',
+    appId: '1:194910563832:ios:fe382d0bb5489e10c5fa0d',
     messagingSenderId: '194910563832',
     projectId: 'glang-98622',
     storageBucket: 'glang-98622.firebasestorage.app',
-    iosClientId: '194910563832-epg4uecivnmc7fl219fqjep0r9stsc8u.apps.googleusercontent.com',
-    iosBundleId: 'com.zero.glang',
+    androidClientId: '194910563832-23ei1u336vjar7j0p1fcb99oii3kqnnr.apps.googleusercontent.com',
+    iosClientId: '194910563832-81q7mf4c284fcqn2q21rukie7qbq5oba.apps.googleusercontent.com',
+    iosBundleId: 'com.zero.glang2025',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -75,7 +76,7 @@ class DefaultFirebaseOptions {
     projectId: 'glang-98622',
     storageBucket: 'glang-98622.firebasestorage.app',
     iosClientId: '194910563832-l41ru5t3vakp4c9fpkk6u40pg7vh5uat.apps.googleusercontent.com',
-    iosBundleId: 'com.example.readventure',
+    iosBundleId: 'com.zero.glang2025',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
