@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/restart_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'app.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -32,6 +33,13 @@ void main() async {
     // 기본 설정으로 동작하도록 설정 가능
   }
 
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    print("✅ SharedPreferences initialized successfully!");
+  } catch (e, st) {
+    print("❌ SharedPreferences failed: $e");
+    print("📌 $st");
+  }
   // local notification
   // await requestNotificationPermission();
   // await initializeNotifications();
@@ -45,9 +53,19 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     print("🔥 Firebase initialized successfully!"); // 정상 연결 검증
-  } catch (e) {
+  } catch (e, stack) {
     print("❌ Firebase initialization failed: $e");
+    print("📌 Stack trace: $stack");  // <-- 에러 상세 출력 추가!
   }
+
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    print("✅ SharedPreferences initialized successfully!");
+  } catch (e, st) {
+    print("❌ SharedPreferences failed: $e");
+    print("📌 $st");
+  }
+
 
   // 카카오 로그인 (이전 코드)
   KakaoSdk.init(

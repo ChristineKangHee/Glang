@@ -4,6 +4,7 @@
 /// Created: 2025-01-07
 /// Last Modified: 2025-02-03 by 박민준
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'; // AlertDialog를 사용하기 위해 추가
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,6 +14,9 @@ import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart' as kakao;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart'; // Apple 로그인 추가
 import '../home/attendance/attendance_service.dart';
 import '../home/stage_provider.dart';
+import 'dart:convert';
+import 'dart:math';
+import 'package:crypto/crypto.dart';
 
 final authControllerProvider =
 StateNotifierProvider<AuthController, User?>((ref) => AuthController(ref));
@@ -131,34 +135,45 @@ class AuthController extends StateNotifier<User?> {
     }
   }
 
-  /// Apple 로그인 (프로필 사진은 제공되지 않으므로 업데이트하지 않음)
+  String _generateNonce([int length = 32]) {
+    final charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(length, (_) => charset[random.nextInt(charset.length)]).join();
+  }
+
+  String _sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
   Future<void> signInWithApple({
     required BuildContext context,
     required Function onNicknameRequired,
     required Function onHome,
   }) async {
     try {
-      final appleCredential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
-      final oauthCredential = OAuthProvider("apple.com").credential(
-        idToken: appleCredential.identityToken,
-        accessToken: appleCredential.authorizationCode,
-      );
-      final userCredential = await _auth.signInWithCredential(oauthCredential);
+      final provider = OAuthProvider("apple.com")
+        ..addScope('email')
+        ..addScope('name')
+        ..setCustomParameters({
+          'client_id': 'com.zero.glang2025.web', // ✅ 반드시 Service ID와 일치
+          'redirect_uri': 'https://glang-98622.firebaseapp.com/__/auth/handler', // ✅ Firebase의 redirect URI
+          'response_type': 'code id_token',
+        });
+
+      final userCredential = await FirebaseAuth.instance.signInWithProvider(provider);
       final user = userCredential.user;
+
       if (user != null) {
         await _handleUserState(user, onNicknameRequired, onHome);
         state = user;
       }
     } catch (e) {
+      print('❌ Firebase Apple 로그인 실패: $e');
       _showErrorDialog(context, 'Apple 로그인 오류', e.toString());
     }
   }
-
 
   Future<void> _handleUserState(
       User user, Function onNicknameRequired, Function onHome) async {
