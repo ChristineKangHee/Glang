@@ -32,6 +32,7 @@ import 'package:readventure/view/mypage/settings/settings_language.dart';
 import 'package:readventure/view/mypage/settings/settings_FAQ.dart';
 import 'package:readventure/view/mypage/settings/settings_politics.dart';
 import 'package:readventure/view/mypage/settings/settings_announcement.dart';
+import 'package:readventure/view/mypage/settings/settings_reportlistpage.dart';
 import 'package:readventure/view/mypage/settings/settings_requests.dart';
 import 'package:readventure/view/mypage/settings/settings_secession.dart';
 import 'package:readventure/viewmodel/app_state_controller.dart';
@@ -106,7 +107,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
             '/mypage/info/interpretation' : (context) => const BookmarksPage(),
             '/mypage/info/history' : (context) => const InfoHistory(),
             '/mypage/info/mycommunitypost' : (context) => MyPostsPage(),
-
+            '/mypage/settings/reports': (context) => ReportListPage(),
           },
           localizationsDelegates: context.localizationDelegates, // Localization 설정
           supportedLocales: context.supportedLocales, // 지원 언어

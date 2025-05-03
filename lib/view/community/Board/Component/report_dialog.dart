@@ -50,13 +50,26 @@ class _ReportDialogState extends State<ReportDialog> {
         TextButton(
           onPressed: () async {
             Navigator.pop(context);
-            await CommunityService().reportPost(
-              postId: widget.postId,
-              reason: selectedReason,
-            );
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("신고가 접수되었습니다.")),
-            );
+
+            try {
+              // 👉 추가: postId로 작성자 ID 가져오기
+              final reportedUserId = await CommunityService().getAuthorIdByPostId(widget.postId);
+
+              // 👉 submitReport() 호출
+              await ReportService.submitReport(
+                reportedUserId: reportedUserId,
+                reportedPostId: widget.postId,
+                reason: selectedReason,
+              );
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("신고가 접수되었습니다.")),
+              );
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("신고 처리 중 오류가 발생했습니다.")),
+              );
+            }
           },
           child: const Text("신고"),
         ),

@@ -10,6 +10,7 @@ import '../../../theme/font.dart';
 import '../../../theme/theme.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/custom_app_bar.dart';
+import 'Component/ReportOrBlockBottomSheet.dart';
 import 'Component/block_dialog.dart';
 import 'Component/postaction_bottomsheet.dart';
 import 'CM_2depth_boardMain_firebase.dart';
@@ -127,17 +128,15 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
             )
           else
             IconButton(
-              icon: Icon(Icons.flag_outlined, color: customColors.error),
+              icon: Icon(Icons.more_vert_rounded, color: customColors.neutral80),
               onPressed: () {
-                showReportDialog(context, widget.post.id);
+                if (isAuthor) {
+                  showPostActionBottomSheet(context, widget.post, customColors, context);
+                } else {
+                  showReportOrBlockBottomSheet(context, widget.post, customColors);
+                }
               },
-            ),
-          // IconButton(
-          //   icon: Icon(Icons.block, color: Colors.redAccent),
-          //   onPressed: () {
-          //     showBlockDialog(context, widget.post.authorId);
-          //   },
-          // ),
+            )
         ]
       ],
     );
@@ -270,6 +269,16 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
         post: post,
         customColors: customColors,
         parentContext: parentContext,
+      ),
+    );
+  }
+
+  void showReportOrBlockBottomSheet(BuildContext context, Post post, CustomColors customColors) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => ReportOrBlockBottomSheet(
+        post: post,
+        customColors: customColors,
       ),
     );
   }

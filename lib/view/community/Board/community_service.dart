@@ -78,33 +78,46 @@ class CommunityService {
   /// Firestore에서 게시글 목록을 최신 순으로 가져옵니다.
   ///
   /// 반환값: 게시글 목록의 스트림
-  Stream<List<Post>> getPosts() {
-    return _firestore
-        .collection('posts')
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) => Post.fromMap(doc.data())).toList();
-    });
-  }
-  // Stream<List<Post>> getPosts() async* {
-  //   final user = FirebaseAuth.instance.currentUser;
-  //   if (user == null) throw Exception('로그인이 필요합니다.');
-  //
-  //   final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-  //   final blockedUsers = List<String>.from(userDoc.data()?['blockedUsers'] ?? []);
-  //
-  //   yield* FirebaseFirestore.instance
+  // Stream<List<Post>> getPosts() {
+  //   return _firestore
   //       .collection('posts')
   //       .orderBy('createdAt', descending: true)
   //       .snapshots()
   //       .map((snapshot) {
-  //     return snapshot.docs
-  //         .map((doc) => Post.fromMap(doc.data()))
-  //         .where((post) => !blockedUsers.contains(post.authorId)) // 🔥 여기!
-  //         .toList();
+  //     return snapshot.docs.map((doc) => Post.fromMap(doc.data())).toList();
   //   });
   // }
+  Stream<List<Post>> getPosts() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return Stream.value([]);
+    }
+
+    final postsRef = FirebaseFirestore.instance
+        .collection('posts')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .asBroadcastStream();
+
+    // ✅ userDoc은 따로 처음에 Future로 가져오기
+    final Future<List<String>> blockedUsersFuture = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get()
+        .then((doc) => List<String>.from(doc.data()?['blockedUsers'] ?? []));
+
+    return postsRef.asyncExpand((snapshot) async* {
+      final blockedUsers = await blockedUsersFuture;
+      final posts = snapshot.docs
+          .map((doc) => Post.fromMap(doc.data()))
+          .where((post) => !blockedUsers.contains(post.authorId))
+          .toList();
+      yield posts;
+    });
+  }
+
+
+
 
   /// 🔹 특정 게시글 가져오기
   ///
@@ -244,6 +257,7 @@ class CommunityService {
       print('❌ 좋아요 오류: $e');
     }
   }
+
   Future<void> reportPost({
     required String postId,
     required String reason,
@@ -274,4 +288,38 @@ class CommunityService {
     });
   }
 
+  Future<String> getAuthorIdByPostId(String postId) async {
+    final doc = await FirebaseFirestore.instance.collection('posts').doc(postId).get();
+    if (doc.exists) {
+      return doc.data()?['authorId'] ?? '';
+    } else {
+      throw Exception("게시글이 존재하지 않습니다.");
+    }
+  }
+}
+
+class ReportService {
+  static Future<void> submitReport({
+    required String reportedUserId,
+    String? reportedPostId,
+    String? reportedCommentId,
+    required String reason,
+    String? detail,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw Exception("로그인이 필요합니다.");
+
+    final reportsRef = FirebaseFirestore.instance.collection('reports');
+
+    await reportsRef.add({
+      'reportedUserId': reportedUserId,
+      'reportedPostId': reportedPostId,
+      'reportedCommentId': reportedCommentId,
+      'reporterUserId': user.uid,
+      'reason': reason,
+      'createdAt': FieldValue.serverTimestamp(),
+      'status': '대기중',
+      'adminResponse': '',
+    });
+  }
 }

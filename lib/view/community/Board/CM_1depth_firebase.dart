@@ -11,6 +11,7 @@ import '../../../theme/font.dart';
 import '../../../theme/theme.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/custom_app_bar.dart';
+import '../../components/custom_button.dart';
 import '../../components/custom_navigation_bar.dart';
 import '../../widgets/DoubleBackToExitWrapper.dart';
 import 'Component/postHeader.dart';
@@ -21,71 +22,173 @@ import 'community_searchpage_firebase.dart';
 import '../Ranking/CM_2depth_ranking.dart';
 import '../Ranking/ranking_component.dart';
 import 'community_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+
 
 /// 커뮤니티 메인 페이지
-class CommunityMainPage extends ConsumerWidget {
+class CommunityMainPage extends ConsumerStatefulWidget {
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final customColors = ref.watch(customColorsProvider);  // 커스텀 색상 정보 가져오기
-    final communityService = CommunityService();  // 커뮤니티 서비스 객체 생성
+  ConsumerState<CommunityMainPage> createState() => _CommunityMainPageState();
+}
 
-    return DoubleBackToExitWrapper(  // 뒤로가기 두 번으로 앱 종료 기능 래핑
+class _CommunityMainPageState extends ConsumerState<CommunityMainPage> {
+  @override
+  void initState() {
+    super.initState();
+    _checkEula();
+  }
+
+  Future<void> _checkEula() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    bool acceptedLocal = prefs.getBool('eulaAccepted_community') ?? false;
+
+    bool acceptedServer = false;
+    try {
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      acceptedServer = userDoc.data()?['communityEulaAccepted'] ?? false;
+    } catch (e) {
+      print('❌ Firestore에서 EULA 정보 가져오기 실패: $e');
+    }
+
+    // 로컬 또는 서버 둘 중 하나라도 false면 약관 띄우기
+    if (!acceptedLocal || !acceptedServer) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showEulaBottomSheet();
+      });
+    }
+  }
+
+
+  void _showEulaBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: false, // 🔥 바깥 터치로 닫기 금지
+      enableDrag: false,    // 🔥 스와이프 닫기 금지
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 40, 16, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 제목
+                Text(
+                  '커뮤니티 이용 약관',
+                  style: body_large(context).copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 20),
+                // 약관 내용 스크롤
+                SizedBox(
+                  child: SingleChildScrollView(
+                    child: Text(
+                      '• 타인에게 불쾌감을 주는 발언을 금지합니다.\n'
+                          '• 허위 정보, 광고, 욕설, 비방 금지\n'
+                          '• 운영 정책을 위반할 경우 게시글이 삭제될 수 있습니다.\n'
+                          '• 모든 게시글은 관리자가 모니터링할 수 있습니다.\n\n'
+                          '※ 상세한 약관 내용은 "설정 > 이용약관"에서 확인할 수 있습니다.',
+                      style: body_small(context),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                // 약관 동의 버튼
+                ButtonPrimary_noPadding(
+                  title: '약관에 동의하고 커뮤니티 이용하기',
+                  function: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.setBool('eulaAccepted_community', true);
+
+                    final user = FirebaseAuth.instance.currentUser;
+                    if (user != null) {
+                      final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
+                      await userDoc.update({
+                        'communityEulaAccepted': true,
+                        'communityEulaAcceptedAt': FieldValue.serverTimestamp(),
+                      });
+                    }
+
+                    Navigator.pop(context); // ✅ 동의 후 BottomSheet 닫기
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = ref.watch(customColorsProvider);
+    final communityService = CommunityService();
+
+    return DoubleBackToExitWrapper(
       child: Scaffold(
-        backgroundColor: customColors.neutral90,  // 배경 색상 설정
-        appBar: CustomAppBar_Community(  // 커스텀 앱바
+        backgroundColor: customColors.neutral90,
+        appBar: CustomAppBar_Community(
           onSearchPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SearchPage()),  // 검색 페이지로 이동
+              MaterialPageRoute(builder: (context) => SearchPage()),
             );
           },
         ),
-        body: StreamBuilder<List<Post>>(  // 게시글 데이터를 스트림으로 받기
+        body: StreamBuilder<List<Post>>(
           stream: communityService.getPosts(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());  // 로딩 중일 때 로딩 표시
+              return const Center(child: CircularProgressIndicator());
             }
 
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text("게시글이 없습니다."));  // 데이터가 없으면 게시글이 없다는 메시지 표시
+              return const Center(child: Text("게시글이 없습니다."));
             }
 
             final posts = snapshot.data!;
 
-            return SingleChildScrollView(  // 스크롤 가능 영역 설정
+            return SingleChildScrollView(
               child: Column(
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildRankingPreview(context, customColors),  // 랭킹 미리보기 빌드
+                    child: _buildRankingPreview(context, customColors),
                   ),
                   const SizedBox(height: 24),
-                  CommunityPreview(posts, context, customColors),  // 커뮤니티 미리보기 빌드
+                  CommunityPreview(posts, context, customColors),
                 ],
               ),
             );
           },
         ),
-        bottomNavigationBar: const CustomNavigationBar(),  // 커스텀 네비게이션 바
+        bottomNavigationBar: const CustomNavigationBar(),
       ),
     );
   }
 
-  /// 랭킹 미리보기 위젯
   Widget _buildRankingPreview(BuildContext context, CustomColors customColors) {
     return Column(
       children: [
-        _buildRankingNavigation(context, customColors),  // 랭킹 내비게이션
+        _buildRankingNavigation(context, customColors),
         Container(
           decoration: BoxDecoration(
-            color: customColors.neutral100,  // 배경 색상 설정
-            borderRadius: BorderRadius.circular(16),  // 둥근 모서리
+            color: customColors.neutral100,
+            borderRadius: BorderRadius.circular(16),
           ),
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              buildTopThreeWithPodium(context, customColors),  // 상위 3명 랭킹 표시
+              buildTopThreeWithPodium(context, customColors),
             ],
           ),
         ),
@@ -93,33 +196,32 @@ class CommunityMainPage extends ConsumerWidget {
     );
   }
 
-  /// 랭킹 내비게이션
   Widget _buildRankingNavigation(BuildContext context, CustomColors customColors) {
     return ListTile(
-      contentPadding: EdgeInsets.zero,  // 패딩 제거
+      contentPadding: EdgeInsets.zero,
       title: Text(
-        '랭킹',  // 제목: 랭킹
+        '랭킹',
         style: body_small_semi(context),
       ),
       trailing: TextButton(
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => RankingPage()),  // 랭킹 페이지로 이동
+            MaterialPageRoute(builder: (context) => RankingPage()),
           );
         },
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '더보기',  // 더보기 버튼
+              '더보기',
               style: body_xxsmall_semi(context),
             ),
             const SizedBox(width: 4),
             Icon(
-              Icons.arrow_forward_ios_rounded,  // 화살표 아이콘
+              Icons.arrow_forward_ios_rounded,
               size: 16,
-              color: customColors.neutral0,  // 아이콘 색상
+              color: customColors.neutral0,
             ),
           ],
         ),
@@ -127,6 +229,7 @@ class CommunityMainPage extends ConsumerWidget {
     );
   }
 }
+
 
 /// 커뮤니티 미리보기 페이지
 class CommunityPreview extends StatefulWidget {
