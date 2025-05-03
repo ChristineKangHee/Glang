@@ -99,7 +99,7 @@ class _PostEditPageState extends ConsumerState<PostEditPage> {
         ref.watch(customColorsProvider),
         "게시글 수정 실패",
         "확인",
-        "",
+        "나가기",
             (ctx) => Navigator.of(ctx).pop(),
       );
     }

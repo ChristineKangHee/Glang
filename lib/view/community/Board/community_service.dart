@@ -8,6 +8,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../api/huggingface_toxic_filter.dart';
 import 'CM_2depth_boardMain_firebase.dart';
 import 'community_data_firebase.dart';
 
@@ -36,6 +37,12 @@ class CommunityService {
       final user = _auth.currentUser;
       if (user == null) throw Exception("로그인이 필요합니다.");
 
+      // 🔥 여기 추가! - 욕설 필터링
+      bool isToxic = await HuggingFaceToxicFilter.isToxic(content);
+      if (isToxic) {
+        throw Exception("부적절한 표현이 포함되어 있어 게시글을 등록할 수 없습니다.");
+      }
+
       final userDoc = await _firestore.collection('users').doc(user.uid).get();
       final nickname = userDoc.data()?['nickname'] ?? '익명';
 
@@ -46,7 +53,6 @@ class CommunityService {
         'content': content,
         'authorId': user.uid,
         'nickname': nickname,
-        // photoURL이 유효하면 사용, 그렇지 않으면 기본 아바타 지정
         'profileImage': (user.photoURL != null && user.photoURL!.isNotEmpty)
             ? user.photoURL
             : 'assets/images/default_avatar.png',
@@ -61,9 +67,10 @@ class CommunityService {
       return postRef.id;
     } catch (e) {
       print('❌ 게시글 작성 오류: $e');
-      throw Exception('게시글 작성 실패');
+      throw Exception(e.toString()); // 에러 메시지를 그대로 throw해서 UI에서 처리하게
     }
   }
+
 
 
   /// 🔹 게시글 목록 가져오기
@@ -80,6 +87,24 @@ class CommunityService {
       return snapshot.docs.map((doc) => Post.fromMap(doc.data())).toList();
     });
   }
+  // Stream<List<Post>> getPosts() async* {
+  //   final user = FirebaseAuth.instance.currentUser;
+  //   if (user == null) throw Exception('로그인이 필요합니다.');
+  //
+  //   final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+  //   final blockedUsers = List<String>.from(userDoc.data()?['blockedUsers'] ?? []);
+  //
+  //   yield* FirebaseFirestore.instance
+  //       .collection('posts')
+  //       .orderBy('createdAt', descending: true)
+  //       .snapshots()
+  //       .map((snapshot) {
+  //     return snapshot.docs
+  //         .map((doc) => Post.fromMap(doc.data()))
+  //         .where((post) => !blockedUsers.contains(post.authorId)) // 🔥 여기!
+  //         .toList();
+  //   });
+  // }
 
   /// 🔹 특정 게시글 가져오기
   ///
@@ -117,6 +142,12 @@ class CommunityService {
       final user = _auth.currentUser;
       if (user == null) throw Exception("로그인이 필요합니다.");
 
+      // 🔥 여기 추가 - 수정할 내용에도 욕설 필터링
+      bool isToxic = await HuggingFaceToxicFilter.isToxic(content);
+      if (isToxic) {
+        throw Exception("부적절한 표현이 포함되어 있어 수정할 수 없습니다.");
+      }
+
       final postRef = _firestore.collection('posts').doc(postId);
       final postDoc = await postRef.get();
 
@@ -131,9 +162,10 @@ class CommunityService {
       });
     } catch (e) {
       print('❌ 게시글 수정 오류: $e');
-      throw Exception('게시글 수정 실패');
+      throw Exception(e.toString());
     }
   }
+
 
   /// 🔹 게시글 삭제
   ///
@@ -212,4 +244,34 @@ class CommunityService {
       print('❌ 좋아요 오류: $e');
     }
   }
+  Future<void> reportPost({
+    required String postId,
+    required String reason,
+  }) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception("로그인이 필요합니다.");
+
+      await FirebaseFirestore.instance.collection('reports').add({
+        'reportedPostId': postId,
+        'reporterId': user.uid,
+        'reason': reason,
+        'reportedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print('❌ 신고 오류: $e');
+      throw Exception('신고 실패');
+    }
+  }
+  Future<void> blockUser(String blockedUserId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw Exception('로그인이 필요합니다.');
+
+    final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
+
+    await userDoc.update({
+      'blockedUsers': FieldValue.arrayUnion([blockedUserId])
+    });
+  }
+
 }

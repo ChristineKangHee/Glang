@@ -9,9 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../theme/font.dart';
 import '../../../theme/theme.dart';
+import 'Component/block_dialog.dart';
 import 'Component/postHeader.dart';
 import 'Component/postaction_bottomsheet.dart';
 import 'Component/postfooter.dart';
+import 'Component/report_dialog.dart';
+import 'community_service.dart';
 import 'posting_detail_page.dart';
 import 'community_data_firebase.dart';
 
@@ -74,6 +77,21 @@ class PostItemContainer extends StatelessWidget {
                       showPostActionBottomSheet(context, post, customColors, parentContext);
                     },
                   ),
+                // PostItemContainer.dart 또는 PostDetailPage.dart 안에
+                if (currentUser != null && post.authorId != currentUser.uid)
+                  IconButton(
+                    icon: Icon(Icons.flag, color: customColors.error), // 빨간 깃발 아이콘
+                    onPressed: () {
+                      showReportDialog(context, post.id);
+                    },
+                  ),
+                // IconButton(
+                //   icon: Icon(Icons.block, color: Colors.redAccent),
+                //   onPressed: () {
+                //     showBlockDialog(context, post.authorId);
+                //   },
+                // ),
+
               ],
             ),
             const SizedBox(height: 8),
@@ -92,7 +110,57 @@ class PostItemContainer extends StatelessWidget {
       ),
     );
   }
-
+  void _showReportDialog(BuildContext context, String postId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        String selectedReason = "욕설 및 부적절한 표현"; // 기본 선택값
+        return AlertDialog(
+          title: Text("신고하기"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButton<String>(
+                value: selectedReason,
+                items: [
+                  "욕설 및 부적절한 표현",
+                  "스팸 및 광고",
+                  "개인정보 노출",
+                  "기타 부적절한 내용"
+                ].map((reason) {
+                  return DropdownMenuItem(
+                    value: reason,
+                    child: Text(reason),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    selectedReason = value;
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("취소"),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                await CommunityService().reportPost(postId: postId, reason: selectedReason);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("신고가 접수되었습니다.")),
+                );
+              },
+              child: Text("신고"),
+            ),
+          ],
+        );
+      },
+    );
+  }
   /// 게시물에 대한 액션을 보여주는 하단 시트를 표시하는 함수
   void showPostActionBottomSheet(BuildContext context, Post post, CustomColors customColors, BuildContext parentContext) {
     showModalBottomSheet(

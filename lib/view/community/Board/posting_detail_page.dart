@@ -10,8 +10,10 @@ import '../../../theme/font.dart';
 import '../../../theme/theme.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/custom_app_bar.dart';
+import 'Component/block_dialog.dart';
 import 'Component/postaction_bottomsheet.dart';
 import 'CM_2depth_boardMain_firebase.dart';
+import 'Component/report_dialog.dart';
 import 'community_data_firebase.dart';
 import 'community_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -108,18 +110,35 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
 
   // 게시글 제목 및 작성자 메뉴
   Widget DetailHeader(BuildContext context, bool isAuthor, CustomColors customColors) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
     return Row(
       children: [
         Expanded(
           child: Text(widget.post.title, style: heading_medium(context)),
         ),
-        if (isAuthor) // 작성자인 경우만 메뉴 버튼 표시
-          IconButton(
-            icon: Icon(Icons.more_vert_rounded, color: customColors.neutral80),
-            onPressed: () {
-              showPostActionBottomSheet(context, widget.post, customColors, context); // 게시글 액션 메뉴 호출
-            },
-          ),
+        if (currentUser != null) ...[
+          if (isAuthor)
+            IconButton(
+              icon: Icon(Icons.more_vert_rounded, color: customColors.neutral80),
+              onPressed: () {
+                showPostActionBottomSheet(context, widget.post, customColors, context);
+              },
+            )
+          else
+            IconButton(
+              icon: Icon(Icons.flag_outlined, color: customColors.error),
+              onPressed: () {
+                showReportDialog(context, widget.post.id);
+              },
+            ),
+          // IconButton(
+          //   icon: Icon(Icons.block, color: Colors.redAccent),
+          //   onPressed: () {
+          //     showBlockDialog(context, widget.post.authorId);
+          //   },
+          // ),
+        ]
       ],
     );
   }
