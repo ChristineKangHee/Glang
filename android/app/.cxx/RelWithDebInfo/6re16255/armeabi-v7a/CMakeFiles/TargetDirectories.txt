@@ -1,0 +1,2 @@
+/Users/kanghee/IdeaProject/ReadVenture/android/app/.cxx/RelWithDebInfo/6re16255/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/kanghee/IdeaProject/ReadVenture/android/app/.cxx/RelWithDebInfo/6re16255/armeabi-v7a/CMakeFiles/rebuild_cache.dir
