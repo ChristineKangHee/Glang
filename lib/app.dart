@@ -72,6 +72,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
       designSize: const Size(390, 844), // 기본 디자인 사이즈 설정
       builder: (context, child) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false, // 🔥 이 줄 추가
           title: tr('app_title'), // Localization을 통해 앱 제목 가져오기
           theme: isLightTheme ? themeController.lightTheme : themeController.darkTheme, // 라이트/다크 테마
           darkTheme: themeController.darkTheme, // 다크 테마
