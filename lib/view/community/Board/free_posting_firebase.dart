@@ -88,8 +88,8 @@ class _FreeWritingPageState extends ConsumerState<FreeWritingPage> {
         context,
         ref.watch(customColorsProvider),
         "게시글 작성 실패",
-        "확인",
-        "",
+        "취소",
+        "나가기",
             (ctx) => Navigator.of(ctx).pop(),
       );
     }

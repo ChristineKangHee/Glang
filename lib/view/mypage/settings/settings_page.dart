@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';
+import '../../../constants.dart';
 import '../../../restart_widget.dart';
 import '../../../viewmodel/app_state_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -158,6 +159,31 @@ class SettingsPage extends ConsumerWidget {
               },
             ),
           ),
+          FutureBuilder<bool>(
+            future: isAdminUser(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return SizedBox(); // 로딩 중에는 아무것도 안 보여줌
+              }
+              final isAdmin = snapshot.data ?? false;
+              if (!isAdmin) {
+                return SizedBox(); // 운영자가 아니면 아무것도 안 보여줌
+              }
+              return Column(
+                children: [
+                  Divider(color: customColors.neutral80),
+                  ListTile(
+                    title: Text('🚨 신고 관리', style: body_medium_semi(context).copyWith(color: customColors.neutral0)),
+                    onTap: () {
+                      Navigator.pushNamed(context, '/mypage/settings/reports');
+                    },
+                    trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
+                  ),
+                ],
+              );
+            },
+          ),
+
           Divider(color: customColors.neutral80,),
           ListTile(
             title: Text('로그아웃', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),

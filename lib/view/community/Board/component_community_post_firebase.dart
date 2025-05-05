@@ -9,9 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../theme/font.dart';
 import '../../../theme/theme.dart';
+import 'Component/ReportOrBlockBottomSheet.dart';
+import 'Component/block_dialog.dart';
 import 'Component/postHeader.dart';
 import 'Component/postaction_bottomsheet.dart';
 import 'Component/postfooter.dart';
+import 'Component/report_dialog.dart';
+import 'community_service.dart';
 import 'posting_detail_page.dart';
 import 'community_data_firebase.dart';
 
@@ -63,17 +67,26 @@ class PostItemContainer extends StatelessWidget {
                     style: body_small_semi(context),
                   ),
                 ),
-                // 내가 쓴 게시물인 경우 more_vert 아이콘 표시
-                if (currentUser != null && post.authorId == currentUser.uid)
-                  IconButton(
-                    icon: Icon(Icons.more_vert_rounded, color: customColors.neutral80),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    onPressed: () {
-                      // more_vert 아이콘 클릭 시 하단 시트 표시
-                      showPostActionBottomSheet(context, post, customColors, parentContext);
-                    },
-                  ),
+                if (currentUser != null) ...[
+                  if (post.authorId == currentUser.uid)
+                    IconButton(
+                      icon: Icon(Icons.more_vert_rounded, color: customColors.neutral80),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () {
+                        showPostActionBottomSheet(context, post, customColors, parentContext);
+                      },
+                    )
+                  else
+                    IconButton(
+                      icon: Icon(Icons.more_vert_rounded, color: customColors.neutral80),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () {
+                        showReportOrBlockBottomSheet(context, post, customColors);
+                      },
+                    ),
+                ],
               ],
             ),
             const SizedBox(height: 8),
@@ -92,7 +105,6 @@ class PostItemContainer extends StatelessWidget {
       ),
     );
   }
-
   /// 게시물에 대한 액션을 보여주는 하단 시트를 표시하는 함수
   void showPostActionBottomSheet(BuildContext context, Post post, CustomColors customColors, BuildContext parentContext) {
     showModalBottomSheet(
@@ -101,6 +113,15 @@ class PostItemContainer extends StatelessWidget {
         post: post,
         customColors: customColors,
         parentContext: parentContext,
+      ),
+    );
+  }
+  void showReportOrBlockBottomSheet(BuildContext context, Post post, CustomColors customColors) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => ReportOrBlockBottomSheet(
+        post: post,
+        customColors: customColors,
       ),
     );
   }
