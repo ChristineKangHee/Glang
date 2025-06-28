@@ -16,6 +16,7 @@ import 'package:readventure/view/feature/reading/GA_02/word_interpretation.dart'
 import '../../../../viewmodel/memo_notifier.dart';
 import '../../after_read/widget/answer_section.dart';
 import 'reading_chatbot.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 /// 사용자가 선택한 문장을 기반으로 메모를 작성할 수 있는 다이얼로그 위젯
 class NoteDialog extends StatefulWidget {
@@ -75,7 +76,7 @@ class NoteDialogState extends State<NoteDialog> {
             children: [
               // 제목 텍스트
               Text(
-                '메모',
+                'note_title'.tr(),
                 textAlign: TextAlign.center,
                 style: body_small_semi(context).copyWith(
                   color: widget.customColors.neutral30,
@@ -87,7 +88,7 @@ class NoteDialogState extends State<NoteDialog> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '선택된 문장',
+                  'selected_sentence'.tr(),
                   style: body_xsmall_semi(context),
                 ),
               ),
@@ -136,7 +137,7 @@ class NoteDialogState extends State<NoteDialog> {
                       child: TextButton(
                         onPressed: () => Navigator.pop(context), // 다이얼로그 닫기
                         child: Text(
-                          '취소',
+                          'cancel'.tr(),
                           style: body_small_semi(context)
                               .copyWith(color: widget.customColors.neutral60),
                         ),
@@ -191,7 +192,7 @@ class NoteDialogState extends State<NoteDialog> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Text(
-                                      '메모가 저장되었어요.',
+                                      'note_saved'.tr(),
                                       style: body_small_semi(context)
                                           .copyWith(color: widget.customColors.neutral100),
                                     ),
@@ -209,7 +210,7 @@ class NoteDialogState extends State<NoteDialog> {
                           Navigator.pop(context);
                         },
                         child: Text(
-                          '저장',
+                          'save'.tr(),
                           style: body_small_semi(context)
                               .copyWith(color: widget.customColors.neutral100),
                         ),

@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:easy_localization/easy_localization.dart'; // 추가
+
 
 // 프로젝트 내 폰트/스타일 관련 함수 import (경로는 필요에 따라 수정)
 import 'package:readventure/theme/font.dart';
@@ -100,7 +102,7 @@ Widget _buildPopupHeader(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       Text(
-        '해석',
+        'interpretation_title'.tr(),
         style: body_small_semi(context).copyWith(color: customColors.neutral30),
       ),
       Row(
@@ -158,38 +160,38 @@ Widget _buildResultContent(BuildContext context, Map<String, dynamic> data, dyna
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        '사전적 의미',
+        'dictionary_meaning'.tr(),
         style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
       ),
       Text(
-        data['dictionaryMeaning'] ?? '정보 없음',
+        data['dictionaryMeaning'] ?? 'info_not_available'.tr(),
         style: body_small(context),
       ),
       const SizedBox(height: 16),
       Text(
-        '문맥상 의미',
+        'contextual_meaning'.tr(),
         style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
       ),
       Text(
-        data['contextualMeaning'] ?? '정보 없음',
+        data['contextualMeaning'] ?? 'info_not_available'.tr(),
         style: body_small(context),
       ),
       const SizedBox(height: 16),
       Text(
-        '유사어',
+        'synonyms'.tr(),
         style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
       ),
       Text(
-        synonyms.isNotEmpty ? synonyms.join(', ') : '정보 없음',
+        synonyms.isNotEmpty ? synonyms.join(', ') : 'info_not_available'.tr(),
         style: body_small(context),
       ),
       const SizedBox(height: 16),
       Text(
-        '반의어',
+        'antonyms'.tr(),
         style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
       ),
       Text(
-        antonyms.isNotEmpty ? antonyms.join(', ') : '정보 없음',
+        antonyms.isNotEmpty ? antonyms.join(', ') : 'info_not_available'.tr(),
         style: body_small(context),
       ),
     ],
@@ -279,7 +281,7 @@ void showWordPopup({
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '오류가 발생했습니다.',
+                        'error_occurred'.tr(),
                         style: body_small_semi(context).copyWith(color: customColors.neutral30),
                       ),
                       const SizedBox(height: 20),
@@ -304,7 +306,7 @@ void showWordPopup({
                       isBookmarked = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("해석이 저장되었습니다.")),
+                      SnackBar(content: Text("interpretation_saved".tr())),
                     );
                   };
 

@@ -19,6 +19,7 @@ import '../../after_read/choose_activities.dart';
 import '../quiz_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class RdMain extends ConsumerStatefulWidget {
   const RdMain({super.key});
@@ -158,7 +159,7 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
 
     if (currentStage == null) {
       return Scaffold(
-        appBar: CustomAppBar_2depth_8(title: "로딩 중..."),
+        appBar: CustomAppBar_2depth_8(title: "loading".tr()),
         body: Center(child: CircularProgressIndicator()),
       );
     }
@@ -172,9 +173,9 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
           showResultSaveDialog(
             context,
             customColors,
-            "결과를 저장하고 이동할까요?",
-            "아니오",
-            "예",
+            "save_and_exit_prompt".tr(),
+            "no".tr(),
+            "yes".tr(),
                 (ctx) {
                   Navigator.of(context).popUntil((route) => route.isFirst);
             },
@@ -288,7 +289,7 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
             // 📌 '읽기 완료' 버튼: 이후 활동 선택 페이지로 이동
             ButtonPrimary_noPadding(
               function: () => _onSubmit(currentStage), // ✅ 진행도 저장 후 이동
-              title: "읽기 완료",
+              title: "reading_complete".tr(),
               condition: mcqCompleted && oxCompleted ? "not null" : "null", // ✅ 모든 문제를 풀었을 때만 활성화
             ),
 

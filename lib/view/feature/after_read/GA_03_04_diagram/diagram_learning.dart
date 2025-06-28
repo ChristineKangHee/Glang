@@ -21,6 +21,7 @@ import '../../../home/stage_provider.dart';
 import '../choose_activities.dart';
 import '../widget/title_section_learning.dart';
 import 'diagram_main.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 /// ─────────── 정답 정보 및 제출 상태 Provider ───────────
 /// ─────────── 제출 상태/완료 상태 Provider ───────────
@@ -107,9 +108,9 @@ class RootedTreeScreen extends ConsumerWidget {
     // 3) stage.arData?.featureData['feature4Diagram']에서 다이어그램 정보 추출
     final diagramData = stage.arData?.featureData?['feature4Diagram'] as Map<String, dynamic>?;
     if (diagramData == null) {
-      // 다이어그램 데이터가 없을 경우
-      return const Scaffold(
-        body: Center(child: Text("다이어그램 데이터가 없습니다.")),
+      // 다이어그램이 없을 경우 메시지
+      return Scaffold(
+        body: Center(child: Text("diagram_no_data").tr()),
       );
     }
 
@@ -170,7 +171,8 @@ class RootedTreeScreen extends ConsumerWidget {
     });
     return Scaffold(
       backgroundColor: customColors.neutral90,
-      appBar: CustomAppBar_2depth_8(title: '다이어그램', key: _appBarKey,),
+      // 앱바 타이틀
+      appBar: CustomAppBar_2depth_8(title: 'diagram_title'.tr(), key: _appBarKey,),
       body: Column(
         children: [
           // 상단 안내영역
@@ -186,7 +188,8 @@ class RootedTreeScreen extends ConsumerWidget {
                 customColors: Theme.of(context).extension<CustomColors>()!,
                 title: diagramTitle,
                 subtitle: diagramSubtitle,
-                author: "작성자 없음",
+                // TitleSection_withIcon 내
+                author: "author_none".tr(),
                 stageId: stage.stageId, // ✅ stageId 추가
                 subdetailTitle: stage.subdetailTitle, // ✅ subdetailTitle 추가
               ),
@@ -329,8 +332,8 @@ class _WordListWidgetState extends ConsumerState<WordListWidget> {
 
     // 버튼 텍스트 처리
     final buttonTitle = submitted
-        ? (complete ? '제출 완료' : '수정하기')
-        : '제출하기';
+        ? (complete ? 'submit_complete'.tr() : 'edit_submission'.tr())
+        : 'submit'.tr();
 
     // 모든 단어가 노드에 배치되면 → 제출/수정 버튼 표시
     if (wordList.isEmpty) {

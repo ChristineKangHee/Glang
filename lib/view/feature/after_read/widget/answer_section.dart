@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:readventure/viewmodel/custom_colors_provider.dart';
 import '../../../../../theme/font.dart';
 import '../../../../../theme/theme.dart';
+import 'package:easy_localization/easy_localization.dart'; // 추가
+
 
 class Answer_Section extends StatefulWidget {
   const Answer_Section({
@@ -45,7 +47,7 @@ class _AnswerSectionState extends State<Answer_Section> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("나의 답변", style: body_small(context)),
+        Text("my_answer".tr(), style: body_small(context)),
         const SizedBox(height: 16),
         SizedBox(
           height: 200,
@@ -57,7 +59,7 @@ class _AnswerSectionState extends State<Answer_Section> {
             textAlignVertical: TextAlignVertical.top,
             style: body_medium(context),
             decoration: InputDecoration(
-              hintText: "글을 작성해주세요.",
+              hintText: "write_placeholder".tr(),
               hintStyle: body_medium(context)
                   .copyWith(color: widget.customColors.neutral60),
               filled: true,
@@ -132,7 +134,7 @@ class _AnswerSectionNoTitleState extends State<Answer_Section_No_Title> {
             textAlignVertical: TextAlignVertical.top,
             style: body_medium(context),
             decoration: InputDecoration(
-              hintText: "글을 작성해주세요.",
+              hintText: "write_placeholder".tr(),
               hintStyle: body_medium(context)
                   .copyWith(color: widget.customColors.neutral60),
               filled: true,
