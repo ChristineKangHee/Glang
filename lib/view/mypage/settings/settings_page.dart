@@ -99,14 +99,14 @@ class SettingsPage extends ConsumerWidget {
             },
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
           ),
-          // ListTile(
-          //   title: Text('언어 설정', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
-          //   onTap: () {
-          //     // TODO: 언어 설정 페이지로 이동
-          //     Navigator.pushNamed(context, '/mypage/settings/language');
-          //   },
-          //   trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
-          // ),
+          ListTile(
+            title: Text('언어 설정', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
+            onTap: () {
+              // TODO: 언어 설정 페이지로 이동
+              Navigator.pushNamed(context, '/mypage/settings/language');
+            },
+            trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
+          ),
           // ListTile(
           //   title: Text('테마 설정', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
           //   trailing: IconButton(

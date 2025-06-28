@@ -10,7 +10,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:easy_localization/easy_localization.dart'; // 추가
 import '../../../../viewmodel/bookmark_interpretation.dart';
 
 /// ChatGPT API를 호출하여 문장 정보를 받아오는 함수
@@ -81,7 +81,7 @@ Widget _popupHeader(
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      Text('해석', style: body_small_semi(context).copyWith(color: customColors.neutral30)),
+      Text('interpretation_title'.tr(), style: body_small_semi(context).copyWith(color: customColors.neutral30)),
       Row(
         children: [
           IconButton(
@@ -141,23 +141,12 @@ Widget _buildResultContent(Map<String, dynamic> data, dynamic customColors, Buil
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(
-        '문맥상 의미',
-        style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
-      ),
-      Text(
-        data['contextualMeaning'] ?? '정보 없음',
-        style: body_small(context),
-      ),
+      Text('contextual_meaning'.tr(), style: heading_xxsmall(context).copyWith(color: customColors.neutral30)),
+      Text(data['contextualMeaning'] ?? 'info_not_available'.tr(), style: body_small(context)),
       const SizedBox(height: 16),
-      Text(
-        '요약',
-        style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
-      ),
-      Text(
-        data['summary'] ?? '정보 없음',
-        style: body_small(context),
-      ),
+      Text('summary'.tr(), style: heading_xxsmall(context).copyWith(color: customColors.neutral30)),
+      Text(data['summary'] ?? 'info_not_available'.tr(), style: body_small(context)),
+
     ],
   );
 }
@@ -235,8 +224,7 @@ void showSentencePopup({
                         isBookmarked: isBookmarked,
                       ),
                       const SizedBox(height: 20),
-                      Text('오류가 발생했습니다.',
-                          style: body_small_semi(context).copyWith(color: customColors.neutral30)),
+                      Text('error_occurred'.tr(), style: body_small_semi(context).copyWith(color: customColors.neutral30)),
                       const SizedBox(height: 10),
                       Text(snapshot.error.toString(), style: body_small(context)),
                       const SizedBox(height: 20),
@@ -259,7 +247,7 @@ void showSentencePopup({
                       isBookmarked = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("해석이 저장되었습니다.")),
+                      SnackBar(content: Text("interpretation_saved".tr())),
                     );
                   };
 
