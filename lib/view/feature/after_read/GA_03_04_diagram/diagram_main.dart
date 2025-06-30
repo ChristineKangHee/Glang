@@ -4,6 +4,9 @@ import 'package:readventure/theme/theme.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/view/components/custom_button.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:easy_localization/easy_localization.dart';
+
 import '../widget/start_page/description_section_main.dart';
 import '../widget/start_page/icon_section_main.dart';
 import '../widget/start_page/title_section_main.dart';
@@ -22,14 +25,14 @@ class DiagramMainDialog extends StatelessWidget {
         builder: (context) {
           return SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 0, 16),
+              padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
               child: Column(
-                mainAxisSize: MainAxisSize.min,  // Adjust height to fit the content
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Column(
                     children: [
                       TitleSectionMain(
-                        title: "다이어그램 미션",
+                        title: "diagram_mission_title".tr(),
                         subtitle: "",
                         subtitle2: "",
                         customColors: customColors,
@@ -38,10 +41,9 @@ class DiagramMainDialog extends StatelessWidget {
                         customColors: customColors,
                         assetPath: "assets/icons/diagram_cover.svg",
                         size: 120,
-                      )
+                      ),
                     ],
                   ),
-
                   Column(
                     children: [
                       DescriptionSection(
@@ -49,19 +51,19 @@ class DiagramMainDialog extends StatelessWidget {
                         items: [
                           {
                             "icon": Icons.comment_outlined,
-                            "text": "단어를 드래그해 트리에 추가해주세요",
+                            "text": "diagram_instruction_drag".tr(),
                           },
                           {
                             "icon": Icons.access_time_filled,
-                            "text": "미션을 시작하면 타이머가 작동해요!",
+                            "text": "diagram_instruction_timer".tr(),
                           },
                         ],
                       ),
                       ButtonPrimary(
                         function: () {
-                          Navigator.pop(context); // To close the current screen (Dialog)
+                          Navigator.pop(context);
                         },
-                        title: '시작하기',
+                        title: 'start_button'.tr(),
                       )
                     ],
                   ),

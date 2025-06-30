@@ -16,6 +16,7 @@ import '../../../../viewmodel/memo_notifier.dart';
 import '../../after_read/widget/answer_section.dart';
 import 'notedialog.dart';
 import 'reading_chatbot.dart';
+import 'package:easy_localization/easy_localization.dart'; // 추가
 
 /// 읽기 화면에서 텍스트를 선택할 때 나타나는 툴바 위젯
 class Toolbar extends StatefulWidget {
@@ -47,31 +48,33 @@ class Toolbar extends StatefulWidget {
 class _ToolbarState extends State<Toolbar> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: widget.toolbarWidth,
-      height: widget.toolbarHeight,
-      decoration: BoxDecoration(
-        color: widget.customColors.neutral90,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x3F000000),
-            blurRadius: 30,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildToolbarButton('메모', () => _showNoteDialog(context, widget.delegate), false),
-          _buildToolbarButton('해석', () => _showWordOrSentencePopup(context, widget.delegate), false),
-          _buildToolbarButton('챗봇', () => _navigateToChatbot(context, widget.delegate), true),
-        ],
+    return IntrinsicWidth(
+      child: Container(
+        height: widget.toolbarHeight,
+        decoration: BoxDecoration(
+          color: widget.customColors.neutral90,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x3F000000),
+              blurRadius: 30,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildToolbarButton('toolbar_note', () => _showNoteDialog(context, widget.delegate), false),
+            _buildToolbarButton('toolbar_interpret', () => _showWordOrSentencePopup(context, widget.delegate), false),
+            _buildToolbarButton('toolbar_chatbot', () => _navigateToChatbot(context, widget.delegate), true),
+          ],
+        ),
       ),
     );
   }
+
 
   /// 툴바 버튼을 생성하는 메서드
   Widget _buildToolbarButton(String label, VoidCallback onPressed, bool isLast) {
@@ -81,12 +84,15 @@ class _ToolbarState extends State<Toolbar> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            label,
+            label.tr(),
+            overflow: TextOverflow.ellipsis,
+            softWrap: false,
             style: body_small_semi(context).copyWith(
               color: widget.customColors.neutral0,
               decoration: TextDecoration.none,
             ),
           ),
+
           if (!isLast)
             VerticalDivider(
               color: widget.customColors.neutral60,

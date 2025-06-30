@@ -15,6 +15,7 @@ import '../../../../theme/font.dart';
 import '../../../../util/box_shadow_styles.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
 import '../../../components/custom_app_bar.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 // 챗봇 화면을 나타내는 위젯
 class ChatBot extends ConsumerStatefulWidget {
@@ -31,8 +32,9 @@ class ChatBot extends ConsumerStatefulWidget {
 class _ChatBotState extends ConsumerState<ChatBot> {
   final TextEditingController _controller = TextEditingController();
   final List<Map<String, String>> _messages = [
-    {'role': 'assistant', 'content': '어떤 도움이 필요하신가요?'}
+    {'role': 'assistant', 'content': 'chatbot_greeting'.tr()}
   ];
+
   final ChatBotService _chatBotService = ChatBotService();
   bool _isLoading = false;
   final ScrollController _scrollController = ScrollController();  // 스크롤 컨트롤러 추가
@@ -87,13 +89,13 @@ class _ChatBotState extends ConsumerState<ChatBot> {
   Widget build(BuildContext context) {
     final customColors = ref.watch(customColorsProvider);
     final options = [
-      '문장을 쉽게 풀어줘',
-      '필요한 배경지식을 알려줘',
-      '더 깊이 탐구해야 할 부분은 뭐야?'
+      'chatbot_option_explain'.tr(),
+      'chatbot_option_background'.tr(),
+      'chatbot_option_deep'.tr()
     ];
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_4(title: '챗봇'),
+      appBar: CustomAppBar_2depth_4(title: 'chatbot_title'.tr()),
       backgroundColor: customColors.neutral90,
       body: Column(
         children: [
@@ -105,7 +107,7 @@ class _ChatBotState extends ConsumerState<ChatBot> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('선택된 문장', style: body_small_semi(context)),
+                Text('chatbot_selected_sentence'.tr(), style: body_small_semi(context)),
                 SizedBox(height: 4),
                 ExpandableText(
                   text: widget.selectedText,
@@ -217,7 +219,7 @@ class _ChatBotState extends ConsumerState<ChatBot> {
                 minLines: 1,  // 최소 1줄
                 controller: _controller,
                 decoration: InputDecoration(
-                  hintText: "메시지 입력",  // 힌트 텍스트
+                  hintText: 'chatbot_input_hint'.tr(),
                   hintStyle: body_small(context).copyWith(
                     color: customColors.neutral60,
                   ),
@@ -261,7 +263,7 @@ class _ExpandableTextState extends ConsumerState<ExpandableText> {
     final textPainter = TextPainter(
       text: textSpan,
       maxLines: widget.maxLines,
-      textDirection: TextDirection.ltr,
+      textDirection: Directionality.of(context),
     );
     textPainter.layout(maxWidth: MediaQuery.of(context).size.width - 32);  // 텍스트 크기 측정
 
