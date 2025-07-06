@@ -17,7 +17,7 @@ class SettingsLanguage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final Locale currentLocale = context.locale;
-    final customColors = ref.watch(customColorsProvider); // ✅ 공지사항 구조처럼 추가
+    final customColors = ref.watch(customColorsProvider);
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
@@ -58,19 +58,18 @@ class SettingsLanguage extends ConsumerWidget {
     required String subtitle,
     required bool selected,
     required VoidCallback onTap,
-    required CustomColors customColors, // ✅ 파라미터 추가
+    required CustomColors customColors,
   }) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        height: 75,
         width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16), // ✅ height 대신 padding
         child: Row(
           children: [
             Expanded(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -88,7 +87,7 @@ class SettingsLanguage extends ConsumerWidget {
               ),
             ),
             if (selected)
-              const Icon(Icons.check, color: Colors.blue, size: 24),
+              Icon(Icons.check, color: customColors.primary, size: 24),
           ],
         ),
       ),

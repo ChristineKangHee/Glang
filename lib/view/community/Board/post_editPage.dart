@@ -4,6 +4,7 @@
 /// Created: 2024-12-28
 /// Last Modified: 2024-12-28 by 강희
 
+import 'package:easy_localization/easy_localization.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -97,9 +98,9 @@ class _PostEditPageState extends ConsumerState<PostEditPage> {
       showResultSaveDialog(
         context,
         ref.watch(customColorsProvider),
-        "게시글 수정 실패",
-        "확인",
-        "나가기",
+        "post_edit.fail".tr(),
+        "common.cancel".tr(),
+        "common.exit".tr(),
             (ctx) => Navigator.of(ctx).pop(),
       );
     }
@@ -122,9 +123,9 @@ class _PostEditPageState extends ConsumerState<PostEditPage> {
       showResultSaveDialog(
         context,
         ref.watch(customColorsProvider),
-        "나가시겠습니까?",
-        "취소",
-        "나가기",
+        "post_edit.exit_confirm".tr(),
+        "common.cancel".tr(),
+        "common.exit".tr(),
             (ctx) {
           discardChanges(); // 변경사항 취소
           Navigator.of(ctx).pop();
@@ -154,7 +155,8 @@ class _PostEditPageState extends ConsumerState<PostEditPage> {
       onWillPop: _onWillPop, // 뒤로 가기 전에 변경사항 확인
       child: Scaffold(
         appBar: CustomAppBar_2depth_9(
-          title: "게시글 수정", // 앱 바 제목 설정
+          // 앱바 제목
+          title: "post_edit.title".tr(),
           onIconPressed: () async {
             if (await _onWillPop()) Navigator.of(context).pop();
           },
@@ -162,8 +164,9 @@ class _PostEditPageState extends ConsumerState<PostEditPage> {
             // 수정 버튼: 내용이 유효한 경우만 활성화
             TextButton(
               onPressed: isContentValid() ? submitEdit : null,
+              // 수정 버튼
               child: Text(
-                "수정",
+                "post_edit.edit".tr(),
                 style: body_xsmall_semi(context).copyWith(
                   color: isContentValid() ? customColors.primary : customColors.neutral80,
                 ),

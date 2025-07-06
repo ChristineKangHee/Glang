@@ -5,7 +5,7 @@ import '../../../constants.dart';
 import '../../../restart_widget.dart';
 import '../../../viewmodel/app_state_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../../viewmodel/theme_controller.dart';
 import '../../components/alarm_dialog.dart';
@@ -42,7 +42,7 @@ class SettingsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        title: '설정',
+        title: 'settings.title'.tr(), // "설정"
       ),
       body: ListView(
         children: [
@@ -76,10 +76,10 @@ class SettingsPage extends ConsumerWidget {
           //   ),
           // ),
           // Divider(color: customColors.neutral80,),
-          ListTile(title: Text('도움 및 지원', style: body_xsmall(context).copyWith(color: customColors.neutral30),),),
+          ListTile(title: Text('settings.help_support'.tr(), style: body_xsmall(context).copyWith(color: customColors.neutral30),),),
           ListTile(
             title: Text(
-              '공지사항',
+              'settings.notice'.tr(),
               style: body_medium_semi(context).copyWith(color: customColors.neutral0),
             ),
             onTap: () {
@@ -90,7 +90,7 @@ class SettingsPage extends ConsumerWidget {
           ),
           ListTile(
             title: Text(
-              '자주 묻는 질문 (FAQ)',
+              'settings.faq'.tr(),
               style: body_medium_semi(context).copyWith(color: customColors.neutral0),
             ),
             onTap: () {
@@ -100,7 +100,7 @@ class SettingsPage extends ConsumerWidget {
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
           ),
           ListTile(
-            title: Text('언어 설정', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
+            title: Text('settings.language'.tr(), style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
             onTap: () {
               // TODO: 언어 설정 페이지로 이동
               Navigator.pushNamed(context, '/mypage/settings/language');
@@ -118,7 +118,7 @@ class SettingsPage extends ConsumerWidget {
           // ),
           ListTile(
             title: Text(
-              '약관 및 정책',
+              'settings.policy'.tr(),
               style: body_medium_semi(context).copyWith(color: customColors.neutral0),
             ),
             onTap: () {
@@ -129,7 +129,7 @@ class SettingsPage extends ConsumerWidget {
           ),
           ListTile(
             title: Text(
-              '문의 및 개선 사항 요청',
+              'settings.feedback'.tr(),
               style: body_medium_semi(context).copyWith(color: customColors.neutral0),
             ),
             onTap: () {
@@ -140,7 +140,7 @@ class SettingsPage extends ConsumerWidget {
           ),
           ListTile(
             title: Text(
-              '최신 버전 업데이트',
+              'settings.update'.tr(),
               style: body_medium_semi(context).copyWith(color: customColors.neutral0),
             ),
             trailing: FutureBuilder<String>(
@@ -173,7 +173,7 @@ class SettingsPage extends ConsumerWidget {
                 children: [
                   Divider(color: customColors.neutral80),
                   ListTile(
-                    title: Text('🚨 신고 관리', style: body_medium_semi(context).copyWith(color: customColors.neutral0)),
+                    title: Text('🚨 admin_report'.tr(), style: body_medium_semi(context).copyWith(color: customColors.neutral0)),
                     onTap: () {
                       Navigator.pushNamed(context, '/mypage/settings/reports');
                     },
@@ -186,14 +186,14 @@ class SettingsPage extends ConsumerWidget {
 
           Divider(color: customColors.neutral80,),
           ListTile(
-            title: Text('로그아웃', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
+            title: Text('settings.logout'.tr(), style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
             onTap: () {
               showResultSaveDialog(
                 context,
                 customColors,
-                "로그아웃하시겠습니까?",
-                "취소",
-                "로그아웃",
+                'settings.logout_confirm'.tr(),  // "로그아웃하시겠습니까?"
+                'settings.cancel'.tr(),          // "취소"
+                'settings.logout'.tr(),          // "로그아웃"
                     (ctx) {
                       _logout(context, ref);
                 },
@@ -203,7 +203,7 @@ class SettingsPage extends ConsumerWidget {
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
           ),
           ListTile(
-            title: Text('탈퇴하기', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
+            title: Text('settings.withdraw'.tr(), style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
             onTap: () {
               // TODO: 프로필 설정 페이지로 이동
               Navigator.pushNamed(context, '/mypage/settings/secession');

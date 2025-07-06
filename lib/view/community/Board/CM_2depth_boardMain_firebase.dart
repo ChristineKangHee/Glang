@@ -18,6 +18,7 @@ import 'community_service.dart';
 import 'component_community_post_firebase.dart';
 import 'essay_posting_firebase.dart';
 import 'free_posting_firebase.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class Cm2depthBoardmain extends ConsumerStatefulWidget {
   const Cm2depthBoardmain({Key? key}) : super(key: key);
@@ -60,7 +61,7 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain> with Tick
 
     return Scaffold(
       appBar: CustomAppBar_2depth_5(
-        title: '게시판',
+        title: 'community.board'.tr(), // '게시판'
         onIconPressed: () {
           Navigator.push(
             context,
@@ -75,10 +76,10 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain> with Tick
             labelStyle: body_small_semi(context),
             indicatorColor: customColors.primary,
             dividerColor: customColors.neutral80,
-            tabs: const [
-              Tab(text: '전체'),
-              Tab(text: '에세이'),
-              Tab(text: '자유글'),
+            tabs: [
+              Tab(text: 'community.all'.tr()),
+              Tab(text: 'community.essay'.tr()),
+              Tab(text: 'community.free'.tr()),
             ],
           ),
           Expanded(
@@ -107,7 +108,7 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain> with Tick
         if (snapshot.hasError || !snapshot.hasData) {
           return Center(
             child: Text(
-              '게시글을 불러올 수 없습니다.',
+              'community.load_error'.tr(),
               style: body_small(context).copyWith(color: customColors.neutral60),
             ),
           );
@@ -121,7 +122,7 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain> with Tick
         if (posts.isEmpty) {
           return Center(
             child: Text(
-              '해당 카테고리에 게시글이 없습니다.',
+              'community.no_posts_in_category'.tr(),
               style: body_small(context).copyWith(color: customColors.neutral60),
             ),
           );
@@ -158,7 +159,7 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain> with Tick
           children: [
             SpeedDialChild(
               child: Icon(Icons.article, color: customColors.neutral30),
-              label: '자유글',
+              label: 'community.free'.tr(),
               onTap: () {
                 Navigator.push(
                   context,
@@ -173,7 +174,7 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain> with Tick
             ),
             SpeedDialChild(
               child: Icon(Icons.lightbulb, color: customColors.neutral30),
-              label: '에세이',
+              label: 'community.essay'.tr(),
               onTap: () {
                 Navigator.push(
                   context,

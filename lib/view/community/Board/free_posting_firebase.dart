@@ -15,6 +15,7 @@ import '../../components/custom_app_bar.dart';
 import 'Component/taginput_component.dart';
 import 'Component/writingform_component.dart';
 import 'community_service.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 // 자유글 작성 페이지 클래스
 class FreeWritingPage extends ConsumerStatefulWidget {
@@ -87,9 +88,10 @@ class _FreeWritingPageState extends ConsumerState<FreeWritingPage> {
       showResultSaveDialog(
         context,
         ref.watch(customColorsProvider),
-        "게시글 작성 실패",
-        "취소",
-        "나가기",
+        // 실패 메시지
+        "community.write_fail".tr(),
+        "common.cancel".tr(),
+        "common.exit".tr(),
             (ctx) => Navigator.of(ctx).pop(),
       );
     }
@@ -112,14 +114,15 @@ class _FreeWritingPageState extends ConsumerState<FreeWritingPage> {
       showResultSaveDialog(
         context,
         ref.watch(customColorsProvider),
-        "나가시겠습니까?",
-        "취소",
-        "나가기",
+          // 나가기 확인 다이얼로그
+          "community.exit_confirm".tr(),
+          "common.cancel".tr(),
+          "common.exit".tr(),
             (ctx) {
           discardDraft(); // 초안 삭제
           Navigator.of(ctx).pop(); // 이전 페이지로 돌아가기
         },
-        continuationMessage: "작성 중인 내용은 저장되지 않습니다.",
+        continuationMessage: "community.unsaved_warning".tr(),
       );
     } else {
       Navigator.of(context).pop(); // 변경사항이 없으면 바로 이전 페이지로 돌아가기
@@ -133,14 +136,14 @@ class _FreeWritingPageState extends ConsumerState<FreeWritingPage> {
       showResultSaveDialog(
         context,
         ref.watch(customColorsProvider),
-        "나가시겠습니까?",
-        "취소",
-        "나가기",
+        "community.exit_confirm".tr(),
+        "common.cancel".tr(),
+        "common.exit".tr(),
             (ctx) {
           discardDraft(); // 초안 삭제
           Navigator.of(ctx).pop(); // 이전 페이지로 돌아가기
         },
-        continuationMessage: "작성 중인 내용은 저장되지 않습니다.",
+        continuationMessage:"community.unsaved_warning".tr(),
       );
       return false; // 페이지가 닫히지 않도록 방지
     }
@@ -154,13 +157,15 @@ class _FreeWritingPageState extends ConsumerState<FreeWritingPage> {
       onWillPop: _onWillPop, // 뒤로 가기 동작 처리
       child: Scaffold(
         appBar: CustomAppBar_2depth_9(
-          title: "자유글", // 제목
+          // 앱바 타이틀
+          title: "community.free".tr(),
           onIconPressed: _handleClose, // 뒤로 가기 버튼 동작
           actions: [
             TextButton(
               onPressed: isContentValid() ? submitPost : null, // 등록 버튼, 내용이 유효할 때만 활성화
+              // 등록 버튼
               child: Text(
-                "등록",
+                "common.submit".tr(),
                 style: body_xsmall_semi(context).copyWith(
                   color: isContentValid() ? customColors.primary : customColors.neutral80,
                 ),

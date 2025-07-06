@@ -4,7 +4,7 @@
 /// Created: 2024-12-28
 /// Last Modified: 2024-12-28 by 강희
 
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../theme/font.dart';
@@ -134,15 +134,15 @@ String formatPostDate(DateTime createdAt) {
   final difference = now.difference(createdAt);
 
   if (difference.inMinutes < 1) {
-    return "방금 전"; // 1분 미만
+    return 'post.just_now'.tr(); // "방금 전"
   } else if (difference.inMinutes < 60) {
-    return "${difference.inMinutes}분 전"; // 1시간 미만
+    return '${difference.inMinutes}${'post.minutes_ago'.tr()}'; // "분 전"
   } else if (difference.inHours < 24) {
-    return "${(difference.inMinutes / 60).ceil()}시간 전"; // 24시간 미만
-  } else if (difference.inDays <= 3) { // 3일 이내
-    return "${difference.inDays}일 전";
-  } else { // 3일 초과
-    // yyyy.MM.dd 형식으로 반환
+    return '${(difference.inMinutes / 60).ceil()}${'post.hours_ago'.tr()}'; // "시간 전"
+  } else if (difference.inDays <= 3) {
+    return '${difference.inDays}${'post.days_ago'.tr()}'; // "일 전"
+  } else {
     return "${createdAt.year}.${createdAt.month.toString().padLeft(2, '0')}.${createdAt.day.toString().padLeft(2, '0')}";
   }
 }
+

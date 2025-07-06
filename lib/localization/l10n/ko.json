@@ -47,6 +47,106 @@
   "selection_tip": "단어나 문장을 선택하면,\n메모, 밑줄, 해석, 챗봇 기능을 사용할 수 있어요!",
   "toolbar_note": "메모",
   "toolbar_interpret": "해석",
-  "toolbar_chatbot": "챗봇"
+  "toolbar_chatbot": "챗봇",
+  "my_page": {
+    "edit_info": "내 정보 수정",
+    "stat_title": "학습 통계",
+    "stat_desc": "일주일에 활동한 학습을 확인하세요!",
+    "badge": "뱃지",
+    "community_post": "커뮤니티 작성글",
+    "memo": "메모",
+    "interpretation": "해석",
+    "learning_history": "학습 기록",
+    "xp": "경험치",
+    "course": "코스",
+    "ranking": "랭킹",
+    "loading_error": "배지 로딩 중 오류가 발생했습니다.",
+    "error": "오류",
+    "locked": "잠김"
+  },
+  "edit_profile": {
+    "title": "내 정보 수정",
+    "nickname": "별명",
+    "real_name": "이름",
+    "email": "이메일",
+    "no_name": "이름 없음",
+    "no_email": "이메일 없음",
+    "load_failed": "불러오기 실패",
+    "error_upload": "프로필 사진 업데이트 오류"
+  },
+  "settings": {
+    "title": "설정",
+    "help_support": "도움 및 지원",
+    "notice": "공지사항",
+    "faq": "자주 묻는 질문 (FAQ)",
+    "language": "언어 설정",
+    "policy": "약관 및 정책",
+    "feedback": "문의 및 개선 사항 요청",
+    "update": "최신 버전 업데이트",
+    "error": "오류",
+    "logout": "로그아웃",
+    "logout_confirm": "로그아웃하시겠습니까?",
+    "cancel": "취소",
+    "withdraw": "탈퇴하기",
+    "admin_report": "🚨 신고 관리"
+  },
+  "settings_requests": {
+    "title": "불편한 점이 있으신가요?",
+    "description": "이용 중 불편한 점이나 문의사항을 알려주세요.\n평일 (월~금) 10:00~18:00, 주말 및 공휴일 휴무",
+    "send_email": "이메일 보내기",
+    "email_subject": "[문의]앱_사용_중_불편_사항",
+    "email_body": "안녕하세요,\n\n아래_내용을_작성하여_문의해_주세요:\n\n-발생한_문제:\n-기기_및_OS_정보:\n-추가_의견:\n\n감사합니다."
+  },
+  "settings_secession": {
+    "title": "탈퇴하기",
+    "confirm_message": "정말 탈퇴하시나요?",
+    "warning": "탈퇴 시 모든 데이터가 삭제되며 복구가 불가능합니다"
+  },
+  "community": {
+    "eula_title": "커뮤니티 이용 약관",
+    "eula_content": "• 타인에게 불쾌감을 주는 발언을 금지합니다.\n• 허위 정보, 광고, 욕설, 비방 금지\n• 운영 정책을 위반할 경우 게시글이 삭제될 수 있습니다.\n• 모든 게시글은 관리자가 모니터링할 수 있습니다.\n\n※ 상세한 약관 내용은 \"설정 > 이용약관\"에서 확인할 수 있습니다.",
+    "eula_agree_button": "약관에 동의하고 커뮤니티 이용하기",
+    "no_posts": "게시글이 없습니다.",
+    "ranking": "랭킹",
+    "more": "더보기",
+    "board": "게시판",
+    "all": "전체",
+    "essay": "에세이",
+    "free": "자유글",
+    "load_error": "게시글을 불러올 수 없습니다.",
+    "no_posts_in_category": "해당 카테고리에 게시글이 없습니다.",
+    "write_fail": "게시글 작성 실패",
+    "exit_confirm": "나가시겠습니까?",
+    "unsaved_warning": "작성 중인 내용은 저장되지 않습니다."
+  },
+  "search": {
+    "enter_keyword": "검색어를 입력해주세요",
+    "enter_prompt": "검색어를 입력해주세요.",
+    "no_results": "검색 결과가 없습니다.",
+    "history_title": "검색 기록",
+    "no_history": "최근 검색 기록이 없습니다."
+  },
+  "post": {
+    "just_now": "방금 전",
+    "minutes_ago": "분 전",
+    "hours_ago": "시간 전",
+    "days_ago": "일 전"
+  },
+  "common": {
+    "submit": "등록",
+    "confirm": "확인",
+    "cancel": "취소",
+    "exit": "나가기"
+  },
+  "post_edit": {
+    "title": "게시글 수정",
+    "edit": "수정",
+    "fail": "게시글 수정 실패",
+    "exit_confirm": "나가시겠습니까?",
+    "unsaved_warning": "작성 중인 내용은 저장되지 않습니다."
+  },
+  "ranking": {
+    "title": "랭킹"
+  }
 }
 
