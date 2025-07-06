@@ -4,7 +4,7 @@
 /// Created: 2024-12-28
 /// Last Modified: 2024-12-28 by 강희
 
-
+import 'package:easy_localization/easy_localization.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
@@ -108,7 +108,8 @@ class _SearchPageState extends State<SearchPage>
   Widget _buildRecentSearches() {
     return _searchHistory.isEmpty
         ? Center(
-      child: Text("검색어를 입력해주세요.",
+      child:
+          Text('search.enter_keyword'.tr(), // '검색어를 입력해주세요'
           style: TextStyle(color: Colors.grey)),
     )
         : ListView.builder(
@@ -131,7 +132,7 @@ class _SearchPageState extends State<SearchPage>
     if (posts.isEmpty) {
       return Center(
         child: Text(
-          "검색 결과가 없습니다.",
+          "search.no_results".tr(),
           style: body_medium(context).copyWith(color: customColors.neutral60),
         ),
       );
@@ -182,7 +183,7 @@ class _SearchPageState extends State<SearchPage>
                             .copyWith(color: customColors.neutral30),
                         controller: _searchController,
                         decoration: InputDecoration(
-                          hintText: '검색어를 입력해주세요',
+                          hintText: 'search.enter_keyword'.tr(), // '검색어를 입력해주세요'
                           hintStyle: body_medium(context)
                               .copyWith(color: customColors.neutral60),
                           border: UnderlineInputBorder(
@@ -229,7 +230,7 @@ class _SearchPageState extends State<SearchPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("검색 기록",
+                    Text("search.history_title".tr(), //'검색 기록'
                         style: body_small(context)
                             .copyWith(color: customColors.neutral80)),
                     ListView.builder(
@@ -256,10 +257,10 @@ class _SearchPageState extends State<SearchPage>
                 indicatorColor: customColors.primary,
                 dividerColor: customColors.neutral80,
                 controller: _tabController,
-                tabs: const [
-                  Tab(text: '전체'),
-                  Tab(text: '에세이'),
-                  Tab(text: '자유글'),
+                tabs: [
+                  Tab(text: 'community.all'.tr()),
+                  Tab(text: 'community.essay'.tr()),
+                  Tab(text: 'community.free'.tr()),
                 ],
               ),
             Expanded(
@@ -285,7 +286,7 @@ class _SearchPageState extends State<SearchPage>
               )
                   : Center(
                 child: _searchHistory.isEmpty
-                    ? Text("최근 검색 기록이 없습니다.",
+                    ? Text("search.no_history".tr(),
                     style: body_medium(context)
                         .copyWith(color: customColors.neutral60))
                     : SizedBox.shrink(),

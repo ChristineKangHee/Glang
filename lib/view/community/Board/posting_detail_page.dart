@@ -19,7 +19,7 @@ import 'community_data_firebase.dart';
 import 'community_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'component_community_post_firebase.dart';
 
 // 게시글 상세 페이지
@@ -86,7 +86,8 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     final isAuthor = currentUser != null && widget.post.authorId == currentUser.uid; // 작성자 여부 확인
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_4(title: '게시판'),
+      // 앱바 제목
+      appBar: CustomAppBar_2depth_4(title: 'community.board'.tr()),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

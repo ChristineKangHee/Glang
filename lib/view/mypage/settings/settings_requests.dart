@@ -25,12 +25,8 @@ class SettingsRequests extends ConsumerWidget {
       scheme: 'mailto',
       path: 'hgu.zero24@gmail.com', // 수신 이메일 주소
       queryParameters: {
-        'subject': '[문의]앱_사용_중_불편_사항', // 기본 제목 설정
-        'body': '안녕하세요,\n\n아래_내용을_작성하여_문의해_주세요:\n\n'
-            '-발생한_문제:\n'
-            '-기기_및_OS_정보:\n'
-            '-추가_의견:\n\n'
-            '감사합니다.', // 기본 본문 내용 설정
+        'subject': tr('settings_requests.email_subject'), // 번역된 제목
+        'body': tr('settings_requests.email_body'),       // 번역된 본문
       },
     );
 
@@ -49,7 +45,7 @@ class SettingsRequests extends ConsumerWidget {
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        title: '문의 및 개선 사항 요청'.tr(), // 다국어 지원
+        title: 'settings.feedback'.tr(), // 기존 문자열 대체
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0), // 바디 패딩 설정
@@ -59,14 +55,13 @@ class SettingsRequests extends ConsumerWidget {
             Align(
               alignment: Alignment.centerLeft, // 텍스트 왼쪽 정렬
               child: Text(
-                "불편한 점이 있으신가요?", // 제목 텍스트
+                "settings_requests.title".tr(), // "불편한 점이 있으신가요?"
                 style: heading_large(context),
               ),
             ),
             const SizedBox(height: 8), // 간격 추가
             Text(
-              "이용 중 불편한 점이나 문의사항을 알려주세요.\n"
-                  "평일 (월~금) 10:00~18:00, 주말 및 공휴일 휴무", // 설명 텍스트
+              "settings_requests.description".tr(), // 설명
               style: body_small(context).copyWith(color: customColors.neutral60),
             ),
           ],
@@ -78,7 +73,7 @@ class SettingsRequests extends ConsumerWidget {
           width: double.infinity, // 버튼이 화면 너비를 가득 채우도록 설정
           child: ButtonPrimary_noPadding(
             function: _sendEmail, // 이메일 전송 기능 연결
-            title: '이메일 보내기', // 버튼 텍스트
+            title: 'settings_requests.send_email'.tr(), // 이메일 보내기 버튼
           ),
         ),
       ),

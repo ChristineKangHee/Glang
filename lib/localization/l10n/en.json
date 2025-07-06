@@ -47,5 +47,105 @@
   "selection_tip": "When you select a word or sentence,\nyou can use memo, underline, translation, and chatbot features!",
   "toolbar_note": "Note",
   "toolbar_interpret": "Mean",
-  "toolbar_chatbot": "AI"
+  "toolbar_chatbot": "AI",
+  "my_page": {
+    "edit_info": "Edit My Info",
+    "stat_title": "Learning Statistics",
+    "stat_desc": "Check your weekly learning activity!",
+    "badge": "Badges",
+    "community_post": "Community Posts",
+    "memo": "Memo",
+    "interpretation": "Interpretation",
+    "learning_history": "Learning History",
+    "xp": "XP",
+    "course": "Courses",
+    "ranking": "Ranking",
+    "loading_error": "An error occurred while loading badges.",
+    "error": "Error",
+    "locked": "Locked"
+  },
+  "edit_profile": {
+    "title": "Edit Profile",
+    "nickname": "Nickname",
+    "real_name": "Name",
+    "email": "Email",
+    "no_name": "No name",
+    "no_email": "No email",
+    "load_failed": "Failed to load",
+    "error_upload": "Failed to update profile picture"
+  },
+  "settings": {
+    "title": "Settings",
+    "help_support": "Help & Support",
+    "notice": "Announcements",
+    "faq": "FAQ",
+    "language": "Language Settings",
+    "policy": "Terms & Policies",
+    "feedback": "Contact & Suggestions",
+    "update": "Latest Version",
+    "error": "Error",
+    "logout": "Logout",
+    "logout_confirm": "Are you sure you want to log out?",
+    "cancel": "Cancel",
+    "withdraw": "Delete Account",
+    "admin_report": "🚨 Report Management"
+  },
+  "settings_requests": {
+    "title": "Encountering any issues?",
+    "description": "Let us know if you experience any problems or have questions.\nMon–Fri 10:00–18:00, closed on weekends and public holidays.",
+    "send_email": "Send Email",
+    "email_subject": "[Inquiry]App_Issue_Report",
+    "email_body": "Hello,\n\nPlease_fill_out_the_following_details_to_help_us_assist_you:\n\n-Problem_encountered:\n-Device_and_OS_information:\n- Additional feedback:\n\nThank you."
+  },
+  "settings_secession": {
+    "title": "Delete Account",
+    "confirm_message": "Are you sure you want to delete your account?",
+    "warning": "All your data will be deleted and cannot be recovered."
+  },
+  "community": {
+    "eula_title": "Community Terms of Use",
+    "eula_content": "• Do not post offensive comments.\n• No false information, advertising, profanity, or defamation.\n• Posts may be deleted if they violate our policies.\n• All posts are monitored by administrators.\n\n※ You can view detailed terms in \"Settings > Terms of Use\".",
+    "eula_agree_button": "Agree and Use Community",
+    "no_posts": "No posts available.",
+    "ranking": "Ranking",
+    "more": "More",
+    "board": "Board",
+    "all": "All",
+    "essay": "Essay",
+    "free": "Free Post",
+    "load_error": "Unable to load posts.",
+    "no_posts_in_category": "No posts in this category.",
+    "write_fail": "Failed to submit post",
+    "exit_confirm": "Do you want to leave?",
+    "unsaved_warning": "Your writing will not be saved."
+  },
+  "search": {
+    "enter_keyword": "Enter a keyword",
+    "enter_prompt": "Please enter a keyword.",
+    "no_results": "No search results found.",
+    "history_title": "Search History",
+    "no_history": "No recent search history."
+  },
+  "post": {
+    "just_now": "just now",
+    "minutes_ago": "m ago",
+    "hours_ago": "h ago",
+    "days_ago": "d ago"
+  },
+  "common": {
+    "submit": "Submit",
+    "confirm": "OK",
+    "cancel": "Cancel",
+    "exit": "Exit"
+  },
+  "post_edit": {
+    "title": "Edit Post",
+    "edit": "Edit",
+    "fail": "Failed to edit the post",
+    "exit_confirm": "Do you want to leave?",
+    "unsaved_warning": "Your unsaved changes will be lost."
+  },
+  "ranking": {
+    "title": "Ranking"
+  }
 }

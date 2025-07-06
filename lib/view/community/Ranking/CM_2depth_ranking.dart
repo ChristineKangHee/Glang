@@ -11,6 +11,7 @@ import 'package:readventure/view/community/Ranking/ranking_component.dart';
 import '../../../theme/theme.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/custom_app_bar.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 // RankingPage 위젯: 랭킹 페이지를 구성하는 화면
 class RankingPage extends ConsumerWidget {
@@ -22,7 +23,7 @@ class RankingPage extends ConsumerWidget {
     // 페이지의 구조를 Scaffold로 구성, 커스텀 앱바와 랭킹 관련 위젯들을 포함
     return Scaffold(
       // 커스텀 앱바, 제목은 '랭킹'
-      appBar: CustomAppBar_2depth_4(title: '랭킹'),
+      appBar: CustomAppBar_2depth_4(title: 'ranking.title'.tr()),
 
       // 본문은 SingleChildScrollView로 감싸서 스크롤 가능하게 설정
       body: SingleChildScrollView(

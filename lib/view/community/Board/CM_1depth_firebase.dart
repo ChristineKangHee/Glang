@@ -4,6 +4,7 @@
 /// Created: 2024-12-28
 /// Last Modified: 2024-12-28 by 강희
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/view/community/Board/posting_detail_page.dart';
@@ -83,7 +84,7 @@ class _CommunityMainPageState extends ConsumerState<CommunityMainPage> {
               children: [
                 // 제목
                 Text(
-                  '커뮤니티 이용 약관',
+                  'community.eula_title'.tr(),  // 커뮤니티 이용 약관
                   style: body_large(context).copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
@@ -91,11 +92,7 @@ class _CommunityMainPageState extends ConsumerState<CommunityMainPage> {
                 SizedBox(
                   child: SingleChildScrollView(
                     child: Text(
-                      '• 타인에게 불쾌감을 주는 발언을 금지합니다.\n'
-                          '• 허위 정보, 광고, 욕설, 비방 금지\n'
-                          '• 운영 정책을 위반할 경우 게시글이 삭제될 수 있습니다.\n'
-                          '• 모든 게시글은 관리자가 모니터링할 수 있습니다.\n\n'
-                          '※ 상세한 약관 내용은 "설정 > 이용약관"에서 확인할 수 있습니다.',
+                      'community.eula_content'.tr(),  // 약관 본문
                       style: body_small(context),
                     ),
                   ),
@@ -103,7 +100,7 @@ class _CommunityMainPageState extends ConsumerState<CommunityMainPage> {
                 const SizedBox(height: 24),
                 // 약관 동의 버튼
                 ButtonPrimary_noPadding(
-                  title: '약관에 동의하고 커뮤니티 이용하기',
+                  title: 'community.eula_agree_button'.tr(),
                   function: () async {
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.setBool('eulaAccepted_community', true);
@@ -152,7 +149,7 @@ class _CommunityMainPageState extends ConsumerState<CommunityMainPage> {
             }
 
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text("게시글이 없습니다."));
+              return Center(child:Text('community.no_posts'.tr()));
             }
 
             final posts = snapshot.data!;
@@ -200,7 +197,7 @@ class _CommunityMainPageState extends ConsumerState<CommunityMainPage> {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       title: Text(
-        '랭킹',
+        'community.ranking'.tr(), // '랭킹'
         style: body_small_semi(context),
       ),
       trailing: TextButton(
@@ -214,7 +211,7 @@ class _CommunityMainPageState extends ConsumerState<CommunityMainPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '더보기',
+              'community.more'.tr(), // '더보기'
               style: body_xxsmall_semi(context),
             ),
             const SizedBox(width: 4),
@@ -340,7 +337,7 @@ class _CommunityPreviewState extends State<CommunityPreview> {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       title: Text(
-        '게시판',  // 제목: 게시판
+        'community.board'.tr(), // '게시판'
         style: body_small_semi(context),
       ),
       trailing: TextButton(
@@ -354,7 +351,7 @@ class _CommunityPreviewState extends State<CommunityPreview> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '더보기',  // 더보기 버튼
+              'community.more'.tr(), // '더보기'
               style: body_xxsmall_semi(context),
             ),
             const SizedBox(width: 4),

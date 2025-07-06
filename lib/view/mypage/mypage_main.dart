@@ -3,7 +3,7 @@
 /// Author: 박민준
 /// Created: 2025-01-02
 /// Last Modified: 2025-02-12 by 윤은서
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/view/components/custom_app_bar.dart';
@@ -72,8 +72,8 @@ class MyPageContent extends StatelessWidget {
             const UserStatsSection(), // 사용자 경험치, 코스, 랭킹 표시
             const SizedBox(height: 24),
             InfoCard(
-              title: '학습 통계',
-              description: '일주일에 활동한 학습을 확인하세요!',
+              titleKey: 'my_page.stat_title',  // '학습 통계'
+              descriptionKey: 'my_page.stat_desc',
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/statistics');
@@ -81,7 +81,7 @@ class MyPageContent extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             InfoCard(
-              title: '뱃지',
+              titleKey: 'my_page.badge',
               child: BadgeRow(), // 수정: const 제거
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
@@ -91,7 +91,7 @@ class MyPageContent extends StatelessWidget {
             const SizedBox(height: 16),
             InfoCard(
               leadingIcon: Icons.article_rounded,
-              title: '커뮤니티 작성글',
+              titleKey: 'my_page.community_post',
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/mycommunitypost');
@@ -100,7 +100,7 @@ class MyPageContent extends StatelessWidget {
             const SizedBox(height: 16),
             InfoCard(
               leadingIcon: Icons.bookmark_rounded,
-              title: '메모',
+              titleKey: 'my_page.memo',
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/memo');
@@ -109,7 +109,7 @@ class MyPageContent extends StatelessWidget {
             const SizedBox(height: 16),
             InfoCard(
               leadingIcon: Icons.bookmark_rounded,
-              title: '해석',
+              titleKey: 'my_page.interpretation',
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/interpretation');
@@ -118,7 +118,7 @@ class MyPageContent extends StatelessWidget {
             const SizedBox(height: 16),
             InfoCard(
               leadingIcon: Icons.book,
-              title: '학습 기록',
+              titleKey: 'my_page.learning_history',
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/history');
@@ -183,7 +183,7 @@ class UserProfileSection extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    '내 정보 수정',
+                    'my_page.edit_info'.tr(),  // '내 정보 수정'
                     style: pretendardMedium(context).copyWith(
                       fontSize: 14,
                       color: customColors.neutral30,
@@ -228,7 +228,7 @@ class UserStatsSection extends ConsumerWidget {
         children: [
           Expanded(
             child: xpAsyncValue.when(
-              data: (xp) => StatBox(value: xp.toString(), label: '경험치'),
+              data: (xp) => StatBox(value: xp.toString(), label: 'my_page.xp'.tr()),
               loading: () => const StatBox(value: '...', label: '경험치'),
               error: (_, __) => const StatBox(value: '오류', label: '경험치'),
             ),
@@ -236,7 +236,7 @@ class UserStatsSection extends ConsumerWidget {
           VerticalDivider(color: customColors.neutral80),
           Expanded(
             child: courseAsyncValue.when(
-              data: (course) => StatBox(value: course, label: '코스'),
+              data: (course) => StatBox(value: course, label: 'my_page.course'.tr()),
               loading: () => const StatBox(value: '...', label: '코스'),
               error: (_, __) => const StatBox(value: '오류', label: '코스'),
             ),
@@ -244,7 +244,7 @@ class UserStatsSection extends ConsumerWidget {
           VerticalDivider(color: customColors.neutral80),
           Expanded(
             child: rankingAsyncValue.when(
-              data: (rank) => StatBox(value: rank.toString()+'위', label: '랭킹'),
+              data: (rank) => StatBox(value: '$rank위', label: 'my_page.ranking'.tr()),
               loading: () => const StatBox(value: '...', label: '랭킹'),
               error: (_, __) => const StatBox(value: '오류', label: '랭킹'),
             ),
@@ -403,7 +403,8 @@ class BadgeRow extends ConsumerWidget {
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stackTrace) =>
-          Center(child: Text('배지 로딩 중 오류가 발생했습니다.')),
+          Center(child: Text('my_page.loading_error'.tr())),
+
     );
   }
 }
@@ -434,16 +435,16 @@ class StatBox extends StatelessWidget {
 
 /// 정보 카드 위젯
 class InfoCard extends StatelessWidget {
-  final String title;
-  final String? description;
+  final String titleKey;
+  final String? descriptionKey;
   final IconData? leadingIcon;
   final Widget? child;
   final IconData? trailingIcon;
   final VoidCallback? onTap;
 
   const InfoCard({
-    required this.title,
-    this.description,
+    required this.titleKey,
+    this.descriptionKey,
     this.leadingIcon,
     this.child,
     this.trailingIcon,
@@ -453,25 +454,20 @@ class InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // '학습 통계' 카드 비활성화 여부 확인
-    final bool isDisabled = title == '학습 통계' || title == '학습 기록';
+    final String title = titleKey.tr();
+    final String? description = descriptionKey?.tr();
+    final bool isDisabled = titleKey == 'my_page.stat_title' || titleKey == 'my_page.learning_history';
 
     return InkWell(
-      onTap: isDisabled ? null : onTap, // 비활성화 시 onTap 비활성화
+      onTap: isDisabled ? null : onTap,
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isDisabled ? Colors.black.withOpacity(0.05) : Colors.white, // 비활성화 시 색상 변경
+          color: isDisabled ? Colors.black.withOpacity(0.05) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: isDisabled
               ? []
-              : [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 2,
-              offset: const Offset(0, 1),
-            ),
-          ],
+              : [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 2, offset: const Offset(0, 1))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -480,35 +476,18 @@ class InfoCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     if (leadingIcon != null) ...[
-                      Icon(
-                        leadingIcon,
-                        size: 24,
-                        color: Colors.black54,
-                      ),
+                      Icon(leadingIcon, size: 24, color: Colors.black54),
                       const SizedBox(width: 12),
                     ],
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          title,
-                          style: pretendardSemiBold(context).copyWith(
-                            fontSize: 18,
-                            color: Colors.black,
-                          ),
-                        ),
+                        Text(title, style: pretendardSemiBold(context).copyWith(fontSize: 18)),
                         if (description != null) ...[
                           const SizedBox(height: 4),
-                          Text(
-                            description!,
-                            style: pretendardRegular(context).copyWith(
-                              fontSize: 16,
-                              color: Colors.black54,
-                            ),
-                          ),
+                          Text(description, style: pretendardRegular(context).copyWith(fontSize: 16, color: Colors.black54)),
                         ],
                       ],
                     ),
@@ -518,12 +497,12 @@ class InfoCard extends StatelessWidget {
                   Icon(
                     isDisabled ? Icons.lock : trailingIcon,
                     size: 20,
-                    color: isDisabled ? Colors.grey : Colors.black54, // 비활성화 시 아이콘 색상 변경
+                    color: isDisabled ? Colors.grey : Colors.black54,
                   ),
               ],
             ),
             if (child != null && !isDisabled) ...[
-              const SizedBox(height: 16), // child와 상단 텍스트 간격
+              const SizedBox(height: 16),
               child!,
             ],
           ],
