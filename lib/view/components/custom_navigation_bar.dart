@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';
 import '../../viewmodel/navigation_controller.dart';
 import '../../theme/theme.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class CustomNavigationBar extends ConsumerWidget {
   const CustomNavigationBar({
@@ -41,22 +42,22 @@ class CustomNavigationBar extends ConsumerWidget {
         selectedLabelStyle: body_xsmall_semi(context),
         unselectedLabelStyle: body_xsmall_semi(context).copyWith(color: customColors.neutral60),
         onTap: (index) => navigationController.navigateToIndex(context, index), // 페이지 전환
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_rounded),
-            label: '홈',
+            icon: const Icon(Icons.home_rounded),
+            label: 'nav.home'.tr(),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.stars_rounded),
-            label: '코스',
+            icon: const Icon(Icons.stars_rounded),
+            label: 'nav.course'.tr(),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.article_rounded),
-            label: '커뮤니티',
+            icon: const Icon(Icons.article_rounded),
+            label: 'nav.community'.tr(),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_rounded),
-            label: '마이페이지',
+            icon: const Icon(Icons.person_rounded),
+            label: 'nav.mypage'.tr(),
           ),
         ],
       ),

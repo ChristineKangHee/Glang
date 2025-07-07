@@ -9,6 +9,7 @@ import 'package:readventure/view/feature/reading/quiz_data.dart';
 import '../../../../../theme/font.dart';
 import '../../../../../theme/theme.dart';
 import '../../../components/custom_button.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class OxQuiz extends StatefulWidget {
   final OxQuestion question; // 퀴즈 질문 데이터
@@ -64,11 +65,12 @@ class _OxQuizState extends State<OxQuiz> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center, // 컬럼 가운데 정렬
           children: [
+            // 수정 후
             Text(
-              '퀴즈', // 퀴즈 제목
+              'quiz.title'.tr(),
               textAlign: TextAlign.center,
               style: body_small_semi(context).copyWith(
-                color: customColors.neutral30, // 제목 색상
+                color: customColors.neutral30,
               ),
             ),
             const SizedBox(height: 24),

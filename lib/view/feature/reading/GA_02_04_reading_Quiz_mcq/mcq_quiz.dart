@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:readventure/view/feature/reading/quiz_data.dart';
 import '../../../../../theme/font.dart';
 import '../../../../../theme/theme.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class McqQuiz extends StatefulWidget {
   final McqQuestion question; // 퀴즈 문제 객체
@@ -52,10 +53,10 @@ class _McqQuizState extends State<McqQuiz> {
           crossAxisAlignment: CrossAxisAlignment.center, // 텍스트 중앙 정렬
           children: [
             Text(
-              '퀴즈', // 퀴즈 제목
+              'quiz.title'.tr(), // 🔹 다국어 키 적용
               textAlign: TextAlign.center,
               style: body_small_semi(context).copyWith(
-                color: customColors.neutral30, // 제목 색상 설정
+                color: customColors.neutral30,
               ),
             ),
             const SizedBox(height: 24), // 제목과 문제 사이의 간격

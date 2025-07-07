@@ -6,7 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 import '../../theme/theme.dart';
 import '../components/custom_button.dart';
 import '../widgets/DoubleBackToExitWrapper.dart';
@@ -74,26 +74,26 @@ class TutorialPageView extends StatelessWidget {
       controller: controller, // 페이지 컨트롤러
       onPageChanged: onPageChanged, // 페이지가 변경될 때 호출되는 콜백
       children: [
-        TutorialPage( // 첫 번째 튜토리얼 페이지
-          title: '맞춤 코스로\n몰입형 읽기 경험!',
-          content: '책 읽기 전, 중, 후 미션과\n읽기 목표를 수행하며 몰입형 독서를 즐겨요',
+        TutorialPage(
+          title: 'tutorial.page1.title'.tr(),
+          content: 'tutorial.page1.content'.tr(),
           image: 'assets/images/tutorial1.png',
         ),
-        TutorialPage( // 두 번째 튜토리얼 페이지
-          title: 'AI 피드백으로\n성장 포인트 점검!',
-          content: '강점과 개선점을 바로 확인해요',
+        TutorialPage(
+          title: 'tutorial.page2.title'.tr(),
+          content: 'tutorial.page2.content'.tr(),
           image: 'assets/images/tutorial2.png',
         ),
-        TutorialPage( // 세 번째 튜토리얼 페이지
-          title: '읽기 패턴 분석으로\n성장을 한눈에!',
-          content: '리포트를 통해 성취도를 시각적으로 확인하세요',
+        TutorialPage(
+          title: 'tutorial.page3.title'.tr(),
+          content: 'tutorial.page3.content'.tr(),
           image: 'assets/images/tutorial3.png',
         ),
-        TutorialPage( // 네 번째 튜토리얼 페이지
-          title: '배지와 커뮤니티로\n읽기의 재미 UP!',
-          content: '미션 완료로 배지를 획득하고,\n커뮤니티에 글을 공유하며 함께 성장하세요',
+        TutorialPage(
+          title: 'tutorial.page4.title'.tr(),
+          content: 'tutorial.page4.content'.tr(),
           image: 'assets/images/tutorial4.png',
-          showStartButton: true, // '시작하기' 버튼 표시 여부
+          showStartButton: true,
         ),
       ],
     );
@@ -158,7 +158,7 @@ class TutorialPage extends StatelessWidget {
                   print("시작하기 버튼이 눌렸습니다!");
                   Navigator.pushReplacementNamed(context, '/'); // 버튼 클릭 시 메인 화면으로 이동
                 },
-                title: '시작하기', // 버튼 제목
+                title: '시작하기'.tr(),
               ),
             ),
           ),

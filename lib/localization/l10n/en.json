@@ -88,8 +88,11 @@
     "logout_confirm": "Are you sure you want to log out?",
     "cancel": "Cancel",
     "withdraw": "Delete Account",
-    "admin_report": "🚨 Report Management"
-  },
+    "admin_report": "🚨 Report Management",
+    "politics": {
+      "title": "Terms and Policies"
+    }
+    },
   "settings_requests": {
     "title": "Encountering any issues?",
     "description": "Let us know if you experience any problems or have questions.\nMon–Fri 10:00–18:00, closed on weekends and public holidays.",
@@ -136,7 +139,8 @@
     "submit": "Submit",
     "confirm": "OK",
     "cancel": "Cancel",
-    "exit": "Exit"
+    "exit": "Exit",
+    "complete": "Complete"
   },
   "post_edit": {
     "title": "Edit Post",
@@ -147,5 +151,54 @@
   },
   "ranking": {
     "title": "Ranking"
+  },
+  "quiz": {
+    "title": "Quiz",
+    "correct": "Correct!",
+    "incorrect": "Incorrect."
+  },
+  "nickname": {
+    "title": "Please enter a nickname",
+    "duplicate_error": "This nickname is already taken.",
+    "save_error": "There was a problem saving the nickname. Please try again.",
+    "auth_error": "User authentication could not be verified.",
+    "invalid_input": "Please enter a valid nickname."
+  },
+  "login": {
+    "google": "Continue with Google",
+    "apple": "Continue with Apple",
+    "kakao": "Continue with Kakao"
+  },
+  "tutorial": {
+    "page1": {
+      "title": "Immersive reading\nwith personalized courses!",
+      "content": "Enjoy immersive reading\nwith missions before, during, and after reading."
+    },
+    "page2": {
+      "title": "Get feedback from AI\nand track your growth!",
+      "content": "Check your strengths and areas to improve instantly."
+    },
+    "page3": {
+      "title": "Analyze your reading patterns\nand see your progress!",
+      "content": "Visualize your achievements with a personalized report."
+    },
+    "page4": {
+      "title": "Badges & community\nmake reading fun!",
+      "content": "Earn badges by completing missions and share in the community."
+    },
+    "start": "Start"
+  },
+  "editNick": {
+    "title": "Edit Profile",
+    "enterNickname": "Please enter your nickname",
+    "nicknameLabel": "Nickname",
+    "error": "Nickname must be 1–8 characters without spaces.",
+    "submit": "Done"
+  },
+  "nav": {
+    "home": "Home",
+    "course": "Course",
+    "community": "Community",
+    "mypage": "My Page"
   }
 }

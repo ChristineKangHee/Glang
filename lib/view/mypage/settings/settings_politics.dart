@@ -22,7 +22,7 @@ class SettingsPolitics extends ConsumerWidget {
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        title: '약관 및 정책'.tr(), // 다국어 지원
+        title: 'settings.politics.title'.tr(),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance

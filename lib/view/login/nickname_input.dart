@@ -13,6 +13,7 @@ import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../components/custom_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import '../widgets/DoubleBackToExitWrapper.dart';
 
@@ -56,7 +57,7 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
           if (snapshot.exists) {
             // 닉네임이 이미 존재하는 경우
             setState(() {
-              errorMessage = '이미 사용 중인 별명입니다.';
+              errorMessage = 'nickname.duplicate_error'.tr();
             });
           } else {
             // Firestore에 닉네임 저장 및 사용자 상태 업데이트
@@ -73,7 +74,7 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
           }
         } catch (e) {
           setState(() {
-            errorMessage = '별명을 저장하는 중 문제가 발생했습니다. 다시 시도해주세요.';
+            errorMessage = 'nickname.save_error'.tr();
           });
           print('별명 저장 오류: $e');
         } finally {
@@ -83,7 +84,7 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
         }
       } else {
         setState(() {
-          errorMessage = '사용자 인증 정보를 확인할 수 없습니다.';
+          errorMessage = 'nickname.auth_error'.tr();
         });
       }
     }
@@ -103,7 +104,7 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '별명을 입력해주세요',
+                          'nickname.title'.tr(),
                           style: heading_medium(context),
                         ),
                         const SizedBox(height: 24),
@@ -135,15 +136,15 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
                 child: isInputValid && !isLoading
                     ? ButtonPrimary_noPadding(
                   function: _saveNickname,
-                  title: '완료',
+                    title: 'common.complete'.tr()
                 )
                     : ButtonPrimary20_noPadding(
                   function: () {
                     setState(() {
-                      errorMessage = '별명을 올바르게 입력해주세요.';
+                      errorMessage = 'nickname.invalid_input'.tr();
                     });
                   },
-                  title: '완료',
+                    title: 'common.complete'.tr()
                 ),
               ),
             ],
