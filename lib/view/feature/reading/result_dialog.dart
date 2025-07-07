@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import '../../../../theme/theme.dart';
 import '../../../theme/font.dart';
 import '../../components/custom_button.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ResultDialog extends StatelessWidget {
   final bool isCorrect; // 정답 여부를 나타내는 변수
@@ -41,9 +42,9 @@ class ResultDialog extends StatelessWidget {
               ),
               const SizedBox(width: 8), // 아이콘과 텍스트 사이에 여백 추가
               Text(
-                isCorrect ? '정답입니다!' : '오답입니다.', // 정답/오답 메시지 출력
+                isCorrect ? 'quiz.correct'.tr() : 'quiz.incorrect'.tr(),
                 style: body_large_semi(context).copyWith(
-                  color: isCorrect ? customColors.primary : customColors.error, // 텍스트 색상 변경
+                  color: isCorrect ? customColors.primary : customColors.error,
                 ),
               ),
             ],
@@ -61,7 +62,7 @@ class ResultDialog extends StatelessWidget {
               Navigator.pop(context); // 다이얼로그 닫기
               onCompleted(); // 완료 콜백 실행
             },
-            title: '완료', // 버튼 텍스트
+            title: 'common.complete'.tr(),
           ),
         ],
       ),

@@ -15,6 +15,7 @@ import '../../../../theme/theme.dart';
 import '../components/custom_textfield.dart';
 import '../../viewmodel/user_service.dart' as viewmodel;
 import 'edit_profile.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class EditNickInput extends ConsumerStatefulWidget {
   const EditNickInput({super.key});
@@ -48,7 +49,7 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        title: "내 정보 수정",
+        title: "editNick.title".tr(),
       ),
       body: Column(
         children: [
@@ -59,15 +60,12 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '별명을 입력해주세요',
-                      style: heading_medium(context),
-                    ),
+                    Text("editNick.enterNickname".tr(), style: heading_medium(context)),
                     const SizedBox(height: 24),
                     NicknameTextField(
                       controller: _controller,
-                      decoration: const InputDecoration(
-                        labelText: '별명',
+                      decoration: InputDecoration(
+                        labelText: "editNick.nicknameLabel".tr(),
                         border: OutlineInputBorder(),
                       ),
                       existingNicknames: existingNicknames,
@@ -98,7 +96,7 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
 
                 if (newNickname.isEmpty || newNickname.length > 8 || newNickname.contains(' ')) {
                   setState(() {
-                    errorMessage = '별명은 1-8자 이내로 공백 없이 입력해주세요.';
+                    errorMessage = "editNick.error".tr();
                   });
                   return;
                 }
@@ -113,7 +111,7 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
                   Navigator.pop(context, newNickname);
                 }
               },
-              title: '완료',
+              title: "editNick.submit".tr(),
             ),
           ),
         ],
