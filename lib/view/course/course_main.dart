@@ -14,6 +14,7 @@ import '../widgets/DoubleBackToExitWrapper.dart';
 import 'section.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 /// 코스 섹션을 보여주는 메인 위젯.
 /// 현재 보여지는 섹션과 스크롤 동작을 관리하는 로직 포함.
@@ -106,14 +107,18 @@ class _CourseMainState extends State<CourseMain> {
               }
               // 에러 발생
               if (snapshot.hasError) {
-                return Center(child: Text("데이터 로딩 실패: ${snapshot.error}"));
+                return Center( // [i18n] 교체
+                  child: Text('data_load_failed'.tr(args: [snapshot.error.toString()])),
+                );
               }
 
               // 정상 로딩 완료
               final sections = snapshot.data!;
               if (sections.isEmpty) {
                 // 섹션이 하나도 없을 경우
-                return const Center(child: Text("표시할 코스가 없습니다."));
+                return Center( // [i18n] 교체
+                  child: Text('no_courses_to_show'.tr()),
+                );
               }
 
               // 섹션 개수와 _sectionKeys 길이가 다르면 새로 생성

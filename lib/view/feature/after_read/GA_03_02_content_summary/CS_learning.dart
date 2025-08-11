@@ -17,6 +17,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'CS_main.dart';
 import '../choose_activities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 /// ConsumerStatefulWidget으로 변경하여 Riverpod의 ref 사용
 class CSLearning extends ConsumerStatefulWidget {
@@ -105,20 +106,20 @@ class _CSLearningState extends ConsumerState<CSLearning> {
     // 아직 데이터가 없으면 로딩 인디케이터 표시
     if (currentStage == null) {
       return Scaffold(
-        appBar: CustomAppBar_2depth_8(title: "내용 요약 게임", key: _appBarKey,),
+        appBar: CustomAppBar_2depth_8(title: 'summary_game_title'.tr(), key: _appBarKey,), // ***
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
     // 읽기 중(READING) 데이터의 textSegments를 이어붙여 본문 텍스트 구성
     final readingText = currentStage.readingData?.textSegments.join(" ")
-        ?? "텍스트 데이터가 없습니다.";
+        ?? 'no_text_data'.tr(); // ***
     // 읽기 전(BR) 데이터의 키워드 배열 가져오기
     final stageKeywords = currentStage.brData?.keywords ?? [];
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: CustomAppBar_2depth_8(title: "내용 요약 게임", key: _appBarKey,),
+      appBar: CustomAppBar_2depth_8(title: 'summary_game_title'.tr(), key: _appBarKey,), // ***
       floatingActionButton: Container(
         margin: const EdgeInsets.only(bottom: 70),
         child: FloatingActionButton(
@@ -148,7 +149,7 @@ class _CSLearningState extends ConsumerState<CSLearning> {
                       padding: const EdgeInsets.all(16.0),
                       child: TitleSection_withoutIcon(
                         customColors: customColors,
-                        title: "글을 3문장으로 요약해주세요!",
+                        title: 'summary_instruction_three_sentences'.tr(), // ***
                         subtitle: currentStage.subdetailTitle,
                         author: "AI",
                       ),
@@ -222,7 +223,7 @@ class _CSLearningState extends ConsumerState<CSLearning> {
                       await updateFeatureCompletion(currentStage, 2, true);
                     }
                     // '요약하기' 활동 유형을 전달하면서 제출: answerText, readingText, activityType
-                    _showAlertDialog(_controller.text, readingText, "요약하기");
+                    _showAlertDialog(_controller.text, readingText, 'activity_summary'.tr()); // ***
                   }
                       : null,
                   style: ElevatedButton.styleFrom(
@@ -235,7 +236,7 @@ class _CSLearningState extends ConsumerState<CSLearning> {
                     disabledBackgroundColor: customColors.primary20,
                     disabledForegroundColor: Colors.white,
                   ),
-                  child: const Text("제출하기", style: TextStyle(fontSize: 16)),
+                  child: Text('submit'.tr(), style: const TextStyle(fontSize: 16)), // ***
                 ),
               ),
             ),
@@ -270,7 +271,7 @@ class _CSLearningState extends ConsumerState<CSLearning> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "힌트를 선택해주세요",
+                          'hint_select_prompt'.tr(), // ***
                           style: body_large_semi(context)
                               .copyWith(color: customColors.neutral30),
                         ),
@@ -308,7 +309,7 @@ class _CSLearningState extends ConsumerState<CSLearning> {
                               ),
                               child: Center(
                                 child: Text(
-                                  "키워드 ${stageKeywords.length}개",
+                                  'keyword_count'.tr(args: [stageKeywords.length.toString()]), // ***
                                   style: body_small_semi(context)
                                       .copyWith(color: customColors.neutral30),
                                 ),
@@ -340,7 +341,7 @@ class _CSLearningState extends ConsumerState<CSLearning> {
                               ),
                               child: Center(
                                 child: Text(
-                                  "본문 자동 추가",
+                                  'auto_add_body'.tr(), // ***
                                   style: body_small_semi(context)
                                       .copyWith(color: customColors.neutral30),
                                   textAlign: TextAlign.center,
@@ -356,7 +357,7 @@ class _CSLearningState extends ConsumerState<CSLearning> {
                     selectedOption == null
                         ? ButtonPrimary20_noPadding(
                       function: () {},
-                      title: '선택 완료',
+                      title: 'select_done'.tr(), // ***
                       condition: "null",
                     )
                         : ButtonPrimary_noPadding(
@@ -368,7 +369,7 @@ class _CSLearningState extends ConsumerState<CSLearning> {
                           _updateTextField(readingText);
                         }
                       },
-                      title: '선택 완료',
+                      title: 'select_done'.tr(), // ***
                       condition: "not null",
                     ),
                   ],

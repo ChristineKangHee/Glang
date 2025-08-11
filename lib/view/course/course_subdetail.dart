@@ -20,6 +20,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../feature/reading/GA_02/RD_before.dart';
 import '../home/stage_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 // course_subdetail.dart
 class CourseDetailPage extends ConsumerWidget {
@@ -32,7 +33,7 @@ class CourseDetailPage extends ConsumerWidget {
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_4(title: '스테이지 상세'),
+      appBar: CustomAppBar_2depth_4(title: 'stage_detail_title'.tr()),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -55,7 +56,10 @@ class CourseDetailPage extends ConsumerWidget {
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    IconTextRow(icon: Icons.timer, text: '${stage.totalTime}분'),
+                                    IconTextRow(
+                                      icon: Icons.timer,
+                                      text: 'time_minutes'.tr(args: [stage.totalTime.toString()]), // ***
+                                    ),
                                     const SizedBox(width: 12),
                                     IconTextRow(icon: Icons.star, text: stage.difficultyLevel),
                                   ],
@@ -77,9 +81,9 @@ class CourseDetailPage extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      MissionSection(title: '미션', missions: stage.missions),
+                      MissionSection(title: 'missions_title'.tr(), missions: stage.missions), // ***
                       const SizedBox(height: 20),
-                      EffectSection(title: '효과', effects: stage.effects),
+                      EffectSection(title: 'effects_title'.tr(), effects: stage.effects), // ***
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -123,7 +127,7 @@ class CourseDetailPage extends ConsumerWidget {
                     //   MaterialPageRoute(builder: (_) => const CRLearning()),
                     // );
                   },
-                  title: '시작하기',
+                  title: 'start_button'.tr(), // ***
                 ),
               ),
             ],

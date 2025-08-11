@@ -6,6 +6,7 @@ import 'package:readventure/view/course/course_subdetail.dart';
 import 'package:readventure/model/stage_data.dart';
 import '../../model/section_data.dart';
 import '../../util/box_shadow_styles.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SectionPopup extends StatelessWidget {
   final StageData stage; // 🔹 이제 StageData 전체를 받는다.
@@ -63,9 +64,9 @@ class SectionPopup extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "스테이지 ID: ${stage.stageId}",
-                        style: body_xsmall_semi(context).copyWith(color: titleColor),
+                      Text( // ***
+                          'stage_id'.tr(args: [stage.stageId]),
+                          style: body_xsmall_semi(context).copyWith(color: titleColor),
                       ),
                       Text(
                         stage.subdetailTitle,
@@ -97,11 +98,9 @@ class SectionPopup extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   ),
-                  child: Text(
-                    stage.status == StageStatus.locked ? '잠겨있음' : '시작하기',
-                    style: body_xsmall_semi(context).copyWith(
-                      color: customColors.neutral0,
-                    ),
+                  child: Text( // ***
+                    stage.status == StageStatus.locked ? 'locked'.tr() : 'start_button'.tr(),
+                    style: body_xsmall_semi(context).copyWith(color: customColors.neutral0),
                   ),
                 ),
               ],
@@ -125,7 +124,7 @@ class SectionPopup extends StatelessWidget {
                 _buildIconWithText(
                   context,
                   Icons.timer,
-                  '${stage.totalTime}분',
+                  'time_minutes'.tr(args: [stage.totalTime.toString()]),
                   customColors,
                   (stage.status == StageStatus.completed ||
                       stage.status == StageStatus.locked)

@@ -18,6 +18,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'widgets/debate_provider.dart';
 import 'widgets/debate_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class DebatePage extends ConsumerWidget {
   @override
@@ -29,7 +30,7 @@ class DebatePage extends ConsumerWidget {
     // 현재 스테이지 데이터에서 debate 주제 가져오기
     final currentStage = ref.watch(currentStageProvider);
     final debateTopic = currentStage?.arData?.featureData?["feature3DebateTopic"] as String?
-        ?? "기본 토론 주제"; // fallback 값
+        ?? 'default_debate_topic'.tr(); // *** fallback 값
 
     // 앱 시작 시 첫 토론 라운드에서 주제 사용,,,맨 처음꺼
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -39,14 +40,14 @@ class DebatePage extends ConsumerWidget {
           context,
           debateState.currentRound,
           debateTopic, // Firestore에서 가져온 debate 주제 사용
-          debateState.isUserPro ? "찬성" : "반대",
+          debateState.isUserPro ? 'stance_pro'.tr() : 'stance_con'.tr(), // ***
         );
       }
     });
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("토론", style: heading_xsmall(context).copyWith(color: customColors.neutral30,)),
+        title: Text('debate_title'.tr(), style: heading_xsmall(context).copyWith(color: customColors.neutral30,)), // ***
         centerTitle: true,
         leadingWidth: 90,
         leading: CountdownTimer(
@@ -59,7 +60,7 @@ class DebatePage extends ConsumerWidget {
                 context,
                 debateState.currentRound + 1, // 다음 라운드 번호
                 debateTopic,
-                !debateState.isUserPro ? "찬성" : "반대",
+                !debateState.isUserPro ? 'stance_pro'.tr() : 'stance_con'.tr(), // ***
               );
             }
           },
@@ -122,7 +123,7 @@ class _DebateContentState extends ConsumerState<DebateContent> {
             child: Column(
               children: [
                 Text(
-                  "ROUND ${debateState.currentRound} | ${debateState.isUserPro ? '찬성' : '반대'}",
+                  'round_label'.tr(args: [debateState.currentRound.toString(), debateState.isUserPro ? 'stance_pro'.tr() : 'stance_con'.tr()]), // ***
                   style: body_small_semi(context).copyWith(
                     color: widget.customColors.primary,
                     fontWeight: FontWeight.bold,
@@ -155,7 +156,7 @@ class _DebateContentState extends ConsumerState<DebateContent> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                "결과",
+                  'result_title'.tr(), // ***
                 style: body_small_semi(context)
               ),
               const SizedBox(height: 16),
@@ -163,7 +164,7 @@ class _DebateContentState extends ConsumerState<DebateContent> {
               _buildRoundResult(
                 context: context,
                 round: 1,
-                stance: "찬성",
+                stance: 'stance_pro'.tr(), // ***
                 userPercentage: 55,
                 aiPercentage: 45,
                 customColors: widget.customColors,
@@ -173,7 +174,7 @@ class _DebateContentState extends ConsumerState<DebateContent> {
               _buildRoundResult(
                 context: context,
                 round: 2,
-                stance: "반대",
+                stance: 'stance_con'.tr(), // ***
                 userPercentage: 80,
                 aiPercentage: 20,
                 customColors: widget.customColors,
@@ -191,12 +192,12 @@ class _DebateContentState extends ConsumerState<DebateContent> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "종합 평가",
+                        'overall_evaluation'.tr(), // ***
                       style: body_xsmall_semi(context)
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "찬성 측과 반대 측의 주장에서 제시한 경제적 효과에 대한 구체적 수치와 사례 분석이 설득력이 높았습니다.",
+                        'overall_feedback_sample'.tr(), // ***
                       style: body_small(context)
                     ),
                   ],
@@ -224,7 +225,7 @@ class _DebateContentState extends ConsumerState<DebateContent> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    child: Text("다시 쓰기", style: body_small_semi(context).copyWith(color: widget.customColors.neutral60),),
+                    child: Text('write_again'.tr(), style: body_small_semi(context).copyWith(color: widget.customColors.neutral60),), // ***
                   ),
                 ),
                 SizedBox(width: 16,),
@@ -275,7 +276,7 @@ class _DebateContentState extends ConsumerState<DebateContent> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    child: Text("완료", style: body_small_semi(context).copyWith(color: widget.customColors.neutral100),),
+                    child: Text('finish'.tr(), style: body_small_semi(context).copyWith(color: widget.customColors.neutral100),), // ***
                   ),
                 ),
               ],
@@ -305,7 +306,7 @@ class _DebateContentState extends ConsumerState<DebateContent> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "ROUND $round | $stance",
+              'round_label'.tr(args: [round.toString(), stance]), // ***
             style: body_small(context).copyWith(color: customColors.neutral30)
           ),
           const SizedBox(height: 8),
@@ -340,11 +341,11 @@ class _DebateContentState extends ConsumerState<DebateContent> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "사용자 $userPercentage%",
+                  'user_percentage'.tr(args: [userPercentage.toString()]), // ***
                 style: body_small_semi(context).copyWith(color: customColors.primary)
               ),
               Text(
-                "AI $aiPercentage%",
+                  'ai_percentage'.tr(args: [aiPercentage.toString()]), // ***
                 style: body_small_semi(context).copyWith(color: customColors.neutral60)
               ),
             ],

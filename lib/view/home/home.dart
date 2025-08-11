@@ -53,7 +53,7 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
         appBar: CustomAppBar_Logo(),
         body: SafeArea(
           child: userId == null
-            ? Center(child: Text("로그인이 필요합니다"),)
+            ? Center(child: Text("need_login".tr()))
           :  sectionAsync.when(
             data: (sections){
               StageData? findFirstInProgress(List<SectionData> sections) {
@@ -116,7 +116,7 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("출석 체크", style: body_small_semi(context),),
+                            Text('attendance_title'.tr(), style: body_small_semi(context)),
                             SizedBox(height: 12,),
                             Container(
                                 padding: EdgeInsets.all(16),
@@ -183,7 +183,7 @@ class AttendanceWidget extends ConsumerWidget {
             .toList(),
       ),
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(child: Text("오류 발생: $error")),
+      error: (error, stack) => Center(child: Text('error_with_message'.tr(args: [error.toString()]))),
     );
   }
 }
@@ -292,14 +292,16 @@ class LearningSection extends ConsumerWidget {
         // 초 단위를 시간과 분으로 변환
         final hours = learningTimeSeconds ~/ 3600;
         final minutes = (learningTimeSeconds % 3600) ~/ 60;
-        final formattedTime = hours > 0 ? "$hours시간 ${minutes}분" : "$minutes분";
+        final formattedTime = hours > 0
+            ? 'time_format_hm'.tr(args: [hours.toString(), minutes.toString()])
+            : 'time_format_m'.tr(args: [minutes.toString()]);
 
-        final formattedMissionCount = "$completedMissionCount개";
+        final formattedMissionCount = 'count_format'.tr(args: [completedMissionCount.toString()]);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("이번달 기록", style: body_small_semi(context)),
+            Text('this_month_record'.tr(), style: body_small_semi(context)),
             SizedBox(height: 12.h,),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -309,7 +311,7 @@ class LearningSection extends ConsumerWidget {
                     customColors: customColors,
                     imageLink: imageLink_1,
                     title: formattedTime,
-                    subtitle: "읽은 시간",
+                    subtitle: 'read_time'.tr(),
                   ),
                 ),
                 SizedBox(width: 16,),
@@ -318,7 +320,7 @@ class LearningSection extends ConsumerWidget {
                     customColors: customColors,
                     imageLink: imageLink_2,
                     title: formattedMissionCount,
-                    subtitle: "완료한 미션",
+                    subtitle: 'completed_missions'.tr(),
                   ),
                 ),
               ],
@@ -327,7 +329,7 @@ class LearningSection extends ConsumerWidget {
         );
       },
       loading: () => Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Text("Error loading stats"),
+      error: (error, stack) => Text('error_with_message'.tr(args: [error.toString()])),
     );
   }
 }
@@ -396,7 +398,7 @@ class ProgressSection extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("진행 중인 스테이지", style: body_small_semi(context),),
+        Text('in_progress_stage'.tr(), style: body_small_semi(context)),
         SizedBox(height: 12.h,),
         SectionPopup(stage: data),
       ],
@@ -414,12 +416,13 @@ class GreetingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final safeName = (name ?? '').isEmpty ? '' : name!;
     return Column( // 나중에 섹션 분리할 것
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("안녕하세요, $name님!", style: heading_medium(context),),
-        SizedBox(height: 4.h,),
-        Text("오늘의 목표를 달성해 보세요!", style: body_xsmall(context),),
+        Text('greeting_hello_name'.tr(args: [safeName]), style: heading_medium(context)),
+        SizedBox(height: 4.h),
+        Text('greeting_motivation'.tr(), style: body_xsmall(context)),
       ],
     );
   }
@@ -442,12 +445,12 @@ class HotPostSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("인기 게시물", style: body_small_semi(context),),
+            Text('hot_posts'.tr(), style: body_small_semi(context)),
             GestureDetector(
               onTap: () => Navigator.pushNamed(context, "/notification"),
               child: Row(
                 children: [
-                  Text("더보기", style: body_xxsmall_semi(context),),
+                  Text('see_more'.tr(), style: body_xxsmall_semi(context)),
                   Icon(Icons.keyboard_arrow_right),
                 ],
               ),
