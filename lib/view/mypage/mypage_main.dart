@@ -1,13 +1,14 @@
 /// File: mypage_main.dart
-/// Purpose: 마이페이지 화면 구현
+/// Purpose: 마이페이지 화면 구현 (L10N 적용, 비활성화 로직 안정화)
 /// Author: 박민준
 /// Created: 2025-01-02
-/// Last Modified: 2025-02-12 by 윤은서
+/// Last Modified: 2025-08-26 by ChatGPT (L10N)
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/view/components/custom_app_bar.dart';
 import 'package:readventure/view/components/custom_navigation_bar.dart';
+import 'package:easy_localization/easy_localization.dart'; // ✅ L10N
 import '../../theme/font.dart';
 import '../../theme/theme.dart';
 import '../../viewmodel/badge_provider.dart';
@@ -72,17 +73,18 @@ class MyPageContent extends StatelessWidget {
             const UserStatsSection(), // 사용자 경험치, 코스, 랭킹 표시
             const SizedBox(height: 24),
             InfoCard(
-              title: '학습 통계',
-              description: '일주일에 활동한 학습을 확인하세요!',
+              title: 'learning_stats'.tr(),                   // ✅ 학습 통계
+              description: 'learning_stats_desc'.tr(),
               trailingIcon: Icons.arrow_forward_ios,
+              disabled: true, // 🔒 언어와 무관하게 안전하게 비활성화
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/statistics');
               },
             ),
             const SizedBox(height: 16),
             InfoCard(
-              title: '뱃지',
-              child: BadgeRow(), // 수정: const 제거
+              title: 'badges'.tr(),                           // ✅ 뱃지
+              child: const BadgeRow(),
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/badge');
@@ -91,7 +93,7 @@ class MyPageContent extends StatelessWidget {
             const SizedBox(height: 16),
             InfoCard(
               leadingIcon: Icons.article_rounded,
-              title: '커뮤니티 작성글',
+              title: 'community_posts'.tr(),                  // ✅ 커뮤니티 작성글
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/mycommunitypost');
@@ -100,7 +102,7 @@ class MyPageContent extends StatelessWidget {
             const SizedBox(height: 16),
             InfoCard(
               leadingIcon: Icons.bookmark_rounded,
-              title: '메모',
+              title: 'note_title'.tr(),                       // ✅ 메모 (기존 키 재사용)
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/memo');
@@ -109,7 +111,7 @@ class MyPageContent extends StatelessWidget {
             const SizedBox(height: 16),
             InfoCard(
               leadingIcon: Icons.bookmark_rounded,
-              title: '해석',
+              title: 'interpretation_title'.tr(),             // ✅ 해석 (기존 키 재사용)
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/interpretation');
@@ -118,8 +120,9 @@ class MyPageContent extends StatelessWidget {
             const SizedBox(height: 16),
             InfoCard(
               leadingIcon: Icons.book,
-              title: '학습 기록',
+              title: 'learning_history'.tr(),                 // ✅ 학습 기록
               trailingIcon: Icons.arrow_forward_ios,
+              disabled: true, // 🔒 비활성화
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/history');
               },
@@ -183,7 +186,7 @@ class UserProfileSection extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    '내 정보 수정',
+                    'edit_profile'.tr(), // ✅ 내 정보 수정
                     style: pretendardMedium(context).copyWith(
                       fontSize: 14,
                       color: customColors.neutral30,
@@ -202,11 +205,8 @@ class UserProfileSection extends ConsumerWidget {
 // 상단 import 구문 아래에 provider 추가
 final myRankingProvider = FutureProvider<int>((ref) async {
   final rankings = await getRankings();
-  // 사용자 이름은 userNameProvider로부터 가져옵니다.
   final userName = ref.watch(userNameProvider) ?? '';
-  // 랭킹 리스트에서 사용자 이름과 일치하는 항목의 인덱스를 찾습니다.
   final index = rankings.indexWhere((user) => user['name'] == userName);
-  // 인덱스는 0부터 시작하므로 +1 해서 랭킹으로 표시 (만약 찾지 못하면 0)
   return index == -1 ? 0 : index + 1;
 });
 
@@ -228,25 +228,28 @@ class UserStatsSection extends ConsumerWidget {
         children: [
           Expanded(
             child: xpAsyncValue.when(
-              data: (xp) => StatBox(value: xp.toString(), label: '경험치'),
-              loading: () => const StatBox(value: '...', label: '경험치'),
-              error: (_, __) => const StatBox(value: '오류', label: '경험치'),
+              data: (xp) => StatBox(value: xp.toString(), label: 'xp_label'.tr()), // ✅ 경험치
+              loading: () => StatBox(value: 'loading'.tr(), label: 'xp_label'.tr()),
+              error: (_, __) => StatBox(value: 'error_short'.tr(), label: 'xp_label'.tr()),
             ),
           ),
           VerticalDivider(color: customColors.neutral80),
           Expanded(
             child: courseAsyncValue.when(
-              data: (course) => StatBox(value: course, label: '코스'),
-              loading: () => const StatBox(value: '...', label: '코스'),
-              error: (_, __) => const StatBox(value: '오류', label: '코스'),
+              data: (course) => StatBox(value: course, label: 'course_title'.tr()), // ✅ 코스
+              loading: () => StatBox(value: 'loading'.tr(), label: 'course_title'.tr()),
+              error: (_, __) => StatBox(value: 'error_short'.tr(), label: 'course_title'.tr()),
             ),
           ),
           VerticalDivider(color: customColors.neutral80),
           Expanded(
             child: rankingAsyncValue.when(
-              data: (rank) => StatBox(value: rank.toString()+'위', label: '랭킹'),
-              loading: () => const StatBox(value: '...', label: '랭킹'),
-              error: (_, __) => const StatBox(value: '오류', label: '랭킹'),
+              data: (rank) => StatBox(
+                value: 'rank_value_format'.tr(args: ['${rank}']), // ✅ "{}위"/"#{}"
+                label: 'rank_label'.tr(),                         // ✅ 랭킹
+              ),
+              loading: () => StatBox(value: 'loading'.tr(), label: 'rank_label'.tr()),
+              error: (_, __) => StatBox(value: 'error_short'.tr(), label: 'rank_label'.tr()),
             ),
           ),
         ],
@@ -254,73 +257,6 @@ class UserStatsSection extends ConsumerWidget {
     );
   }
 }
-
-
-
-/// 학습 통계 그래프 위젯
-/*
-class ProgressChart extends StatelessWidget {
-  const ProgressChart({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    List<TimeData> series1 = [
-      TimeData(domain: DateTime(2025, 1, 6), measure: 7),
-      TimeData(domain: DateTime(2025, 1, 7), measure: 5),
-      TimeData(domain: DateTime(2025, 1, 8), measure: 9),
-      TimeData(domain: DateTime(2025, 1, 9), measure: 10),
-      TimeData(domain: DateTime(2025, 1, 10), measure: 6),
-      TimeData(domain: DateTime(2025, 1, 11), measure: 1),
-      TimeData(domain: DateTime(2025, 1, 12), measure: 8),
-    ];
-
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/mypage/info/statistics');
-      },
-      child: AbsorbPointer( // 내부 그래프 터치 이벤트를 무시하고 InfoCard의 onTap 동작
-        child: SizedBox(
-          height: 200,
-          child: DChartBarT(
-            fillColor: (group, timeData, index) {
-              String day = DateFormat.E('ko').format(timeData.domain).substring(0, 1);
-              return Theme.of(context).extension<CustomColors>()?.primary;
-            },
-            configRenderBar: ConfigRenderBar(
-              barGroupInnerPaddingPx: 10,
-              radius: 12,
-            ),
-            domainAxis: DomainAxis(
-              showLine: true,
-              tickLength: 0,
-              gapAxisToLabel: 12,
-              labelStyle: LabelStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              tickLabelFormatterT: (domain) {
-                return DateFormat.E('ko').format(domain).substring(0, 1);
-              },
-            ),
-            measureAxis: const MeasureAxis(
-              showLine: true,
-            ),
-            groupList: [
-              TimeGroup(
-                id: '1',
-                data: series1.map((e) => TimeData(
-                  domain: e.domain,
-                  measure: e.measure,
-                )).toList(),
-                color: Colors.transparent,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-*/
 
 /// 수정된 BadgeBox 위젯
 class BadgeBox extends StatelessWidget {
@@ -383,18 +319,29 @@ class BadgeRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final badgesAsync = ref.watch(badgesProvider);
+    final earnedIdsAsync = ref.watch(userEarnedBadgeIdsProvider);
 
     return badgesAsync.when(
       data: (badges) {
-        // 전체 배지 컬렉션에서 3개만 표시
         final displayBadges = badges.take(3).toList();
+
+        // 유저 보유 뱃지 ID
+        final earnedIds = earnedIdsAsync.when(
+          data: (ids) => ids,
+          loading: () => const <String>[],
+          error: (_, __) => const <String>[],
+        );
+
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: displayBadges.map((badge) {
+            final localizedName = badge.name.pick(context);
+            final isUnlocked = earnedIds.contains(badge.id);
+
             return Flexible(
               child: BadgeBox(
-                label: badge.name,
-                isUnlocked: true, // earned 여부와 관계없이 unlocked 상태로 표시
+                label: localizedName,       // ✅ 현지화된 이름
+                isUnlocked: isUnlocked,     // ✅ 실제 보유 여부
                 imageUrl: badge.imageUrl,
               ),
             );
@@ -403,11 +350,10 @@ class BadgeRow extends ConsumerWidget {
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stackTrace) =>
-          Center(child: Text('배지 로딩 중 오류가 발생했습니다.')),
+          Center(child: Text('badges_load_error'.tr())),
     );
   }
 }
-
 
 /// 사용자 통계 박스 위젯
 class StatBox extends StatelessWidget {
@@ -440,6 +386,7 @@ class InfoCard extends StatelessWidget {
   final Widget? child;
   final IconData? trailingIcon;
   final VoidCallback? onTap;
+  final bool disabled; // ✅ 언어와 무관하게 제어
 
   const InfoCard({
     required this.title,
@@ -448,20 +395,20 @@ class InfoCard extends StatelessWidget {
     this.child,
     this.trailingIcon,
     this.onTap,
+    this.disabled = false, // ✅ 기본값 false
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    // '학습 통계' 카드 비활성화 여부 확인
-    final bool isDisabled = title == '학습 통계' || title == '학습 기록';
+    final bool isDisabled = disabled;
 
     return InkWell(
-      onTap: isDisabled ? null : onTap, // 비활성화 시 onTap 비활성화
+      onTap: isDisabled ? null : onTap,
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isDisabled ? Colors.black.withOpacity(0.05) : Colors.white, // 비활성화 시 색상 변경
+          color: isDisabled ? Colors.black.withOpacity(0.05) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: isDisabled
               ? []
@@ -518,12 +465,12 @@ class InfoCard extends StatelessWidget {
                   Icon(
                     isDisabled ? Icons.lock : trailingIcon,
                     size: 20,
-                    color: isDisabled ? Colors.grey : Colors.black54, // 비활성화 시 아이콘 색상 변경
+                    color: isDisabled ? Colors.grey : Colors.black54,
                   ),
               ],
             ),
             if (child != null && !isDisabled) ...[
-              const SizedBox(height: 16), // child와 상단 텍스트 간격
+              const SizedBox(height: 16),
               child!,
             ],
           ],

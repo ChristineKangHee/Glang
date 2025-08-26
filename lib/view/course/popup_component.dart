@@ -1,26 +1,26 @@
-// popup_component.dart
+// File: lib/view/course/popup_component.dart
+// Last Modified: 2025-08-13 by ChatGPT (StatusButton 복구, 다국어 유지)
+
 import 'package:flutter/material.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';
 import 'package:readventure/view/course/course_subdetail.dart';
 import 'package:readventure/model/stage_data.dart';
-import '../../model/section_data.dart';
-import '../../util/box_shadow_styles.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:easy_localization/easy_localization.dart' hide tr;
+
+// CHANGED: tr 유틸
+import '../../localization/tr.dart';
 
 class SectionPopup extends StatelessWidget {
-  final StageData stage; // 🔹 이제 StageData 전체를 받는다.
-
-  const SectionPopup({
-    super.key,
-    required this.stage,
-  });
+  final StageData stage;
+  const SectionPopup({super.key, required this.stage});
 
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
+    final locale = context.glangLocale;
 
-    // 상태에 따른 색상 설정
+    // 상태별 색상
     Color? cardColor;
     Color? titleColor;
     Color? subTitleColor;
@@ -49,27 +49,26 @@ class SectionPopup extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(20),
-        // boxShadow: BoxShadowStyles.shadow1(context),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 상단: 코스 제목 + 스테이지 제목 + 시작하기 버튼
+            // 상단: 스테이지 ID + 타이틀 + 시작 버튼
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded( // 🔹 Expanded 추가
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text( // ***
-                          'stage_id'.tr(args: [stage.stageId]),
-                          style: body_xsmall_semi(context).copyWith(color: titleColor),
+                      Text(
+                        'stage_id'.tr(args: [stage.stageId]),
+                        style: body_xsmall_semi(context).copyWith(color: titleColor),
                       ),
                       Text(
-                        stage.subdetailTitle,
+                        tr(stage.subdetailTitle, locale), // CHANGED
                         style: body_large_semi(context).copyWith(color: subTitleColor),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -77,28 +76,23 @@ class SectionPopup extends StatelessWidget {
                     ],
                   ),
                 ),
-                // 시작하기 버튼
                 ElevatedButton(
                   onPressed: stage.status == StageStatus.locked
                       ? null
                       : () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => CourseDetailPage(stage: stage),
-                      ),
+                      MaterialPageRoute(builder: (context) => CourseDetailPage(stage: stage)),
                     );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: stage.status == StageStatus.locked
                         ? customColors.neutral60
                         : customColors.neutral100,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   ),
-                  child: Text( // ***
+                  child: Text(
                     stage.status == StageStatus.locked ? 'locked'.tr() : 'start_button'.tr(),
                     style: body_xsmall_semi(context).copyWith(color: customColors.neutral0),
                   ),
@@ -107,7 +101,7 @@ class SectionPopup extends StatelessWidget {
             ),
 
             const SizedBox(height: 32),
-            // 하단: 진행도%, 시간, 난이도 표시
+            // 하단: 진행도/시간/난이도
             Row(
               children: [
                 _buildIconWithText(
@@ -115,8 +109,7 @@ class SectionPopup extends StatelessWidget {
                   Icons.check_circle,
                   '${stage.achievement}%',
                   customColors,
-                  (stage.status == StageStatus.completed ||
-                      stage.status == StageStatus.locked)
+                  (stage.status == StageStatus.completed || stage.status == StageStatus.locked)
                       ? customColors.neutral30!
                       : customColors.neutral90!,
                 ),
@@ -126,8 +119,7 @@ class SectionPopup extends StatelessWidget {
                   Icons.timer,
                   'time_minutes'.tr(args: [stage.totalTime.toString()]),
                   customColors,
-                  (stage.status == StageStatus.completed ||
-                      stage.status == StageStatus.locked)
+                  (stage.status == StageStatus.completed || stage.status == StageStatus.locked)
                       ? customColors.neutral30!
                       : customColors.neutral90!,
                 ),
@@ -135,10 +127,9 @@ class SectionPopup extends StatelessWidget {
                 _buildIconWithText(
                   context,
                   Icons.star,
-                  stage.difficultyLevel,
+                  tr(stage.difficultyLevel, locale), // CHANGED
                   customColors,
-                  (stage.status == StageStatus.completed ||
-                      stage.status == StageStatus.locked)
+                  (stage.status == StageStatus.completed || stage.status == StageStatus.locked)
                       ? customColors.neutral30!
                       : customColors.neutral90!,
                 ),
@@ -150,7 +141,6 @@ class SectionPopup extends StatelessWidget {
     );
   }
 
-  // StageStatus -> String
   String _stageStatusToString(StageStatus status) {
     switch (status) {
       case StageStatus.locked:
@@ -182,6 +172,9 @@ class SectionPopup extends StatelessWidget {
   }
 }
 
+/// --------------------------
+/// RESTORED: StatusButton + PulsatingPlayButton
+/// --------------------------
 
 class StatusButton extends StatelessWidget {
   final String status;
@@ -199,10 +192,8 @@ class StatusButton extends StatelessWidget {
     IconData buttonIcon;
     double iconSize;
     Color? iconColor;
-    double iconWeight;
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
-    // 상태에 따른 색상, 아이콘 및 아이콘 크기 설정
     switch (status) {
       case 'inProgress':
         buttonColor = customColors.primary;
@@ -210,14 +201,12 @@ class StatusButton extends StatelessWidget {
         iconSize = 40.0;
         iconColor = customColors.neutral100!;
         break;
-
       case 'completed':
         buttonColor = customColors.primary40;
         buttonIcon = Icons.check_rounded;
         iconSize = 40.0;
         iconColor = customColors.neutral100!;
         break;
-
       case 'locked':
       default:
         buttonColor = customColors.neutral80;
@@ -229,12 +218,12 @@ class StatusButton extends StatelessWidget {
 
     return status == 'start' || status == 'inProgress'
         ? PulsatingPlayButton(
-            onPressed: onPressed,
-            buttonColor: buttonColor??Colors.purple,
-            buttonIcon: buttonIcon,
-            iconSize: iconSize,
-            iconColor: iconColor??Colors.white,
-          )
+      onPressed: onPressed,
+      buttonColor: buttonColor ?? Colors.purple,
+      buttonIcon: buttonIcon,
+      iconSize: iconSize,
+      iconColor: iconColor ?? Colors.white,
+    )
         : ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
@@ -244,11 +233,13 @@ class StatusButton extends StatelessWidget {
         padding: EdgeInsets.zero,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         minimumSize: Size.zero,
+        shape: const CircleBorder(),
       ),
       child: Icon(buttonIcon, size: iconSize, color: customColors.neutral30),
     );
   }
 }
+
 class PulsatingPlayButton extends StatefulWidget {
   final VoidCallback onPressed;
   final Color buttonColor;
@@ -266,31 +257,20 @@ class PulsatingPlayButton extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _PulsatingPlayButtonState createState() => _PulsatingPlayButtonState();
+  State<PulsatingPlayButton> createState() => _PulsatingPlayButtonState();
 }
 
 class _PulsatingPlayButtonState extends State<PulsatingPlayButton>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _opacityAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat();
-
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
-
-    _opacityAnimation = Tween<double>(begin: 0.5, end: 0.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
-  }
+  late final AnimationController _controller =
+  AnimationController(vsync: this, duration: const Duration(seconds: 2))
+    ..repeat();
+  late final Animation<double> _scaleAnimation =
+  Tween<double>(begin: 1.0, end: 1.2).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+  late final Animation<double> _opacityAnimation =
+  Tween<double>(begin: 0.5, end: 0.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
   @override
   void dispose() {
@@ -301,7 +281,7 @@ class _PulsatingPlayButtonState extends State<PulsatingPlayButton>
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 120, // 고정된 크기 설정
+      width: 120,
       height: 120,
       child: Stack(
         alignment: Alignment.center,
@@ -324,16 +304,12 @@ class _PulsatingPlayButtonState extends State<PulsatingPlayButton>
             style: ElevatedButton.styleFrom(
               shape: const CircleBorder(),
               backgroundColor: widget.buttonColor,
-              fixedSize: const Size(80, 80), // 버튼 크기 고정
+              fixedSize: const Size(80, 80),
               elevation: 0,
             ),
             child: Transform.translate(
-              offset: const Offset(-4, 0), // 아이콘을 왼쪽으로 4px 이동
-              child: Icon(
-                widget.buttonIcon,
-                color: widget.iconColor,
-                size: widget.iconSize,
-              ),
+              offset: const Offset(-4, 0),
+              child: Icon(widget.buttonIcon, color: widget.iconColor, size: widget.iconSize),
             ),
           ),
         ],

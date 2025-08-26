@@ -1,45 +1,45 @@
-/// File: badge_provider.dart
-/// Purpose: 배지 데이터를 스트리밍으로 제공하는 Provider
-/// Author: 강희
-/// Created: 2024-12-28
-/// Last Modified: 2024-12-28 by 강희
+// lib/viewmodel/badge_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../model/badge_data.dart'; // AppBadge가 정의된 파일
 import 'package:firebase_auth/firebase_auth.dart';
+import '../model/badge_data.dart'; // AppBadge + L10N 포함
 
-/// 배지 데이터를 스트리밍으로 제공하는 Provider
+/// 모든 배지 메타를 스트리밍으로 제공
 final badgesProvider = StreamProvider<List<AppBadge>>((ref) {
   final badgesCollection = FirebaseFirestore.instance.collection('badges');
-
-  // Firestore의 'badges' 컬렉션을 구독하여 실시간으로 배지 데이터를 가져옴
   return badgesCollection.snapshots().map((snapshot) =>
       snapshot.docs.map((doc) => AppBadge.fromFirestore(doc)).toList());
 });
 
-/// 첫 출석 배지를 부여하는 함수
+/// 첫 출석 배지 부여(중복 방지 포함)
 Future<void> awardFirstAttendanceBadge() async {
-  final user = FirebaseAuth.instance.currentUser; // 현재 로그인된 사용자 가져오기
-  if (user == null) return; // 사용자가 없으면 함수 종료
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return;
 
-  final userDocRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
-  final attendanceSnapshot = await userDocRef.collection('attendance').get();
+  final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
+  final attendanceSnapshot =
+  await userDoc.collection('attendance').limit(1).get();
 
-  // 사용자가 출석 기록이 있는지 확인
-  if (attendanceSnapshot.docs.isNotEmpty) {
-    final attendanceDoc = attendanceSnapshot.docs.first; // 첫 번째 출석 기록 가져오기
+  // 출석 기록이 있고 상태가 completed인 경우에만 부여
+  if (attendanceSnapshot.docs.isNotEmpty &&
+      (attendanceSnapshot.docs.first.data()['status'] == 'completed')) {
+    const badgeId = 'first_step';
 
-    // 첫 번째 출석이 'completed' 상태가 아니라면 배지 부여
-    if (attendanceDoc['status'] == 'completed') {
-      await userDocRef.collection('badges').add({
-        'badgeId': 'first_step', // '첫 걸음' 배지 ID
-        'earnedAt': Timestamp.now(), // 배지를 획득한 시간
-      });
+    // 이미 user.badges에 존재하는지 확인
+    final userBadgesCol = userDoc.collection('badges');
+    final exists =
+    await userBadgesCol.where('badgeId', isEqualTo: badgeId).limit(1).get();
+    if (exists.docs.isNotEmpty) return; // 이미 부여됨
 
-      // 사용자 문서의 'earnedBadges' 필드에 배지를 추가
-      await userDocRef.update({
-        'earnedBadges': FieldValue.arrayUnion(['first_step']), // 'first_step' 배지를 추가
-      });
-    }
+    // 부여
+    await userBadgesCol.add({
+      'badgeId': badgeId,
+      'earnedAt': Timestamp.now(),
+    });
+
+    // users 문서의 earnedBadges 배열에도 반영(중복 방지)
+    await userDoc.update({
+      'earnedBadges': FieldValue.arrayUnion([badgeId]),
+    });
   }
 }

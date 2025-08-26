@@ -1,11 +1,12 @@
 /// File: edit_profile.dart
-/// Purpose: 사용자의 정보를 수정할 수 있다.
+/// Purpose: 사용자의 정보를 수정할 수 있다. (L10N 적용)
 /// Author: 윤은서
 /// Created: 2025-01-08
-/// Last Modified: 2025-02-17 by 강희
+/// Last Modified: 2025-08-26 by ChatGPT (L10N)
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart'; // ✅ L10N
 import '../../viewmodel/custom_colors_provider.dart';
 import '../../viewmodel/user_photo_url_provider.dart';
 import '../components/custom_app_bar.dart';
@@ -28,11 +29,9 @@ class EditProfile extends ConsumerWidget {
     final userName = ref.watch(userNameProvider) ?? 'null';
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_4(title: "내 정보 수정"),
+      appBar: CustomAppBar_2depth_4(title: 'edit_profile'.tr()), // ✅ 내 정보 수정
       backgroundColor: customColors.neutral100,
-      body: EditInfo(
-        userName: userName,
-      ),
+      body: EditInfo(userName: userName),
     );
   }
 }
@@ -77,6 +76,7 @@ class EditInfo extends StatelessWidget {
     );
   }
 }
+
 class ProfileImage extends ConsumerStatefulWidget {
   const ProfileImage({Key? key}) : super(key: key);
 
@@ -120,7 +120,7 @@ class _ProfileImageState extends ConsumerState<ProfileImage> {
         ref.read(userPhotoUrlProvider.notifier).updatePhotoUrl(downloadUrl);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("프로필 사진 업데이트 오류: $e")),
+          SnackBar(content: Text('profile_photo_update_error'.tr(args: [e.toString()]))), // ✅ L10N
         );
       }
     }
@@ -133,7 +133,7 @@ class _ProfileImageState extends ConsumerState<ProfileImage> {
     return Center(
       child: InkWell(
         onTap: _pickAndUploadImage,
-        borderRadius: BorderRadius.circular(60), // 동그란 모양 유지
+        borderRadius: BorderRadius.circular(60),
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -196,7 +196,7 @@ class _EditNickState extends ConsumerState<EditNick> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '별명',
+          'nickname'.tr(), // ✅ 별명
           style: body_xsmall(context).copyWith(
             color: customColors.primary,
           ),
@@ -242,21 +242,32 @@ class MyInfo extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         nameAsync.when(
-          data: (name) => InfoRow(title: '이름', value: name ?? '이름 없음'),
+          data: (name) => InfoRow(
+            title: 'real_name'.tr(),                                // ✅ 이름
+            value: name ?? 'info_not_available'.tr(),               // ✅ 이름 없음 → 공통 키
+          ),
           loading: () => const CircularProgressIndicator(),
-          error: (err, stack) => InfoRow(title: '이름', value: '불러오기 실패'),
+          error: (err, stack) => InfoRow(
+            title: 'real_name'.tr(),
+            value: 'load_failed'.tr(),                              // ✅ 불러오기 실패
+          ),
         ),
         const SizedBox(height: 24),
         emailAsync.when(
-          data: (email) => InfoRow(title: '이메일', value: email ?? '이메일 없음'),
+          data: (email) => InfoRow(
+            title: 'email_label'.tr(),                              // ✅ 이메일
+            value: email ?? 'info_not_available'.tr(),              // ✅ 이메일 없음 → 공통 키
+          ),
           loading: () => const CircularProgressIndicator(),
-          error: (err, stack) => InfoRow(title: '이메일', value: '불러오기 실패'),
+          error: (err, stack) => InfoRow(
+            title: 'email_label'.tr(),
+            value: 'load_failed'.tr(),                              // ✅ 불러오기 실패
+          ),
         ),
       ],
     );
   }
 }
-
 
 class InfoRow extends StatelessWidget {
   final String title;

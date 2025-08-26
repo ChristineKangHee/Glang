@@ -1,25 +1,35 @@
+// lib/view/feature/reading/GA_02/RD_main.dart
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-// 새 모델 파일을 사용하도록 import 경로 수정
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:easy_localization/easy_localization.dart';
+
+// 모델
 import 'package:readventure/model/stage_data.dart';
+import 'package:readventure/model/reading_data.dart';
+
+// UI
 import 'package:readventure/view/feature/reading/result_dialog.dart';
-import 'package:readventure/view/feature/reading/GA_02_02_subjective/subjective_quiz.dart';
 import 'package:readventure/view/feature/reading/GA_02_04_reading_Quiz_mcq/mcq_quiz.dart';
 import 'package:readventure/view/feature/reading/GA_02_04_reading_Quiz_ox/ox_quiz.dart';
 import 'package:readventure/view/feature/reading/GA_02/toolbar_component.dart';
 import 'package:readventure/view/home/stage_provider.dart';
+import 'package:readventure/view/feature/after_read/choose_activities.dart';
+
+// 로케일 헬퍼
+import 'package:readventure/util/locale_text.dart';
+
+// 테마/공용
 import '../../../../../theme/font.dart';
 import '../../../../../theme/theme.dart';
-import '../../../../model/reading_data.dart';
-import '../../../../model/section_data.dart';
 import '../../../components/alarm_dialog.dart';
 import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_button.dart';
-import '../../after_read/choose_activities.dart';
 import '../quiz_data.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:readventure/services/progress_repository.dart';
+
 
 class RdMain extends ConsumerStatefulWidget {
   const RdMain({super.key});
@@ -28,14 +38,11 @@ class RdMain extends ConsumerStatefulWidget {
   _RdMainState createState() => _RdMainState();
 }
 
-
 class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateMixin {
-  // late StageData currentStage; // 현재 선택된 스테이지 데이터
-
   bool _showOxQuiz = false;
   bool _showMcqQuiz = false;
 
-  // 이전에는 여러 문제를 위한 리스트였으나, 새 모델은 단일 퀴즈만 있으므로 단일 값으로 처리
+  // 단일 퀴즈 기준
   List<int> mcqUserAnswers = [];
   List<bool> oxUserAnswers = [];
 
@@ -48,15 +55,11 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _animation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
+    _animation = CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
   }
 
   @override
@@ -65,58 +68,73 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
     super.dispose();
   }
 
-  // 객관식(MCQ) 퀴즈 정답 체크
+  // 객관식(MCQ) 정답 체크 (리스트 스키마 대응: 첫 문제만)
   void checkMcqAnswer(int selectedIndex, StageData currentStage) {
-    final mcqQuiz = currentStage.readingData?.multipleChoice;
-    if (mcqQuiz == null) return;
+    final rd = currentStage.readingData;
+    if (rd == null || rd.multipleChoice.isEmpty) return;
+    final mcqQuiz = rd.multipleChoice.first;
 
-    // 인덱스를 'A', 'B', 'C', ... 로 변환 (예: 0 -> 'A')
-    String selectedLetter = String.fromCharCode(65 + selectedIndex);
-    bool isCorrect = selectedLetter == mcqQuiz.correctAnswer;
+    final bool isCorrect = selectedIndex == mcqQuiz.correctIndex;
 
     setState(() {
-      // 단일 문제이므로 리스트를 초기화하고 하나의 값만 추가합니다.
       mcqUserAnswers = [selectedIndex];
       mcqCompleted = true;
     });
 
-    // 새 모델에는 설명 필드가 없으므로 빈 문자열 전달
-    ResultDialog.show(context, isCorrect, mcqQuiz.explanation, () {
-      setState(() {
-        _showMcqQuiz = false;
-        _animationController.reverse();
-      });
-    });
+    ResultDialog.show(
+      context,
+      isCorrect,
+      lx(context, mcqQuiz.explanation),
+          () {
+        if (!mounted) return;
+        setState(() {
+          _showMcqQuiz = false;
+          _animationController.reverse();
+        });
+      },
+    );
   }
 
-  // OX 퀴즈 정답 체크
+  // OX 정답 체크 (리스트 스키마 대응: 첫 문제만)
   void checkOxAnswer(bool selectedAnswer, StageData currentStage) {
-    final oxQuiz = currentStage.readingData?.oxQuiz;
-    if (oxQuiz == null) return;
+    final rd = currentStage.readingData;
+    if (rd == null || rd.oxQuiz.isEmpty) return;
+    final oxQuiz = rd.oxQuiz.first;
 
-    bool isCorrect = selectedAnswer == oxQuiz.correctAnswer;
+    final bool isCorrect = selectedAnswer == oxQuiz.correctAnswer;
 
     setState(() {
       oxUserAnswers = [selectedAnswer];
       oxCompleted = true;
     });
 
-    // 새 모델에는 설명 필드가 없으므로 빈 문자열 전달
-    ResultDialog.show(context, isCorrect, oxQuiz.explanation, () {
-      setState(() {
-        _showOxQuiz = false;
-        _animationController.reverse();
-      });
-    });
+    ResultDialog.show(
+      context,
+      isCorrect,
+      lx(context, oxQuiz.explanation),
+          () {
+        if (!mounted) return;
+        setState(() {
+          _showOxQuiz = false;
+          _animationController.reverse();
+        });
+      },
+    );
   }
 
-  // 퀴즈 표시 여부 토글
-  void toggleQuizVisibility(String quizType) {
+  // 퀴즈 표시 토글 (존재하지 않으면 무시)
+  void toggleQuizVisibility(String quizType, StageData currentStage) {
+    final rd = currentStage.readingData;
+    final hasMcq = rd != null && rd.multipleChoice.isNotEmpty;
+    final hasOx  = rd != null && rd.oxQuiz.isNotEmpty;
+
     setState(() {
       if (quizType == 'MCQ') {
+        if (!hasMcq) return;
         _showMcqQuiz = !_showMcqQuiz;
         _showOxQuiz = false;
       } else {
+        if (!hasOx) return;
         _showOxQuiz = !_showOxQuiz;
         _showMcqQuiz = false;
       }
@@ -128,27 +146,38 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
     });
   }
 
-  // ✅ 진행도를 저장하는 함수 (duringReading -> true)
+  // 진행도 저장 (duringReading -> true)
+// 진행도 저장 (duringReading -> true)
   Future<void> _onSubmit(StageData stage) async {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId == null) {
-      print("⚠️ 유저가 로그인되지 않음!");
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      debugPrint("⚠️ 유저가 로그인되지 않음!");
       return;
     }
 
-    await completeActivityForStage(
-      userId: userId,
-      stageId: stage.stageId,
-      activityType: 'duringReading', // ✅ duringReading 값을 true로 변경
-    );
+    try {
+      await ProgressRepository.instance.setStageProgress(
+        uid: uid,
+        stageId: stage.stageId,
+        data: {
+          // duringReading 완료 처리
+          'activityCompleted': {
+            'duringReading': true,
+          },
 
-    // ✅ 저장 완료 후 다음 페이지로 이동
+          // 필요하면 상태/진행도도 함께 병합 (주석 해제해서 사용)
+          // 'status': 'inProgress',
+          // 'achievement': 66, // 예시: 읽기 단계 완료 시 66%로
+        },
+      );
+    } catch (e, st) {
+      debugPrint('❌ duringReading 업데이트 실패: $e\n$st');
+    }
+
+    if (!mounted) return;
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        // settings: RouteSettings(name: 'LearningActivitiesPage'),
-        builder: (context) => LearningActivitiesPage(),
-      ),
+      MaterialPageRoute(builder: (context) => LearningActivitiesPage()),
     );
   }
 
@@ -160,16 +189,35 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
     if (currentStage == null) {
       return Scaffold(
         appBar: CustomAppBar_2depth_8(title: "loading".tr()),
-        body: Center(child: CircularProgressIndicator()),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
+    final rd = currentStage.readingData;
+    if (rd == null) {
+      return Scaffold(
+        appBar: CustomAppBar_2depth_8(title: "loading".tr()),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    // 본문 세그먼트 (LocalizedList → List<String>)
+    final List<String> segs = llx(context, rd.textSegments);
+
+    // 퀴즈 존재 여부/첫 문제
+    final hasMcq = rd.multipleChoice.isNotEmpty;
+    final hasOx  = rd.oxQuiz.isNotEmpty;
+    final mcq = hasMcq ? rd.multipleChoice.first : null;
+    final ox  = hasOx  ? rd.oxQuiz.first : null;
+
+    // 모든 퀴즈를 요구하되, 없는 퀴즈는 자동 완료 취급
+    final canSubmit = (hasMcq ? mcqCompleted : true) && (hasOx ? oxCompleted : true);
+
     return Scaffold(
-      // 제목은 새 모델의 subdetailTitle 사용
       appBar: CustomAppBar_2depth_8(
-          title: currentStage.subdetailTitle,
+        // StageData.subdetailTitle는 LocalizedText → String 변환
+        title: lx(context, currentStage.subdetailTitle),
         onClosePressed: () {
-          // 기본 동작: 결과 저장 여부 다이얼로그 표시
           showResultSaveDialog(
             context,
             customColors,
@@ -177,7 +225,7 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
             "no".tr(),
             "yes".tr(),
                 (ctx) {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
+              Navigator.of(context).popUntil((route) => route.isFirst);
             },
           );
         },
@@ -187,110 +235,110 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 📌 본문 1: 읽기 중(READING) 데이터의 textSegments[0] 사용
+            // 📌 본문 1
             SelectableText(
-              currentStage.readingData?.textSegments[0] ?? '',
+              (segs.isNotEmpty) ? segs[0] : '',
               style: reading_textstyle(context).copyWith(color: customColors.neutral0),
               selectionControls: Read_Toolbar(
                 customColors: customColors,
-                readingData: currentStage.readingData!,
+                readingData: rd,
                 stageId: currentStage.stageId,
-                subdetailTitle: currentStage.subdetailTitle,
+                subdetailTitle: lx(context, currentStage.subdetailTitle),
               ),
             ),
 
             const SizedBox(height: 16),
 
-            // 📌 사지선다(MCQ) 퀴즈
-            GestureDetector(
-              onTap: () => toggleQuizVisibility('MCQ'),
-              child: Column(
-                children: [
-                  _buildQuizButton(customColors, 'MCQ', mcqCompleted),
-                  SizeTransition(
-                    sizeFactor: _animation,
-                    child: _showMcqQuiz
-                        ? McqQuiz(
-                      // 새 모델의 객관식 퀴즈 데이터 사용
-                      question: McqQuestion(
-                        paragraph: currentStage.readingData!.multipleChoice.question,
-                        options: currentStage.readingData!.multipleChoice.choices,
-                        correctAnswerIndex: currentStage.readingData!.multipleChoice.correctAnswer.codeUnitAt(0) - 65,
-                        explanation: currentStage.readingData!.multipleChoice.explanation,
-                      ),
-                      onAnswerSelected: (index) => checkMcqAnswer(index, currentStage),
-                      // 단일 문제이므로 인덱스 0 사용
-                      userAnswer: mcqUserAnswers.isNotEmpty ? mcqUserAnswers[0] : null,
-                    )
-                        : SizedBox.shrink(),
-                  ),
-                ],
+            // 📌 사지선다(MCQ)
+            if (hasMcq)
+              GestureDetector(
+                onTap: () => toggleQuizVisibility('MCQ', currentStage),
+                child: Column(
+                  children: [
+                    _buildQuizButton(customColors, 'MCQ', mcqCompleted),
+                    SizeTransition(
+                      sizeFactor: _animation,
+                      child: _showMcqQuiz
+                          ? McqQuiz(
+                        question: McqQuestion(
+                          paragraph: lx(context, mcq!.question),
+                          options: llx(context, mcq.choices),
+                          correctAnswerIndex: mcq.correctIndex,
+                          explanation: lx(context, mcq.explanation),
+                        ),
+                        onAnswerSelected: (index) => checkMcqAnswer(index, currentStage),
+                        userAnswer: mcqUserAnswers.isNotEmpty ? mcqUserAnswers[0] : null,
+                      )
+                          : const SizedBox.shrink(),
+                    ),
+                  ],
+                ),
               ),
-            ),
 
             const SizedBox(height: 20),
 
-            // 📌 본문 2: 읽기 중(READING) 데이터의 textSegments[1] 사용
-            SelectableText(
-              currentStage.readingData?.textSegments[1] ?? '',
-              style: reading_textstyle(context).copyWith(color: customColors.neutral0),
-              selectionControls: Read_Toolbar(
-                customColors: customColors,
-                readingData: currentStage.readingData!,
-                stageId: currentStage.stageId,
-                subdetailTitle: currentStage.subdetailTitle,
+            // 📌 본문 2
+            if (segs.length > 1)
+              SelectableText(
+                segs[1],
+                style: reading_textstyle(context).copyWith(color: customColors.neutral0),
+                selectionControls: Read_Toolbar(
+                  customColors: customColors,
+                  readingData: rd,
+                  stageId: currentStage.stageId,
+                  subdetailTitle: lx(context, currentStage.subdetailTitle),
+                ),
               ),
-            ),
 
             const SizedBox(height: 16),
 
-            // 📌 OX 퀴즈
-            GestureDetector(
-              onTap: () => toggleQuizVisibility('OX'),
-              child: Column(
-                children: [
-                  _buildQuizButton(customColors, 'OX', oxCompleted),
-                  SizeTransition(
-                    sizeFactor: _animation,
-                    child: _showOxQuiz
-                        ? OxQuiz(
-                      // 새 모델의 OX 퀴즈 데이터 사용
-                      question: OxQuestion(
-                        paragraph: currentStage.readingData!.oxQuiz.question,
-                        correctAnswer: currentStage.readingData!.oxQuiz.correctAnswer,
-                        explanation: currentStage.readingData!.oxQuiz.explanation,
-                      ),
-                      onAnswerSelected: (answer) => checkOxAnswer(answer, currentStage),
-                      userAnswer: oxUserAnswers.isNotEmpty ? oxUserAnswers[0] : null,
-                    )
-                        : SizedBox.shrink(),
-                  ),
-                ],
+            // 📌 OX
+            if (hasOx)
+              GestureDetector(
+                onTap: () => toggleQuizVisibility('OX', currentStage),
+                child: Column(
+                  children: [
+                    _buildQuizButton(customColors, 'OX', oxCompleted),
+                    SizeTransition(
+                      sizeFactor: _animation,
+                      child: _showOxQuiz
+                          ? OxQuiz(
+                        question: OxQuestion(
+                          paragraph: lx(context, ox!.question),
+                          correctAnswer: ox.correctAnswer,
+                          explanation: lx(context, ox.explanation),
+                        ),
+                        onAnswerSelected: (answer) => checkOxAnswer(answer, currentStage),
+                        userAnswer: oxUserAnswers.isNotEmpty ? oxUserAnswers[0] : null,
+                      )
+                          : const SizedBox.shrink(),
+                    ),
+                  ],
+                ),
               ),
-            ),
 
             const SizedBox(height: 20),
 
-            // 📌 본문 3: 읽기 중(READING) 데이터의 textSegments[2] 사용
-            SelectableText(
-              currentStage.readingData?.textSegments[2] ?? '',
-              style: reading_textstyle(context).copyWith(color: customColors.neutral0),
-              selectionControls: Read_Toolbar(
-                customColors: customColors,
-                readingData: currentStage.readingData!,
-                stageId: currentStage.stageId,
-                subdetailTitle: currentStage.subdetailTitle,
+            // 📌 본문 3
+            if (segs.length > 2)
+              SelectableText(
+                segs[2],
+                style: reading_textstyle(context).copyWith(color: customColors.neutral0),
+                selectionControls: Read_Toolbar(
+                  customColors: customColors,
+                  readingData: rd,
+                  stageId: currentStage.stageId,
+                  subdetailTitle: lx(context, currentStage.subdetailTitle),
+                ),
               ),
-            ),
-
 
             const SizedBox(height: 40),
 
-            // 📌 '읽기 완료' 버튼: 이후 활동 선택 페이지로 이동
+            // 📌 '읽기 완료' (존재하는 퀴즈만 완료되면 활성화)
             ButtonPrimary_noPadding(
-              function: () => _onSubmit(currentStage), // ✅ 진행도 저장 후 이동
+              function: () => _onSubmit(currentStage),
               title: "reading_complete".tr(),
-              condition: mcqCompleted && oxCompleted ? "not null" : "null", // ✅ 모든 문제를 풀었을 때만 활성화
+              condition: canSubmit ? "not null" : "null",
             ),
 
             const SizedBox(height: 40),

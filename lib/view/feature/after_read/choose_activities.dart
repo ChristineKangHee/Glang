@@ -1,18 +1,19 @@
 /// File: choose_activities.dart
-/// Purpose: 읽기 후 학습 선택 화면 (Firestore의 stage 데이터에 따라 진행할 feature만 표시)
+/// Purpose: 읽기 후 학습 선택 화면 (progress 문서의 arData에 따라 표시/계산)
 /// Author: 강희 (수정됨)
-/// Created: 2024-1-19
-/// Last Modified: 2025-02-07 by 강희
+/// Last Modified: 2025-08-23 (L10N 적용, 라우팅 안정화: title → featureNumber)
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../../model/section_data.dart';
+import 'package:easy_localization/easy_localization.dart'; // L10N: 추가
+
 import '../../../model/stage_data.dart';
 import '../../../theme/font.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
+import '../../../viewmodel/custom_colors_provider.dart' as custom_colors_provider;
 import '../../../viewmodel/section_provider.dart';
 import '../../../viewmodel/user_service.dart';
 import '../../components/alarm_dialog.dart';
@@ -21,36 +22,41 @@ import 'package:readventure/theme/theme.dart';
 import '../../components/custom_button.dart';
 import '../../home/stage_provider.dart';
 import '../Result_Report.dart';
+import '../../../services/firestore_paths.dart'; // 파일 상단 import 추가
+
+// Activities
 import 'GA_03_01_change_ending/CE_main.dart';
 import 'GA_03_02_content_summary/CS_learning.dart';
-import 'GA_03_02_content_summary/CS_main.dart';
 import 'GA_03_03_debate_activity/DA_learning.dart';
-import 'GA_03_03_debate_activity/DA_main.dart';
 import 'GA_03_04_diagram/diagram_learning.dart';
-import 'GA_03_04_diagram/diagram_main.dart';
 import 'GA_03_05_writing_form/writing_form_main.dart';
-import 'GA_03_06_writing_essay/WE_main.dart';
-import 'GA_03_07_format_conversion/FC_main.dart';
-import 'GA_03_08_paragraph_analysis/paragraph_analysis.dart';
 import 'GA_03_08_paragraph_analysis/paragraph_analysis_main.dart';
-import 'GA_03_09_review_writing/review_writing.dart';
 import 'GA_03_09_review_writing/review_writing_main.dart';
 
 /// 학습 활동 데이터 모델
+// 기존 LearningActivity 교체
 class LearningActivity {
-  final String title;
-  final String time;
-  final String xp;
-  bool isCompleted;
+  final String titleKey; // 번역 키
+  final int minutes;     // 시간(분)
+  final int xp;          // XP 정수
   final int featureNumber;
+  final bool isCompleted;
 
-  LearningActivity({
-    required this.title,
-    required this.time,
+  const LearningActivity({
+    required this.titleKey,
+    required this.minutes,
     required this.xp,
     required this.featureNumber,
     this.isCompleted = false,
   });
+
+  LearningActivity copyWith({bool? isCompleted}) => LearningActivity(
+    titleKey: titleKey,
+    minutes: minutes,
+    xp: xp,
+    featureNumber: featureNumber,
+    isCompleted: isCompleted ?? this.isCompleted,
+  );
 }
 
 class LearningActivitiesPage extends ConsumerStatefulWidget {
@@ -59,362 +65,122 @@ class LearningActivitiesPage extends ConsumerStatefulWidget {
 }
 
 class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage> {
-  // 전체 학습 활동 리스트 (인덱스+1을 feature 번호로 가정)
-  // activities 리스트 생성 시 각 미션에 featureNumber를 할당
-  final List<LearningActivity> activities = [
-    LearningActivity(title: '결말 바꾸기', time: '20분', xp: '100xp', featureNumber: 1),
-    LearningActivity(title: '요약', time: '10분', xp: '50xp', featureNumber: 2),
-    LearningActivity(title: '토론', time: '25분', xp: '120xp', featureNumber: 3),
-    LearningActivity(title: '다이어그램', time: '5분', xp: '10xp', featureNumber: 4),
-    LearningActivity(title: '문장 구조', time: '5분', xp: '10xp', featureNumber: 5),
-    LearningActivity(title: '에세이 작성', time: '15분', xp: '80xp', featureNumber: 6),
-    LearningActivity(title: '형식 변환하기', time: '30분', xp: '150xp', featureNumber: 7),
-    LearningActivity(title: '주제 추출', time: '5분', xp: '10xp', featureNumber: 8),
-    LearningActivity(title: '자유 소감', time: '5분', xp: '10xp', featureNumber: 9),
-  ];
 
-  // Firestore에서 로드한 StageData를 저장할 Future
-  Future<StageData?>? _stageDataFuture;
+  // static const List<LearningActivity> baseActivities = [
+  //
+  //   LearningActivity(titleKey: 'activity_change_ending', timeKey: 'time_minutes', xp: '100xp', featureNumber: 1),
+  //
+  //   LearningActivity(titleKey: 'activity_summary', timeKey: 'time_minutes', xp: '50xp', featureNumber: 2),
+  //
+  //   LearningActivity(titleKey: 'debate_title', timeKey: 'time_minutes', xp: '120xp', featureNumber: 3),
+  //
+  //   LearningActivity(titleKey: 'diagram_title', timeKey: 'time_minutes', xp: '10xp', featureNumber: 4),
+  //
+  //   LearningActivity(titleKey: 'activity_sentence_structure', timeKey: 'time_minutes', xp: '10xp', featureNumber: 5),
+  //
+  //   LearningActivity(titleKey: 'activity_essay_writing', timeKey: 'time_minutes', xp: '80xp', featureNumber: 6),
+  //
+  //   LearningActivity(titleKey: 'activity_format_conversion', timeKey: 'time_minutes', xp: '150xp', featureNumber: 7),
+  //
+  //   LearningActivity(titleKey: 'activity_topic_extraction', timeKey: 'time_minutes', xp: '10xp', featureNumber: 8),
+  //
+  //   LearningActivity(titleKey: 'activity_free_opinion', timeKey: 'time_minutes', xp: '10xp', featureNumber: 9),
+  // ];
+
+  // 베이스 활동 목록(정적) - L10N: title/time을 키로 저장
+  static const List<LearningActivity> baseActivities = [
+    // feature 1: 결말 바꾸기 (키 필요: activity_change_ending)
+    LearningActivity(titleKey: 'activity_change_ending',      minutes: 20, xp: 100, featureNumber: 1),
+    // feature 2: 요약 (기존 키 활용: activity_summary 또는 summary_mission_title/summary)
+    LearningActivity(titleKey: 'activity_summary',            minutes: 10, xp:  50, featureNumber: 2),
+    // feature 3: 토론
+    LearningActivity(titleKey: 'debate_title',                minutes: 25, xp: 120, featureNumber: 3),
+    // feature 4: 다이어그램
+    LearningActivity(titleKey: 'diagram_title',               minutes:  5, xp:  10, featureNumber: 4),
+    // feature 5: 문장 구조 (키 필요: activity_sentence_structure)
+    LearningActivity(titleKey: 'activity_sentence_structure', minutes:  5, xp:  10, featureNumber: 5),
+    // feature 6: 에세이 작성 (키 필요: activity_essay_writing)
+    LearningActivity(titleKey: 'activity_essay_writing',      minutes: 15, xp:  80, featureNumber: 6),
+    // feature 7: 형식 변환하기 (키 필요: activity_format_conversion)
+    LearningActivity(titleKey: 'activity_format_conversion',  minutes: 30, xp: 150, featureNumber: 7),
+    // feature 8: 주제 추출 (키 필요: activity_topic_extraction)
+    LearningActivity(titleKey: 'activity_topic_extraction',   minutes:  5, xp:  10, featureNumber: 8),
+    // feature 9: 자유 소감 (키 필요: activity_free_opinion)
+    LearningActivity(titleKey: 'activity_free_opinion',       minutes:  5, xp:  10, featureNumber: 9),
+  ];
 
   @override
   void initState() {
     super.initState();
-
-    // 기존 설명 팝업 (원래 코드 유지)
-    Future.delayed(Duration(seconds: 0), () {
-      _showExplanationPopup();
+    // 설명 팝업
+    Future.microtask(_showExplanationPopup);
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) Navigator.pop(context); // 팝업 닫기
     });
-    Future.delayed(Duration(seconds: 2), () {
-      Navigator.pop(context);  // 팝업 닫기
-    });
-
-    // Firebase에서 userId와 stageId 읽기 (각 provider에서 가져옴)
-    final userId = ref.read(userIdProvider);
-    final stageId = ref.read(selectedStageIdProvider);
-    _stageDataFuture = _loadStageData(userId!, stageId!);
-  }
-
-  // /// Firestore 데이터를 다시 불러오는 함수
-  // Future<void> _refreshData() async {
-  //   final userId = ref.read(userIdProvider);
-  //   final stageId = ref.read(selectedStageIdProvider);
-  //
-  //   if (userId != null && stageId != null) {
-  //     final newStageData = await _loadStageData(userId, stageId);
-  //     setState(() {
-  //       _stageDataFuture = Future.value(newStageData); // 🚀 새로운 데이터로 화면 갱신
-  //     });
-  //   }
-  // }
-
-  /// Firestore에서 현재 스테이지 데이터를 불러오는 함수
-  Future<StageData?> _loadStageData(String userId, String stageId) async {
-    final stages = await loadStagesFromFirestore(userId);
-    try {
-      return stages.firstWhere((stage) => stage.stageId == stageId);
-    } catch (e) {
-      print('Stage $stageId not found: $e');
-      return null;
-    }
-  }
-
-  Future<void> _onSubmit(StageData stage, CustomColors customColors) async {
-    // 실제 유저 ID 가져오기
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId == null) {
-      print("⚠️ 유저가 로그인되지 않음!");
-      return;
-    }
-
-    print(">> _onSubmit 시작: stageId=${stage.stageId}");
-
-    // 현재 스테이지의 afterReading 활동 완료 처리
-    await completeActivityForStage(
-      userId: userId,
-      stageId: stage.stageId,
-      activityType: 'afterReading',
-    );
-    print(">> completeActivityForStage 호출 완료 for activityType 'afterReading'");
-
-    // // 🔹 Firestore에서 현재 유저의 totalXP 가져오기
-    final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
-    // final userSnapshot = await userRef.get();
-    //
-    // int currentTotalXP = 0; // 기본값 설정
-    // if (userSnapshot.exists && userSnapshot.data()!.containsKey('totalXP')) {
-    //   currentTotalXP = userSnapshot.data()!['totalXP'];
-    // }
-
-    // ✅ Provider를 통해 Firestore에서 XP 값을 가져옴
-    final currentTotalXP = ref.read(userXPProvider).value ?? 0;
-
-
-    // 🔹 현재 스테이지에서 완료된 XP 계산 (🔥 새로운 로직 추가)
-    int earnedXP = 0;
-    if (stage.arData?.featuresCompleted != null) {
-      earnedXP = stage.arData!.featuresCompleted.entries
-          .where((entry) => entry.value) // 완료된 미션만 필터링
-          .map((entry) {
-        // 해당 feature의 XP 값을 찾아 더함
-        final featureNumber = int.parse(entry.key);
-        return activities.firstWhere((a) => a.featureNumber == featureNumber).xp;
-      })
-          .map((xp) => int.parse(xp.replaceAll('xp', '')))
-          .fold(0, (prev, e) => prev + e);
-    }
-
-    // 🔹 totalXP 업데이트 (기존 XP + 새로운 XP)
-    final newTotalXP = currentTotalXP + earnedXP;
-    print(">> totalXP 업데이트: $currentTotalXP + $earnedXP = $newTotalXP");
-
-    await userRef.update({'totalXP': newTotalXP});
-    print(">> Firestore totalXP 업데이트 완료!");
-
-    // 업데이트가 완료된 후, Firestore에서 다시 현재 스테이지 데이터를 가져옵니다.
-    final currentStageRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .collection('progress')
-        .doc(stage.stageId);
-    final updatedSnapshot = await currentStageRef.get();
-
-    if (!updatedSnapshot.exists) {
-      print("⚠️ 현재 스테이지(${stage.stageId}) 문서를 찾을 수 없습니다.");
-      return;
-    }
-
-    final updatedStage =
-    StageData.fromJson(updatedSnapshot.id, updatedSnapshot.data()!);
-    print(">> 현재 스테이지 업데이트 확인: stageId=${updatedStage.stageId}, status=${updatedStage.status}, achievement=${updatedStage.achievement}");
-
-    // 현재 스테이지가 완전히 완료되었는지 확인 (Status가 completed인 경우)
-    if (updatedStage.status == StageStatus.completed) {
-      final nextStageId = _getNextStageId(stage.stageId);
-      if (nextStageId != null) {
-        print(">> 다음 스테이지 ID: $nextStageId");
-        final nextStageRef = FirebaseFirestore.instance
-            .collection('users')
-            .doc(userId)
-            .collection('progress')
-            .doc(nextStageId);
-        final nextSnapshot = await nextStageRef.get();
-
-        if (nextSnapshot.exists) {
-          final nextStage =
-          StageData.fromJson(nextSnapshot.id, nextSnapshot.data()!);
-          print(">> 다음 스테이지 현재 상태: stageId=${nextStage.stageId}, status=${nextStage.status}");
-          if (nextStage.status == StageStatus.locked) {
-            nextStage.status = StageStatus.inProgress;
-            await nextStageRef.update(nextStage.toJson());
-            print(">> 다음 스테이지 해금 완료: stageId=${nextStage.stageId} -> status=${nextStage.status}");
-          } else {
-            print(">> 다음 스테이지는 이미 해금되었거나 완료됨: stageId=${nextStage.stageId}, status=${nextStage.status}");
-          }
-        } else {
-          print("⚠️ 다음 스테이지 문서($nextStageId)가 존재하지 않습니다.");
-        }
-      } else {
-        print("⚠️ 다음 스테이지 ID를 계산할 수 없습니다. (현재 stageId: ${stage.stageId})");
-      }
-      // 현재 스테이지가 마지막 스테이지인지 확인 (각 섹션 4개 스테이지 기준)
-      final currentStageNumber = int.tryParse(stage.stageId.split('_')[1]);
-      if (currentStageNumber != null && currentStageNumber % 4 == 0) {
-        String newCourse;
-        if (currentStageNumber == 4) {
-          newCourse = '코스2';
-        } else if (currentStageNumber == 8) {
-          newCourse = '코스3';
-        } else if (currentStageNumber >= 12) {
-          newCourse = '최종 완료';
-        } else {
-          newCourse = '코스1'; // 기본값, 필요시 조정
-        }
-        await updateUserCourse(userId, newCourse);
-        print(">> 사용자 currentCourse 업데이트: $newCourse");
-      }
-    } else {
-      print(">> 현재 스테이지가 아직 완료되지 않았습니다. (status: ${updatedStage.status})");
-    }
-
-    ref.invalidate(sectionProvider);
-
-    // 결과 다이얼로그 띄우기
-    showResultSaveDialog(
-      context,
-      customColors,
-      "결과를 확인하시겠습니까?",
-      "아니오",
-      "예",
-          (ctx) {
-        Navigator.pushReplacement(
-          ctx,
-          MaterialPageRoute(builder: (ctx) => ResultReportPage(earnedXP: earnedXP,)),
-        );
-      },
-    );
-  }
-
-  /// 현재 스테이지 ID("stage_001")에서 다음 스테이지 ID("stage_002")를 구하는 헬퍼 함수
-  String? _getNextStageId(String currentStageId) {
-    final parts = currentStageId.split('_');
-    if (parts.length != 2) return null;
-    final number = int.tryParse(parts[1]);
-    if (number == null) return null;
-    final nextNumber = number + 1;
-    final nextId = 'stage_${nextNumber.toString().padLeft(3, '0')}';
-    print(">> _getNextStageId: $currentStageId -> $nextId");
-    return nextId;
-  }
-
-  // 학습 결과 확인 버튼 (ResultButton) 위젯 수정: stageData를 추가로 전달
-  Widget ResultButton(
-      BuildContext context,
-      int completedCount,
-      CustomColors customColors,
-      List<LearningActivity> availableActivities,
-      StageData stageData,
-      ) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      padding: const EdgeInsets.all(16.0),
-      child: completedCount / availableActivities.length < 1.0
-          ? ButtonPrimary20(
-        function: () {
-          print("결과 확인하기 (미완료)");
-        },
-        title: '결과 확인하기',
-      )
-          : ButtonPrimary(
-        function: () async {
-          print("결과 확인하기");
-          await _onSubmit(stageData, customColors);
-        },
-        title: '결과 확인하기',
-      ),
-    );
-  }
-
-  // 설명 팝업 표시 함수
-  void _showExplanationPopup() {
-    final customColors = ref.read(customColorsProvider);
-    showDialog(
-      barrierDismissible: false, // 다이얼로그 외부 클릭 방지
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 44, vertical: 28),
-            decoration: ShapeDecoration(
-              color: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: double.infinity,
-                        child: Text(
-                          '읽은 내용과 관련된\n미션을 해볼까요?',
-                          textAlign: TextAlign.center,
-                          style: body_large_semi(context).copyWith(color: customColors.neutral30),
-                        ),
-                      ),
-                      const SizedBox(height: 28),
-                      Container(
-                        width: 172,
-                        height: 172,
-                        child: Image.asset("assets/images/book_star.png"),
-                      ),
-                      const SizedBox(height: 28),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Text(
-                          '경험치를 채워 미션을 완료해보세요!',
-                          textAlign: TextAlign.center,
-                          style: body_small(context).copyWith(color: customColors.neutral60),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final customColors = ref.watch(customColorsProvider);
+    final customColors = ref.watch(custom_colors_provider.customColorsProvider);
+    final uid = ref.watch(userIdProvider);
+    final stageId = ref.watch(selectedStageIdProvider);
 
-    return FutureBuilder<StageData?>(
-      future: _stageDataFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+    // 현재 선택된 스테이지의 정적 마스터/조립 데이터 (제목 등 표시용)
+    final stage = ref.watch(currentStageProvider);
+
+    if (uid == null || stageId == null) {
+      return Scaffold(
+        backgroundColor: customColors.neutral90,
+        body: Center(child: Text('info_not_available'.tr(), style: body_small(context))), // L10N
+      );
+    }
+    if (stage == null) {
+      return Scaffold(
+        backgroundColor: customColors.neutral90,
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    // 진행(progress) 문서 스트림: features / featuresCompleted 는 여기서 읽음
+    final progressDocStream = FirebaseFirestore.instance
+        .doc('${FsPaths.userProgressSections(uid)}/$stageId') // users/{uid}/progress/root/sections/{stageId}
+        .snapshots();
+
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: progressDocStream,
+      builder: (context, snap) {
+        if (!snap.hasData) {
           return Scaffold(
             backgroundColor: customColors.neutral90,
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-        if (!snapshot.hasData || snapshot.data == null) {
-          return Scaffold(
-            backgroundColor: customColors.neutral90,
-            body: Center(child: Text("Stage 데이터를 불러올 수 없습니다.", style: body_small(context))),
+            body: const Center(child: CircularProgressIndicator()),
           );
         }
 
-        final stageData = snapshot.data!;
-        // arData.features에 포함된 feature 번호(예: [2,3,4])만 사용
-        final allowedFeatures = stageData.arData?.features;
+        final data = snap.data!.data() ?? const <String, dynamic>{};
+        final arRaw = (data['arData'] is Map) ? data['arData'] as Map : const <String, dynamic>{};
+        final features = _extractFeatureIds(arRaw['features'], fallback: stage.arData?.features);
+        final fcRaw = _extractFeaturesCompleted(arRaw['featuresCompleted'],
+            fallback: stage.arData?.featuresCompleted);
+        final Set<int> allowedSet = features.toSet();
 
-        // ✅ [1] DB에서 가져온 featureCompleted / features를 반영한 리스트로 만듦
-        final availableActivities = <LearningActivity>[];
+        final availableActivities = baseActivities
+            .where((a) => allowedSet.contains(a.featureNumber))
+            .map((a) => a.copyWith(isCompleted: (fcRaw['${a.featureNumber}'] == true)))
+            .toList();
 
-        for (final baseActivity in activities) {
-          if (stageData.arData?.features.contains(baseActivity.featureNumber) ?? false) {
-            final completed =
-                stageData.arData?.featuresCompleted[baseActivity.featureNumber.toString()] ?? false;
-
-            availableActivities.add(
-              LearningActivity(
-                title: baseActivity.title,
-                time: baseActivity.time,
-                xp: baseActivity.xp,
-                featureNumber: baseActivity.featureNumber,
-                isCompleted: completed,
-              ),
-            );
-          }
-        }
-
-        // ✅ [2] 완료된 개수
-        final completedCount =
-            availableActivities.where((activity) => activity.isCompleted).length;
-
-        // ✅ [3] XP 계산
+        // 진행/XP 계산 교체
+        final completedCount = availableActivities.where((a) => a.isCompleted).length;
         final totalXP = availableActivities
             .where((a) => a.isCompleted)
-            .map((a) => int.parse(a.xp.replaceAll('xp', '')))
-            .fold(0, (prev, e) => prev + e);
-
+            .fold<int>(0, (sum, a) => sum + a.xp);
         final totalPossibleXP = availableActivities
-            .map((a) => int.parse(a.xp.replaceAll('xp', '')))
-            .fold(0, (prev, e) => prev + e);
+            .fold<int>(0, (sum, a) => sum + a.xp);
+
 
         return Scaffold(
           backgroundColor: customColors.neutral90,
           appBar: CustomAppBar_2depth_6(
-            title: '미션 선택',
+            title: 'missions_title'.tr(), // L10N: 미션 선택 → 미션(상단 타이틀 키 재사용)
             automaticallyImplyLeading: false,
             onIconPressed: () {
               Navigator.of(context).popUntil((route) => route.isFirst);
@@ -428,8 +194,7 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        // ✅ [4] 진행도 출력 (같은 availableActivities 사용)
-                        LearningProgress(
+                        _learningProgress(
                           completedCount,
                           totalXP,
                           totalPossibleXP,
@@ -438,14 +203,20 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
                           availableActivities,
                         ),
                         const SizedBox(height: 20),
-                        ActivityList(context, customColors, stageData, availableActivities,),
+                        _activityList(context, customColors, stageId, availableActivities),
                       ],
                     ),
                   ),
                 ),
               ),
-              ResultButton(context, completedCount, customColors,
-                  availableActivities, stageData),
+              _resultButton(
+                context: context,
+                completedCount: completedCount,
+                customColors: customColors,
+                availableActivities: availableActivities,
+                stageId: stageId,
+                earnedXP: totalXP, // 이미 계산한 값 재사용
+              ),
             ],
           ),
         );
@@ -453,7 +224,8 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     );
   }
 
-  Widget LearningProgress(
+  // 진행 위젯
+  Widget _learningProgress(
       int completedCount,
       int totalXP,
       int totalPossibleXP,
@@ -461,13 +233,13 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
       BuildContext context,
       List<LearningActivity> availableActivities,
       ) {
+    final percent = availableActivities.isEmpty ? 0.0 : completedCount / availableActivities.length;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: ShapeDecoration(
         color: customColors.neutral100,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
       child: Row(
         children: [
@@ -475,11 +247,9 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
             radius: 40.0,
             lineWidth: 10.0,
             animation: true,
-            percent: availableActivities.isEmpty
-                ? 0
-                : completedCount / availableActivities.length,
+            percent: percent.clamp(0.0, 1.0),
             center: Text(
-              '${(availableActivities.isEmpty ? 0 : (completedCount / availableActivities.length * 100)).toStringAsFixed(0)}%',
+              '${(percent * 100).toStringAsFixed(0)}%',
               style: body_xsmall_semi(context).copyWith(color: customColors.neutral30),
             ),
             progressColor: customColors.primary,
@@ -490,11 +260,15 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('$totalXP/$totalPossibleXP xp',
-                  style: heading_medium(context).copyWith(color: customColors.neutral30)),
+              // L10N: xp 진행 텍스트(키가 없다면 그대로 숫자 + "xp")
+              Text('$totalXP/$totalPossibleXP XP',
+                style: heading_medium(context).copyWith(color: customColors.neutral30),
+              ),
               const SizedBox(height: 8),
-              Text('$completedCount 미션 완료',
-                  style: body_xsmall(context).copyWith(color: customColors.neutral60)),
+              // L10N: "{n} 미션 완료" → en의 경우 "{n} missions completed"
+              Text('missions_completed'.tr(args: ['${completedCount}']),
+                style: body_xsmall(context).copyWith(color: customColors.neutral60),
+              ),
             ],
           ),
         ],
@@ -502,26 +276,32 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     );
   }
 
-  // 학습 활동 목록
-  Widget ActivityList(BuildContext context, CustomColors customColors, StageData stageData, List<LearningActivity> availableActivities) {
-    // 완료되지 않은 미션이 위쪽에 오도록 정렬
-    final sortedActivities = List<LearningActivity>.from(availableActivities)
-      ..sort((a, b) => a.isCompleted ? 1 : -1);
+  // 활동 리스트
+  Widget _activityList(
+      BuildContext context,
+      CustomColors customColors,
+      String stageId,
+      List<LearningActivity> availableActivities,
+      ) {
+    final sorted = List<LearningActivity>.from(availableActivities)
+      ..sort((a, b) {
+        if (a.isCompleted == b.isCompleted) return 0;
+        return a.isCompleted ? 1 : -1; // 미완료 먼저, 완료 뒤
+      });
+
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: ShapeDecoration(
         color: customColors.neutral100,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('미션', style: body_small_semi(context)),
+          Text('missions_title'.tr(), style: body_small_semi(context)), // L10N
           const SizedBox(height: 20),
-          ...sortedActivities.map((activity) => Padding(
+          ...sorted.map((activity) => Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -537,9 +317,8 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildActivityText(activity, customColors),
-                  // _buildActivityButton 호출 시 StageData 전달
-                  _buildActivityButton(context, activity, customColors, stageData),
+                  _buildActivityText(context, activity, customColors),
+                  _buildActivityButton(context, activity, customColors, stageId),
                 ],
               ),
             ),
@@ -549,46 +328,50 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
     );
   }
 
-  // 학습 항목 텍스트
-  Widget _buildActivityText(LearningActivity activity, CustomColors customColors) {
+  Widget _buildActivityText(BuildContext context, LearningActivity activity, CustomColors customColors) {
+    final title = activity.titleKey.tr(); // 각 미션의 로컬라이즈된 이름
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(activity.title, style: body_small_semi(context).copyWith(color: customColors.neutral30)),
+        Text(title, style: body_small_semi(context).copyWith(color: customColors.neutral30)),
         const SizedBox(height: 8),
         if (!activity.isCompleted)
           Row(
             children: [
               Icon(Icons.timer, size: 16, color: customColors.neutral30),
               const SizedBox(width: 4),
-              Text(activity.time, style: body_xsmall(context).copyWith(color: customColors.neutral30)),
+              Text('time_minutes'.tr(args: ['${activity.minutes}']),
+                  style: body_xsmall(context).copyWith(color: customColors.neutral30)),
               const SizedBox(width: 8),
               Icon(Icons.star, size: 16, color: customColors.neutral30),
               const SizedBox(width: 4),
-              Text(activity.xp, style: body_xsmall(context).copyWith(color: customColors.neutral30)),
+              Text('${activity.xp} XP',
+                  style: body_xsmall(context).copyWith(color: customColors.neutral30)),
             ],
           )
         else
-          Text('경험치 ${activity.xp} 획득!', style: body_xsmall(context).copyWith(color: customColors.primary)),
+          Text('earned_xp_message'.tr(args: ['${activity.xp}']),
+              style: body_xsmall(context).copyWith(color: customColors.primary)),
       ],
     );
   }
 
-  // 학습하기 버튼
-  Widget _buildActivityButton(BuildContext context, LearningActivity activity, CustomColors customColors, StageData stageData) {
+
+  Widget _buildActivityButton(
+      BuildContext context,
+      LearningActivity activity,
+      CustomColors customColors,
+      String stageId,
+      ) {
     return ElevatedButton(
       onPressed: activity.isCompleted
           ? null
           : () async {
-        // // Firestore 업데이트: 해당 feature의 완료 상태를 true로 변경
-        // await _updateFeatureCompletion(stageData, activity.featureNumber, true);
-        // setState(() {
-        //   activity.isCompleted = true;
-        // });
-        // 각 미션에 해당하는 페이지로 이동
+        // 각 미션 페이지로 이동 (L10N 안전: featureNumber로 분기)
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => _getActivityPage(activity.title)),
+          MaterialPageRoute(builder: (context) => _getActivityPageByFeature(activity.featureNumber)),
         );
       },
       style: ElevatedButton.styleFrom(
@@ -597,79 +380,302 @@ class _LearningActivitiesPageState extends ConsumerState<LearningActivitiesPage>
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       child: Text(
-        activity.isCompleted ? '미션완료' : '미션하기',
-        style: body_xsmall_semi(context).copyWith(
-            color: activity.isCompleted ? customColors.neutral30 : customColors.neutral100),
+        activity.isCompleted ? 'done'.tr() : 'start_button'.tr(), // L10N
+        style: body_xsmall_semi(context)
+            .copyWith(color: activity.isCompleted ? customColors.neutral30 : customColors.neutral100),
       ),
     );
   }
 
-  // 학습 활동에 맞는 페이지 반환
-  Widget _getActivityPage(String title) {
-    switch (title) {
-      case '결말 바꾸기':
-        // return ChangeEndingMain();
-      case '요약':
+  // 학습 활동에 맞는 페이지 반환 (L10N 안전: featureNumber 기반)
+  Widget _getActivityPageByFeature(int featureNumber) {
+    switch (featureNumber) {
+      case 1:
+        return const SizedBox(); // ChangeEndingMain(); // 아직 미연결이면 비워둠
+      case 2:
         return CSLearning();
-      case '토론':
+      case 3:
         return DebatePage();
-      case '다이어그램':
+      case 4:
         return RootedTreeScreen();
-      case '문장 구조':
+      case 5:
         return WritingFormMain();
-      case '에세이 작성':
-        // return WritingEssayMain();
-      case '형식 변환하기':
-        // return FormatConversionMain();
-      case '주제 추출':
+      case 6:
+        return const SizedBox(); // WritingEssayMain();
+      case 7:
+        return const SizedBox(); // FormatConversionMain();
+      case 8:
         return ParagraphAnalysisMain();
-      case '자유 소감':
+      case 9:
         return ReviewWritingMain();
       default:
         return const SizedBox();
     }
   }
+
+  // 제출 버튼
+  Widget _resultButton({
+    required BuildContext context,
+    required int completedCount,
+    required CustomColors customColors,
+    required List<LearningActivity> availableActivities,
+    required String stageId,
+    required int earnedXP,
+  }) {
+    final allDone = availableActivities.isNotEmpty && completedCount == availableActivities.length;
+    final title = 'result_check'.tr(); // "결과 확인하기" / "View results"
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      padding: const EdgeInsets.all(16.0),
+      child: allDone
+          ? ButtonPrimary(
+        function: () async {
+          await _onSubmit(stageId, earnedXP, customColors);
+        },
+        title: title, // L10N: "결과 확인하기"에 해당하는 키가 없다면 result_title로 대체
+      )
+          : ButtonPrimary20(
+        function: () {
+          debugPrint("result button pressed (incomplete)");
+        },
+        title: title,
+      ),
+    );
+  }
+
+  // 결과 팝업
+  void _showExplanationPopup() {
+    final customColors = ref.read(custom_colors_provider.customColorsProvider);
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 44, vertical: 28),
+            decoration: ShapeDecoration(
+              color: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    // L10N: 안내 문구 → 기존 키 재사용
+                    'reading_greeting'.tr(),
+                    textAlign: TextAlign.center,
+                    style: body_large_semi(context).copyWith(color: customColors.neutral30),
+                  ),
+                ),
+                const SizedBox(height: 28),
+                SizedBox(
+                  width: 172,
+                  height: 172,
+                  child: Image.asset("assets/images/book_star.png"),
+                ),
+                const SizedBox(height: 28),
+                SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    // L10N: 팁 문구 → selection_tip 재사용
+                    'selection_tip'.tr(),
+                    textAlign: TextAlign.center,
+                    style: body_small(context).copyWith(color: customColors.neutral60),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // 제출: afterReading 완료 + XP 반영 + 다음 스테이지 해금(조건부)
+  Future<void> _onSubmit(String stageId, int earnedXP, CustomColors customColors) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      debugPrint("⚠️ 유저가 로그인되지 않음!");
+      return;
+    }
+
+    final stageRef = FirebaseFirestore.instance.doc('${FsPaths.userProgressSections(userId)}/$stageId');
+
+    // 1) progress 섹션 문서에 activityCompleted.afterReading = true, status='completed'
+    try {
+      await FirebaseFirestore.instance.runTransaction((tx) async {
+        final snap = await tx.get(stageRef);
+        if (!snap.exists) return;
+
+        final data = Map<String, dynamic>.from(snap.data()!);
+        final activityCompleted = Map<String, dynamic>.from(data['activityCompleted'] ?? const {});
+
+        activityCompleted['afterReading'] = true;
+
+        tx.update(stageRef, {
+          'activityCompleted': activityCompleted,
+          'status': 'completed',
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      });
+    } catch (e, st) {
+      debugPrint('mark afterReading completed failed: $e');
+      debugPrint('$st');
+    }
+
+    // 2) XP 누적
+    final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
+    final currentTotalXP = ref.read(userXPProvider).value ?? 0;
+    final newTotalXP = currentTotalXP + earnedXP;
+    await userRef.update({'totalXP': newTotalXP});
+
+    // 3) 다음 스테이지 해금 (지금 막 status를 completed로 바꿨으니 조건 만족)
+    await _maybeUnlockNextStage(userId, stageId);
+
+    // 4) 섹션/홈 리프레시
+    ref.invalidate(sectionProvider);
+
+    // 5) 결과 다이얼로그 → 리포트
+    showResultSaveDialog(
+      context,
+      customColors,
+      'save_and_exit_prompt'.tr(), // L10N: "Do you want to save the result and exit?"
+      'no'.tr(),
+      'yes'.tr(),
+          (ctx) {
+        Navigator.pushReplacement(
+          ctx,
+          MaterialPageRoute(builder: (ctx) => ResultReportPage(earnedXP: earnedXP)),
+        );
+      },
+    );
+  }
+
+  Future<void> _maybeUnlockNextStage(String userId, String currentStageId) async {
+    final nextId = _getNextStageId(currentStageId);
+    if (nextId == null) return;
+
+    final currentRef = FirebaseFirestore.instance.doc('${FsPaths.userProgressSections(userId)}/$currentStageId');
+    final nextRef = FirebaseFirestore.instance.doc('${FsPaths.userProgressSections(userId)}/$nextId');
+
+    await FirebaseFirestore.instance.runTransaction((tx) async {
+      final currentSnap = await tx.get(currentRef);
+      if (!currentSnap.exists) return;
+
+      final statusStr = (currentSnap.data()?['status'] ?? 'locked').toString();
+      if (statusStr != 'completed') return; // 아직 완료 아님
+
+      final nextSnap = await tx.get(nextRef);
+      if (!nextSnap.exists) return;
+
+      final nextStatusStr = (nextSnap.data()?['status'] ?? 'locked').toString();
+      if (nextStatusStr == 'locked') {
+        tx.update(nextRef, {'status': 'inProgress'});
+      }
+    });
+  }
+
+  String? _getNextStageId(String currentStageId) {
+    final parts = currentStageId.split('_');
+    if (parts.length != 2) return null;
+    final number = int.tryParse(parts[1]);
+    if (number == null) return null;
+    final nextNumber = number + 1;
+    return 'stage_${nextNumber.toString().padLeft(3, '0')}';
+  }
 }
 
-Future<void> updateFeatureCompletion(StageData stage, int featureNumber, bool isCompleted) async {
+/// --------- 미션 완료 처리 (featuresCompleted) 트랜잭션 버전 ---------
+Future<void> updateFeatureCompletion({
+  required String stageId,
+  required int featureNumber,
+  required bool isCompleted,
+}) async {
   final userId = FirebaseAuth.instance.currentUser?.uid;
   if (userId == null) {
-    print("updateFeatureCompletion: userId is null");
+    debugPrint("updateFeatureCompletion: userId is null");
     return;
   }
-  if (stage.arData == null) {
-    print("updateFeatureCompletion: stage.arData is null");
-    return;
-  }
+
+  final stageRef = FirebaseFirestore.instance.doc('${FsPaths.userProgressSections(userId)}/$stageId');
 
   try {
-    print("updateFeatureCompletion: 시작 - featureNumber: $featureNumber, isCompleted: $isCompleted");
+    await FirebaseFirestore.instance.runTransaction((tx) async {
+      final snap = await tx.get(stageRef);
+      if (!snap.exists) return;
 
-    // 1. 로컬 stage 객체 업데이트
-    stage.updateArFeatureCompletion(featureNumber, isCompleted);
-    print("updateFeatureCompletion: stage.arData.featuresCompleted = ${stage.arData!.featuresCompleted}");
+      final data = Map<String, dynamic>.from(snap.data()!);
+      final ar = Map<String, dynamic>.from((data['arData'] ?? const {}));
+      final fc = Map<String, dynamic>.from((ar['featuresCompleted'] ?? const {}));
 
-    // 2. Firestore progress 문서 업데이트 (해당 스테이지의 arData 업데이트)
-    final stageRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .collection('progress')
-        .doc(stage.stageId);
-    await stageRef.update({
-      'arData': stage.arData!.toJson(),
+      fc['$featureNumber'] = isCompleted;
+      ar['featuresCompleted'] = fc;
+      tx.update(stageRef, {'arData': ar});
     });
-    print("updateFeatureCompletion: Firestore progress 업데이트 완료 (stageId: ${stage.stageId})");
 
-    // 3. 미션 하나 완료 시, 사용자 문서의 completedMissionCount 원자적 증가
+    // 사용자 지표 업데이트(원자 증가)
     final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
-    await userRef.update({
-      'completedMissionCount': FieldValue.increment(1),
-    });
-    print("updateFeatureCompletion: 사용자 문서 업데이트 완료 - completedMissionCount 증가");
-
+    await userRef.update({'completedMissionCount': FieldValue.increment(1)});
   } catch (e, stack) {
-    print("updateFeatureCompletion: 에러 발생 - $e");
-    print("Stacktrace: $stack");
+    debugPrint("updateFeatureCompletion error: $e");
+    debugPrint("$stack");
   }
 }
 
+List<int> _extractFeatureIds(dynamic raw, {dynamic fallback}) {
+  List<int>? parse(dynamic v) {
+    if (v is List) {
+      final out = <int>[];
+      for (final e in v) {
+        if (e is int) out.add(e);
+        else {
+          final n = int.tryParse(e.toString());
+          if (n != null) out.add(n);
+        }
+      }
+      return out;
+    }
+    if (v is Map) {
+      final out = <int>[];
+      for (final val in v.values) {
+        final p = parse(val);
+        if (p != null) out.addAll(p);
+      }
+      return out.isEmpty ? null : out;
+    }
+    try {
+      final json = (v as dynamic).toJson();
+      if (json is Map) return parse(json);
+    } catch (_) {}
+    return null;
+  }
+
+  return parse(raw) ?? parse(fallback) ?? const <int>[];
+}
+
+Map<String, bool> _extractFeaturesCompleted(dynamic raw, {dynamic fallback}) {
+  Map<String, bool>? parse(dynamic v) {
+    if (v is Map) {
+      final out = <String, bool>{};
+      v.forEach((k, val) {
+        if (val is bool) out['$k'] = val;
+        else if (val is num) out['$k'] = val != 0;
+        else if (val is String) {
+          final t = val.toLowerCase();
+          if (t == 'true' || t == '1') out['$k'] = true;
+          if (t == 'false' || t == '0') out['$k'] = false;
+        }
+      });
+      return out;
+    }
+    try {
+      final json = (v as dynamic).toJson();
+      if (json is Map) return parse(json);
+    } catch (_) {}
+    return null;
+  }
+  return parse(raw) ?? parse(fallback) ?? const <String, bool>{};
+}

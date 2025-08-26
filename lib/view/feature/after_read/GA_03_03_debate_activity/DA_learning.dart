@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/view/feature/after_read/GA_03_03_debate_activity/widgets/debate_notifier.dart';
 import '../../../../model/section_data.dart';
+import '../../../../model/stage_data.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
 import '../../../../viewmodel/user_service.dart';
 import '../../../components/message_bubble.dart';
@@ -19,6 +20,35 @@ import 'widgets/debate_provider.dart';
 import 'widgets/debate_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:readventure/util/locale_text.dart';
+import 'package:readventure/model/localized_types.dart';
+
+String pickLocaleString(BuildContext context, dynamic v, {String fallback = ''}) {
+  if (v == null) return fallback;
+
+  // LocalizedText라면 util의 lx 사용
+  if (v is LocalizedText) {
+    return lx(context, v);
+  }
+
+  // 그냥 String
+  if (v is String) return v;
+
+  // Map 형태 {ko: "...", en: "..."} 처리
+  if (v is Map) {
+    final lang = context.locale.languageCode; // 'ko', 'en', ...
+    final sel = v[lang] ?? v['ko'] ?? v['en'] ?? (v.values.isNotEmpty ? v.values.first : null);
+    return sel?.toString() ?? fallback;
+  }
+
+  // toJson()이 있는 케이스 방어
+  try {
+    final json = (v as dynamic).toJson();
+    if (json is Map) return pickLocaleString(context, json, fallback: fallback);
+  } catch (_) {}
+
+  return fallback;
+}
 
 class DebatePage extends ConsumerWidget {
   @override
@@ -29,18 +59,25 @@ class DebatePage extends ConsumerWidget {
 
     // 현재 스테이지 데이터에서 debate 주제 가져오기
     final currentStage = ref.watch(currentStageProvider);
-    final debateTopic = currentStage?.arData?.featureData?["feature3DebateTopic"] as String?
-        ?? 'default_debate_topic'.tr(); // *** fallback 값
+
+    final rawTopic = currentStage?.arData?.featureData?["feature3DebateTopic"];
+    final String debateTopic = pickLocaleString(
+      context,
+      rawTopic,
+      fallback: 'default_debate_topic'.tr(),
+    );
 
     // 앱 시작 시 첫 토론 라운드에서 주제 사용,,,맨 처음꺼
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final debateState = ref.read(debateProvider);
-      if (debateState.currentRound == 1 && !debateState.isFinished) {
+      final isTopicReady = debateTopic.trim().isNotEmpty && debateTopic != 'default_debate_topic'.tr();
+
+      if (debateState.currentRound == 1 && !debateState.isFinished && isTopicReady) {
         showStartDialog(
           context,
           debateState.currentRound,
-          debateTopic, // Firestore에서 가져온 debate 주제 사용
-          debateState.isUserPro ? 'stance_pro'.tr() : 'stance_con'.tr(), // ***
+          debateTopic,
+          debateState.isUserPro ? 'stance_pro'.tr() : 'stance_con'.tr(),
         );
       }
     });
@@ -243,7 +280,12 @@ class _DebateContentState extends ConsumerState<DebateContent> {
                       }
                       if (freshStage != null) {
                         // feature3(토론 활동에 해당하는 feature 번호 3)를 완료 처리
-                        await updateFeatureCompletion(freshStage, 3, true);
+                        await updateFeatureCompletion(
+                          stageId: freshStage.stageId,
+                          featureNumber: 3,
+                          isCompleted: true,
+                        );
+
                         // stagesProvider를 무효화하여 최신 상태로 갱신
                         ref.invalidate(stagesProvider);
                         // ref.invalidate(selectedStageIdProvider); // 혹시 모를 캐싱 문제 방지

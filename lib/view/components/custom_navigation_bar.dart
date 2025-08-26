@@ -1,30 +1,20 @@
 /// File: custom_navigation_bar.dart
-/// Purpose: 앱의 하단에 사용자 정의 NavigationBar를 제공하여 페이지 전환 및 상태 관리를 지원
-/// Author: 박민준
-/// Created: 2024-12-28
-/// Last Modified: 2024-12-30 by 박민준
+/// Purpose: 앱 하단 NavigationBar (L10N 적용)
+/// Last Modified: 2025-08-26 by ChatGPT
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart'; // ✅ 추가
 import 'package:readventure/theme/font.dart';
 import '../../viewmodel/navigation_controller.dart';
 import '../../theme/theme.dart';
 
 class CustomNavigationBar extends ConsumerWidget {
-  const CustomNavigationBar({
-    Key? key,
-  }) : super(key: key);
-
-  /*
-  사용 방법:
-  Scaffold 에서 아래와 같이 사용
-
-  bottomNavigationBar: const CustomNavigationBar(),
-   */
+  const CustomNavigationBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedIndex = ref.watch(navigationProvider); // 현재 선택된 인덱스 상태
+    final selectedIndex = ref.watch(navigationProvider);
     final navigationController = ref.read(navigationProvider.notifier);
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
@@ -40,23 +30,23 @@ class CustomNavigationBar extends ConsumerWidget {
         unselectedItemColor: customColors.neutral60,
         selectedLabelStyle: body_xsmall_semi(context),
         unselectedLabelStyle: body_xsmall_semi(context).copyWith(color: customColors.neutral60),
-        onTap: (index) => navigationController.navigateToIndex(context, index), // 페이지 전환
-        items: const <BottomNavigationBarItem>[
+        onTap: (index) => navigationController.navigateToIndex(context, index),
+        items: <BottomNavigationBarItem>[ // ❌ const 제거
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_rounded),
-            label: '홈',
+            icon: const Icon(Icons.home_rounded),
+            label: 'nav_home'.tr(),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.stars_rounded),
-            label: '코스',
+            icon: const Icon(Icons.stars_rounded),
+            label: 'nav_course'.tr(),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.article_rounded),
-            label: '커뮤니티',
+            icon: const Icon(Icons.article_rounded),
+            label: 'nav_community'.tr(),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_rounded),
-            label: '마이페이지',
+            icon: const Icon(Icons.person_rounded),
+            label: 'nav_mypage'.tr(),
           ),
         ],
       ),

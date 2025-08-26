@@ -40,51 +40,97 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
 
     Future<void> _saveNickname() async {
       setState(() {
-        isLoading = true; // 로딩 상태 활성화
+        isLoading = true;
+        errorMessage = null;
       });
 
-      final nickname = _controller.text.trim();
-      final user = FirebaseAuth.instance.currentUser; // 현재 로그인한 사용자 가져오기
+      final raw = _controller.text;
+      final nickname = raw.trim();
+      final user = FirebaseAuth.instance.currentUser;
 
-      if (user != null) {
-        try {
-          // Firestore에서 기존 닉네임 확인
-          final nicknameDoc = FirebaseFirestore.instance.collection('nicknames').doc(nickname);
-          final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
-
-          final snapshot = await nicknameDoc.get();
-          if (snapshot.exists) {
-            // 닉네임이 이미 존재하는 경우
-            setState(() {
-              errorMessage = '이미 사용 중인 별명입니다.';
-            });
-          } else {
-            // Firestore에 닉네임 저장 및 사용자 상태 업데이트
-            await nicknameDoc.set({'uid': user.uid, 'created_at': FieldValue.serverTimestamp()});
-            await userDoc.update({
-              'nickname': nickname,
-              'nicknameSet': true, // 닉네임 설정 완료 상태 업데이트
-            });
-
-            // 성공 시 홈 화면으로 이동
-            if (context.mounted) {
-              Navigator.pushReplacementNamed(context, '/tutorial');
-            }
-          }
-        } catch (e) {
-          setState(() {
-            errorMessage = '별명을 저장하는 중 문제가 발생했습니다. 다시 시도해주세요.';
-          });
-          print('별명 저장 오류: $e');
-        } finally {
-          setState(() {
-            isLoading = false; // 로딩 상태 비활성화
-          });
-        }
-      } else {
+      // 프런트 검증 한번 더(1~8자, 공백 없음)
+      final valid = nickname.isNotEmpty &&
+          nickname.length >= 1 &&
+          nickname.length <= 8 &&
+          !nickname.contains(' ');
+      if (!valid) {
         setState(() {
+          isLoading = false;
+          errorMessage = '별명을 올바르게 입력해주세요.';
+        });
+        return;
+      }
+
+      if (user == null) {
+        setState(() {
+          isLoading = false;
           errorMessage = '사용자 인증 정보를 확인할 수 없습니다.';
         });
+        return;
+      }
+
+      final fs = FirebaseFirestore.instance;
+      final nickRef = fs.collection('nicknames').doc(nickname);
+      final userRef = fs.collection('users').doc(user.uid);
+
+      try {
+        await fs.runTransaction((tx) async {
+          // 1) 닉네임 중복 확인
+          final nickSnap = await tx.get(nickRef);
+          if (nickSnap.exists) {
+            throw Exception('이미 사용 중인 별명입니다.');
+          }
+
+          // 2) 유저 문서 upsert
+          final userSnap = await tx.get(userRef);
+          if (!userSnap.exists) {
+            // 최소 스키마로 생성 (필요한 필드는 프로젝트 스키마에 맞게 추가)
+            tx.set(userRef, {
+              'name': user.displayName,
+              'photoURL': user.photoURL,
+              'email': user.email,
+              'createdAt': FieldValue.serverTimestamp(),
+              'totalXP': 0,
+              'currentCourse': '코스1',
+              'learningTime': 0,
+              'completedMissionCount': 0,
+              // 닉네임 필드 동시 반영
+              'nickname': nickname,
+              'nicknameSet': true,
+              'updatedAt': FieldValue.serverTimestamp(),
+            });
+          } else {
+            // 존재하면 닉네임/플래그만 업데이트
+            tx.update(userRef, {
+              'nickname': nickname,
+              'nicknameSet': true,
+              'updatedAt': FieldValue.serverTimestamp(),
+            });
+          }
+
+          // 3) 닉네임 점유 문서 생성
+          tx.set(nickRef, {
+            'uid': user.uid,
+            'created_at': FieldValue.serverTimestamp(),
+          });
+        });
+
+        // 성공 → 튜토리얼로 이동
+        if (context.mounted) {
+          Navigator.pushReplacementNamed(context, '/tutorial');
+        }
+      } catch (e) {
+        setState(() {
+          errorMessage = e.toString().contains('이미 사용 중인 별명')
+              ? '이미 사용 중인 별명입니다.'
+              : '별명을 저장하는 중 문제가 발생했습니다. 다시 시도해주세요.';
+        });
+      } finally {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
       }
     }
 
