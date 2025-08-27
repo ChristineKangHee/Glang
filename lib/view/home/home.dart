@@ -25,6 +25,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../viewmodel/user_service.dart';
+import '../login/levelTest/level_test_RDmain.dart';
 import '../widgets/DoubleBackToExitWrapper.dart';
 import 'attendance/attendance_model.dart';
 import 'attendance/attendance_provider.dart';
@@ -141,10 +142,15 @@ class MyHomePage extends ConsumerWidget { // ConsumerWidget으로 변경
                         //   child: Text('Show Notification'),
                         // ),
                         //
-                        // ElevatedButton(
-                        //   onPressed: () => Navigator.pushNamed(context, "/brmain"),
-                        //   child: Text('읽기 전 코스 이동'),
-                        // ),
+                        ElevatedButton(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const LevelTestRDMain(),
+                            ),
+                          ),
+                          child: Text('읽기 전 코스 이동'),
+                        ),
                         // ElevatedButton(
                         //   onPressed: () => Navigator.pushNamed(context, "/rdmain"),
                         //   child: Text('읽기 중 코스 이동'),

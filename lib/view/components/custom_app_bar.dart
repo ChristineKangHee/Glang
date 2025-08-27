@@ -77,6 +77,7 @@ import 'dart:async';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../viewmodel/user_service.dart';
+import '../login/levelTest/level_test_RDmain.dart';
 import 'alarm_dialog.dart';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -816,5 +817,100 @@ class CustomAppBar_2depth_9 extends StatelessWidget implements PreferredSizeWidg
   Size get preferredSize {
     final bottomHeight = bottom?.preferredSize.height ?? 0.0;
     return Size.fromHeight(kToolbarHeight + bottomHeight);
+  }
+}
+
+////////////////////// 타이머 존재하는 앱바 //////////////////////
+//레벨테스트 용 타이머 앱바
+//개별 페이지에서 루트 지정 가능
+class CustomAppBar_2depth_10 extends StatefulWidget implements PreferredSizeWidget {
+  final String title;
+  final Color? backgroundColor;
+
+  const CustomAppBar_2depth_10({
+    Key? key,
+    required this.title,
+    this.backgroundColor,
+  }) : super(key: key);
+
+  @override
+  CustomAppBar_2depth_10State createState() => CustomAppBar_2depth_10State();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class CustomAppBar_2depth_10State extends State<CustomAppBar_2depth_10> {
+  late Timer _timer;
+  int _elapsedSeconds = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _elapsedSeconds++;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    levelTestTime = _elapsedSeconds; // ✅ 레벨테스트 시간 저장
+    super.dispose();
+  }
+
+  String _formatTime(int seconds) {
+    final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
+    final secs = (seconds % 60).toString().padLeft(2, '0');
+    return "$minutes:$secs";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    return AppBar(
+      scrolledUnderElevation: 0,
+      leadingWidth: 100,
+      leading: Center(
+        child: Row(
+          children: [
+            const SizedBox(width: 16),
+            SizedBox(
+              width: 59,
+              height: 32,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: customColors.neutral90,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  _formatTime(_elapsedSeconds),
+                  style: TextStyle(
+                    color: customColors.neutral30,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      title: Text(
+        widget.title,
+        style: heading_xsmall(context).copyWith(color: customColors.neutral30),
+      ).tr(),
+      centerTitle: true,
+      backgroundColor: widget.backgroundColor ?? customColors.neutral100,
+      elevation: 0,
+    );
   }
 }

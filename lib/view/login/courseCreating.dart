@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/theme/theme.dart';
 import '../../viewmodel/custom_colors_provider.dart';
+import '../components/custom_button.dart';
 
 class CourseProcessingPage extends ConsumerStatefulWidget {
   @override
@@ -46,23 +47,31 @@ class _CourseProcessingPageState extends ConsumerState<CourseProcessingPage> {
     final customColors = ref.watch(customColorsProvider);
 
     return Scaffold(
+      bottomNavigationBar: !_isProcessing
+          ? Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ButtonPrimary(
+                function: () {
+                  Navigator.pushNamed(context, '/');
+                },
+                title: '시작하기',
+              ),
+              const SizedBox(height: 36), // 하단 간격 추가
+            ],
+          )
+          : null,
+
       body: SafeArea(
         child: Center(
           child: _isProcessing
-              ? _buildProcessingBody(customColors) // 로딩 중일 때
-              : _buildCompletionBody(customColors), // 완료 후
+              ? _buildProcessingBody(customColors)
+              : _buildCompletionBody(customColors),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            _isProcessing = !_isProcessing; // 로딩 상태 토글
-          });
-        },
-        child: Icon(Icons.refresh),
       ),
     );
   }
+
 
   // 로딩 중일 때의 화면 구성
   Widget _buildProcessingBody(CustomColors customColors) {
