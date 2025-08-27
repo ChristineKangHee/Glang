@@ -4,6 +4,7 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:readventure/theme/font.dart';
 
 import '../../../../../theme/theme.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 void showStartDialog(BuildContext context, int roundNumber, String topic, String stance) {
   showDialog(
@@ -76,7 +77,11 @@ class _StartDialogContentState extends State<_StartDialogContent>
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    final Color stanceColor = widget.stance == "반대" ? customColors.error! : customColors.primary!;
+    final Color stanceColor = widget.stance == 'stance_con'.tr() // ***
+        ? customColors.error!
+        : customColors.primary!;
+
+    final int remaining = (3 - (3 * _progressAnimation.value)).ceil(); // ***
 
     return AlertDialog(
       contentPadding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
@@ -84,9 +89,9 @@ class _StartDialogContentState extends State<_StartDialogContent>
         mainAxisSize: MainAxisSize.min,
         children: [
           // 라운드 정보
-          Text(
-            "ROUND ${widget.roundNumber}",
-            style: body_small_semi(context).copyWith(color: customColors.neutral30)
+          Text( // ***
+              'round_only'.tr(args: [widget.roundNumber.toString()]),
+              style: body_small_semi(context).copyWith(color: customColors.neutral30),
           ),
           const SizedBox(height: 16),
           // 토론 주제
@@ -100,18 +105,12 @@ class _StartDialogContentState extends State<_StartDialogContent>
             textAlign: TextAlign.center,
             text: TextSpan(
               children: [
+                TextSpan(text: 'you_are'.tr(), style: body_medium_semi(context)), // ***
                 TextSpan(
-                    text: "당신은 ",
-                    style: body_medium_semi(context)
-                ),
-                TextSpan(
-                    text: "'${widget.stance}' ",
+                    text: "'${widget.stance}' ", // stance 자체는 상위에서 tr()된 값이 들어옴
                     style: body_medium_semi(context).copyWith(color: stanceColor), // 변경된 색상 적용
                 ),
-                TextSpan(
-                    text: "입장입니다",
-                    style: body_medium_semi(context)
-                ),
+                TextSpan(text: 'stance_suffix'.tr(), style: body_medium_semi(context)), // ***
               ],
             ),
           ),
@@ -123,7 +122,7 @@ class _StartDialogContentState extends State<_StartDialogContent>
             lineWidth: 8.0,
             percent: _progressAnimation.value, // 애니메이션 값으로 진행도 설정
             center: Text(
-              "${(3 - (3 * _progressAnimation.value)).ceil()}초", // 남은 시간 표시
+              'seconds_suffix'.tr(args: [remaining.toString()]), // ***
               style: body_large_semi(context).copyWith(color: customColors.neutral30),
             ),
             progressColor: customColors.primary, // 진행 색상

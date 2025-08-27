@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:readventure/view/feature/after_read/GA_03_03_debate_activity/widgets/debate_notifier.dart';
 import '../../../../model/section_data.dart';
+import '../../../../model/stage_data.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
 import '../../../../viewmodel/user_service.dart';
 import '../../../components/message_bubble.dart';
@@ -18,6 +19,36 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'widgets/debate_provider.dart';
 import 'widgets/debate_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:readventure/util/locale_text.dart';
+import 'package:readventure/model/localized_types.dart';
+
+String pickLocaleString(BuildContext context, dynamic v, {String fallback = ''}) {
+  if (v == null) return fallback;
+
+  // LocalizedText라면 util의 lx 사용
+  if (v is LocalizedText) {
+    return lx(context, v);
+  }
+
+  // 그냥 String
+  if (v is String) return v;
+
+  // Map 형태 {ko: "...", en: "..."} 처리
+  if (v is Map) {
+    final lang = context.locale.languageCode; // 'ko', 'en', ...
+    final sel = v[lang] ?? v['ko'] ?? v['en'] ?? (v.values.isNotEmpty ? v.values.first : null);
+    return sel?.toString() ?? fallback;
+  }
+
+  // toJson()이 있는 케이스 방어
+  try {
+    final json = (v as dynamic).toJson();
+    if (json is Map) return pickLocaleString(context, json, fallback: fallback);
+  } catch (_) {}
+
+  return fallback;
+}
 
 class DebatePage extends ConsumerWidget {
   @override
@@ -28,25 +59,32 @@ class DebatePage extends ConsumerWidget {
 
     // 현재 스테이지 데이터에서 debate 주제 가져오기
     final currentStage = ref.watch(currentStageProvider);
-    final debateTopic = currentStage?.arData?.featureData?["feature3DebateTopic"] as String?
-        ?? "기본 토론 주제"; // fallback 값
+
+    final rawTopic = currentStage?.arData?.featureData?["feature3DebateTopic"];
+    final String debateTopic = pickLocaleString(
+      context,
+      rawTopic,
+      fallback: 'default_debate_topic'.tr(),
+    );
 
     // 앱 시작 시 첫 토론 라운드에서 주제 사용,,,맨 처음꺼
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final debateState = ref.read(debateProvider);
-      if (debateState.currentRound == 1 && !debateState.isFinished) {
+      final isTopicReady = debateTopic.trim().isNotEmpty && debateTopic != 'default_debate_topic'.tr();
+
+      if (debateState.currentRound == 1 && !debateState.isFinished && isTopicReady) {
         showStartDialog(
           context,
           debateState.currentRound,
-          debateTopic, // Firestore에서 가져온 debate 주제 사용
-          debateState.isUserPro ? "찬성" : "반대",
+          debateTopic,
+          debateState.isUserPro ? 'stance_pro'.tr() : 'stance_con'.tr(),
         );
       }
     });
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("토론", style: heading_xsmall(context).copyWith(color: customColors.neutral30,)),
+        title: Text('debate_title'.tr(), style: heading_xsmall(context).copyWith(color: customColors.neutral30,)), // ***
         centerTitle: true,
         leadingWidth: 90,
         leading: CountdownTimer(
@@ -59,7 +97,7 @@ class DebatePage extends ConsumerWidget {
                 context,
                 debateState.currentRound + 1, // 다음 라운드 번호
                 debateTopic,
-                !debateState.isUserPro ? "찬성" : "반대",
+                !debateState.isUserPro ? 'stance_pro'.tr() : 'stance_con'.tr(), // ***
               );
             }
           },
@@ -122,7 +160,7 @@ class _DebateContentState extends ConsumerState<DebateContent> {
             child: Column(
               children: [
                 Text(
-                  "ROUND ${debateState.currentRound} | ${debateState.isUserPro ? '찬성' : '반대'}",
+                  'round_label'.tr(args: [debateState.currentRound.toString(), debateState.isUserPro ? 'stance_pro'.tr() : 'stance_con'.tr()]), // ***
                   style: body_small_semi(context).copyWith(
                     color: widget.customColors.primary,
                     fontWeight: FontWeight.bold,
@@ -155,7 +193,7 @@ class _DebateContentState extends ConsumerState<DebateContent> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                "결과",
+                  'result_title'.tr(), // ***
                 style: body_small_semi(context)
               ),
               const SizedBox(height: 16),
@@ -163,7 +201,7 @@ class _DebateContentState extends ConsumerState<DebateContent> {
               _buildRoundResult(
                 context: context,
                 round: 1,
-                stance: "찬성",
+                stance: 'stance_pro'.tr(), // ***
                 userPercentage: 55,
                 aiPercentage: 45,
                 customColors: widget.customColors,
@@ -173,7 +211,7 @@ class _DebateContentState extends ConsumerState<DebateContent> {
               _buildRoundResult(
                 context: context,
                 round: 2,
-                stance: "반대",
+                stance: 'stance_con'.tr(), // ***
                 userPercentage: 80,
                 aiPercentage: 20,
                 customColors: widget.customColors,
@@ -191,12 +229,12 @@ class _DebateContentState extends ConsumerState<DebateContent> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "종합 평가",
+                        'overall_evaluation'.tr(), // ***
                       style: body_xsmall_semi(context)
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "찬성 측과 반대 측의 주장에서 제시한 경제적 효과에 대한 구체적 수치와 사례 분석이 설득력이 높았습니다.",
+                        'overall_feedback_sample'.tr(), // ***
                       style: body_small(context)
                     ),
                   ],
@@ -224,7 +262,7 @@ class _DebateContentState extends ConsumerState<DebateContent> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    child: Text("다시 쓰기", style: body_small_semi(context).copyWith(color: widget.customColors.neutral60),),
+                    child: Text('write_again'.tr(), style: body_small_semi(context).copyWith(color: widget.customColors.neutral60),), // ***
                   ),
                 ),
                 SizedBox(width: 16,),
@@ -242,7 +280,12 @@ class _DebateContentState extends ConsumerState<DebateContent> {
                       }
                       if (freshStage != null) {
                         // feature3(토론 활동에 해당하는 feature 번호 3)를 완료 처리
-                        await updateFeatureCompletion(freshStage, 3, true);
+                        await updateFeatureCompletion(
+                          stageId: freshStage.stageId,
+                          featureNumber: 3,
+                          isCompleted: true,
+                        );
+
                         // stagesProvider를 무효화하여 최신 상태로 갱신
                         ref.invalidate(stagesProvider);
                         // ref.invalidate(selectedStageIdProvider); // 혹시 모를 캐싱 문제 방지
@@ -275,7 +318,7 @@ class _DebateContentState extends ConsumerState<DebateContent> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    child: Text("완료", style: body_small_semi(context).copyWith(color: widget.customColors.neutral100),),
+                    child: Text('finish'.tr(), style: body_small_semi(context).copyWith(color: widget.customColors.neutral100),), // ***
                   ),
                 ),
               ],
@@ -305,7 +348,7 @@ class _DebateContentState extends ConsumerState<DebateContent> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "ROUND $round | $stance",
+              'round_label'.tr(args: [round.toString(), stance]), // ***
             style: body_small(context).copyWith(color: customColors.neutral30)
           ),
           const SizedBox(height: 8),
@@ -340,11 +383,11 @@ class _DebateContentState extends ConsumerState<DebateContent> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "사용자 $userPercentage%",
+                  'user_percentage'.tr(args: [userPercentage.toString()]), // ***
                 style: body_small_semi(context).copyWith(color: customColors.primary)
               ),
               Text(
-                "AI $aiPercentage%",
+                  'ai_percentage'.tr(args: [aiPercentage.toString()]), // ***
                 style: body_small_semi(context).copyWith(color: customColors.neutral60)
               ),
             ],

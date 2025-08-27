@@ -1,137 +1,234 @@
-/// File: reading_data.dart
-/// Purpose: 읽기 중(During-Reading) 활동 데이터를 관리하는 모델 클래스, 퀴즈 및 텍스트 세그먼트 포함
-/// Author: 박민준
-/// Created: 2025-01-07
-/// Last Modified: 2025-01-07 by 박민준
+/// File: lib/model/reading_data.dart
+/// Purpose: 읽기 중(During-Reading) 활동 데이터 (본문/MCQ/OX, 다국어 스키마 적용)
+/// CHANGED:
+///  - textSegments: List<String> → LocalizedList (Map/List 모두 허용)
+///  - MultipleChoiceQuiz.question/explanation: String → LocalizedText
+///  - MultipleChoiceQuiz.choices: List<String> → LocalizedList (Map/List 모두 허용)
+///  - OXQuiz.question/explanation: String → LocalizedText
+///  - JSON 컨버터에 구 스키마(단일 언어/단일 객체) 폴백 처리 추가
 
-/*
-  Comment by 민준
-  - 읽기 중 활동의 데이터를 저장하는 모델.
-  - 내부에 다지선다 퀴즈 모델, oxquiz 모델 두 개 더 존재.
- */
+import 'package:flutter/foundation.dart';
+import 'localized_types.dart';
 
-/// **ReadingData 클래스**
-/// - "읽기 중(During-Reading)" 활동에서 사용되는 데이터 모델.
-/// - 표지 이미지, 텍스트 세그먼트(본문 3분할), 객관식 퀴즈, OX 퀴즈 정보를 포함.
-/// - Firestore 또는 API 데이터와 JSON 변환을 지원.
+@immutable
 class ReadingData {
-  /// **coverImageUrl**: 표지 이미지 URL
-  /// - `BrData`(읽기 전 활동)와 동일한 이미지일 수도 있으나, 독립적으로 관리 가능.
   final String coverImageUrl;
+  final LocalizedList textSegments;                 // ko/en 리스트
+  final List<MultipleChoiceQuiz> multipleChoice;    // 리스트/단일 객체 모두 허용
+  final List<OXQuiz> oxQuiz;                        // 리스트/단일 객체 모두 허용
 
-  /// **textSegments**: 본문을 3개의 세그먼트로 나눈 리스트.
-  /// - 예시: `["첫 번째 부분", "두 번째 부분", "세 번째 부분"]`
-  final List<String> textSegments;
-
-  /// **multipleChoice**: 객관식 퀴즈 객체.
-  /// - `MultipleChoiceQuiz` 클래스 인스턴스로 관리.
-  final MultipleChoiceQuiz multipleChoice;
-
-  /// **oxQuiz**: OX 퀴즈 객체.
-  /// - `OXQuiz` 클래스 인스턴스로 관리.
-  final OXQuiz oxQuiz;
-
-  /// **ReadingData 생성자**
-  /// - `coverImageUrl`, `textSegments`, `multipleChoice`, `oxQuiz` 필수 값.
-  ReadingData({
-    required this.coverImageUrl,
-    required this.textSegments,
-    required this.multipleChoice,
-    required this.oxQuiz,
+  const ReadingData({
+    this.coverImageUrl = '',
+    this.textSegments = const LocalizedList(),
+    this.multipleChoice = const [],
+    this.oxQuiz = const [],
   });
 
-  /// **JSON 데이터를 Dart 객체로 변환하는 팩토리 생성자**
-  /// - Firestore 또는 API에서 받은 JSON 데이터를 `ReadingData` 객체로 변환.
-  factory ReadingData.fromJson(Map<String, dynamic> json) {
+  factory ReadingData.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return const ReadingData();
+
+    // textSegments: Map 또는 List 허용
+    final LocalizedList segments = _parseLocalizedList(json['textSegments']);
+
+    // multipleChoice: List 또는 단일 Map 허용
+    final List<MultipleChoiceQuiz> mcList = _parseListOrSingle<MultipleChoiceQuiz>(
+      json['multipleChoice'],
+          (e) => MultipleChoiceQuiz.fromJson(_asMap(e)),
+    );
+
+    // oxQuiz: List 또는 단일 Map 허용
+    final List<OXQuiz> oxList = _parseListOrSingle<OXQuiz>(
+      json['oxQuiz'],
+          (e) => OXQuiz.fromJson(_asMap(e)),
+    );
+
     return ReadingData(
-      /// 표지 이미지가 없을 경우 기본값 `""` 설정.
-      coverImageUrl: json['coverImageUrl'] ?? '',
-
-      /// 본문 텍스트 세그먼트가 없을 경우 빈 리스트로 초기화.
-      textSegments: List<String>.from(json['textSegments'] ?? []),
-
-      /// 객관식 퀴즈 데이터를 `MultipleChoiceQuiz` 객체로 변환.
-      multipleChoice: MultipleChoiceQuiz.fromJson(json['multipleChoice'] ?? {}),
-
-      /// OX 퀴즈 데이터를 `OXQuiz` 객체로 변환.
-      oxQuiz: OXQuiz.fromJson(json['oxQuiz'] ?? {}),
+      coverImageUrl: (json['coverImageUrl'] ?? '').toString(),
+      textSegments: segments,
+      multipleChoice: mcList,
+      oxQuiz: oxList,
     );
   }
 
-  /// **Dart 객체를 JSON 형식으로 변환하는 메서드**
-  /// - Firestore 또는 API로 데이터를 저장할 때 사용.
-  Map<String, dynamic> toJson() {
-    return {
-      'coverImageUrl': coverImageUrl,
-      'textSegments': textSegments,
-      'multipleChoice': multipleChoice.toJson(),
-      'oxQuiz': oxQuiz.toJson(),
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'coverImageUrl': coverImageUrl,
+    'textSegments': textSegments.toJson(),
+    'multipleChoice': multipleChoice.map((e) => e.toJson()).toList(),
+    'oxQuiz': oxQuiz.map((e) => e.toJson()).toList(),
+  };
+
+  ReadingData copyWith({
+    String? coverImageUrl,
+    LocalizedList? textSegments,
+    List<MultipleChoiceQuiz>? multipleChoice,
+    List<OXQuiz>? oxQuiz,
+  }) =>
+      ReadingData(
+        coverImageUrl: coverImageUrl ?? this.coverImageUrl,
+        textSegments: textSegments ?? this.textSegments,
+        multipleChoice: multipleChoice ?? this.multipleChoice,
+        oxQuiz: oxQuiz ?? this.oxQuiz,
+      );
 }
 
-/// **객관식 퀴즈(Multiple Choice Quiz) 모델 클래스**
-/// - 질문(`question`), 정답(`correctAnswer`), 선택지(`choices`), 설명(`explanation`) 포함.
+@immutable
 class MultipleChoiceQuiz {
-  final String question;         // 문제 텍스트
-  final String correctAnswer;    // 정답 (선택지 중 하나)
-  final List<String> choices;    // 객관식 선택지 리스트
-  final String explanation;      // 정답에 대한 설명
+  final LocalizedText question;               // 다국어
+  final LocalizedList choices;                // 다국어 리스트
+  final int correctIndex;                     // 정답 인덱스 (A→0, B→1 폴백 지원)
+  final LocalizedText explanation;            // 다국어
 
-  /// **MultipleChoiceQuiz 생성자**
-  MultipleChoiceQuiz({
-    required this.question,
-    required this.correctAnswer,
-    required this.choices,
-    required this.explanation,
+  const MultipleChoiceQuiz({
+    this.question = const LocalizedText(),
+    this.choices = const LocalizedList(),
+    this.correctIndex = 0,
+    this.explanation = const LocalizedText(),
   });
 
-  /// **JSON 데이터를 Dart 객체로 변환하는 팩토리 생성자**
-  factory MultipleChoiceQuiz.fromJson(Map<String, dynamic> json) {
+  factory MultipleChoiceQuiz.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return const MultipleChoiceQuiz();
+
+    final LocalizedList parsedChoices = _parseLocalizedList(json['choices']);
+    final int idx = _parseCorrectIndex(
+      rawIndex: json['correctIndex'],
+      rawAnswer: json['correctAnswer'],
+    );
+
     return MultipleChoiceQuiz(
-      question: json['question'] ?? '',
-      correctAnswer: json['correctAnswer'] ?? '',
-      choices: List<String>.from(json['choices'] ?? []),
-      explanation: json['explanation'] ?? '',
+      question: LocalizedText.fromJson(json['question']),
+      choices: parsedChoices,
+      correctIndex: idx,
+      explanation: LocalizedText.fromJson(json['explanation']),
     );
   }
 
-  /// **Dart 객체를 JSON 형식으로 변환하는 메서드**
   Map<String, dynamic> toJson() => {
-    'question': question,
-    'correctAnswer': correctAnswer,
-    'choices': choices,
-    'explanation': explanation,
+    'question': question.toJson(),
+    'choices': choices.toJson(),
+    'correctIndex': correctIndex,
+    'explanation': explanation.toJson(),
   };
+
+  MultipleChoiceQuiz copyWith({
+    LocalizedText? question,
+    LocalizedList? choices,
+    int? correctIndex,
+    LocalizedText? explanation,
+  }) =>
+      MultipleChoiceQuiz(
+        question: question ?? this.question,
+        choices: choices ?? this.choices,
+        correctIndex: correctIndex ?? this.correctIndex,
+        explanation: explanation ?? this.explanation,
+      );
 }
 
-/// **OX 퀴즈(OX Quiz) 모델 클래스**
-/// - 질문(`question`), 정답(`correctAnswer`), 설명(`explanation`) 포함.
+@immutable
 class OXQuiz {
-  final String question;      // 문제 텍스트
-  final bool correctAnswer;   // 정답 (true: O, false: X)
-  final String explanation;   // 정답에 대한 설명
+  final LocalizedText question;              // 다국어
+  final bool correctAnswer;
+  final LocalizedText explanation;           // 다국어
 
-  /// **OXQuiz 생성자**
-  OXQuiz({
-    required this.question,
-    required this.correctAnswer,
-    required this.explanation,
+  const OXQuiz({
+    this.question = const LocalizedText(),
+    this.correctAnswer = false,
+    this.explanation = const LocalizedText(),
   });
 
-  /// **JSON 데이터를 Dart 객체로 변환하는 팩토리 생성자**
-  factory OXQuiz.fromJson(Map<String, dynamic> json) {
+  factory OXQuiz.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return const OXQuiz();
     return OXQuiz(
-      question: json['question'] ?? '',
-      correctAnswer: json['correctAnswer'] == true, // Firestore에서 `bool` 타입으로 변환
-      explanation: json['explanation'] ?? '',
+      question: LocalizedText.fromJson(json['question']),
+      correctAnswer: _parseBool(json['correctAnswer']),
+      explanation: LocalizedText.fromJson(json['explanation']),
     );
   }
 
-  /// **Dart 객체를 JSON 형식으로 변환하는 메서드**
   Map<String, dynamic> toJson() => {
-    'question': question,
+    'question': question.toJson(),
     'correctAnswer': correctAnswer,
-    'explanation': explanation,
+    'explanation': explanation.toJson(),
   };
+
+  OXQuiz copyWith({
+    LocalizedText? question,
+    bool? correctAnswer,
+    LocalizedText? explanation,
+  }) =>
+      OXQuiz(
+        question: question ?? this.question,
+        correctAnswer: correctAnswer ?? this.correctAnswer,
+        explanation: explanation ?? this.explanation,
+      );
+}
+
+// ----------------- Helpers -----------------
+
+/// ko/en 맵 또는 단일 리스트(List<String>) 모두 허용.
+/// 단일 리스트면 ko에만 채워서 폴백.
+LocalizedList _parseLocalizedList(dynamic raw) {
+  if (raw is Map<String, dynamic>) {
+    return LocalizedList.fromJson(raw);
+  }
+  if (raw is List) {
+    final list = raw.map((e) => e.toString()).toList();
+    return LocalizedList(ko: list, en: const []);
+  }
+  return const LocalizedList();
+}
+
+/// 값이 List면 각각 파싱, Map이면 단일 원소 리스트로 감싼다.
+/// null이면 빈 리스트.
+List<T> _parseListOrSingle<T>(dynamic raw, T Function(dynamic) parseOne) {
+  if (raw == null) return <T>[];
+  if (raw is List) {
+    return raw.map((e) => parseOne(e)).toList();
+  }
+  // 단일 객체(Map 등) → 1개짜리 리스트로 폴백
+  return <T>[parseOne(raw)];
+}
+
+Map<String, dynamic>? _asMap(dynamic v) {
+  if (v is Map<String, dynamic>) return v;
+  if (v is Map) {
+    return v.map((k, value) => MapEntry(k.toString(), value));
+  }
+  return null;
+}
+
+/// correctIndex(숫자) 또는 correctAnswer(문자열 "A"/"B"/...) 지원.
+/// 숫자 문자열도 안전하게 파싱.
+int _parseCorrectIndex({dynamic rawIndex, dynamic rawAnswer}) {
+  // 1) 인덱스가 숫자/숫자문자열이면 우선 사용
+  if (rawIndex is int) return rawIndex;
+  final idxTry = int.tryParse(rawIndex?.toString() ?? '');
+  if (idxTry != null) return idxTry;
+
+  // 2) 정답문자(A/B/C/...) → 0/1/2/...
+  final ans = (rawAnswer ?? '').toString().trim();
+  if (ans.isNotEmpty) {
+    final upper = ans.toUpperCase();
+    // 예: "B" -> 1
+    final code = upper.codeUnitAt(0);
+    final aCode = 'A'.codeUnitAt(0);
+    final zCode = 'Z'.codeUnitAt(0);
+    if (code >= aCode && code <= zCode) {
+      return code - aCode;
+    }
+    // 혹시 "2" 같은 숫자문자열이면 그것도 허용
+    final fromNum = int.tryParse(upper);
+    if (fromNum != null) return fromNum;
+  }
+
+  return 0;
+}
+
+bool _parseBool(dynamic v) {
+  if (v is bool) return v;
+  if (v is String) {
+    final s = v.toLowerCase().trim();
+    return s == 'true' || s == '1' || s == 'yes' || s == 'y';
+  }
+  if (v is num) return v != 0;
+  return false;
 }

@@ -15,6 +15,7 @@ import 'package:readventure/view/home/attendance/attendance_service.dart';
 import 'package:readventure/view/home/home.dart';
 import 'package:readventure/view/home/notification/notification_page.dart';
 import 'package:readventure/view/home/stage_provider.dart';
+import 'package:readventure/view/login/auth_controller.dart';
 import 'package:readventure/view/login/login_main.dart';
 import 'package:readventure/view/login/nickname_input.dart';
 import 'package:readventure/view/login/tutorial.dart';
@@ -49,9 +50,12 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
     final isLightTheme = ref.watch(themeProvider); // 테마 상태를 읽음
     final themeController = ref.read(themeProvider.notifier); // 테마 컨트롤러
     final user = ref.watch(appStateProvider); // 현재 로그인한 사용자 정보
+    ref.watch(authControllerProvider);
+
 
     return ScreenUtilInit(
       // ScreenUtil 사용법
@@ -73,6 +77,7 @@ class MyApp extends ConsumerWidget { // ConsumerWidget으로 변경
       designSize: const Size(390, 844), // 기본 디자인 사이즈 설정
       builder: (context, child) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false, // 🔥 이 줄 추가
           title: tr('app_title'), // Localization을 통해 앱 제목 가져오기
           theme: isLightTheme ? themeController.lightTheme : themeController.darkTheme, // 라이트/다크 테마
           darkTheme: themeController.darkTheme, // 다크 테마

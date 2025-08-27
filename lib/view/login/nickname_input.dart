@@ -1,8 +1,8 @@
 /// File: nickname_input.dart
-/// Purpose: 별명 입력 및 검증을 위한 UI 구현, Firestore를 통해 닉네임 중복 확인 및 저장 처리
+/// Purpose: 별명 입력 및 검증 UI, Firestore 트랜잭션으로 닉네임 중복 확인 및 저장
 /// Author: 박민준
 /// Created: 2025-01-06
-/// Last Modified: 2025-01-07 by 박민준
+/// Last Modified: 2025-08-27 by ChatGPT (merge conflict resolved)
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,7 +17,7 @@ import 'package:easy_localization/easy_localization.dart';
 
 import '../widgets/DoubleBackToExitWrapper.dart';
 
-//TODO: Error Message 출력(닉네임 겹칠)시 버튼 색 바뀌게하기
+// TODO: Error Message 출력(닉네임 겹칠)시 버튼 색 바뀌게 하기
 
 class NicknameInput extends ConsumerStatefulWidget {
   const NicknameInput({super.key});
@@ -41,51 +41,99 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
 
     Future<void> _saveNickname() async {
       setState(() {
-        isLoading = true; // 로딩 상태 활성화
+        isLoading = true;
+        errorMessage = null;
       });
 
-      final nickname = _controller.text.trim();
-      final user = FirebaseAuth.instance.currentUser; // 현재 로그인한 사용자 가져오기
+      final raw = _controller.text;
+      final nickname = raw.trim();
+      final user = FirebaseAuth.instance.currentUser;
 
-      if (user != null) {
-        try {
-          // Firestore에서 기존 닉네임 확인
-          final nicknameDoc = FirebaseFirestore.instance.collection('nicknames').doc(nickname);
-          final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
+      // 0) 프런트 1차 검증 (1~8자, 공백 없음)
+      final valid = nickname.isNotEmpty &&
+          nickname.length >= 1 &&
+          nickname.length <= 8 &&
+          !nickname.contains(' ');
+      if (!valid) {
+        setState(() {
+          isLoading = false;
+          errorMessage = 'nickname.invalid_input'.tr(); // "별명을 올바르게 입력해주세요."
+        });
+        return;
+      }
 
-          final snapshot = await nicknameDoc.get();
-          if (snapshot.exists) {
-            // 닉네임이 이미 존재하는 경우
-            setState(() {
-              errorMessage = 'nickname.duplicate_error'.tr();
+      // 1) 인증 체크
+      if (user == null) {
+        setState(() {
+          isLoading = false;
+          errorMessage = 'nickname.auth_error'.tr(); // "사용자 인증 정보를 확인할 수 없습니다."
+        });
+        return;
+      }
+
+      // 2) Firestore 트랜잭션: 닉네임 점유 + 유저 문서 업데이트
+      final fs = FirebaseFirestore.instance;
+      final nickRef = fs.collection('nicknames').doc(nickname);
+      final userRef = fs.collection('users').doc(user.uid);
+
+      try {
+        await fs.runTransaction((tx) async {
+          // (a) 닉네임 중복 확인
+          final nickSnap = await tx.get(nickRef);
+          if (nickSnap.exists) {
+            // 커스텀 에러 토큰으로 던져서 구분 처리
+            throw Exception('DUPLICATE_NICKNAME');
+          }
+
+          // (b) 유저 문서 upsert (최소 스키마, 프로젝트에 맞게 조정)
+          final userSnap = await tx.get(userRef);
+          if (!userSnap.exists) {
+            tx.set(userRef, {
+              'name': user.displayName,
+              'photoURL': user.photoURL,
+              'email': user.email,
+              'createdAt': FieldValue.serverTimestamp(),
+              'totalXP': 0,
+              'currentCourse': '코스1',
+              'learningTime': 0,
+              'completedMissionCount': 0,
+              'nickname': nickname,
+              'nicknameSet': true,
+              'updatedAt': FieldValue.serverTimestamp(),
             });
           } else {
-            // Firestore에 닉네임 저장 및 사용자 상태 업데이트
-            await nicknameDoc.set({'uid': user.uid, 'created_at': FieldValue.serverTimestamp()});
-            await userDoc.update({
+            tx.update(userRef, {
               'nickname': nickname,
-              'nicknameSet': true, // 닉네임 설정 완료 상태 업데이트
+              'nicknameSet': true,
+              'updatedAt': FieldValue.serverTimestamp(),
             });
-
-            // 성공 시 홈 화면으로 이동
-            if (context.mounted) {
-              Navigator.pushReplacementNamed(context, '/tutorial');
-            }
           }
-        } catch (e) {
-          setState(() {
-            errorMessage = 'nickname.save_error'.tr();
+
+          // (c) 닉네임 점유 문서 생성
+          tx.set(nickRef, {
+            'uid': user.uid,
+            'created_at': FieldValue.serverTimestamp(),
           });
-          print('별명 저장 오류: $e');
-        } finally {
+        });
+
+        // 성공 → 튜토리얼 화면으로 이동
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/tutorial');
+        }
+      } catch (e) {
+        setState(() {
+          if (e.toString().contains('DUPLICATE_NICKNAME')) {
+            errorMessage = 'nickname.duplicate_error'.tr(); // "이미 사용 중인 별명입니다."
+          } else {
+            errorMessage = 'nickname.save_error'.tr(); // "별명을 저장하는 중 문제가 발생했습니다."
+          }
+        });
+      } finally {
+        if (mounted) {
           setState(() {
-            isLoading = false; // 로딩 상태 비활성화
+            isLoading = false;
           });
         }
-      } else {
-        setState(() {
-          errorMessage = 'nickname.auth_error'.tr();
-        });
       }
     }
 
@@ -103,17 +151,14 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'nickname.title'.tr(),
-                          style: heading_medium(context),
-                        ),
+                        Text('nickname.title'.tr(), style: heading_medium(context)),
                         const SizedBox(height: 24),
                         NicknameTextField(
                           controller: _controller,
-                          existingNicknames: [], // Firestore에서 가져오기 때문에 불필요
-                          onChanged: (text, error) {
+                          existingNicknames: const [], // Firestore에서 확인하므로 불필요
+                          onChanged: (text, err) {
                             setState(() {
-                              errorMessage = null; // 입력 중 에러 메시지 초기화
+                              errorMessage = null; // 입력 시 에러 제거
                             });
                           },
                         ),
@@ -133,10 +178,10 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
               Container(
                 width: MediaQuery.of(context).size.width,
                 padding: const EdgeInsets.all(20),
-                child: isInputValid && !isLoading
+                child: (isInputValid && !isLoading)
                     ? ButtonPrimary_noPadding(
                   function: _saveNickname,
-                    title: 'common.complete'.tr()
+                  title: 'common.complete'.tr(),
                 )
                     : ButtonPrimary20_noPadding(
                   function: () {
@@ -144,7 +189,7 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
                       errorMessage = 'nickname.invalid_input'.tr();
                     });
                   },
-                    title: 'common.complete'.tr()
+                  title: 'common.complete'.tr(),
                 ),
               ),
             ],

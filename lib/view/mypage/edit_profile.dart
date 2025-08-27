@@ -1,12 +1,13 @@
 /// File: edit_profile.dart
-/// Purpose: 사용자의 정보를 수정할 수 있다.
+/// Purpose: 사용자의 정보를 수정할 수 있다. (L10N 적용)
 /// Author: 윤은서
 /// Created: 2025-01-08
-/// Last Modified: 2025-02-17 by 강희
+/// Last Modified: 2025-08-26 by ChatGPT (L10N)
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart'; // ✅ L10N
 import '../../viewmodel/custom_colors_provider.dart';
 import '../../viewmodel/user_photo_url_provider.dart';
 import '../components/custom_app_bar.dart';
@@ -31,9 +32,7 @@ class EditProfile extends ConsumerWidget {
     return Scaffold(
       appBar: CustomAppBar_2depth_4(title: "edit_profile.title".tr()), // "내 정보 수정"
       backgroundColor: customColors.neutral100,
-      body: EditInfo(
-        userName: userName,
-      ),
+      body: EditInfo(userName: userName),
     );
   }
 }
@@ -78,6 +77,7 @@ class EditInfo extends StatelessWidget {
     );
   }
 }
+
 class ProfileImage extends ConsumerStatefulWidget {
   const ProfileImage({Key? key}) : super(key: key);
 
@@ -134,7 +134,7 @@ class _ProfileImageState extends ConsumerState<ProfileImage> {
     return Center(
       child: InkWell(
         onTap: _pickAndUploadImage,
-        borderRadius: BorderRadius.circular(60), // 동그란 모양 유지
+        borderRadius: BorderRadius.circular(60),
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -198,7 +198,7 @@ class _EditNickState extends ConsumerState<EditNick> {
       children: [
         Text(
           'edit_profile.nickname'.tr(), // "별명"
-          style: body_xsmall(context).copyWith(
+            style: body_xsmall(context).copyWith(
             color: customColors.primary,
           ),
         ),
@@ -257,7 +257,6 @@ class MyInfo extends ConsumerWidget {
     );
   }
 }
-
 
 class InfoRow extends StatelessWidget {
   final String title;

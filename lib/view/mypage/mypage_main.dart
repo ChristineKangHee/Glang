@@ -1,5 +1,5 @@
 /// File: mypage_main.dart
-/// Purpose: 마이페이지 화면 구현
+/// Purpose: 마이페이지 화면 구현 (L10N 적용, 비활성화 로직 안정화)
 /// Author: 박민준
 /// Created: 2025-01-02
 /// Last Modified: 2025-02-12 by 윤은서
@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/view/components/custom_app_bar.dart';
 import 'package:readventure/view/components/custom_navigation_bar.dart';
+import 'package:easy_localization/easy_localization.dart'; // ✅ L10N
 import '../../theme/font.dart';
 import '../../theme/theme.dart';
 import '../../viewmodel/badge_provider.dart';
@@ -75,6 +76,7 @@ class MyPageContent extends StatelessWidget {
               titleKey: 'my_page.stat_title',  // '학습 통계'
               descriptionKey: 'my_page.stat_desc',
               trailingIcon: Icons.arrow_forward_ios,
+              disabled: true, // 🔒 언어와 무관하게 안전하게 비활성화
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/statistics');
               },
@@ -120,6 +122,7 @@ class MyPageContent extends StatelessWidget {
               leadingIcon: Icons.book,
               titleKey: 'my_page.learning_history',
               trailingIcon: Icons.arrow_forward_ios,
+              disabled: true, // 🔒 비활성화
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/history');
               },
@@ -202,11 +205,8 @@ class UserProfileSection extends ConsumerWidget {
 // 상단 import 구문 아래에 provider 추가
 final myRankingProvider = FutureProvider<int>((ref) async {
   final rankings = await getRankings();
-  // 사용자 이름은 userNameProvider로부터 가져옵니다.
   final userName = ref.watch(userNameProvider) ?? '';
-  // 랭킹 리스트에서 사용자 이름과 일치하는 항목의 인덱스를 찾습니다.
   final index = rankings.indexWhere((user) => user['name'] == userName);
-  // 인덱스는 0부터 시작하므로 +1 해서 랭킹으로 표시 (만약 찾지 못하면 0)
   return index == -1 ? 0 : index + 1;
 });
 
@@ -254,73 +254,6 @@ class UserStatsSection extends ConsumerWidget {
     );
   }
 }
-
-
-
-/// 학습 통계 그래프 위젯
-/*
-class ProgressChart extends StatelessWidget {
-  const ProgressChart({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    List<TimeData> series1 = [
-      TimeData(domain: DateTime(2025, 1, 6), measure: 7),
-      TimeData(domain: DateTime(2025, 1, 7), measure: 5),
-      TimeData(domain: DateTime(2025, 1, 8), measure: 9),
-      TimeData(domain: DateTime(2025, 1, 9), measure: 10),
-      TimeData(domain: DateTime(2025, 1, 10), measure: 6),
-      TimeData(domain: DateTime(2025, 1, 11), measure: 1),
-      TimeData(domain: DateTime(2025, 1, 12), measure: 8),
-    ];
-
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/mypage/info/statistics');
-      },
-      child: AbsorbPointer( // 내부 그래프 터치 이벤트를 무시하고 InfoCard의 onTap 동작
-        child: SizedBox(
-          height: 200,
-          child: DChartBarT(
-            fillColor: (group, timeData, index) {
-              String day = DateFormat.E('ko').format(timeData.domain).substring(0, 1);
-              return Theme.of(context).extension<CustomColors>()?.primary;
-            },
-            configRenderBar: ConfigRenderBar(
-              barGroupInnerPaddingPx: 10,
-              radius: 12,
-            ),
-            domainAxis: DomainAxis(
-              showLine: true,
-              tickLength: 0,
-              gapAxisToLabel: 12,
-              labelStyle: LabelStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              tickLabelFormatterT: (domain) {
-                return DateFormat.E('ko').format(domain).substring(0, 1);
-              },
-            ),
-            measureAxis: const MeasureAxis(
-              showLine: true,
-            ),
-            groupList: [
-              TimeGroup(
-                id: '1',
-                data: series1.map((e) => TimeData(
-                  domain: e.domain,
-                  measure: e.measure,
-                )).toList(),
-                color: Colors.transparent,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-*/
 
 /// 수정된 BadgeBox 위젯
 class BadgeBox extends StatelessWidget {
@@ -383,18 +316,29 @@ class BadgeRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final badgesAsync = ref.watch(badgesProvider);
+    final earnedIdsAsync = ref.watch(userEarnedBadgeIdsProvider);
 
     return badgesAsync.when(
       data: (badges) {
-        // 전체 배지 컬렉션에서 3개만 표시
         final displayBadges = badges.take(3).toList();
+
+        // 유저 보유 뱃지 ID
+        final earnedIds = earnedIdsAsync.when(
+          data: (ids) => ids,
+          loading: () => const <String>[],
+          error: (_, __) => const <String>[],
+        );
+
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: displayBadges.map((badge) {
+            final localizedName = badge.name.pick(context);
+            final isUnlocked = earnedIds.contains(badge.id);
+
             return Flexible(
               child: BadgeBox(
-                label: badge.name,
-                isUnlocked: true, // earned 여부와 관계없이 unlocked 상태로 표시
+                label: localizedName,       // ✅ 현지화된 이름
+                isUnlocked: isUnlocked,     // ✅ 실제 보유 여부
                 imageUrl: badge.imageUrl,
               ),
             );
@@ -404,11 +348,9 @@ class BadgeRow extends ConsumerWidget {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stackTrace) =>
           Center(child: Text('my_page.loading_error'.tr())),
-
     );
   }
 }
-
 
 /// 사용자 통계 박스 위젯
 class StatBox extends StatelessWidget {
@@ -441,6 +383,7 @@ class InfoCard extends StatelessWidget {
   final Widget? child;
   final IconData? trailingIcon;
   final VoidCallback? onTap;
+  final bool disabled; // ✅ 언어와 무관하게 제어
 
   const InfoCard({
     required this.titleKey,
@@ -449,6 +392,7 @@ class InfoCard extends StatelessWidget {
     this.child,
     this.trailingIcon,
     this.onTap,
+    this.disabled = false, // ✅ 기본값 false
     super.key,
   });
 

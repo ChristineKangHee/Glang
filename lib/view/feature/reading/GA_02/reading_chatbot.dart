@@ -1,4 +1,4 @@
-/// File: reading_chatbot.dart
+/// File: lib/view/feature/reading/GA_02/reading_chatbot.dart
 /// Purpose: 읽기중 챗봇 화면을 나타내는 코드
 /// Author: 강희
 /// Created: 2024-1-19
@@ -51,7 +51,7 @@ class _ChatBotState extends ConsumerState<ChatBot> {
       try {
         final response = await _chatBotService.getChatResponse(
             widget.selectedText,
-            widget.readingData.textSegments,
+            widget.readingData.textSegments as List<String>,
             _messages
         );
 

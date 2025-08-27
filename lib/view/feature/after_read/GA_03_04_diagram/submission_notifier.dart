@@ -1,9 +1,10 @@
-// submission_notifier.dart
+// lib/view/feature/after_read/GA_03_04_diagram/submission_notifier.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collection/collection.dart';
 
 import '../../../../model/section_data.dart';
+import '../../../../model/stage_data.dart';
 import '../../../home/stage_provider.dart';
 import '../choose_activities.dart';
 import 'diagram_learning.dart';
@@ -47,7 +48,12 @@ class SubmissionNotifier extends StateNotifier<SubmissionStatus> {
         );
       }
       if (freshStage != null) {
-        await updateFeatureCompletion(freshStage, 4, true);
+        await updateFeatureCompletion(
+          stageId: freshStage.stageId,
+          featureNumber: 4,
+          isCompleted: true,
+        );
+
         // update 후 stagesProvider를 invalidate하여 최신 상태를 반영합니다.
         ref.invalidate(stagesProvider);
       }
