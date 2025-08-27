@@ -1,51 +1,56 @@
 /// File: settings_announcement.dart
-/// Purpose: 공지사항 설정 화면 위젯
+/// Purpose: 공지사항 설정 화면 위젯 (L10N 보강: 에러/빈상태/날짜 로캘)
 /// Author: 강희
 /// Created: 2024-12-28
-/// Last Modified: 2024-12-28 by 강희
+/// Last Modified: 2025-08-26 by ChatGPT (L10N)
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../../viewmodel/theme_controller.dart';
-import 'package:easy_localization/easy_localization.dart';
 import '../../components/custom_app_bar.dart';
 
-// 공지사항 설정 화면 위젯
 class SettingsAnnouncement extends ConsumerWidget {
   const SettingsAnnouncement({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final customColors = ref.watch(customColorsProvider); // 커스텀 색상 프로바이더 감시
+    final customColors = ref.watch(customColorsProvider);
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        title: '공지사항'.tr(), // 다국어 지원을 위한 번역 적용
+        title: 'announcements'.tr(), // ✅ 공지사항
       ),
       body: StreamBuilder<QuerySnapshot>(
-        // Firestore에서 공지사항 데이터를 실시간으로 가져오기
         stream: FirebaseFirestore.instance
             .collection('settings')
             .doc('announcements')
             .collection('announcements')
-            .orderBy('date', descending: true) // 최신순 정렬
+            .orderBy('date', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('오류: ${snapshot.error}')); // 오류 발생 시 표시
+            return Center(
+              child: Text('error_with_message'.tr(args: [snapshot.error.toString()])), // ✅ 에러 L10N
+            );
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator()); // 데이터 로딩 중
+            return const Center(child: CircularProgressIndicator());
           }
 
-          // Firestore에서 가져온 데이터를 Announcement 객체 리스트로 변환
-          final announcements = snapshot.data!.docs.map((doc) {
+          final docs = snapshot.data!.docs;
+          if (docs.isEmpty) {
+            return Center(child: Text('no_announcements'.tr())); // ✅ 빈 상태 L10N
+          }
+
+          final announcements = docs.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
             return Announcement(
               title: data['title'] ?? '',
-              date: (data['date'] as Timestamp).toDate(), // Timestamp를 DateTime으로 변환
+              date: (data['date'] as Timestamp).toDate(),
               detail: data['detail'] ?? '',
             );
           }).toList();
@@ -56,7 +61,6 @@ class SettingsAnnouncement extends ConsumerWidget {
               final announcement = announcements[index];
               return GestureDetector(
                 onTap: () {
-                  // 공지사항 상세 페이지로 이동
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -83,7 +87,6 @@ class SettingsAnnouncement extends ConsumerWidget {
   }
 }
 
-// 공지사항 목록에서 개별 공지사항을 표시하는 카드 위젯
 class AnnouncementCard extends ConsumerWidget {
   final String title;
   final DateTime date;
@@ -96,19 +99,17 @@ class AnnouncementCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final customColors = ref.watch(customColorsProvider); // 커스텀 색상 가져오기
+    final customColors = ref.watch(customColorsProvider);
+    final localeStr = context.locale.toString(); // ✅ 날짜 로캘 적용
 
     return ListTile(
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: body_small_semi(context), // 제목 스타일 적용
-          ),
+          Text(title, style: body_small_semi(context)),
           const SizedBox(height: 10),
           Text(
-            DateFormat('yyyy-MM-dd').format(date), // 날짜 형식 변환하여 표시
+            DateFormat('yyyy-MM-dd', localeStr).format(date), // ✅ 로캘 기반 포맷
             style: body_xsmall(context).copyWith(color: customColors.neutral60),
           ),
         ],
@@ -117,7 +118,6 @@ class AnnouncementCard extends ConsumerWidget {
   }
 }
 
-// 공지사항 정보를 담는 데이터 모델 클래스
 class Announcement {
   final String title;
   final DateTime date;
@@ -130,7 +130,6 @@ class Announcement {
   });
 }
 
-// 공지사항 상세 페이지 위젯
 class AnnouncementDetailPage extends ConsumerWidget {
   final Announcement announcement;
 
@@ -139,11 +138,12 @@ class AnnouncementDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final customColors = ref.watch(customColorsProvider); // 커스텀 색상 가져오기
+    final customColors = ref.watch(customColorsProvider);
+    final localeStr = context.locale.toString(); // ✅ 날짜 로캘 적용
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        title: '공지사항'.tr(),
+        title: 'announcements'.tr(), // ✅ 공지사항
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -153,19 +153,16 @@ class AnnouncementDetailPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  announcement.title,
-                  style: body_small_semi(context), // 제목 스타일 적용
-                ),
+                Text(announcement.title, style: body_small_semi(context)),
                 const SizedBox(height: 10),
                 Text(
-                  DateFormat('yyyy-MM-dd').format(announcement.date), // 날짜 표시
+                  DateFormat('yyyy-MM-dd', localeStr).format(announcement.date), // ✅ 로캘 기반
                   style: body_xsmall(context).copyWith(color: customColors.neutral60),
                 ),
                 Divider(color: customColors.neutral80),
                 const SizedBox(height: 20),
                 Text(
-                  announcement.detail.replaceAll(r'\n', '\n'), // 줄 바꿈 적용
+                  announcement.detail.replaceAll(r'\n', '\n'),
                   style: body_small(context),
                   softWrap: true,
                   overflow: TextOverflow.visible,

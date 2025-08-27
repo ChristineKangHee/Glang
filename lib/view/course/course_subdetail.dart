@@ -1,8 +1,8 @@
-/// 파일: course_subdetail.dart
-/// 목적: 사용자에게 각 학습에 대한 코스 상세 정보를 보여줌
-/// 작성자: 강희
-/// 생성일: 2024-01-04
-/// 마지막 수정: 2025-01-06 by 강희
+/// File: lib/view/course/course_subdetail.dart
+/// Purpose: 사용자에게 각 학습에 대한 코스 상세 정보를 보여줌
+/// Author: 강희
+/// Created: 2024-01-04
+/// Last Modified: 2025-08-13 by ChatGPT (다국어 적용 + 새 StageData 타입 반영)
 
 import 'package:flutter/material.dart';
 import 'package:readventure/view/course/section.dart';
@@ -20,19 +20,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../feature/reading/GA_02/RD_before.dart';
 import '../home/stage_provider.dart';
+import 'package:easy_localization/easy_localization.dart' hide tr;
 
-// course_subdetail.dart
+// CHANGED: tr 유틸
+import '../../localization/tr.dart';
+import '../../model/stage_data.dart'; // StageData, StageStatus
+
 class CourseDetailPage extends ConsumerWidget {
   final StageData stage; // 스테이지 전체를 받음
-
   const CourseDetailPage({Key? key, required this.stage}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
+    final locale = context.glangLocale; // CHANGED
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_4(title: '스테이지 상세'),
+      appBar: CustomAppBar_2depth_4(title: 'stage_detail_title'.tr()),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -43,7 +47,7 @@ class CourseDetailPage extends ConsumerWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      // 예: 스테이지 정보 표시
+                      // 스테이지 정보
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -51,18 +55,24 @@ class CourseDetailPage extends ConsumerWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(stage.subdetailTitle, style: body_large_semi(context)),
+                                // CHANGED: 다국어
+                                Text(tr(stage.subdetailTitle, locale), style: body_large_semi(context)),
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    IconTextRow(icon: Icons.timer, text: '${stage.totalTime}분'),
+                                    IconTextRow(
+                                      icon: Icons.timer,
+                                      text: 'time_minutes'.tr(args: [stage.totalTime.toString()]),
+                                    ),
                                     const SizedBox(width: 12),
-                                    IconTextRow(icon: Icons.star, text: stage.difficultyLevel),
+                                    // CHANGED: 난이도 다국어
+                                    IconTextRow(icon: Icons.star, text: tr(stage.difficultyLevel, locale)),
                                   ],
                                 ),
                                 const SizedBox(height: 16),
+                                // CHANGED: 본문 다국어
                                 Text(
-                                  stage.textContents,
+                                  tr(stage.textContents, locale),
                                   style: body_small(context),
                                 ),
                               ],
@@ -77,9 +87,10 @@ class CourseDetailPage extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      MissionSection(title: '미션', missions: stage.missions),
+                      // CHANGED: missions/effects 다국어 리스트
+                      MissionSection(title: 'missions_title'.tr(), missions: trList(stage.missions, locale)),
                       const SizedBox(height: 20),
-                      EffectSection(title: '효과', effects: stage.effects),
+                      EffectSection(title: 'effects_title'.tr(), effects: trList(stage.effects, locale)),
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -87,43 +98,31 @@ class CourseDetailPage extends ConsumerWidget {
               ),
 
               // 시작 버튼
-              Container(
+              SizedBox(
                 width: MediaQuery.of(context).size.width,
                 child: ButtonPrimary_noPadding(
                   function: () {
-                    // ⭐ 핵심: 현재 스테이지 ID를 Riverpod에 설정
+                    // 현재 스테이지 ID를 Riverpod에 설정
                     ref.read(selectedStageIdProvider.notifier).state = stage.stageId;
 
                     if (stage.activityCompleted["beforeReading"] == true &&
                         stage.activityCompleted["duringReading"] == false) {
-                      // 읽기 전 완료 → 읽기 중 화면으로 이동
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => RdBefore()),
-                      );
+                      // 읽기 전 완료 → 읽기 중
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => RdBefore()));
                     } else if (stage.activityCompleted["duringReading"] == true) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          settings: RouteSettings(name: 'LearningActivitiesPage'),
+                          settings: const RouteSettings(name: 'LearningActivitiesPage'),
                           builder: (context) => LearningActivitiesPage(),
                         ),
                       );
                     } else {
-                      // 기본적으로 읽기 전 화면으로 이동
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const CRLearning()),
-                      );
+                      // 기본: 읽기 전
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const CRLearning()));
                     }
-
-                    // // 그리고 CRLearning 화면으로 이동
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (_) => const CRLearning()),
-                    // );
                   },
-                  title: '시작하기',
+                  title: 'start_button'.tr(),
                 ),
               ),
             ],
@@ -134,10 +133,9 @@ class CourseDetailPage extends ConsumerWidget {
   }
 }
 
-
 class IconTextRow extends StatelessWidget {
-  final IconData icon; // 아이콘 데이터
-  final String text; // 텍스트
+  final IconData icon;
+  final String text;
 
   const IconTextRow({super.key, required this.icon, required this.text});
 
@@ -146,17 +144,17 @@ class IconTextRow extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon), // 아이콘 표시
+        Icon(icon),
         const SizedBox(width: 4),
-        Text(text, style: body_xsmall_semi(context)), // 텍스트 표시
+        Text(text, style: body_xsmall_semi(context)),
       ],
     );
   }
 }
 
 class MissionSection extends StatelessWidget {
-  final String title; // 섹션 제목
-  final List<String> missions; // 미션 리스트
+  final String title;
+  final List<String> missions; // CHANGED: 이미 trList로 변환된 List<String>을 받음
 
   const MissionSection({super.key, required this.title, required this.missions});
 
@@ -164,31 +162,27 @@ class MissionSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16), // 섹션 여백
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: ShapeDecoration(
-        color: Theme.of(context).extension<CustomColors>()!.neutral90, // 배경 색상
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20), // 모서리 둥글기
-        ),
+        color: Theme.of(context).extension<CustomColors>()!.neutral90,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: body_xsmall_semi(context)), // 섹션 제목
+          Text(title, style: body_xsmall_semi(context)),
           const SizedBox(height: 10),
           Wrap(
-            spacing: 12, // 항목 간 가로 간격
-            runSpacing: 12, // 줄 간 세로 간격
+            spacing: 12,
+            runSpacing: 12,
             children: List.generate((missions.length / 2).ceil(), (index) {
-              final firstMissionIndex = index * 2; // 첫 번째 미션 인덱스
-              final secondMissionIndex = firstMissionIndex + 1; // 두 번째 미션 인덱스
+              final first = index * 2;
+              final second = first + 1;
               return Row(
                 children: [
-                  Expanded(child: MissionItem(mission: missions[firstMissionIndex])), // 첫 번째 미션
-                  if (secondMissionIndex < missions.length)
-                    const SizedBox(width: 12), // 항목 간 간격
-                  if (secondMissionIndex < missions.length)
-                    Expanded(child: MissionItem(mission: missions[secondMissionIndex])), // 두 번째 미션
+                  Expanded(child: MissionItem(mission: missions[first])),
+                  if (second < missions.length) const SizedBox(width: 12),
+                  if (second < missions.length) Expanded(child: MissionItem(mission: missions[second])),
                 ],
               );
             }),
@@ -200,8 +194,7 @@ class MissionSection extends StatelessWidget {
 }
 
 class MissionItem extends StatelessWidget {
-  final String mission; // 개별 미션 내용
-
+  final String mission;
   const MissionItem({super.key, required this.mission});
 
   @override
@@ -209,17 +202,17 @@ class MissionItem extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.circle, size: 6), // 작은 원 아이콘
+        const Icon(Icons.circle, size: 6),
         const SizedBox(width: 8),
-        Text(mission, style: body_xsmall(context)), // 미션 텍스트
+        Text(mission, style: body_xsmall(context)),
       ],
     );
   }
 }
 
 class EffectSection extends StatelessWidget {
-  final String title; // 섹션 제목
-  final List<String> effects; // 학습 효과 리스트
+  final String title;
+  final List<String> effects; // CHANGED: 이미 trList로 변환된 List<String>
 
   const EffectSection({super.key, required this.title, required this.effects});
 
@@ -227,21 +220,19 @@ class EffectSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16), // 섹션 여백
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: ShapeDecoration(
-        color: Theme.of(context).extension<CustomColors>()!.neutral90, // 배경 색상
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20), // 모서리 둥글기
-        ),
+        color: Theme.of(context).extension<CustomColors>()!.neutral90,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: body_xsmall_semi(context)), // 섹션 제목
+          Text(title, style: body_xsmall_semi(context)),
           const SizedBox(height: 10),
           ...effects.map((effect) => Padding(
-            padding: const EdgeInsets.only(bottom: 10), // 항목 간 간격
-            child: EffectItem(effect: effect), // 개별 학습 효과 항목
+            padding: const EdgeInsets.only(bottom: 10),
+            child: EffectItem(effect: effect),
           )),
         ],
       ),
@@ -250,17 +241,16 @@ class EffectSection extends StatelessWidget {
 }
 
 class EffectItem extends StatelessWidget {
-  final String effect; // 개별 학습 효과 내용
-
+  final String effect;
   const EffectItem({super.key, required this.effect});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(Icons.circle, size: 6), // 작은 원 아이콘
+        const Icon(Icons.circle, size: 6),
         const SizedBox(width: 8),
-        Text(effect, style: body_xsmall(context)), // 학습 효과 텍스트
+        Text(effect, style: body_xsmall(context)),
       ],
     );
   }

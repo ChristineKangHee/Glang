@@ -1,16 +1,17 @@
-/// File: diagram_learning.dart
+/// File: lib/view/feature/after_read/GA_03_04_diagram/diagram_learning.dart
 /// Purpose: 사용자가 단어를 트리 구조의 노드에 드래그 앤 드롭하여 트리 구조를 완성하도록 설계되었습니다.
 /// Author: 강희
-/// Created: 2024-1-17
-/// Last Modified: 2024-02-11 by 박민준
+/// Created: 2024-01-17
+/// Last Modified: 2025-08-XX by ChatGPT (post-frame init + locale-safe + no-build-mutation)
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:graphview/GraphView.dart';
-import 'package:readventure/view/feature/after_read/GA_03_04_diagram/submission_notifier.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../../../model/section_data.dart';
+import '../../../../model/stage_data.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
@@ -21,210 +22,298 @@ import '../../../home/stage_provider.dart';
 import '../choose_activities.dart';
 import '../widget/title_section_learning.dart';
 import 'diagram_main.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'submission_notifier.dart';
+import 'package:readventure/util/locale_text.dart';
 
-/// ─────────── 정답 정보 및 제출 상태 Provider ───────────
-/// ─────────── 제출 상태/완료 상태 Provider ───────────
+/// ───────────────────────────── Helpers: locale-safe pickers ─────────────────────────────
+String _pickLocaleString(BuildContext context, dynamic v, {String fallback = ''}) {
+  if (v == null) return fallback;
+  if (v is String) return v;
+  if (v is Map) {
+    final lang = context.locale.languageCode; // 'ko'/'en'...
+    final val = v[lang] ?? v['ko'] ?? v['en'] ?? v.values.first;
+    return val?.toString() ?? fallback;
+  }
+  try {
+    final json = (v as dynamic).toJson();
+    if (json is Map) return _pickLocaleString(context, json, fallback: fallback);
+  } catch (_) {}
+  return fallback;
+}
+
+List<String> _pickLocaleList(BuildContext context, dynamic v, {List<String> fallback = const []}) {
+  if (v == null) return fallback;
+  if (v is List) return v.map((e) => e.toString()).toList(growable: false);
+  if (v is Map) {
+    final lang = context.locale.languageCode;
+    final sel = v[lang] ?? v['ko'] ?? v['en'] ?? v.values.first;
+    if (sel is List) return sel.map((e) => e.toString()).toList(growable: false);
+  }
+  try {
+    final json = (v as dynamic).toJson();
+    return _pickLocaleList(context, json, fallback: fallback);
+  } catch (_) {}
+  return fallback;
+}
+
+Map<String, String> _pickLocaleStringMap(BuildContext context, Map raw) {
+  final out = <String, String>{};
+  raw.forEach((k, v) => out['$k'] = _pickLocaleString(context, v, fallback: ''));
+  return out;
+}
+
+/// 트리 데이터에서 id(로컬라이즈드/복합 가능)를 문자열로 **정규화**해줌
+Map<String, dynamic> _normalizeTree(BuildContext context, Map raw) {
+  final idStr = _pickLocaleString(context, raw['id'], fallback: '');
+  final children = (raw['children'] as List?)
+      ?.whereType<Map>()
+      .map((m) => _normalizeTree(context, m))
+      .toList() ??
+      const <Map<String, dynamic>>[];
+  return {'id': idStr, 'children': children};
+}
+
+/// ───────────────────────────── Providers ─────────────────────────────
+/// 제출 상태/완료 상태
 final submissionStatusProvider = StateProvider<bool>((ref) => false);
 final submissionCompleteProvider = StateProvider<bool>((ref) => false);
 
-/// ─────────── 단어 리스트를 관리하기 위한 StateNotifierProvider ───────────
-/// 1) Firestore에서 가져온 wordList를 초기값으로 설정
-final wordListProvider = StateNotifierProvider<WordListNotifier, List<String>>((ref) {
-  final stage = ref.watch(currentStageProvider);
-  // diagramData 안의 wordList를 가져온다
-  final diagramData = stage?.arData?.featureData?['feature4Diagram'] as Map<String, dynamic>?;
-  final words = (diagramData?['wordList'] as List<dynamic>?)?.cast<String>() ?? [];
-  return WordListNotifier(words);
-});
+/// 안내 다이얼로그 1회 표시 여부
+// final dialogShownProvider = StateProvider.autoDispose<bool>((ref) => false);
 
-// 단어 리스트 관리 클래스
+/// 단어 리스트(워드뱅크)
+final wordListProvider =
+StateNotifierProvider<WordListNotifier, List<String>>((ref) => WordListNotifier(const []));
+
 class WordListNotifier extends StateNotifier<List<String>> {
-  WordListNotifier(List<String> initialWords) : super(initialWords);
-
-  void removeWord(String word) {
-    state = state.where((w) => w != word).toList();
-  }
-
-  void resetWords() {
-    state = []; // wordList를 비움
+  WordListNotifier(List<String> initial) : super(initial);
+  void removeWord(String word) => state = state.where((w) => w != word).toList(growable: false);
+  void resetWords() => state = const [];
+  void setIfEmpty(List<String> words) {
+    if (state.isEmpty) state = List.unmodifiable(words);
   }
 }
 
-/// ─────────── 노드 라벨을 관리하기 위한 StateNotifierProvider ───────────
-final nodeLabelProvider = StateNotifierProvider<NodeLabelNotifier, Map<String, String>>((ref) {
-  return NodeLabelNotifier();
-});
+/// 노드 라벨 맵
+final nodeLabelProvider =
+StateNotifierProvider<NodeLabelNotifier, Map<String, String>>((ref) => NodeLabelNotifier());
 
 class NodeLabelNotifier extends StateNotifier<Map<String, String>> {
-  NodeLabelNotifier() : super({});
-
-  void updateNodeLabel(String nodeId, String label) {
-    state = {...state, nodeId: label};
-  }
-
-  String getNodeLabel(String nodeId) {
-    return state[nodeId] ?? "";
-  }
-
-  void clearNodeLabels() {
-    state = state.map((key, value) => MapEntry(key, ""));
-  }
+  NodeLabelNotifier() : super(const {});
+  void updateNodeLabel(String nodeId, String label) => state = {...state, nodeId: label};
+  String getNodeLabel(String nodeId) => state[nodeId] ?? "";
+  void clearNodeLabels() => state = state.map((k, v) => MapEntry(k, ""));
 }
 
-/// ─────────── 트리 다이어그램 화면 ───────────
-class RootedTreeScreen extends ConsumerWidget {
-  RootedTreeScreen({Key? key}) : super(key: key);
+/// ───────────────────────────── Screen ─────────────────────────────
+class RootedTreeScreen extends ConsumerStatefulWidget {
+  const RootedTreeScreen({Key? key}) : super(key: key);
 
+  @override
+  ConsumerState<RootedTreeScreen> createState() => _RootedTreeScreenState();
+}
+
+class _RootedTreeScreenState extends ConsumerState<RootedTreeScreen> {
   final BuchheimWalkerConfiguration builder = BuchheimWalkerConfiguration();
-  final dialogShownProvider = StateProvider<bool>((ref) => false);
+  final _appBarKey = GlobalKey<CustomAppBar_2depth_8State>();
 
-  /// 트리를 재귀적으로 그리는 헬퍼
-  void buildTree(Graph graph, Map<String, dynamic> data, Node? parentNode) {
-    final Node currentNode = Node.Id(data['id']);
-    if (parentNode != null) {
-      graph.addEdge(parentNode, currentNode);
+  late final ProviderSubscription<StageData?> _stageSub;
+  late final ProviderSubscription<SubmissionStatus> _submitSub;
+  bool _didSeedOnce = false;
+
+  bool _dialogShownOnce = false; // ⬅️ 추가 (팝업 1회 표시 플래그)
+
+  @override
+  void initState() {
+    super.initState();
+
+    // currentStageProvider 변화 감지 (initState에서 listenManual 사용, fireImmediately 제거)
+    _stageSub = ref.listenManual<StageData?>(
+      currentStageProvider,
+          (prev, next) {
+        if (next != null) _seedFromStage(next); // 내부에서 post-frame으로 시드
+      },
+      // fireImmediately: true  ← 사용하지 않음 (컨텍스트 의존 접근을 피하기 위해)
+    );
+
+    // 제출 상태 변화 감지
+    _submitSub = ref.listenManual<SubmissionStatus>(
+      submissionNotifierProvider,
+          (prev, next) async {
+        if (next != SubmissionStatus.success) return;
+        final elapsedSeconds = _appBarKey.currentState?.elapsedSeconds ?? 0;
+        final userId = ref.read(userIdProvider);
+        if (userId != null) {
+          await ref.read(userServiceProvider).updateLearningTime(elapsedSeconds);
+        }
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => LearningActivitiesPage()),
+        );
+      },
+    );
+  }
+
+  /// 최초 1회 시드는 didChangeDependencies에서 (EasyLocalization 의존 안전)
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // ── 팝업 1회 ──
+    if (!_dialogShownOnce) {
+      _dialogShownOnce = true; // 먼저 막아 중복 방지
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (_) => const DiagramMainDialog(),
+        );
+      });
     }
-    if (data['children'] != null) {
-      for (var child in data['children']) {
-        buildTree(graph, child, currentNode);
+
+    // ── ★★★ 최초 1회 워드리스트 시드 ★★★ ──
+    if (!_didSeedOnce) {
+      _didSeedOnce = true;
+      final stageNow = ref.read(currentStageProvider); // 현재 값 직접 읽기
+      if (stageNow != null) {
+        _seedFromStage(stageNow); // 내부에서 post-frame + locale-safe
       }
     }
   }
 
-  final GlobalKey<CustomAppBar_2depth_8State> _appBarKey = GlobalKey<CustomAppBar_2depth_8State>();
+
+  /// 구독 해제
+  @override
+  void dispose() {
+    _stageSub.close();
+    _submitSub.close();
+    super.dispose();
+  }
+
+  /// 빌드 중 프로바이더 변경 금지: 항상 포스트-프레임에서 시드 + 여기서 locale 접근
+  void _seedFromStage(StageData stage) {
+    final diag = stage.arData?.featureData?['feature4Diagram'] as Map<String, dynamic>?;
+    if (diag == null) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final wordsInit = _pickLocaleList(context, diag['wordList']); // 여기서 locale 참조
+      if (wordsInit.isNotEmpty) {
+        ref.read(wordListProvider.notifier).setIfEmpty(wordsInit);
+      }
+    });
+  }
+
+  /// 그래프 빌더 (정규화된 트리 사용)
+  void _buildTree(Graph graph, Map<String, dynamic> data, Node? parentNode) {
+    final Node currentNode = Node.Id(data['id'] as String);
+    if (parentNode != null) graph.addEdge(parentNode, currentNode);
+    final children = (data['children'] as List).cast<Map<String, dynamic>>();
+    for (final child in children) {
+      _buildTree(graph, child, currentNode);
+    }
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // 1) 현재 스테이지 데이터 구독
+  Widget build(BuildContext context) {
     final stage = ref.watch(currentStageProvider);
-    // 2) 만약 로딩 중이거나 stage가 없으면 처리
+    final customColors = ref.watch(customColorsProvider);
+
     if (stage == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // 3) stage.arData?.featureData['feature4Diagram']에서 다이어그램 정보 추출
     final diagramData = stage.arData?.featureData?['feature4Diagram'] as Map<String, dynamic>?;
     if (diagramData == null) {
-      // 다이어그램이 없을 경우 메시지
-      return Scaffold(
-        body: Center(child: Text("diagram_no_data").tr()),
-      );
+      return Scaffold(body: Center(child: Text("diagram_no_data").tr()));
     }
 
-    // 4) Firestore에서 불러온 treeStructure, correctAnswers 등
-    final treeStructure = (diagramData['treeStructure'] as List<dynamic>?) ?? [];
-    final correctAnswers = (diagramData['correctAnswers'] as Map<String, dynamic>?) ?? {};
-    final diagramTitle = diagramData['title'] as String? ?? "다이어그램";
-    final diagramSubtitle = diagramData['subtitle'] as String? ?? "";
-    // 아래처럼 Map<String,String> 형태로 변환
-    final correctAnswersMap = correctAnswers.map((key, value) => MapEntry(key, value.toString()));
+    // 안내 다이얼로그 1회 표시 (post-frame에서 state set)
+    // if (!ref.read(dialogShownProvider)) {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     if (!mounted) return;
+    //     showDialog(
+    //       context: context,
+    //       builder: (_) => const DiagramMainDialog(),
+    //     );
+    //     ref.read(dialogShownProvider.notifier).state = true;
+    //   });
+    // }
 
-    // 그래프 초기화
+    // ── 다국어 대응 필드 파싱 ──
+    final diagramTitle = _pickLocaleString(context, diagramData['title'], fallback: "다이어그램");
+    final diagramSubtitle = _pickLocaleString(context, diagramData['subtitle'], fallback: "");
+    final correctAnswersRaw = (diagramData['correctAnswers'] as Map?) ?? const {};
+    final correctAnswersMap = _pickLocaleStringMap(context, correctAnswersRaw as Map);
+
+    // ── 트리 구조 정규화 ──
+    final treeStructure =
+        (diagramData['treeStructure'] as List?)?.whereType<Map>().toList() ?? const [];
     final graph = Graph();
     if (treeStructure.isNotEmpty) {
-      buildTree(graph, treeStructure.first, null);
+      final normalizedRoot = _normalizeTree(context, treeStructure.first);
+      _buildTree(graph, normalizedRoot, null);
     }
-    // 트리 레이아웃 설정
+
+    // 레이아웃 설정
     builder
       ..siblingSeparation = 30
       ..levelSeparation = 70
       ..subtreeSeparation = 50
       ..orientation = BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM;
 
-    // 5) 앱에 필요한 나머지 Provider/상태 구독
-    final customColors = ref.watch(customColorsProvider);
-    final dialogShown = ref.watch(dialogShownProvider);
-
-    // 처음 로드 시, 다이얼로그 띄우기 (diagramMainDialog)
-    if (!dialogShown) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return const DiagramMainDialog();
-          },
-        );
-        ref.read(dialogShownProvider.notifier).state = true;
-      });
-    }
-    // SubmissionNotifier의 상태를 listen 합니다.
-    ref.listen<SubmissionStatus>(submissionNotifierProvider, (prev, next) async {
-      if (next == SubmissionStatus.success) {
-        // 제출 성공 시 안전하게 네비게이션 실행
-        final elapsedSeconds = _appBarKey.currentState?.elapsedSeconds ?? 0;
-
-        // 사용자 학습시간 업데이트
-        final userId = ref.watch(userIdProvider);
-        if (userId != null) {
-          await ref.read(userServiceProvider).updateLearningTime(elapsedSeconds);
-        }
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LearningActivitiesPage()),
-        );
-      }
-      // 실패한 경우 에러 다이얼로그 등 추가 처리할 수 있습니다.
-    });
     return Scaffold(
       backgroundColor: customColors.neutral90,
-      // 앱바 타이틀
-      appBar: CustomAppBar_2depth_8(title: 'diagram_title'.tr(), key: _appBarKey,),
+      appBar: CustomAppBar_2depth_8(title: 'diagram_title'.tr(), key: _appBarKey),
       body: Column(
         children: [
-          // 상단 안내영역
-          // ✅ RootedTreeScreen에서 TitleSection_withIcon 호출 시 stageId, subdetailTitle 추가
+          // 상단 설명
           Container(
             decoration: ShapeDecoration(
               color: customColors.neutral100,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: TitleSection_withIcon(
                 customColors: Theme.of(context).extension<CustomColors>()!,
-                title: diagramTitle,
-                subtitle: diagramSubtitle,
-                // TitleSection_withIcon 내
+                title: diagramTitle, // ⚠️ 이미 로컬라이즈된 문자열. 위젯 내부에서 .tr() 하지 마세요.
+                subtitle: diagramSubtitle, // ⚠️ 동일
                 author: "author_none".tr(),
-                stageId: stage.stageId, // ✅ stageId 추가
-                subdetailTitle: stage.subdetailTitle, // ✅ subdetailTitle 추가
+                stageId: stage.stageId,
+                subdetailTitle: lx(context, stage.subdetailTitle),
               ),
             ),
           ),
-          // 트리 다이어그램 영역
+
+          // 트리 뷰
           Expanded(
-            flex: 1,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Center(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    // 화면 크기에 따라 간격 동적으로 조정
-                    final nodeCount = graph.nodeCount();
+                    final nodeCount = graph.nodeCount().clamp(1, 999);
                     builder
-                      ..siblingSeparation = (constraints.maxWidth / (nodeCount * 1.5))
-                          .clamp(20, 100)
-                          .toInt()
-                      ..levelSeparation = (constraints.maxHeight / (nodeCount * 2.5))
-                          .clamp(50, 200)
-                          .toInt();
+                      ..siblingSeparation =
+                      (constraints.maxWidth / (nodeCount * 1.5)).clamp(20, 100).toInt()
+                      ..levelSeparation =
+                      (constraints.maxHeight / (nodeCount * 2.5)).clamp(50, 200).toInt();
 
                     return InteractiveViewer(
                       constrained: false,
                       child: GraphView(
                         graph: graph,
-                        algorithm: BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder)),
+                        algorithm:
+                        BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder)),
                         paint: Paint()
                           ..color = customColors.neutral80!
                           ..strokeWidth = 1.5
                           ..style = PaintingStyle.stroke,
                         builder: (Node node) {
-                          final nodeId = node.key!.value as String;
-                          return nodeWidget(nodeId, ref, correctAnswersMap);
+                          final nodeId = node.key!.value as String; // 정상적으로 String
+                          return _nodeWidget(nodeId, ref, correctAnswersMap);
                         },
                       ),
                     );
@@ -233,7 +322,8 @@ class RootedTreeScreen extends ConsumerWidget {
               ),
             ),
           ),
-          // 단어 리스트 + 제출 버튼
+
+          // 단어 리스트 / 제출 버튼
           WordListWidget(correctAnswersMap: correctAnswersMap),
           const SizedBox(height: 20),
         ],
@@ -241,21 +331,18 @@ class RootedTreeScreen extends ConsumerWidget {
     );
   }
 
-  /// 노드 위젯: nodeId에 매핑된 라벨 표시 + 드래그 타겟
-  Widget nodeWidget(String nodeId, WidgetRef ref, Map<String, String> correctAnswersMap) {
-    final label = ref.watch(nodeLabelProvider.select((map) => map[nodeId] ?? ""));
+  /// 노드 위젯
+  Widget _nodeWidget(String nodeId, WidgetRef ref, Map<String, String> correctAnswersMap) {
+    final label = ref.watch(nodeLabelProvider.select((m) => m[nodeId] ?? ""));
     final customColors = ref.watch(customColorsProvider);
     final submitted = ref.watch(submissionStatusProvider);
 
-    // 제출 후 정답/오답 색상 처리
+    // 색상
     Color? nodeColor;
     if (submitted) {
-      String correctAnswer = correctAnswersMap[nodeId] ?? "";
-      nodeColor = (label == correctAnswer)
-          ? customColors.success40
-          : customColors.error40;
+      final correct = correctAnswersMap[nodeId] ?? "";
+      nodeColor = (label == correct) ? customColors.success40 : customColors.error40;
     } else {
-      // 제출 전 기본 색상
       switch (nodeId) {
         case 'Root':
           nodeColor = customColors.secondary;
@@ -267,44 +354,38 @@ class RootedTreeScreen extends ConsumerWidget {
           break;
         default:
           nodeColor = customColors.primary40;
-          break;
       }
     }
 
     return GestureDetector(
       onTap: () {
-        if (label.isNotEmpty) {
-          // 노드에 배치된 단어를 다시 워드리스트로 이동
-          ref.read(wordListProvider.notifier).state = [
-            ...ref.read(wordListProvider),
-            label
-          ];
-          // 노드 라벨 초기화
-          ref.read(nodeLabelProvider.notifier).updateNodeLabel(nodeId, "");
-          // 제출 상태도 초기화
-          ref.read(submissionStatusProvider.notifier).state = false;
-          ref.read(submissionCompleteProvider.notifier).state = false;
-        }
+        if (label.isEmpty) return;
+        // 라벨 회수 → 워드리스트로 복원
+        final list = ref.read(wordListProvider);
+        ref.read(wordListProvider.notifier).state = [...list, label];
+        // 노드 라벨 초기화 + 제출상태 초기화
+        ref.read(nodeLabelProvider.notifier).updateNodeLabel(nodeId, "");
+        ref.read(submissionStatusProvider.notifier).state = false;
+        ref.read(submissionCompleteProvider.notifier).state = false;
       },
       child: DragTarget<String>(
-        onAccept: (droppedWord) {
-          ref.read(nodeLabelProvider.notifier).updateNodeLabel(nodeId, droppedWord);
-          ref.read(wordListProvider.notifier).removeWord(droppedWord);
+        onWillAccept: (_) => label.isEmpty,
+        onAccept: (word) {
+          ref.read(nodeLabelProvider.notifier).updateNodeLabel(nodeId, word);
+          ref.read(wordListProvider.notifier).removeWord(word);
         },
-        onWillAccept: (data) => label.isEmpty, // 이미 단어가 있으면 드롭 불가
-        builder: (context, candidateData, rejectedData) {
+        builder: (_, candidate, __) {
           return Container(
             width: 80,
             height: 40,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              color: candidateData.isNotEmpty ? customColors.success40 : nodeColor,
+              color: candidate.isNotEmpty ? customColors.success40 : nodeColor,
             ),
             child: Text(
               label.isEmpty ? " " : label,
-              style: body_small_semi(context)
-                  .copyWith(fontSize: 12, color: customColors.neutral100),
+              style: body_small_semi(_).copyWith(fontSize: 12, color: customColors.neutral100),
             ),
           );
         },
@@ -313,13 +394,13 @@ class RootedTreeScreen extends ConsumerWidget {
   }
 }
 
-/// ─────────── 단어 리스트 + 제출 로직 ───────────
+/// ───────────────────────────── Word bank & Submit ─────────────────────────────
 class WordListWidget extends ConsumerStatefulWidget {
   final Map<String, String> correctAnswersMap;
   const WordListWidget({Key? key, required this.correctAnswersMap}) : super(key: key);
 
   @override
-  _WordListWidgetState createState() => _WordListWidgetState();
+  ConsumerState<WordListWidget> createState() => _WordListWidgetState();
 }
 
 class _WordListWidgetState extends ConsumerState<WordListWidget> {
@@ -330,18 +411,16 @@ class _WordListWidgetState extends ConsumerState<WordListWidget> {
     final submitted = ref.watch(submissionStatusProvider);
     final complete = ref.watch(submissionCompleteProvider);
 
-    // 버튼 텍스트 처리
     final buttonTitle = submitted
         ? (complete ? 'submit_complete'.tr() : 'edit_submission'.tr())
         : 'submit'.tr();
 
-    // 모든 단어가 노드에 배치되면 → 제출/수정 버튼 표시
+    // 모든 단어 배치 완료 → 제출/수정 버튼
     if (wordList.isEmpty) {
       return SizedBox(
         width: MediaQuery.of(context).size.width,
         child: ButtonPrimary(
           function: () async {
-            // 단순히 SubmissionNotifier의 submitFeature()를 호출합니다.
             await ref
                 .read(submissionNotifierProvider.notifier)
                 .submitFeature(widget.correctAnswersMap);
@@ -351,7 +430,7 @@ class _WordListWidgetState extends ConsumerState<WordListWidget> {
       );
     }
 
-    // 아직 배치 안된 단어들이 있다면 → Draggable 리스트 표시
+    // 남은 단어들 draggable
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Container(
@@ -371,9 +450,7 @@ class _WordListWidgetState extends ConsumerState<WordListWidget> {
                 padding: const EdgeInsets.all(8),
                 decoration: ShapeDecoration(
                   color: customColors.neutral90,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: Draggable<String>(
                   data: word,
@@ -397,9 +474,7 @@ class _WordListWidgetState extends ConsumerState<WordListWidget> {
       padding: const EdgeInsets.all(8),
       decoration: ShapeDecoration(
         color: customColors.neutral90,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       child: Text(word, style: body_small(context)),
     );

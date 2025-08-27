@@ -8,6 +8,7 @@ import '../widget/start_page/description_section_main.dart';
 import '../widget/start_page/icon_section_main.dart';
 import '../widget/start_page/title_section_main.dart';
 import 'DA_learning.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class DebateActivityMain extends StatelessWidget {
   const DebateActivityMain({super.key});
@@ -29,7 +30,7 @@ class DebateActivityMain extends StatelessWidget {
                   Column(
                     children: [
                       TitleSectionMain(
-                        title: "토론 미션",
+                        title: 'debate_mission_title'.tr(), // ***
                         subtitle: "",
                         subtitle2: "",
                         customColors: customColors,
@@ -46,11 +47,11 @@ class DebateActivityMain extends StatelessWidget {
                         items: [
                           {
                             "icon": Icons.comment_outlined,
-                            "text": "찬성/반대 총 4번을 반복해요!",
+                            "text": 'debate_instruction_rounds'.tr(), // ***
                           },
                           {
                             "icon": Icons.access_time_filled,
-                            "text": "미션을 시작하면 타이머가 작동해요!",
+                            "text": 'mission_instruction_timer'.tr(), // ***
                           },
                         ],
                       ),
@@ -63,7 +64,7 @@ class DebateActivityMain extends StatelessWidget {
                             ),
                           );
                         },
-                        title: '시작하기',
+                        title: 'start_button'.tr(), // ***
                       )
                     ],
                   ),

@@ -1,12 +1,13 @@
 /// File: edit_nick.dart
-/// Purpose: 사용자의 별명를 수정할 수 있다.
+/// Purpose: 사용자의 별명를 수정할 수 있다. (L10N 적용)
 /// Author: 윤은서
 /// Created: 2025-01-08
-/// Last Modified: 2025-02-12 by 윤은서
+/// Last Modified: 2025-08-26 by ChatGPT (L10N)
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart'; // ✅ L10N
 import '../../viewmodel/custom_colors_provider.dart';
 import '../components/custom_app_bar.dart';
 import '../components/custom_button.dart';
@@ -26,6 +27,7 @@ class EditNickInput extends ConsumerStatefulWidget {
 
 class _EditNickInputState extends ConsumerState<EditNickInput> {
   late TextEditingController _controller;
+  String? errorMessage;
 
   @override
   void initState() {
@@ -39,8 +41,6 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
     _controller.dispose();
     super.dispose();
   }
-
-  String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +75,7 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
                         });
                       },
                     ),
-                    if (errorMessage != null)
+                    if (errorMessage != null && errorMessage!.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
                         child: Text(
@@ -94,6 +94,7 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
               function: () async {
                 final newNickname = _controller.text.trim();
 
+                // ✅ 로컬 유효성 검사 (L10N 메시지)
                 if (newNickname.isEmpty || newNickname.length > 8 || newNickname.contains(' ')) {
                   setState(() {
                     errorMessage = "editNick.error".tr();
@@ -101,13 +102,16 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
                   return;
                 }
 
-                final result = await ref.read(viewmodel.userNameProvider.notifier).updateUserName(newNickname);
+                final result =
+                await ref.read(viewmodel.userNameProvider.notifier).updateUserName(newNickname);
 
                 if (result != null) {
                   setState(() {
+                    // 서버/로직에서 온 에러 메시지는 그대로 보여줌(이미 포맷된 문자열일 수 있음)
                     errorMessage = result;
                   });
                 } else {
+                  if (!mounted) return;
                   Navigator.pop(context, newNickname);
                 }
               },

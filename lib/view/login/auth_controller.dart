@@ -1,8 +1,10 @@
-/// File: auth_controller.dart
+/// File: lib/view/login/auth_controller.dart
 /// Purpose: Firebase 및 Google 로그인 기능을 제공하며 사용자 인증 상태를 관리
 /// Author: 박민준
 /// Created: 2025-01-07
 /// Last Modified: 2025-02-03 by 박민준
+
+import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'; // AlertDialog를 사용하기 위해 추가
@@ -17,13 +19,27 @@ import '../home/stage_provider.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
+import '../../../viewmodel/app_state_controller.dart';
 
 final authControllerProvider =
 StateNotifierProvider<AuthController, User?>((ref) => AuthController(ref));
 
 class AuthController extends StateNotifier<User?> {
   final Ref ref;
-  AuthController(this.ref) : super(null);
+  AuthController(this.ref) : super(FirebaseAuth.instance.currentUser) {
+    _sub = FirebaseAuth.instance.userChanges().listen((u) {
+      state = u; // 선택: 컨트롤러 state도 유지
+      ref.read(appStateProvider.notifier).setUser(u); // ✅ 전역 상태 항상 최신
+    });
+  }
+
+  StreamSubscription<User?>? _sub;
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -48,6 +64,7 @@ class AuthController extends StateNotifier<User?> {
 
       if (user != null) {
         // Firestore에서 사용자 문서 가져오기
+        ref.read(appStateProvider.notifier).setUser(user);
         final userDoc = await _firestore.collection('users').doc(user.uid).get();
         if (userDoc.exists && userDoc.data()?['photoURL'] != null) {
           // 이미 커스텀 프로필 사진이 저장되어 있다면 이를 사용
@@ -111,6 +128,7 @@ class AuthController extends StateNotifier<User?> {
       if (user != null) {
         // Firestore에서 사용자 문서 가져오기
         final userDoc = await _firestore.collection('users').doc(user.uid).get();
+        ref.read(appStateProvider.notifier).setUser(user);
 
         if (userDoc.exists && userDoc.data()?['photoURL'] != null) {
           // 이미 저장된 custom 프로필 사진이 있다면 이를 사용
@@ -124,6 +142,7 @@ class AuthController extends StateNotifier<User?> {
             await user.updatePhotoURL(photoUrl);
           }
         }
+        state = user;
 
         await _handleUserState(user, onNicknameRequired, onHome);
       }
@@ -165,9 +184,12 @@ class AuthController extends StateNotifier<User?> {
       final userCredential = await FirebaseAuth.instance.signInWithProvider(provider);
       final user = userCredential.user;
 
+
       if (user != null) {
-        await _handleUserState(user, onNicknameRequired, onHome);
+        ref.read(appStateProvider.notifier).setUser(user);
         state = user;
+
+        await _handleUserState(user, onNicknameRequired, onHome);
       }
     } catch (e) {
       print('❌ Firebase Apple 로그인 실패: $e');

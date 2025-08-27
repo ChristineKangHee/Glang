@@ -1,10 +1,11 @@
-/// File: course_main.dart
+/// File: lib/view/course/course_main.dart
 /// Purpose: 사용자에게 초급, 중급, 고급 코스를 보여주는 메인 화면
 /// Author: 박민준
 /// Created: 2024-12-28
-/// Last Modified: 2025-01-03 by 강희 (수정: 위치측정 방식 적용)
+/// Last Modified: 2025-08-13 by ChatGPT (다국어 + 새 섹션 로딩 구조 적용)
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // CHANGED: Riverpod 사용
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../model/section_data.dart';
@@ -14,32 +15,26 @@ import '../widgets/DoubleBackToExitWrapper.dart';
 import 'section.dart';
 import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
+import 'package:easy_localization/easy_localization.dart' hide tr;
+
+// CHANGED: 새 조립/리포지토리 프로바이더
+import '../../services/repository_providers.dart';
+// CHANGED: tr 유틸
+import '../../localization/tr.dart';
 
 /// 코스 섹션을 보여주는 메인 위젯.
-/// 현재 보여지는 섹션과 스크롤 동작을 관리하는 로직 포함.
-class CourseMain extends StatefulWidget {
+/// CHANGED: FutureBuilder 제거 → Riverpod provider 사용
+class CourseMain extends ConsumerStatefulWidget {
   const CourseMain({Key? key}) : super(key: key);
 
   @override
-  State<CourseMain> createState() => _CourseMainState();
+  ConsumerState<CourseMain> createState() => _CourseMainState();
 }
 
-/// [CourseMain]의 상태 클래스.
-/// 섹션 데이터, 스크롤 동작, UI 업데이트를 관리.
-class _CourseMainState extends State<CourseMain> {
-  /// 화면에 표시할 섹션 데이터 리스트를 담는 Future
-  late Future<List<SectionData>> sectionsFuture;
-
-  /// 현재 화면에 보이는 섹션의 인덱스 (스크롤 위치에 따라 결정)
-  int iCurrentSection = 0;
-
-  /// 첫 번째 박스(인트로 등) 높이
-  final double heightFirstBox = 0.0;
-
-  /// 각 섹션마다 GlobalKey를 할당하여 위치를 측정
-  List<GlobalKey> _sectionKeys = [];
-
-  /// 스크롤 동작을 관리하는 컨트롤러
+class _CourseMainState extends ConsumerState<CourseMain> {
+  int iCurrentSection = 0;                 // 현재 화면에 보이는 섹션 인덱스
+  final double heightFirstBox = 0.0;       // 첫 박스 높이
+  List<GlobalKey> _sectionKeys = [];       // 위치 측정용 키
   final ScrollController scrollCtrl = ScrollController();
 
   @override
@@ -47,40 +42,29 @@ class _CourseMainState extends State<CourseMain> {
     super.initState();
     scrollCtrl.addListener(scrollListener);
 
-    // 유저 ID를 기반으로 섹션 데이터 로드
+    // CHANGED: userId는 provider 내부에서 사용됨. 여기서는 인증만 확인.
     final String? userId = FirebaseAuth.instance.currentUser?.uid;
-
-    if (userId != null) {
-      sectionsFuture = SectionData.loadSections(userId);
-    } else {
-      // 로그인이 안 된 경우 등, 빈 리스트를 반환하도록 처리
-      sectionsFuture = Future.value([]);
+    if (userId == null) {
+      // 로그아웃 상태: 별도 처리 없이 provider가 빈 섹션 반환
     }
   }
 
-  /// 스크롤 이벤트를 감지하고 현재 섹션 인덱스를 업데이트
   void scrollListener() {
-    // 임계값(threshold): 화면 상단에서 어느 정도까지 스크롤되면 섹션이 '지나갔다'고 판단할지 결정
-    // (필요에 따라 이 값을 조정하세요)
     const double topThreshold = 150.0;
-
     int newCurrentSection = 0;
-    // 각 섹션의 GlobalKey를 통해 위치를 측정합니다.
+
     for (int i = 0; i < _sectionKeys.length; i++) {
       final key = _sectionKeys[i];
       if (key.currentContext != null) {
         final RenderBox box = key.currentContext!.findRenderObject() as RenderBox;
         final offset = box.localToGlobal(Offset.zero);
-        // offset.dy가 topThreshold보다 작거나 같으면 화면 상단을 지난 것으로 판단
         if (offset.dy <= topThreshold) {
           newCurrentSection = i;
         }
       }
     }
     if (newCurrentSection != iCurrentSection) {
-      setState(() {
-        iCurrentSection = newCurrentSection;
-      });
+      setState(() => iCurrentSection = newCurrentSection);
     }
   }
 
@@ -93,55 +77,40 @@ class _CourseMainState extends State<CourseMain> {
 
   @override
   Widget build(BuildContext context) {
+    final sectionsAsync = ref.watch(publicSectionsProvider); // CHANGED
+
     return DoubleBackToExitWrapper(
       child: Scaffold(
         appBar: CustomAppBar_Course(),
         body: SafeArea(
-          child: FutureBuilder<List<SectionData>>(
-            future: sectionsFuture,
-            builder: (context, snapshot) {
-              // 로딩 중
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              // 에러 발생
-              if (snapshot.hasError) {
-                return Center(child: Text("데이터 로딩 실패: ${snapshot.error}"));
-              }
-
-              // 정상 로딩 완료
-              final sections = snapshot.data!;
+          child: sectionsAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, st) => Center(
+              child: Text('data_load_failed'.tr(args: [e.toString()])),
+            ),
+            data: (sections) {
               if (sections.isEmpty) {
-                // 섹션이 하나도 없을 경우
-                return const Center(child: Text("표시할 코스가 없습니다."));
+                return Center(child: Text('no_courses_to_show'.tr()));
               }
 
-              // 섹션 개수와 _sectionKeys 길이가 다르면 새로 생성
               if (_sectionKeys.length != sections.length) {
                 _sectionKeys = List.generate(sections.length, (_) => GlobalKey());
               }
 
-              // Stack을 써서 하단에 현재 섹션 정보를 겹쳐서 표시
               return Stack(
                 children: [
-                  // 섹션 목록 표시
                   ListView.separated(
                     controller: scrollCtrl,
                     itemCount: sections.length + 1,
-                    separatorBuilder: (_, i) => const SizedBox(height: 0.0),
+                    separatorBuilder: (_, __) => const SizedBox(height: 0.0),
                     itemBuilder: (_, i) {
-                      // 첫 번째 아이템은 빈 박스로 대체
-                      if (i == 0) {
-                        return SizedBox(height: heightFirstBox);
-                      }
-                      // 실제 섹션은 i-1 인덱스를 사용하며, 각 섹션에 GlobalKey 부여
+                      if (i == 0) return SizedBox(height: heightFirstBox);
                       return Section(
                         key: _sectionKeys[i - 1],
                         data: sections[i - 1],
                       );
                     },
                   ),
-                  // 현재 섹션 표시 위젯
                   if (sections.isNotEmpty)
                     CurrentSection(data: sections[iCurrentSection]),
                 ],
@@ -157,13 +126,13 @@ class _CourseMainState extends State<CourseMain> {
 
 /// 화면 하단에 현재 보이는 섹션 정보를 표시하는 위젯
 class CurrentSection extends StatelessWidget {
-  /// 현재 섹션의 데이터
   final SectionData data;
-
   const CurrentSection({Key? key, required this.data}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final locale = context.glangLocale; // CHANGED: tr()에 전달
+
     return Container(
       decoration: const BoxDecoration(color: Colors.white),
       child: Row(
@@ -175,14 +144,13 @@ class CurrentSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // section 값이 1 이상인 경우만 표시 (예시)
                   if (data.section >= 1) ...[
                     Text(
-                      data.title,
+                      tr(data.title, locale),              // CHANGED
                       style: body_large_semi(context),
                     ),
                     Text(
-                      data.sectionDetail,
+                      tr(data.sectionDetail, locale),      // CHANGED
                       style: body_small(context),
                     ),
                   ],

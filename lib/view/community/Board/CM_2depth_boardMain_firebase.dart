@@ -1,12 +1,13 @@
 /// File: CM_2depth_boardMain_firebase.dart
-/// Purpose: 커뮤니티 게시판 화면 (Cm2depthBoardmain) + 스크롤 유지 최적화
+/// Purpose: 커뮤니티 게시판 화면 (L10N + 다국어 안전 카테고리 필터 + 스트림 공유)
 /// Author: 강희
-/// Created: 2024-12-28
-/// Last Modified: 2025-05-01 by 강희
+/// Last Modified: 2025-08-26 by ChatGPT
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../theme/font.dart';
 import '../../../theme/theme.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
@@ -27,29 +28,30 @@ class Cm2depthBoardmain extends ConsumerStatefulWidget {
   _Cm2depthBoardmainState createState() => _Cm2depthBoardmainState();
 }
 
-class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain> with TickerProviderStateMixin {
+enum CategoryFilter { all, essay, free }
+
+class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain>
+    with TickerProviderStateMixin {
   late final TabController _tabController;
-  final CommunityService _communityService = CommunityService();
   final Map<int, ScrollController> _scrollControllers = {};
+  final CommunityService _communityService = CommunityService();
+  late final Stream<List<Post>> _postsStream;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this)
-      ..addListener(() {
-        setState(() {}); // 탭 변경 시 리빌드
-      });
-
+    _tabController = TabController(length: 3, vsync: this)..addListener(() => setState(() {}));
     for (var i = 0; i < 3; i++) {
       _scrollControllers[i] = ScrollController();
     }
+    _postsStream = _communityService.getPosts(); // ✅ 탭마다 중복 생성 방지
   }
 
   @override
   void dispose() {
     _tabController.dispose();
-    for (var controller in _scrollControllers.values) {
-      controller.dispose();
+    for (final c in _scrollControllers.values) {
+      c.dispose();
     }
     super.dispose();
   }
@@ -63,10 +65,7 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain> with Tick
       appBar: CustomAppBar_2depth_5(
         title: 'community.board'.tr(), // '게시판'
         onIconPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SearchPage()),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (_) => SearchPage()));
         },
       ),
       body: Column(
@@ -85,10 +84,10 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain> with Tick
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: [
-                _buildPostList(context, customColors, 0, category: null),
-                _buildPostList(context, customColors, 1, category: '에세이'),
-                _buildPostList(context, customColors, 2, category: '자유글'),
+              children: const [
+                _PostList(tabIndex: 0, filter: CategoryFilter.all),
+                _PostList(tabIndex: 1, filter: CategoryFilter.essay),
+                _PostList(tabIndex: 2, filter: CategoryFilter.free),
               ],
             ),
           ),
@@ -167,7 +166,7 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain> with Tick
                 );
               },
               shape: const CircleBorder(),
-              labelShadow: [],
+              labelShadow: const [],
               labelStyle: body_small_semi(context).copyWith(color: customColors.neutral100),
               labelBackgroundColor: Colors.transparent,
               backgroundColor: customColors.primary20,
@@ -184,27 +183,90 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain> with Tick
               shape: const CircleBorder(),
               labelStyle: body_small_semi(context).copyWith(color: customColors.neutral100),
               labelBackgroundColor: Colors.transparent,
-              labelShadow: [],
+              labelShadow: const [],
               backgroundColor: customColors.primary20,
             ),
-            // SpeedDialChild(
-            //   child: Icon(Icons.upload_rounded, color: customColors.neutral30),
-            //   label: '미션 글 업로드',
-            //   onTap: () {
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(builder: (context) => MissionPostPage()),
-            //     );
-            //   },
-            //   shape: CircleBorder(),
-            //   labelShadow: [],
-            //   labelStyle: body_small_semi(context).copyWith(color: customColors.neutral100),
-            //   labelBackgroundColor: Colors.transparent,
-            //   backgroundColor: customColors.primary20,
-            // ),
           ],
         );
       },
     );
+  }
+}
+
+/// 게시글 리스트(탭 별)
+class _PostList extends ConsumerWidget {
+  final int tabIndex;
+  final CategoryFilter filter;
+
+  const _PostList({required this.tabIndex, required this.filter});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final customColors = ref.watch(customColorsProvider);
+    final parentState = context.findAncestorStateOfType<_Cm2depthBoardmainState>()!;
+    final postsStream = parentState._postsStream;
+    final scrollController = parentState._scrollControllers[tabIndex];
+
+    return StreamBuilder<List<Post>>(
+      stream: postsStream,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError || !snapshot.hasData) {
+          return Center(
+            child: Text(
+              'posts_load_failed'.tr(), // ✅ 게시글을 불러올 수 없습니다.
+              style: body_small(context).copyWith(color: customColors.neutral60),
+            ),
+          );
+        }
+
+        // ✅ 다국어 안전 필터: DB가 '에세이/자유글' 또는 'essay/free'여도 매칭
+        final posts = snapshot.data!;
+        final filtered = posts.where((p) => _matchFilter(p, filter)).toList();
+
+        if (filtered.isEmpty) {
+          return Center(
+            child: Text(
+              'no_posts_in_category'.tr(), // ✅ 해당 카테고리에 게시글이 없습니다.
+              style: body_small(context).copyWith(color: customColors.neutral60),
+            ),
+          );
+        }
+
+        return ListView.separated(
+          controller: scrollController,
+          itemCount: filtered.length,
+          separatorBuilder: (context, _) => const BigDivider(),
+          itemBuilder: (context, index) {
+            final post = filtered[index];
+            return PostItemContainer(
+              post: post,
+              customColors: customColors,
+              parentContext: context,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  bool _matchFilter(Post post, CategoryFilter filter) {
+    if (filter == CategoryFilter.all) return true;
+    final raw = (post.category ?? '').toString().trim().toLowerCase();
+    if (raw.isEmpty) return false;
+
+    const essaySet = {'에세이', 'essay'}; // 필요시 'Essay' 등 대소문자 변형은 lower로 처리됨
+    const freeSet  = {'자유글', 'free'};
+
+    switch (filter) {
+      case CategoryFilter.essay:
+        return essaySet.contains(raw);
+      case CategoryFilter.free:
+        return freeSet.contains(raw);
+      case CategoryFilter.all:
+        return true;
+    }
   }
 }

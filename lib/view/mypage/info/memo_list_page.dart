@@ -1,8 +1,10 @@
+// lib/view/mypage/info/memo_list_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart'; // 날짜 포맷을 위한 패키지
+import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../model/memo_model.dart';
-import '../../../model/section_data.dart';
 import '../../../model/stage_data.dart';
 import '../../../theme/font.dart';
 import '../../../theme/theme.dart';
@@ -10,12 +12,27 @@ import '../../../viewmodel/custom_colors_provider.dart';
 import '../../../viewmodel/memo_notifier.dart';
 import '../../components/custom_app_bar.dart';
 
-/// 예시: 현재 사용자의 StageData를 Map으로 관리하는 Provider
+// CHANGED: 섹션 마스터 제거 → stage repo만 사용
+import '../../../services/stage_repository.dart';
+import '../../../services/learning_assembly_service.dart';
+
+// CHANGED: 다국어 유틸
+import '../../../localization/tr.dart';
+
+/// 사용자의 StageData를 Map(stageId->StageData)로 제공
 final stageDataProvider = FutureProvider<Map<String, StageData>>((ref) async {
-  // 실제 사용자 ID로 대체 (예: FirebaseAuth.instance.currentUser.uid)
-  final String userId = 'currentUserId';
-  final stages = await loadStagesFromFirestore(userId);
-  return { for (var stage in stages) stage.stageId : stage };
+  final uid = FirebaseAuth.instance.currentUser?.uid;
+  if (uid == null) return {};
+
+  // (선택) 스테이지 마스터 프리로드
+  await StageRepository.instance.getAllStagesOnce();
+
+  // 섹션 마스터 없이 stages만으로 섹션 조립
+  final sections = await LearningAssemblyService.instance.buildPublicSections();
+
+  // 섹션 → 스테이지 평탄화 후 Map으로
+  final stages = sections.expand((s) => s.stages);
+  return {for (final st in stages) st.stageId: st};
 });
 
 class MemoListPage extends ConsumerWidget {
@@ -43,9 +60,7 @@ class MemoListPage extends ConsumerWidget {
 
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             color: customColors.neutral100,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -63,7 +78,7 @@ class MemoListPage extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded( // overflow 방지용 추가
+                      Expanded(
                         child: Text(
                           memo.selectedText,
                           style: body_medium_semi(context),
@@ -85,13 +100,10 @@ class MemoListPage extends ConsumerWidget {
                   // Memo label and note
                   Text("메모", style: body_xsmall_semi(context)),
                   const SizedBox(height: 4),
-                  Text(
-                    memo.note,
-                    style: body_small(context),
-                  ),
+                  Text(memo.note, style: body_small(context)),
                   const SizedBox(height: 12),
 
-                  // Date and Action Button
+                  // Date
                   Text(
                     formattedDate,
                     style: body_xsmall(context).copyWith(color: customColors.neutral60),
@@ -106,7 +118,6 @@ class MemoListPage extends ConsumerWidget {
   }
 }
 
-/// 바텀시트를 호출하는 헬퍼 함수
 void showMemoActionBottomSheet(
     BuildContext context, Memo memo, CustomColors customColors, WidgetRef ref) {
   showModalBottomSheet(
@@ -120,7 +131,6 @@ void showMemoActionBottomSheet(
   );
 }
 
-/// Memo에 대한 액션(수정, 삭제, 원문보기)을 보여주는 바텀시트 위젯
 class MemoActionBottomSheet extends StatelessWidget {
   final Memo memo;
   final CustomColors customColors;
@@ -143,7 +153,6 @@ class MemoActionBottomSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 메모 수정
             ListTile(
               title: Center(child: Text('수정', style: body_large(context))),
               onTap: () {
@@ -180,7 +189,6 @@ class MemoActionBottomSheet extends StatelessWidget {
               },
             ),
             const SizedBox(height: 10),
-            // 원문보기
             ListTile(
               title: Center(child: Text('원문보기', style: body_large(context))),
               onTap: () {
@@ -196,10 +204,7 @@ class MemoActionBottomSheet extends StatelessWidget {
                 );
               },
             ),
-
             const SizedBox(height: 10),
-
-            // 메모 삭제
             ListTile(
               title: Center(child: Text('삭제', style: body_large(context))),
               onTap: () {
@@ -228,6 +233,8 @@ class TextSegmentsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final stageDataMapAsync = ref.watch(stageDataProvider);
     final customColors = Theme.of(context).extension<CustomColors>()!;
+    final locale = context.glangLocale;
+
     return stageDataMapAsync.when(
       data: (stageMap) {
         final stageData = stageMap[stageId];
@@ -237,15 +244,20 @@ class TextSegmentsPage extends ConsumerWidget {
             body: const Center(child: Text("해당 스테이지를 찾을 수 없습니다.")),
           );
         }
-        final textSegments = stageData.readingData?.textSegments ?? [];
+
+        // 다국어 텍스트 세그먼트
+        final segments = stageData.readingData != null
+            ? trList(stageData.readingData!.textSegments, locale)
+            : const <String>[];
+
         return Scaffold(
           appBar: CustomAppBar_2depth_4(title: subdetailTitle),
           body: ListView.builder(
-            itemCount: textSegments.length,
+            itemCount: segments.length,
             itemBuilder: (context, index) => Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                textSegments[index],
+                segments[index],
                 style: reading_textstyle(context).copyWith(color: customColors.neutral0),
               ),
             ),

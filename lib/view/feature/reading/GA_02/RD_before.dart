@@ -1,4 +1,4 @@
-/// File: RD_before.dart
+/// File: lib/view/feature/reading/GA_02/RD_before.dart
 /// Purpose: 읽기 중 시작 전 튜토리얼 구현 코드
 /// Author: 강희
 /// Created: 2024-1-19
@@ -15,6 +15,9 @@ import 'package:readventure/view/components/custom_button.dart';
 import 'package:readventure/view/home/stage_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 
+// CHANGED: 로컬라이즈 유틸을 alias로 임포트하여 easy_localization의 tr과 충돌 방지
+import 'package:readventure/localization/tr.dart' as gl;
+
 class RdBefore extends ConsumerWidget {
   const RdBefore({super.key});
 
@@ -22,10 +25,12 @@ class RdBefore extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     final currentStage = ref.watch(currentStageProvider);
+    final locale = context.glangLocale; // CHANGED: gl.tr에 전달할 로케일
 
     return Scaffold(
       appBar: CustomAppBar_2depth_6(
-        title: currentStage?.subdetailTitle ?? '',
+        // CHANGED: LocalizedText → gl.tr(...)로 변환. null일 땐 빈 문자열.
+        title: currentStage == null ? '' : gl.tr(currentStage.subdetailTitle, locale),
         automaticallyImplyLeading: false,
         onIconPressed: () {
           Navigator.of(context).popUntil((route) => route.isFirst);

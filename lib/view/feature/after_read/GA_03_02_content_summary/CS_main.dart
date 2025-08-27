@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../widget/start_page/description_section_main.dart';
 import '../widget/start_page/icon_section_main.dart';
 import '../widget/start_page/title_section_main.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ContentSummaryMain extends StatelessWidget {
   const ContentSummaryMain({super.key});
@@ -28,7 +29,7 @@ class ContentSummaryMain extends StatelessWidget {
                   Column(
                     children: [
                       TitleSectionMain(
-                        title: "요약 미션",
+                        title: 'summary_mission_title'.tr(),
                         subtitle: "",
                         subtitle2: "",
                         customColors: customColors,
@@ -45,11 +46,11 @@ class ContentSummaryMain extends StatelessWidget {
                         items: [
                           {
                             "icon": Icons.comment_outlined,
-                            "text": "주어진 글에 대한 요약을 작성해보세요",
+                            "text": 'summary_instruction_write'.tr(),
                           },
                           {
                             "icon": Icons.access_time_filled,
-                            "text": "미션을 시작하면 타이머가 작동해요!",
+                            "text": 'mission_instruction_timer'.tr(),
                           },
                         ],
                       ),
@@ -57,7 +58,7 @@ class ContentSummaryMain extends StatelessWidget {
                         function: () {
                           Navigator.pop(context); // To close the current screen (Dialog)
                         },
-                        title: '시작하기',
+                        title: 'start_button'.tr(),
                       )
                     ],
                   ),
