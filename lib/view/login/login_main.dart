@@ -14,6 +14,7 @@ import '../widgets/DoubleBackToExitWrapper.dart';
 import 'auth_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class LoginPage extends ConsumerWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -145,7 +146,7 @@ class GoogleLoginButton extends StatelessWidget {
               child: Image.asset("assets/icons/google.png"),
             ),
             SizedBox(width: 16),
-            Text("Google로 계속하기", style: body_medium_semi(context).copyWith(color: customColors.neutral30),)
+            Text("login.google".tr(), style: body_medium_semi(context).copyWith(color: customColors.neutral30),)
           ],
         ),
       ),
@@ -220,7 +221,7 @@ class AppleLoginButton extends StatelessWidget {
               child: Image.asset("assets/icons/apple_icon_white.png"),
             ),
             SizedBox(width: 16),
-            Text("Apple로 계속하기", style: body_medium_semi(context).copyWith(color: customColors.neutral100),)
+            Text("login.apple".tr(), style: body_medium_semi(context).copyWith(color: customColors.neutral100),)
           ],
         ),
       ),
@@ -257,7 +258,7 @@ class KakaoLoginButton extends StatelessWidget {
               child: Image.asset("assets/icons/kakao_icon.png"),
             ),
             SizedBox(width: 16,),
-            Text("카카오로 계속하기", style: body_medium_semi(context).copyWith(color: customColors.neutral30),)
+            Text("login.kakao".tr(), style: body_medium_semi(context).copyWith(color: customColors.neutral30),)
           ],
         ),
       ),

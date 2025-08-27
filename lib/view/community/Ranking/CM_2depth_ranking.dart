@@ -13,6 +13,7 @@ import 'package:readventure/view/community/Ranking/ranking_component.dart';
 import '../../../theme/theme.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/custom_app_bar.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class RankingPage extends ConsumerWidget {
   const RankingPage({super.key});
@@ -22,8 +23,9 @@ class RankingPage extends ConsumerWidget {
     final customColors = ref.watch(customColorsProvider);
 
     return Scaffold(
-      appBar: CustomAppBar_2depth_4(title: 'ranking_title'.tr()), // ✅ L10N
-      backgroundColor: customColors.neutral90,
+      // 커스텀 앱바, 제목은 '랭킹'
+      appBar: CustomAppBar_2depth_4(title: 'ranking.title'.tr()),
+      // 본문은 SingleChildScrollView로 감싸서 스크롤 가능하게 설정
       body: SingleChildScrollView(
         child: Column(
           children: [

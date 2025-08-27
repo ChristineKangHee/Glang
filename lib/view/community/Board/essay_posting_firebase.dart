@@ -4,7 +4,7 @@
 /// Created: 2024-12-28
 /// Last Modified: 2024-12-28 by 강희
 
-// 필요한 패키지들 임포트
+import 'package:easy_localization/easy_localization.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -134,9 +134,9 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
       showResultSaveDialog(
         context,
         ref.watch(customColorsProvider),
-        "게시글 작성 실패",
-        "확인",
-        "",
+        "community.write_fail".tr(),
+        "common.cancel".tr(),
+        "common.exit".tr(),
             (ctx) => Navigator.of(ctx).pop(),
       );
     }
@@ -151,14 +151,14 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
         showResultSaveDialog(
           context,
           ref.watch(customColorsProvider),
-          "나가시겠습니까?",
-          "취소",
-          "나가기",
+          "community.exit_confirm".tr(),
+          "common.cancel".tr(),
+          "common.exit".tr(),
               (ctx) {
             discardDraft();
             Navigator.of(ctx).pop();
           },
-          continuationMessage: "작성 중인 내용은 저장되지 않습니다.",
+          continuationMessage: "community.unsaved_warning".tr(),
         );
       }
     } else {
@@ -225,14 +225,14 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
         showResultSaveDialog(
           context,
           ref.watch(customColorsProvider),
-          "나가시겠습니까?",
-          "취소",
-          "나가기",
+          "community.exit_confirm".tr(),
+          "common.cancel".tr(),
+          "common.exit".tr(),
               (ctx) {
             discardDraft();
             Navigator.of(ctx).pop();
           },
-          continuationMessage: "작성 중인 내용은 저장되지 않습니다.",
+          continuationMessage: "community.unsaved_warning".tr(),
         );
         return false;
       }
@@ -247,14 +247,15 @@ class _EssayPostPageState extends ConsumerState<EssayPostPage> {
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: CustomAppBar_2depth_9(
-          title: "에세이",
+          // 앱바 타이틀
+          title: "community.essay".tr(), // "에세이"
           onIconPressed: _handleClose,
           actions: [
             // 등록 버튼
             TextButton(
               onPressed: isContentValid() ? submitPost : null,
               child: Text(
-                "등록",
+                "common.submit".tr(),
                 style: body_xsmall_semi(context).copyWith(
                   color: isContentValid() ? customColors.primary : customColors.neutral80,
                 ),

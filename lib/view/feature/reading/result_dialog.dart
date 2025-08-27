@@ -10,6 +10,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../../../theme/theme.dart';
 import '../../../theme/font.dart';
 import '../../components/custom_button.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ResultDialog extends StatelessWidget {
   final bool isCorrect;         // 정답 여부
@@ -41,7 +42,7 @@ class ResultDialog extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                isCorrect ? 'answer_correct'.tr() : 'answer_incorrect'.tr(),
+                isCorrect ? 'quiz.correct'.tr() : 'quiz.incorrect'.tr(),
                 style: body_large_semi(context).copyWith(
                   color: isCorrect ? customColors.primary : customColors.error,
                 ),
@@ -59,7 +60,7 @@ class ResultDialog extends StatelessWidget {
               Navigator.pop(context);
               onCompleted();
             },
-            title: 'done'.tr(),
+            title: 'common.complete'.tr(),
           ),
         ],
       ),

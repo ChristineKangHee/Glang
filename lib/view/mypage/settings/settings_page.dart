@@ -6,7 +6,7 @@ import '../../../constants.dart';
 import '../../../restart_widget.dart';
 import '../../../viewmodel/app_state_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../../viewmodel/theme_controller.dart';
 import '../../components/alarm_dialog.dart';
@@ -43,15 +43,45 @@ class SettingsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        title: 'settings_title'.tr(), // ✅ 설정
+        title: 'settings.title'.tr(), // "설정"
       ),
       body: ListView(
         children: [
-          // 섹션 라벨
+          // ListTile(title: Text('알림 설정', style: body_xsmall(context).copyWith(color: customColors.neutral30),),),
+          // ListTile(
+          //   title: Text('알림 설정', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
+          //   trailing: Switch(
+          //     value: isNotificationEnabled,
+          //     onChanged: (bool value) {
+          //       // TODO: 알림 설정 값 변경
+          //       isNotificationEnabled = value;
+          //     },
+          //     activeColor: customColors.neutral100,
+          //     activeTrackColor: customColors.primary,
+          //     inactiveThumbColor: customColors.neutral100,
+          //     inactiveTrackColor: customColors.neutral80,
+          //   ),
+          // ),
+          // ListTile(
+          //   title: Text('마케팅 수신 동의', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
+          //   trailing: Switch(
+          //     value: isMarketingAgreement,
+          //     onChanged: (bool value) {
+          //       // TODO: 마케팅 동의 값 변경
+          //       isMarketingAgreement = value;
+          //     },
+          //     activeColor: customColors.neutral100,
+          //     activeTrackColor: customColors.primary,
+          //     inactiveThumbColor: customColors.neutral100,
+          //     inactiveTrackColor: customColors.neutral80,
+          //   ),
+          // ),
+          // Divider(color: customColors.neutral80,),
+          ListTile(title: Text('settings.help_support'.tr(), style: body_xsmall(context).copyWith(color: customColors.neutral30),),),
           ListTile(
             title: Text(
-              'help_and_support'.tr(),
-              style: body_xsmall(context).copyWith(color: customColors.neutral30),
+              'settings.notice'.tr(),
+              style: body_medium_semi(context).copyWith(color: customColors.neutral0),
             ),
           ),
           ListTile(
@@ -61,32 +91,60 @@ class SettingsPage extends ConsumerWidget {
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
           ),
           ListTile(
-            title: Text('faq'.tr(),
-                style: body_medium_semi(context).copyWith(color: customColors.neutral0)),
-            onTap: () => Navigator.pushNamed(context, '/mypage/settings/FAQ'),
+            title: Text(
+              'settings.faq'.tr(),
+              style: body_medium_semi(context).copyWith(color: customColors.neutral0),
+            ),
+            onTap: () {
+              // TODO: 프로필 설정 페이지로 이동
+              Navigator.pushNamed(context, '/mypage/settings/FAQ');
+            },
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
           ),
           ListTile(
-            title: Text('language_settings'.tr(),
-                style: body_medium_semi(context).copyWith(color: customColors.neutral0)),
-            onTap: () => Navigator.pushNamed(context, '/mypage/settings/language'),
+            title: Text('settings.language'.tr(), style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
+            onTap: () {
+              // TODO: 언어 설정 페이지로 이동
+              Navigator.pushNamed(context, '/mypage/settings/language');
+            },
+            trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
+          ),
+          // ListTile(
+          //   title: Text('테마 설정', style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
+          //   trailing: IconButton(
+          //     icon: Icon(isLightTheme ? Icons.dark_mode : Icons.light_mode),
+          //     onPressed: () {
+          //       themeController.toggleTheme(); // 테마 변경
+          //     },
+          //   ),
+          // ),
+          ListTile(
+            title: Text(
+              'settings.policy'.tr(),
+              style: body_medium_semi(context).copyWith(color: customColors.neutral0),
+            ),
+            onTap: () {
+              // TODO: 프로필 설정 페이지로 이동
+              Navigator.pushNamed(context, '/mypage/settings/politics');
+            },
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
           ),
           ListTile(
-            title: Text('terms_policies'.tr(),
-                style: body_medium_semi(context).copyWith(color: customColors.neutral0)),
-            onTap: () => Navigator.pushNamed(context, '/mypage/settings/politics'),
+            title: Text(
+              'settings.feedback'.tr(),
+              style: body_medium_semi(context).copyWith(color: customColors.neutral0),
+            ),
+            onTap: () {
+              // TODO: 프로필 설정 페이지로 이동
+              Navigator.pushNamed(context, '/mypage/settings/requests');
+            },
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
           ),
           ListTile(
-            title: Text('feedback_requests'.tr(),
-                style: body_medium_semi(context).copyWith(color: customColors.neutral0)),
-            onTap: () => Navigator.pushNamed(context, '/mypage/settings/requests'),
-            trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
-          ),
-          ListTile(
-            title: Text('update_latest_version'.tr(),
-                style: body_medium_semi(context).copyWith(color: customColors.neutral0)),
+            title: Text(
+              'settings.update'.tr(),
+              style: body_medium_semi(context).copyWith(color: customColors.neutral0),
+            ),
             trailing: FutureBuilder<String>(
               future: _fetchLatestVersion(),
               builder: (context, snapshot) {
@@ -119,9 +177,10 @@ class SettingsPage extends ConsumerWidget {
                 children: [
                   Divider(color: customColors.neutral80),
                   ListTile(
-                    title: Text('admin_reports'.tr(),
-                        style: body_medium_semi(context).copyWith(color: customColors.neutral0)),
-                    onTap: () => Navigator.pushNamed(context, '/mypage/settings/reports'),
+                    title: Text('🚨 admin_report'.tr(), style: body_medium_semi(context).copyWith(color: customColors.neutral0)),
+                    onTap: () {
+                      Navigator.pushNamed(context, '/mypage/settings/reports');
+                    },
                     trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
                   ),
                 ],
@@ -131,24 +190,27 @@ class SettingsPage extends ConsumerWidget {
 
           Divider(color: customColors.neutral80),
           ListTile(
-            title: Text('logout'.tr(),
-                style: body_medium_semi(context).copyWith(color: customColors.neutral0)),
+            title: Text('settings.logout'.tr(), style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
             onTap: () {
               showResultSaveDialog(
                 context,
                 customColors,
-                'logout_confirm_prompt'.tr(), // ✅ "로그아웃하시겠습니까?"
-                'cancel'.tr(),
-                'logout'.tr(),
-                    (ctx) => _logout(context, ref),
+                'settings.logout_confirm'.tr(),  // "로그아웃하시겠습니까?"
+                'settings.cancel'.tr(),          // "취소"
+                'settings.logout'.tr(),          // "로그아웃"
+                    (ctx) {
+                      _logout(context, ref);
+                },
               );
             },
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
           ),
           ListTile(
-            title: Text('delete_account'.tr(),
-                style: body_medium_semi(context).copyWith(color: customColors.neutral0)),
-            onTap: () => Navigator.pushNamed(context, '/mypage/settings/secession'),
+            title: Text('settings.withdraw'.tr(), style: body_medium_semi(context).copyWith(color: customColors.neutral0),),
+            onTap: () {
+              // TODO: 프로필 설정 페이지로 이동
+              Navigator.pushNamed(context, '/mypage/settings/secession');
+            },
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
           ),
         ],

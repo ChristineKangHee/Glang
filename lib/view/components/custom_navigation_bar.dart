@@ -8,6 +8,7 @@ import 'package:easy_localization/easy_localization.dart'; // ✅ 추가
 import 'package:readventure/theme/font.dart';
 import '../../viewmodel/navigation_controller.dart';
 import '../../theme/theme.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class CustomNavigationBar extends ConsumerWidget {
   const CustomNavigationBar({Key? key}) : super(key: key);
@@ -30,23 +31,23 @@ class CustomNavigationBar extends ConsumerWidget {
         unselectedItemColor: customColors.neutral60,
         selectedLabelStyle: body_xsmall_semi(context),
         unselectedLabelStyle: body_xsmall_semi(context).copyWith(color: customColors.neutral60),
-        onTap: (index) => navigationController.navigateToIndex(context, index),
-        items: <BottomNavigationBarItem>[ // ❌ const 제거
+        onTap: (index) => navigationController.navigateToIndex(context, index), // 페이지 전환
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: const Icon(Icons.home_rounded),
-            label: 'nav_home'.tr(),
+            label: 'nav.home'.tr(),
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.stars_rounded),
-            label: 'nav_course'.tr(),
+            label: 'nav.course'.tr(),
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.article_rounded),
-            label: 'nav_community'.tr(),
+            label: 'nav.community'.tr(),
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.person_rounded),
-            label: 'nav_mypage'.tr(),
+            label: 'nav.mypage'.tr(),
           ),
         ],
       ),

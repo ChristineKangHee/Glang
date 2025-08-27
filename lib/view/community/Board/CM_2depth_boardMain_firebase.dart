@@ -3,6 +3,7 @@
 /// Author: 강희
 /// Last Modified: 2025-08-26 by ChatGPT
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,7 @@ import 'community_service.dart';
 import 'component_community_post_firebase.dart';
 import 'essay_posting_firebase.dart';
 import 'free_posting_firebase.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class Cm2depthBoardmain extends ConsumerStatefulWidget {
   const Cm2depthBoardmain({Key? key}) : super(key: key);
@@ -61,7 +63,7 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain>
 
     return Scaffold(
       appBar: CustomAppBar_2depth_5(
-        title: 'board_title'.tr(), // ✅ 게시판
+        title: 'community.board'.tr(), // '게시판'
         onIconPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (_) => SearchPage()));
         },
@@ -74,9 +76,9 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain>
             indicatorColor: customColors.primary,
             dividerColor: customColors.neutral80,
             tabs: [
-              Tab(text: 'tab_all'.tr()),   // ✅ 전체
-              Tab(text: 'tab_essay'.tr()), // ✅ 에세이
-              Tab(text: 'tab_free'.tr()),  // ✅ 자유글
+              Tab(text: 'community.all'.tr()),
+              Tab(text: 'community.essay'.tr()),
+              Tab(text: 'community.free'.tr()),
             ],
           ),
           Expanded(
@@ -95,6 +97,53 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain>
     );
   }
 
+  Widget _buildPostList(BuildContext context, CustomColors customColors, int tabIndex, {String? category}) {
+    return StreamBuilder<List<Post>>(
+      stream: _communityService.getPosts(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError || !snapshot.hasData) {
+          return Center(
+            child: Text(
+              'community.load_error'.tr(),
+              style: body_small(context).copyWith(color: customColors.neutral60),
+            ),
+          );
+        }
+
+        List<Post> posts = snapshot.data!.where((post) {
+          if (category == null) return true;
+          return post.category == category;
+        }).toList();
+
+        if (posts.isEmpty) {
+          return Center(
+            child: Text(
+              'community.no_posts_in_category'.tr(),
+              style: body_small(context).copyWith(color: customColors.neutral60),
+            ),
+          );
+        }
+
+        return ListView.separated(
+          controller: _scrollControllers[tabIndex],
+          itemCount: posts.length,
+          separatorBuilder: (context, index) => const BigDivider(),
+          itemBuilder: (context, index) {
+            final post = posts[index];
+            return PostItemContainer(
+              post: post,
+              customColors: customColors,
+              parentContext: context,
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget _buildSpeedDial(BuildContext context, ValueNotifier<bool> isDialOpen, CustomColors customColors) {
     return ValueListenableBuilder<bool>(
       valueListenable: isDialOpen,
@@ -109,8 +158,13 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain>
           children: [
             SpeedDialChild(
               child: Icon(Icons.article, color: customColors.neutral30),
-              label: 'fab_free_post'.tr(), // ✅ 자유글
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => FreeWritingPage())),
+              label: 'community.free'.tr(),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => FreeWritingPage()),
+                );
+              },
               shape: const CircleBorder(),
               labelShadow: const [],
               labelStyle: body_small_semi(context).copyWith(color: customColors.neutral100),
@@ -119,8 +173,13 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain>
             ),
             SpeedDialChild(
               child: Icon(Icons.lightbulb, color: customColors.neutral30),
-              label: 'fab_essay_post'.tr(), // ✅ 에세이
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => EssayPostPage())),
+              label: 'community.essay'.tr(),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EssayPostPage()),
+                );
+              },
               shape: const CircleBorder(),
               labelStyle: body_small_semi(context).copyWith(color: customColors.neutral100),
               labelBackgroundColor: Colors.transparent,

@@ -16,6 +16,7 @@ import '../../../../theme/theme.dart';
 import '../components/custom_textfield.dart';
 import '../../viewmodel/user_service.dart' as viewmodel;
 import 'edit_profile.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class EditNickInput extends ConsumerStatefulWidget {
   const EditNickInput({super.key});
@@ -48,7 +49,7 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        title: 'edit_profile'.tr(), // ✅ 내 정보 수정
+        title: "editNick.title".tr(),
       ),
       body: Column(
         children: [
@@ -59,13 +60,13 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('enter_nickname'.tr(), style: heading_medium(context)), // ✅ 별명을 입력해주세요
+                    Text("editNick.enterNickname".tr(), style: heading_medium(context)),
                     const SizedBox(height: 24),
                     NicknameTextField(
                       controller: _controller,
                       decoration: InputDecoration(
-                        labelText: 'nickname'.tr(), // ✅ 별명
-                        border: const OutlineInputBorder(),
+                        labelText: "editNick.nicknameLabel".tr(),
+                        border: OutlineInputBorder(),
                       ),
                       existingNicknames: existingNicknames,
                       onChanged: (text, error) {
@@ -96,7 +97,7 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
                 // ✅ 로컬 유효성 검사 (L10N 메시지)
                 if (newNickname.isEmpty || newNickname.length > 8 || newNickname.contains(' ')) {
                   setState(() {
-                    errorMessage = 'nickname_rule_error'.tr(); // "별명은 1-8자…"
+                    errorMessage = "editNick.error".tr();
                   });
                   return;
                 }
@@ -114,7 +115,7 @@ class _EditNickInputState extends ConsumerState<EditNickInput> {
                   Navigator.pop(context, newNickname);
                 }
               },
-              title: 'save'.tr(), // ✅ 완료 → 저장
+              title: "editNick.submit".tr(),
             ),
           ),
         ],

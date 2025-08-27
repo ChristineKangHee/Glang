@@ -2,8 +2,8 @@
 /// Purpose: 마이페이지 화면 구현 (L10N 적용, 비활성화 로직 안정화)
 /// Author: 박민준
 /// Created: 2025-01-02
-/// Last Modified: 2025-08-26 by ChatGPT (L10N)
-
+/// Last Modified: 2025-02-12 by 윤은서
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/view/components/custom_app_bar.dart';
@@ -73,8 +73,8 @@ class MyPageContent extends StatelessWidget {
             const UserStatsSection(), // 사용자 경험치, 코스, 랭킹 표시
             const SizedBox(height: 24),
             InfoCard(
-              title: 'learning_stats'.tr(),                   // ✅ 학습 통계
-              description: 'learning_stats_desc'.tr(),
+              titleKey: 'my_page.stat_title',  // '학습 통계'
+              descriptionKey: 'my_page.stat_desc',
               trailingIcon: Icons.arrow_forward_ios,
               disabled: true, // 🔒 언어와 무관하게 안전하게 비활성화
               onTap: () {
@@ -83,8 +83,8 @@ class MyPageContent extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             InfoCard(
-              title: 'badges'.tr(),                           // ✅ 뱃지
-              child: const BadgeRow(),
+              titleKey: 'my_page.badge',
+              child: BadgeRow(), // 수정: const 제거
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/badge');
@@ -93,7 +93,7 @@ class MyPageContent extends StatelessWidget {
             const SizedBox(height: 16),
             InfoCard(
               leadingIcon: Icons.article_rounded,
-              title: 'community_posts'.tr(),                  // ✅ 커뮤니티 작성글
+              titleKey: 'my_page.community_post',
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/mycommunitypost');
@@ -102,7 +102,7 @@ class MyPageContent extends StatelessWidget {
             const SizedBox(height: 16),
             InfoCard(
               leadingIcon: Icons.bookmark_rounded,
-              title: 'note_title'.tr(),                       // ✅ 메모 (기존 키 재사용)
+              titleKey: 'my_page.memo',
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/memo');
@@ -111,7 +111,7 @@ class MyPageContent extends StatelessWidget {
             const SizedBox(height: 16),
             InfoCard(
               leadingIcon: Icons.bookmark_rounded,
-              title: 'interpretation_title'.tr(),             // ✅ 해석 (기존 키 재사용)
+              titleKey: 'my_page.interpretation',
               trailingIcon: Icons.arrow_forward_ios,
               onTap: () {
                 Navigator.pushNamed(context, '/mypage/info/interpretation');
@@ -120,7 +120,7 @@ class MyPageContent extends StatelessWidget {
             const SizedBox(height: 16),
             InfoCard(
               leadingIcon: Icons.book,
-              title: 'learning_history'.tr(),                 // ✅ 학습 기록
+              titleKey: 'my_page.learning_history',
               trailingIcon: Icons.arrow_forward_ios,
               disabled: true, // 🔒 비활성화
               onTap: () {
@@ -186,7 +186,7 @@ class UserProfileSection extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'edit_profile'.tr(), // ✅ 내 정보 수정
+                    'my_page.edit_info'.tr(),  // '내 정보 수정'
                     style: pretendardMedium(context).copyWith(
                       fontSize: 14,
                       color: customColors.neutral30,
@@ -228,28 +228,25 @@ class UserStatsSection extends ConsumerWidget {
         children: [
           Expanded(
             child: xpAsyncValue.when(
-              data: (xp) => StatBox(value: xp.toString(), label: 'xp_label'.tr()), // ✅ 경험치
-              loading: () => StatBox(value: 'loading'.tr(), label: 'xp_label'.tr()),
-              error: (_, __) => StatBox(value: 'error_short'.tr(), label: 'xp_label'.tr()),
+              data: (xp) => StatBox(value: xp.toString(), label: 'my_page.xp'.tr()),
+              loading: () => const StatBox(value: '...', label: '경험치'),
+              error: (_, __) => const StatBox(value: '오류', label: '경험치'),
             ),
           ),
           VerticalDivider(color: customColors.neutral80),
           Expanded(
             child: courseAsyncValue.when(
-              data: (course) => StatBox(value: course, label: 'course_title'.tr()), // ✅ 코스
-              loading: () => StatBox(value: 'loading'.tr(), label: 'course_title'.tr()),
-              error: (_, __) => StatBox(value: 'error_short'.tr(), label: 'course_title'.tr()),
+              data: (course) => StatBox(value: course, label: 'my_page.course'.tr()),
+              loading: () => const StatBox(value: '...', label: '코스'),
+              error: (_, __) => const StatBox(value: '오류', label: '코스'),
             ),
           ),
           VerticalDivider(color: customColors.neutral80),
           Expanded(
             child: rankingAsyncValue.when(
-              data: (rank) => StatBox(
-                value: 'rank_value_format'.tr(args: ['${rank}']), // ✅ "{}위"/"#{}"
-                label: 'rank_label'.tr(),                         // ✅ 랭킹
-              ),
-              loading: () => StatBox(value: 'loading'.tr(), label: 'rank_label'.tr()),
-              error: (_, __) => StatBox(value: 'error_short'.tr(), label: 'rank_label'.tr()),
+              data: (rank) => StatBox(value: '$rank위', label: 'my_page.ranking'.tr()),
+              loading: () => const StatBox(value: '...', label: '랭킹'),
+              error: (_, __) => const StatBox(value: '오류', label: '랭킹'),
             ),
           ),
         ],
@@ -350,7 +347,7 @@ class BadgeRow extends ConsumerWidget {
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stackTrace) =>
-          Center(child: Text('badges_load_error'.tr())),
+          Center(child: Text('my_page.loading_error'.tr())),
     );
   }
 }
@@ -380,8 +377,8 @@ class StatBox extends StatelessWidget {
 
 /// 정보 카드 위젯
 class InfoCard extends StatelessWidget {
-  final String title;
-  final String? description;
+  final String titleKey;
+  final String? descriptionKey;
   final IconData? leadingIcon;
   final Widget? child;
   final IconData? trailingIcon;
@@ -389,8 +386,8 @@ class InfoCard extends StatelessWidget {
   final bool disabled; // ✅ 언어와 무관하게 제어
 
   const InfoCard({
-    required this.title,
-    this.description,
+    required this.titleKey,
+    this.descriptionKey,
     this.leadingIcon,
     this.child,
     this.trailingIcon,
@@ -401,7 +398,9 @@ class InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDisabled = disabled;
+    final String title = titleKey.tr();
+    final String? description = descriptionKey?.tr();
+    final bool isDisabled = titleKey == 'my_page.stat_title' || titleKey == 'my_page.learning_history';
 
     return InkWell(
       onTap: isDisabled ? null : onTap,
@@ -412,13 +411,7 @@ class InfoCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: isDisabled
               ? []
-              : [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 2,
-              offset: const Offset(0, 1),
-            ),
-          ],
+              : [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 2, offset: const Offset(0, 1))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -427,35 +420,18 @@ class InfoCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     if (leadingIcon != null) ...[
-                      Icon(
-                        leadingIcon,
-                        size: 24,
-                        color: Colors.black54,
-                      ),
+                      Icon(leadingIcon, size: 24, color: Colors.black54),
                       const SizedBox(width: 12),
                     ],
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          title,
-                          style: pretendardSemiBold(context).copyWith(
-                            fontSize: 18,
-                            color: Colors.black,
-                          ),
-                        ),
+                        Text(title, style: pretendardSemiBold(context).copyWith(fontSize: 18)),
                         if (description != null) ...[
                           const SizedBox(height: 4),
-                          Text(
-                            description!,
-                            style: pretendardRegular(context).copyWith(
-                              fontSize: 16,
-                              color: Colors.black54,
-                            ),
-                          ),
+                          Text(description, style: pretendardRegular(context).copyWith(fontSize: 16, color: Colors.black54)),
                         ],
                       ],
                     ),

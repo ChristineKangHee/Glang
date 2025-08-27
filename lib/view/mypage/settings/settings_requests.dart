@@ -21,8 +21,8 @@ class SettingsRequests extends ConsumerWidget {
       scheme: 'mailto',
       path: 'hgu.zero24@gmail.com',
       queryParameters: {
-        'subject': 'requests_email_subject'.tr(),
-        'body': 'requests_email_body'.tr(),
+        'subject': tr('settings_requests.email_subject'), // 번역된 제목
+        'body': tr('settings_requests.email_body'),       // 번역된 본문
       },
     );
 
@@ -41,17 +41,23 @@ class SettingsRequests extends ConsumerWidget {
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        title: 'feedback_requests'.tr(), // ✅ "문의 및 개선 사항 요청"
+        title: 'settings.feedback'.tr(), // 기존 문자열 대체
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('requests_title'.tr(), style: heading_large(context)),
-            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft, // 텍스트 왼쪽 정렬
+              child: Text(
+                "settings_requests.title".tr(), // "불편한 점이 있으신가요?"
+                style: heading_large(context),
+              ),
+            ),
+            const SizedBox(height: 8), // 간격 추가
             Text(
-              'requests_description'.tr(),
+              "settings_requests.description".tr(), // 설명
               style: body_small(context).copyWith(color: customColors.neutral60),
             ),
           ],
@@ -62,8 +68,8 @@ class SettingsRequests extends ConsumerWidget {
         child: SizedBox(
           width: double.infinity,
           child: ButtonPrimary_noPadding(
-            function: () => _sendEmail(context),
-            title: 'send_email'.tr(),
+            function: _sendEmail, // 이메일 전송 기능 연결
+            title: 'settings_requests.send_email'.tr(), // 이메일 보내기 버튼
           ),
         ),
       ),

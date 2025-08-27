@@ -76,14 +76,13 @@ class SettingsLanguage extends ConsumerWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        height: 75,
+      child: Container(
         width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16), // ✅ height 대신 padding
         child: Row(
           children: [
             Expanded(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title, style: body_small_semi(context)),

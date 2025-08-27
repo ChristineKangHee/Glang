@@ -3,6 +3,7 @@
 /// Author: 강희
 /// Last Modified: 2025-08-26 by ChatGPT
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart'; // ✅ L10N
@@ -76,7 +77,7 @@ class _CommunityMainPageState extends ConsumerState<CommunityMainPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'community_terms_title'.tr(), // ✅ 커뮤니티 이용 약관
+                  'community.eula_title'.tr(),  // 커뮤니티 이용 약관
                   style: body_large(context).copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
@@ -86,14 +87,14 @@ class _CommunityMainPageState extends ConsumerState<CommunityMainPage> {
                   ),
                   child: SingleChildScrollView(
                     child: Text(
-                      'community_terms_body'.tr(), // ✅ 약관 본문
+                      'community.eula_content'.tr(),  // 약관 본문
                       style: body_small(context),
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
                 ButtonPrimary_noPadding(
-                  title: 'community_terms_agree'.tr(), // ✅ 동의 버튼
+                  title: 'community.eula_agree_button'.tr(),
                   function: () async {
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.setBool('eulaAccepted_community', true);
@@ -141,7 +142,7 @@ class _CommunityMainPageState extends ConsumerState<CommunityMainPage> {
             }
 
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(child: Text('no_posts'.tr())); // ✅ "게시글이 없습니다."
+              return Center(child:Text('community.no_posts'.tr()));
             }
 
             final posts = snapshot.data!;
@@ -187,7 +188,10 @@ class _CommunityMainPageState extends ConsumerState<CommunityMainPage> {
   Widget _buildRankingNavigation(BuildContext context, CustomColors customColors) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      title: Text('ranking_title'.tr(), style: body_small_semi(context)), // ✅ "랭킹"
+      title: Text(
+        'community.ranking'.tr(), // '랭킹'
+        style: body_small_semi(context),
+      ),
       trailing: TextButton(
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) => RankingPage()));
@@ -195,7 +199,10 @@ class _CommunityMainPageState extends ConsumerState<CommunityMainPage> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('see_more'.tr(), style: body_xxsmall_semi(context)), // ✅ 기존 키 재사용
+            Text(
+              'community.more'.tr(), // '더보기'
+              style: body_xxsmall_semi(context),
+            ),
             const SizedBox(width: 4),
             Icon(Icons.arrow_forward_ios_rounded, size: 16, color: customColors.neutral0),
           ],
@@ -300,7 +307,10 @@ class _CommunityPreviewState extends State<CommunityPreview> {
   Widget _buildPostNavigation(BuildContext context, CustomColors customColors) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-      title: Text('board_title'.tr(), style: body_small_semi(context)), // ✅ "게시판"
+      title: Text(
+        'community.board'.tr(), // '게시판'
+        style: body_small_semi(context),
+      ),
       trailing: TextButton(
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) => Cm2depthBoardmain()));
@@ -308,7 +318,10 @@ class _CommunityPreviewState extends State<CommunityPreview> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('see_more'.tr(), style: body_xxsmall_semi(context)),
+            Text(
+              'community.more'.tr(), // '더보기'
+              style: body_xxsmall_semi(context),
+            ),
             const SizedBox(width: 4),
             Icon(Icons.arrow_forward_ios_rounded, size: 16, color: customColors.neutral0),
           ],

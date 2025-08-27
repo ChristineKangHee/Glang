@@ -1,8 +1,8 @@
 /// File: nickname_input.dart
-/// Purpose: 별명 입력 및 검증을 위한 UI 구현, Firestore를 통해 닉네임 중복 확인 및 저장 처리
+/// Purpose: 별명 입력 및 검증 UI, Firestore 트랜잭션으로 닉네임 중복 확인 및 저장
 /// Author: 박민준
 /// Created: 2025-01-06
-/// Last Modified: 2025-01-07 by 박민준
+/// Last Modified: 2025-08-27 by ChatGPT (merge conflict resolved)
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,10 +13,11 @@ import '../../../../theme/font.dart';
 import '../../../../theme/theme.dart';
 import '../components/custom_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import '../widgets/DoubleBackToExitWrapper.dart';
 
-//TODO: Error Message 출력(닉네임 겹칠)시 버튼 색 바뀌게하기
+// TODO: Error Message 출력(닉네임 겹칠)시 버튼 색 바뀌게 하기
 
 class NicknameInput extends ConsumerStatefulWidget {
   const NicknameInput({super.key});
@@ -48,7 +49,7 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
       final nickname = raw.trim();
       final user = FirebaseAuth.instance.currentUser;
 
-      // 프런트 검증 한번 더(1~8자, 공백 없음)
+      // 0) 프런트 1차 검증 (1~8자, 공백 없음)
       final valid = nickname.isNotEmpty &&
           nickname.length >= 1 &&
           nickname.length <= 8 &&
@@ -56,35 +57,37 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
       if (!valid) {
         setState(() {
           isLoading = false;
-          errorMessage = '별명을 올바르게 입력해주세요.';
+          errorMessage = 'nickname.invalid_input'.tr(); // "별명을 올바르게 입력해주세요."
         });
         return;
       }
 
+      // 1) 인증 체크
       if (user == null) {
         setState(() {
           isLoading = false;
-          errorMessage = '사용자 인증 정보를 확인할 수 없습니다.';
+          errorMessage = 'nickname.auth_error'.tr(); // "사용자 인증 정보를 확인할 수 없습니다."
         });
         return;
       }
 
+      // 2) Firestore 트랜잭션: 닉네임 점유 + 유저 문서 업데이트
       final fs = FirebaseFirestore.instance;
       final nickRef = fs.collection('nicknames').doc(nickname);
       final userRef = fs.collection('users').doc(user.uid);
 
       try {
         await fs.runTransaction((tx) async {
-          // 1) 닉네임 중복 확인
+          // (a) 닉네임 중복 확인
           final nickSnap = await tx.get(nickRef);
           if (nickSnap.exists) {
-            throw Exception('이미 사용 중인 별명입니다.');
+            // 커스텀 에러 토큰으로 던져서 구분 처리
+            throw Exception('DUPLICATE_NICKNAME');
           }
 
-          // 2) 유저 문서 upsert
+          // (b) 유저 문서 upsert (최소 스키마, 프로젝트에 맞게 조정)
           final userSnap = await tx.get(userRef);
           if (!userSnap.exists) {
-            // 최소 스키마로 생성 (필요한 필드는 프로젝트 스키마에 맞게 추가)
             tx.set(userRef, {
               'name': user.displayName,
               'photoURL': user.photoURL,
@@ -94,13 +97,11 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
               'currentCourse': '코스1',
               'learningTime': 0,
               'completedMissionCount': 0,
-              // 닉네임 필드 동시 반영
               'nickname': nickname,
               'nicknameSet': true,
               'updatedAt': FieldValue.serverTimestamp(),
             });
           } else {
-            // 존재하면 닉네임/플래그만 업데이트
             tx.update(userRef, {
               'nickname': nickname,
               'nicknameSet': true,
@@ -108,22 +109,24 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
             });
           }
 
-          // 3) 닉네임 점유 문서 생성
+          // (c) 닉네임 점유 문서 생성
           tx.set(nickRef, {
             'uid': user.uid,
             'created_at': FieldValue.serverTimestamp(),
           });
         });
 
-        // 성공 → 튜토리얼로 이동
-        if (context.mounted) {
+        // 성공 → 튜토리얼 화면으로 이동
+        if (mounted) {
           Navigator.pushReplacementNamed(context, '/tutorial');
         }
       } catch (e) {
         setState(() {
-          errorMessage = e.toString().contains('이미 사용 중인 별명')
-              ? '이미 사용 중인 별명입니다.'
-              : '별명을 저장하는 중 문제가 발생했습니다. 다시 시도해주세요.';
+          if (e.toString().contains('DUPLICATE_NICKNAME')) {
+            errorMessage = 'nickname.duplicate_error'.tr(); // "이미 사용 중인 별명입니다."
+          } else {
+            errorMessage = 'nickname.save_error'.tr(); // "별명을 저장하는 중 문제가 발생했습니다."
+          }
         });
       } finally {
         if (mounted) {
@@ -148,17 +151,14 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          '별명을 입력해주세요',
-                          style: heading_medium(context),
-                        ),
+                        Text('nickname.title'.tr(), style: heading_medium(context)),
                         const SizedBox(height: 24),
                         NicknameTextField(
                           controller: _controller,
-                          existingNicknames: [], // Firestore에서 가져오기 때문에 불필요
-                          onChanged: (text, error) {
+                          existingNicknames: const [], // Firestore에서 확인하므로 불필요
+                          onChanged: (text, err) {
                             setState(() {
-                              errorMessage = null; // 입력 중 에러 메시지 초기화
+                              errorMessage = null; // 입력 시 에러 제거
                             });
                           },
                         ),
@@ -178,18 +178,18 @@ class _NicknameInputState extends ConsumerState<NicknameInput> {
               Container(
                 width: MediaQuery.of(context).size.width,
                 padding: const EdgeInsets.all(20),
-                child: isInputValid && !isLoading
+                child: (isInputValid && !isLoading)
                     ? ButtonPrimary_noPadding(
                   function: _saveNickname,
-                  title: '완료',
+                  title: 'common.complete'.tr(),
                 )
                     : ButtonPrimary20_noPadding(
                   function: () {
                     setState(() {
-                      errorMessage = '별명을 올바르게 입력해주세요.';
+                      errorMessage = 'nickname.invalid_input'.tr();
                     });
                   },
-                  title: '완료',
+                  title: 'common.complete'.tr(),
                 ),
               ),
             ],

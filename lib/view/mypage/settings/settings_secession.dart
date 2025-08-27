@@ -33,7 +33,7 @@ class _SettingsSecessionState extends ConsumerState<SettingsSecession> {
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        title: 'account_delete'.tr(), // ✅ "탈퇴하기"
+        title: 'settings_secession.title'.tr(), // '탈퇴하기'
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -43,7 +43,7 @@ class _SettingsSecessionState extends ConsumerState<SettingsSecession> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'delete_greeting'.tr(args: [nameToShow]), // ✅ "{}님,\n정말 탈퇴하시나요?"
+                "$userName,\n${'settings_secession.confirm_message'.tr()}",
                 style: heading_large(context),
               ),
             ),
@@ -51,7 +51,7 @@ class _SettingsSecessionState extends ConsumerState<SettingsSecession> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'delete_warning'.tr(), // ✅ "탈퇴 시 모든 데이터가 삭제되며 복구가 불가능합니다"
+                'settings_secession.warning'.tr(),
                 style: body_small(context).copyWith(color: customColors.neutral60),
               ),
             ),
@@ -93,7 +93,7 @@ class _SettingsSecessionState extends ConsumerState<SettingsSecession> {
                 },
               );
             },
-            title: _isDeleting ? 'deleting'.tr() : 'account_delete'.tr(),
+            title: 'settings_secession.title'.tr(),
           ),
         ),
       ),

@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readventure/theme/font.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:readventure/viewmodel/app_state_controller.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../theme/theme.dart';
 import '../components/custom_button.dart';
 import '../widgets/DoubleBackToExitWrapper.dart';
@@ -94,23 +95,23 @@ class TutorialPageView extends StatelessWidget {
       onPageChanged: onPageChanged,
       children: [
         TutorialPage(
-          title: '맞춤 코스로\n몰입형 읽기 경험!',
-          content: '책 읽기 전, 중, 후 미션과\n읽기 목표를 수행하며 몰입형 독서를 즐겨요',
+          title: 'tutorial.page1.title'.tr(),
+          content: 'tutorial.page1.content'.tr(),
           image: 'assets/images/tutorial1.png',
         ),
         TutorialPage(
-          title: 'AI 피드백으로\n성장 포인트 점검!',
-          content: '강점과 개선점을 바로 확인해요',
+          title: 'tutorial.page2.title'.tr(),
+          content: 'tutorial.page2.content'.tr(),
           image: 'assets/images/tutorial2.png',
         ),
         TutorialPage(
-          title: '읽기 패턴 분석으로\n성장을 한눈에!',
-          content: '리포트를 통해 성취도를 시각적으로 확인하세요',
+          title: 'tutorial.page3.title'.tr(),
+          content: 'tutorial.page3.content'.tr(),
           image: 'assets/images/tutorial3.png',
         ),
         TutorialPage(
-          title: '배지와 커뮤니티로\n읽기의 재미 UP!',
-          content: '미션 완료로 배지를 획득하고,\n커뮤니티에 글을 공유하며 함께 성장하세요',
+          title: 'tutorial.page4.title'.tr(),
+          content: 'tutorial.page4.content'.tr(),
           image: 'assets/images/tutorial4.png',
           showStartButton: true,
           onStart: onStart, // ✅ 전달
@@ -184,7 +185,7 @@ class TutorialPage extends StatelessWidget {
                     Navigator.pushReplacementNamed(context, '/');
                   }
                 },
-                title: '시작하기', // 버튼 제목
+                title: '시작하기'.tr(),
               ),
             ),
           ),
