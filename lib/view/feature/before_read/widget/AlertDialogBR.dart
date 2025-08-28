@@ -59,7 +59,7 @@ class AlertDialogBR extends StatelessWidget {
           'Authorization': 'Bearer $apiKey',
         },
         body: jsonEncode({
-          'model': 'gpt-3.5-turbo',
+          'model': 'gpt-4o',
           'messages': [
             {'role': 'system', 'content': prompt},
           ],
