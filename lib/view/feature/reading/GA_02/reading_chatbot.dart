@@ -13,6 +13,7 @@ import '../../../../api/reading_chatbot_service.dart';
 import '../../../../model/reading_data.dart';
 import '../../../../theme/font.dart';
 import '../../../../util/box_shadow_styles.dart';
+import '../../../../util/locale_text.dart';
 import '../../../../viewmodel/custom_colors_provider.dart';
 import '../../../components/custom_app_bar.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -49,10 +50,16 @@ class _ChatBotState extends ConsumerState<ChatBot> {
       _controller.clear();
 
       try {
+        // final response = await _chatBotService.getChatResponse(
+        //     widget.selectedText,
+        //     widget.readingData.textSegments as List<String>,
+        //     _messages
+        // );
+        final segs = llx(context, widget.readingData.textSegments);
         final response = await _chatBotService.getChatResponse(
-            widget.selectedText,
-            widget.readingData.textSegments as List<String>,
-            _messages
+           widget.selectedText,
+            segs,
+            _messages,
         );
 
         setState(() {

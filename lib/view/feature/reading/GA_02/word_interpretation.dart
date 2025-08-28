@@ -53,7 +53,7 @@ Future<Map<String, dynamic>> fetchWordDetails(String word, List<String> textSegm
         'Authorization': 'Bearer $apiKey',
       },
       body: jsonEncode({
-        'model': 'gpt-3.5-turbo',
+        'model': 'gpt-4o',
         'messages': [
           {
             'role': 'system',

@@ -31,7 +31,7 @@ Future<Map<String, dynamic>> fetchSentenceDetails(String sentence, List<String> 
         'Authorization': 'Bearer $apiKey',
       },
       body: jsonEncode({
-        'model': 'gpt-3.5-turbo',
+        'model': 'gpt-4o',
         'messages': [
           {
             'role': 'system',
