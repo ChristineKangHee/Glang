@@ -1,5 +1,5 @@
 /// File: settings_FAQ.dart
-/// Purpose: FAQ 페이지를 구성하는 화면 (L10N 보강: 타이틀/인사/에러/빈상태)
+/// Purpose: FAQ 페이지를 구성하는 화면 (L10N 보강: 타이틀/인사/에러/빈상태 + {ko,en} 맵 지원)
 /// Author: 강희
 /// Created: 2024-12-28
 /// Last Modified: 2025-08-26 by ChatGPT (L10N)
@@ -33,24 +33,26 @@ class SettingsFAQ extends ConsumerWidget {
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        title: 'faq'.tr(), // ✅ "자주 묻는 질문"
+        title: 'faq'.tr(), // ✅ "자주 묻는 질문" (키 없으면 'faq' 그대로 표시)
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('settings')
             .doc('faqs')
             .collection('faqs')
-            .orderBy('order')
+            .orderBy('order') // 단일 정렬: 복합 인덱스 불필요
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('error_with_message'.tr(args: [snapshot.error.toString()])));
+            return Center(
+              child: Text('error_with_message'.tr(args: [snapshot.error.toString()])),
+            );
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final faqDocs = snapshot.data!.docs;
+          final faqDocs = snapshot.data?.docs ?? [];
           if (faqDocs.isEmpty) {
             return Center(child: Text('no_faqs'.tr())); // ✅ 빈 상태
           }
@@ -72,9 +74,9 @@ class SettingsFAQ extends ConsumerWidget {
                 child: ListView.builder(
                   itemCount: faqDocs.length,
                   itemBuilder: (context, index) {
-                    final data = faqDocs[index].data() as Map<String, dynamic>;
-                    final question = (data['question'] ?? '') as String;
-                    final answer = (data['answer'] ?? '') as String;
+                    final data = faqDocs[index].data() as Map<String, dynamic>? ?? {};
+                    final question = _pickLocalized(context, data['question']);
+                    final answer = _pickLocalized(context, data['answer']);
 
                     return Column(
                       children: [
@@ -95,8 +97,11 @@ class SettingsFAQ extends ConsumerWidget {
                               ),
                             );
                           },
-                          trailing: Icon(Icons.arrow_forward_ios,
-                              size: 16, color: customColors.neutral30),
+                          trailing: Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                            color: customColors.neutral30,
+                          ),
                         ),
                         Divider(color: customColors.neutral80),
                       ],
@@ -110,6 +115,20 @@ class SettingsFAQ extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// 문자열/맵(ko/en) 모두 안전 처리
+String _pickLocalized(BuildContext context, dynamic value) {
+  if (value == null) return '';
+  if (value is String) return value; // 레거시 호환
+  if (value is Map) {
+    final lang = context.locale.languageCode.toLowerCase();
+    final ko = (value['ko'] ?? '').toString();
+    final en = (value['en'] ?? '').toString();
+    if (lang == 'ko') return ko.isNotEmpty ? ko : (en.isNotEmpty ? en : '');
+    return en.isNotEmpty ? en : (ko.isNotEmpty ? ko : '');
+  }
+  return '';
 }
 
 // FAQ 상세 페이지 위젯
@@ -136,7 +155,10 @@ class FAQDetailPage extends StatelessWidget {
           children: [
             Text(faqQuestion, style: heading_large(context)),
             const SizedBox(height: 20),
-            Text(faqAnswer, style: body_small(context)),
+            Text(
+              faqAnswer.replaceAll(r'\n', '\n'),
+              style: body_small(context),
+            ),
           ],
         ),
       ),
