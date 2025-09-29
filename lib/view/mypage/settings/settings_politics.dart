@@ -19,53 +19,48 @@ class SettingsPolitics extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider);
-    final locale = context.locale;
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        title: 'settings.politics.title'.tr(),
+        // 기존 'settings.politics.title' 대신 공용 키 사용
+        title: 'terms_policies'.tr(),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('settings')
             .doc('terms')
             .collection('terms')
-            .orderBy('order')
+            .orderBy('order') // 단일 정렬 → 추가 인덱스 불필요
             .snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
           if (snapshot.hasError) {
             return Center(
               child: Text('error_with_message'.tr(args: [snapshot.error.toString()])),
             );
           }
-
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text('no_terms'.tr())); // ✅ 빈 상태
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
           }
 
-          final docs = snapshot.data!.docs;
-
-          final items = docs.map((d) {
-            final data = d.data() as Map<String, dynamic>? ?? const {};
-            final title = _localizedField(data, 'title', locale) ?? '';
-            final content = _localizedField(data, 'content', locale) ?? '';
-            return (title, content);
-          }).toList();
+          final docs = snapshot.data?.docs ?? [];
+          if (docs.isEmpty) {
+            return Center(child: Text('no_terms'.tr()));
+          }
 
           return ListView.separated(
-            itemCount: items.length,
+            itemCount: docs.length,
             separatorBuilder: (_, __) => Divider(color: customColors.neutral80),
             itemBuilder: (context, index) {
-              final (title, content) = items[index];
+              final data = docs[index].data() as Map<String, dynamic>? ?? {};
+              final title = _pickLocalized(context, data['title']);
+              final content = _pickLocalized(context, data['content']);
+
               return ListTile(
                 title: Text(
                   title,
                   style: body_medium_semi(context).copyWith(color: customColors.neutral0),
                 ),
+                trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -74,7 +69,6 @@ class SettingsPolitics extends ConsumerWidget {
                     ),
                   );
                 },
-                trailing: Icon(Icons.arrow_forward_ios, size: 16, color: customColors.neutral30),
               );
             },
           );
@@ -82,35 +76,41 @@ class SettingsPolitics extends ConsumerWidget {
       ),
     );
   }
-
-  /// 문서에서 baseKey_lang 로 우선 조회하고, 없으면 baseKey로 폴백
-  String? _localizedField(Map<String, dynamic> data, String baseKey, Locale locale) {
-    final lang = locale.languageCode;
-    final withLang = data['${baseKey}_$lang'];
-    if (withLang is String && withLang.trim().isNotEmpty) return withLang;
-    final base = data[baseKey];
-    return (base is String && base.trim().isNotEmpty) ? base : null;
-  }
 }
 
-/// 약관 상세
-class PolicyDetailScreen extends StatelessWidget {
-  final String title;   // Firestore 동적 제목 (번역 키 아님)
+/// 문자열 / {ko,en} 맵 안전 처리 (레거시 호환)
+String _pickLocalized(BuildContext context, dynamic value) {
+  if (value == null) return '';
+  if (value is String) return value; // 레거시 단일 문자열
+  if (value is Map) {
+    final lang = context.locale.languageCode.toLowerCase();
+    final ko = (value['ko'] ?? '').toString();
+    final en = (value['en'] ?? '').toString();
+    if (lang == 'ko') return ko.isNotEmpty ? ko : (en.isNotEmpty ? en : '');
+    return en.isNotEmpty ? en : (ko.isNotEmpty ? ko : '');
+  }
+  return '';
+}
+
+/// 약관/정책 상세
+class PolicyDetailScreen extends ConsumerWidget {
+  final String title;   // Firestore 동적 제목
   final String content; // Firestore 동적 본문
 
   const PolicyDetailScreen({super.key, required this.title, required this.content});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        // 🔎 동적 제목이므로 .tr() 사용하지 않음
+        // 동적 문자열 → .tr() 사용하지 않음
         title: title,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Container(
+          color: customColors.neutral90,
+          padding: const EdgeInsets.all(16),
           child: Text(
             content.replaceAll(r'\n', '\n'),
             style: body_small(context),

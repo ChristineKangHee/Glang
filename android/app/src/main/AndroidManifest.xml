@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
         android:maxSdkVersion="32"
         tools:targetApi="donut" />
@@ -15,6 +16,7 @@
         android:label="글랑 GLANG"
         android:name="${applicationName}"
         android:extractNativeLibs="true"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/launcher_icon">
 <!--        android:roundIcon="@mipmap/ic_launcher_round"-->
         <activity
@@ -72,6 +74,9 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableImpeller"
+            android:value="false" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
