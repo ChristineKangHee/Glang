@@ -273,11 +273,16 @@ class BadgeBox extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
+    // ✅ 원형 아이콘과 라벨 폭을 살짝 다르게 (라벨은 아이콘보다 약간 넓게)
+    final double badgeSize = screenWidth * 0.18;
+    final double labelMaxWidth = screenWidth * 0.22;
+
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: screenWidth * 0.18,
-          height: screenWidth * 0.18,
+          width: badgeSize,
+          height: badgeSize,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: isUnlocked
@@ -301,9 +306,22 @@ class BadgeBox extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          label,
-          style: body_small_semi(context),
+
+        // ✅ 너무 길면 ... 처리 + 툴팁으로 전체 보기
+        ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: labelMaxWidth),
+          child: Tooltip(
+            message: label, // 길 때 전체 이름을 길게 눌러 볼 수 있음(웹/데스크탑/모바일 롱프레스)
+            triggerMode: TooltipTriggerMode.longPress,
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+              textAlign: TextAlign.center,
+              style: body_small_semi(context),
+            ),
+          ),
         ),
       ],
     );

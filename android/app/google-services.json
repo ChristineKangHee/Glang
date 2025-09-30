@@ -7,6 +7,43 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:194910563832:android:431db0ad8d18c8cec5fa0d",
+        "android_client_info": {
+          "package_name": "com.example.dcampday1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "194910563832-rcd51ljo4ou93l4ooiinu7mmt41o64in.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5HC3E_yewyCSEel9WIw16RsG8eAR9Nc8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "194910563832-rcd51ljo4ou93l4ooiinu7mmt41o64in.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "194910563832-81q7mf4c284fcqn2q21rukie7qbq5oba.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.zero.glang2025",
+                "app_store_id": "6740841063"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:194910563832:android:42afafeded30a1fbc5fa0d",
         "android_client_info": {
           "package_name": "com.zero.glang"
