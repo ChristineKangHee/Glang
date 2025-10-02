@@ -1,18 +1,17 @@
 /// File: word_interpretation.dart
 /// Purpose: 단어 해석(사전적 의미, 문맥상 의미, 유사어, 반의어) 관련 API 호출 및 팝업 UI 처리
 /// Author: 강희 (원본 코드 참조)
+/// Last Modified: 2025-10-02 by ChatGPT (JSON 강제/파싱 보정/안정화)
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:easy_localization/easy_localization.dart'; // 추가
-
+import 'package:easy_localization/easy_localization.dart';
 
 // 프로젝트 내 폰트/스타일 관련 함수 import (경로는 필요에 따라 수정)
 import 'package:readventure/theme/font.dart';
-
 import '../../../../viewmodel/bookmark_interpretation.dart';
 
 /// 기본 응답 값 (API 호출 실패 시 반환)
@@ -23,7 +22,7 @@ const Map<String, dynamic> defaultResponse = {
   "antonyms": [],
 };
 
-/// shimmer 효과 위젯 반환 함수
+/// shimmer 효과 위젯
 Widget shimmerLine({
   required double width,
   required double height,
@@ -36,17 +35,32 @@ Widget shimmerLine({
   );
 }
 
-/// ChatGPT API를 호출하여 단어 정보를 받아오는 함수
+/// ChatGPT API를 호출하여 단어 정보를 받아오는 함수 (안정화 버전)
 Future<Map<String, dynamic>> fetchWordDetails(String word, List<String> textSegments) async {
   final apiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
-  if (apiKey.isEmpty) return defaultResponse;
+  if (apiKey.isEmpty) {
+    debugPrint('[word] OPENAI_API_KEY empty');
+    return defaultResponse;
+  }
 
   const endpoint = 'https://api.openai.com/v1/chat/completions';
   final url = Uri.parse(endpoint);
+
+  // 문맥 과다 길이 방지 (토큰 압박 완화)
   final String contextText = textSegments.join("\n");
+  final String clippedContext =
+  contextText.length > 4000 ? contextText.substring(0, 4000) : contextText;
+
+  // 선택 단어 방어
+  final String trimmedWord = word.trim();
+  if (trimmedWord.isEmpty) {
+    debugPrint('[word] Selected word is empty');
+    return defaultResponse;
+  }
 
   try {
-    final response = await http.post(
+    final response = await http
+        .post(
       url,
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
@@ -54,43 +68,90 @@ Future<Map<String, dynamic>> fetchWordDetails(String word, List<String> textSegm
       },
       body: jsonEncode({
         'model': 'gpt-4o',
+        // ✅ JSON만 오게 강제
+        'response_format': {'type': 'json_object'},
         'messages': [
           {
             'role': 'system',
             'content':
-            'You are a Korean dictionary assistant. For the given word, provide a JSON object with exactly the following keys: "dictionaryMeaning", "contextualMeaning", "synonyms", and "antonyms". "dictionaryMeaning" should be a brief definition of the word in Korean. "contextualMeaning" should explain, based on the following text segments: "$contextText", which among the dictionary definitions is intended in the given sentence, and provide a detailed explanation of that particular meaning. "synonyms" should be an array of similar words in Korean, and "antonyms" should be an array of opposite words in Korean. If any information is not available, set its value to "정보 없음". 모든 결과는 한국어로 제공하세요. Return only the JSON object with no additional text.'
+            '당신은 한국어 사전 도우미입니다. 아래 JSON 스키마대로만 반환하세요. '
+                '키는 정확히 dictionaryMeaning, contextualMeaning, synonyms, antonyms. '
+                '모든 결과는 한국어. contextualMeaning은 주어진 문맥에 근거해 가장 적절한 의미를 상세히 설명. '
+                'synonyms/antonyms는 문자열 배열. 모르면 "정보 없음". JSON 외 텍스트 금지.'
           },
           {
             'role': 'user',
-            'content': 'Word: "$word"'
+            'content':
+            '문맥 세그먼트:\n$clippedContext\n\n단어: "$trimmedWord"\nJSON만 반환하세요.'
           },
         ],
-        'max_tokens': 300,
         'temperature': 0.2,
+        // ✅ 잘림 방지 (여유 확보)
+        'max_tokens': 800,
         'n': 1,
       }),
-    );
+    )
+        .timeout(const Duration(seconds: 30));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> resBody = jsonDecode(utf8.decode(response.bodyBytes));
-      final String message = resBody["choices"][0]["message"]["content"];
-      try {
-        return jsonDecode(message);
-      } catch (e) {
-        print("ChatGPT 응답 파싱 실패: $e");
+      final dynamic content = resBody['choices']?[0]?['message']?['content'];
+      final String raw = (content ?? '').toString();
+
+      // 혹시 모를 코드펜스/잡텍스트가 와도 첫 번째 JSON 객체만 추출
+      String extractJsonObject(String s) {
+        final start = s.indexOf('{');
+        if (start < 0) return '';
+        int depth = 0;
+        for (int i = start; i < s.length; i++) {
+          final ch = s[i];
+          if (ch == '{') depth++;
+          if (ch == '}') {
+            depth--;
+            if (depth == 0) {
+              return s.substring(start, i + 1);
+            }
+          }
+        }
+        return '';
+      }
+
+      final jsonStr = extractJsonObject(raw);
+      if (jsonStr.isEmpty) {
+        debugPrint('[word] No JSON object found in response: $raw');
         return defaultResponse;
       }
+
+      Map<String, dynamic> parsed;
+      try {
+        parsed = jsonDecode(jsonStr);
+      } catch (e) {
+        debugPrint('[word] JSON decode failed: $e\n$jsonStr');
+        return defaultResponse;
+      }
+
+      // 방어적 캐스팅/기본값 보정
+      return {
+        'dictionaryMeaning': parsed['dictionaryMeaning'] ?? '정보 없음',
+        'contextualMeaning': parsed['contextualMeaning'] ?? '정보 없음',
+        'synonyms': (parsed['synonyms'] is List)
+            ? List<String>.from(parsed['synonyms'])
+            : <String>[],
+        'antonyms': (parsed['antonyms'] is List)
+            ? List<String>.from(parsed['antonyms'])
+            : <String>[],
+      };
     } else {
-      print("ChatGPT API 호출 실패: ${response.statusCode} ${response.body}");
+      debugPrint('[word] OpenAI error ${response.statusCode}: ${response.body}');
       return defaultResponse;
     }
-  } catch (e) {
-    print("Exception in fetchWordDetails: $e");
+  } catch (e, st) {
+    debugPrint('[word] Exception: $e\n$st');
     return defaultResponse;
   }
 }
 
-/// 팝업 상단 헤더 위젯 (타이틀 및 닫기, 북마크 아이콘 포함)
+/// 팝업 상단 헤더 (타이틀/닫기/북마크)
 Widget _buildPopupHeader(
     BuildContext context,
     dynamic customColors, {
@@ -124,7 +185,7 @@ Widget _buildPopupHeader(
   );
 }
 
-/// 선택된 단어 표시 위젯
+/// 선택된 단어 표시
 Widget _buildSelectedWord(BuildContext context, String selectedText, dynamic customColors) {
   return Align(
     alignment: Alignment.centerLeft,
@@ -137,7 +198,7 @@ Widget _buildSelectedWord(BuildContext context, String selectedText, dynamic cus
   );
 }
 
-/// 결과 내용 컨테이너 공통 위젯
+/// 결과 컨테이너 공통
 Widget _buildResultContainer(Widget child, dynamic customColors) {
   return Container(
     width: double.infinity,
@@ -152,74 +213,52 @@ Widget _buildResultContainer(Widget child, dynamic customColors) {
   );
 }
 
-/// API 응답 결과를 표시하는 위젯
+/// API 응답 결과 UI
 Widget _buildResultContent(BuildContext context, Map<String, dynamic> data, dynamic customColors) {
   final List<dynamic> synonyms = data['synonyms'] is List ? data['synonyms'] : [];
   final List<dynamic> antonyms = data['antonyms'] is List ? data['antonyms'] : [];
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(
-        'dictionary_meaning'.tr(),
-        style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
-      ),
-      Text(
-        data['dictionaryMeaning'] ?? 'info_not_available'.tr(),
-        style: body_small(context),
-      ),
+      Text('dictionary_meaning'.tr(),
+          style: heading_xxsmall(context).copyWith(color: customColors.neutral30)),
+      Text(data['dictionaryMeaning'] ?? 'info_not_available'.tr(), style: body_small(context)),
       const SizedBox(height: 16),
-      Text(
-        'contextual_meaning'.tr(),
-        style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
-      ),
-      Text(
-        data['contextualMeaning'] ?? 'info_not_available'.tr(),
-        style: body_small(context),
-      ),
+      Text('contextual_meaning'.tr(),
+          style: heading_xxsmall(context).copyWith(color: customColors.neutral30)),
+      Text(data['contextualMeaning'] ?? 'info_not_available'.tr(), style: body_small(context)),
       const SizedBox(height: 16),
-      Text(
-        'synonyms'.tr(),
-        style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
-      ),
-      Text(
-        synonyms.isNotEmpty ? synonyms.join(', ') : 'info_not_available'.tr(),
-        style: body_small(context),
-      ),
+      Text('synonyms'.tr(),
+          style: heading_xxsmall(context).copyWith(color: customColors.neutral30)),
+      Text(synonyms.isNotEmpty ? synonyms.join(', ') : 'info_not_available'.tr(),
+          style: body_small(context)),
       const SizedBox(height: 16),
-      Text(
-        'antonyms'.tr(),
-        style: heading_xxsmall(context).copyWith(color: customColors.neutral30),
-      ),
-      Text(
-        antonyms.isNotEmpty ? antonyms.join(', ') : 'info_not_available'.tr(),
-        style: body_small(context),
-      ),
+      Text('antonyms'.tr(),
+          style: heading_xxsmall(context).copyWith(color: customColors.neutral30)),
+      Text(antonyms.isNotEmpty ? antonyms.join(', ') : 'info_not_available'.tr(),
+          style: body_small(context)),
     ],
   );
 }
 
-/// 로딩 시 shimmer 효과로 API 결과 영역을 표시하는 위젯
+/// 로딩 시 shimmer
 Widget _buildLoadingContent(BuildContext context, dynamic customColors) {
   return _buildResultContainer(
     Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 사전적 의미
         shimmerLine(width: 80, height: 16),
         const SizedBox(height: 8),
         shimmerLine(width: double.infinity, height: 16),
         const SizedBox(height: 16),
-        // 문맥상 의미
         shimmerLine(width: 80, height: 16),
         const SizedBox(height: 8),
         shimmerLine(width: double.infinity, height: 16),
         const SizedBox(height: 16),
-        // 유사어
         shimmerLine(width: 60, height: 16),
         const SizedBox(height: 8),
         shimmerLine(width: double.infinity, height: 16),
         const SizedBox(height: 16),
-        // 반의어
         shimmerLine(width: 60, height: 16),
         const SizedBox(height: 8),
         shimmerLine(width: double.infinity, height: 16),
@@ -229,7 +268,7 @@ Widget _buildLoadingContent(BuildContext context, dynamic customColors) {
   );
 }
 
-/// 단어 해석 팝업 UI를 표시하는 함수
+/// 단어 해석 팝업 표시
 void showWordPopup({
   required BuildContext context,
   required String selectedText,
@@ -238,8 +277,17 @@ void showWordPopup({
   required String stageId,
   required String subdetailTitle,
 }) {
-  // Future를 한 번만 생성해서 재사용합니다.
-  final futureData = fetchWordDetails(selectedText, textSegments);
+  // 빈 선택 단어 방어
+  final String trimmed = selectedText.trim();
+  if (trimmed.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('info_not_available'.tr())),
+    );
+    return;
+  }
+
+  // Future를 한 번만 생성해서 재사용
+  final futureData = fetchWordDetails(trimmed, textSegments);
 
   showDialog(
     context: context,
@@ -250,7 +298,7 @@ void showWordPopup({
         child: StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return FutureBuilder<Map<String, dynamic>>(
-              future: futureData, // setState 호출 시 재생성되지 않습니다.
+              future: futureData,
               builder: (context, snapshot) {
                 Widget content;
                 VoidCallback? onBookmarkCallback;
@@ -269,7 +317,7 @@ void showWordPopup({
                         isBookmarked: isBookmarked,
                       ),
                       const SizedBox(height: 20),
-                      _buildSelectedWord(context, selectedText, customColors),
+                      _buildSelectedWord(context, trimmed, customColors),
                       const SizedBox(height: 20),
                       _buildLoadingContent(context, customColors),
                       const SizedBox(height: 20),
@@ -280,26 +328,31 @@ void showWordPopup({
                   content = Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      _buildPopupHeader(
+                        context,
+                        customColors,
+                        onClose: () => Navigator.pop(context),
+                        onBookmark: onBookmarkCallback,
+                        isBookmarked: isBookmarked,
+                      ),
+                      const SizedBox(height: 20),
                       Text(
                         'error_occurred'.tr(),
                         style: body_small_semi(context).copyWith(color: customColors.neutral30),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
                       Text(snapshot.error.toString(), style: body_small(context)),
                       const SizedBox(height: 20),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: Icon(Icons.close, color: customColors.neutral30),
-                      ),
                     ],
                   );
                 } else {
-                  final data = snapshot.data!;
+                  final data = snapshot.data ?? defaultResponse;
+
                   onBookmarkCallback = () async {
                     await saveBookmarkInterpretation(
                       stageId: stageId,
                       subdetailTitle: subdetailTitle,
-                      selectedText: selectedText,
+                      selectedText: trimmed,
                       interpretationData: data,
                     );
                     setState(() {
@@ -321,7 +374,7 @@ void showWordPopup({
                         isBookmarked: isBookmarked,
                       ),
                       const SizedBox(height: 20),
-                      _buildSelectedWord(context, selectedText, customColors),
+                      _buildSelectedWord(context, trimmed, customColors),
                       const SizedBox(height: 20),
                       _buildResultContainer(
                         _buildResultContent(context, data, customColors),

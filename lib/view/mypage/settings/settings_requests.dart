@@ -17,17 +17,31 @@ class SettingsRequests extends ConsumerWidget {
   const SettingsRequests({super.key});
 
   Future<void> _sendEmail(BuildContext context) async {
+    final subject = tr('settings_requests.email_subject');
+    final body = tr('settings_requests.email_body');
+
+    // mailto URI 구성 (줄바꿈 등 안전하게 인코딩)
     final Uri emailUri = Uri(
       scheme: 'mailto',
       path: 'hgu.zero24@gmail.com',
       queryParameters: {
-        'subject': tr('settings_requests.email_subject'), // 번역된 제목
-        'body': tr('settings_requests.email_body'),       // 번역된 본문
+        'subject': subject,
+        'body': body,
       },
     );
 
-    if (await canLaunchUrl(emailUri)) {
-      await launchUrl(emailUri);
+    // 외부 앱으로 여는 모드가 더 안정적
+    final canOpen = await canLaunchUrl(emailUri);
+    if (canOpen) {
+      final ok = await launchUrl(
+        emailUri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!ok) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('email_client_unavailable'.tr())),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('email_client_unavailable'.tr())),
@@ -41,7 +55,7 @@ class SettingsRequests extends ConsumerWidget {
 
     return Scaffold(
       appBar: CustomAppBar_2depth_4(
-        title: 'settings.feedback'.tr(), // 기존 문자열 대체
+        title: 'settings.feedback'.tr(),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -49,15 +63,15 @@ class SettingsRequests extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Align(
-              alignment: Alignment.centerLeft, // 텍스트 왼쪽 정렬
+              alignment: Alignment.centerLeft,
               child: Text(
-                "settings_requests.title".tr(), // "불편한 점이 있으신가요?"
+                "settings_requests.title".tr(),
                 style: heading_large(context),
               ),
             ),
-            const SizedBox(height: 8), // 간격 추가
+            const SizedBox(height: 8),
             Text(
-              "settings_requests.description".tr(), // 설명
+              "settings_requests.description".tr(),
               style: body_small(context).copyWith(color: customColors.neutral60),
             ),
           ],
@@ -68,8 +82,9 @@ class SettingsRequests extends ConsumerWidget {
         child: SizedBox(
           width: double.infinity,
           child: ButtonPrimary_noPadding(
-            function: _sendEmail, // 이메일 전송 기능 연결
-            title: 'settings_requests.send_email'.tr(), // 이메일 보내기 버튼
+            // ✅ context를 함께 넘겨야 함
+            function: () => _sendEmail(context),
+            title: 'settings_requests.send_email'.tr(),
           ),
         ),
       ),

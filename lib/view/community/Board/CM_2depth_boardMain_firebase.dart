@@ -1,25 +1,32 @@
 /// File: CM_2depth_boardMain_firebase.dart
-/// Purpose: 커뮤니티 게시판 화면 (L10N + 다국어 안전 카테고리 필터 + 스트림 공유)
+/// Purpose: 커뮤니티 게시판 화면 (L10N + 다국어 안전 카테고리 필터 + 단일 스트림 구독)
 /// Author: 강희
-/// Last Modified: 2025-08-26 by ChatGPT
+/// Last Modified: 2025-10-03 by ChatGPT
+///
+/// 변경 요약
+/// - 무한 로딩 원인 제거: 동일 스트림 다중 구독을 피하기 위해 상위에서 단 1회만 구독
+/// - _postsStream 에 asBroadcastStream() 적용(추가 안전장치)
+/// - 각 탭은 받은 리스트를 필터링만 하도록 단순화(_PostListStatic)
+/// - 중복 import 정리
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
+
 import '../../../theme/font.dart';
 import '../../../theme/theme.dart';
 import '../../../viewmodel/custom_colors_provider.dart';
 import '../../components/custom_app_bar.dart';
 import '../../components/my_divider.dart';
+
 import 'community_data_firebase.dart';
 import 'community_searchpage_firebase.dart';
 import 'community_service.dart';
 import 'component_community_post_firebase.dart';
 import 'essay_posting_firebase.dart';
 import 'free_posting_firebase.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class Cm2depthBoardmain extends ConsumerStatefulWidget {
   const Cm2depthBoardmain({Key? key}) : super(key: key);
@@ -40,11 +47,16 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this)..addListener(() => setState(() {}));
+
+    _tabController =
+    TabController(length: 3, vsync: this)..addListener(() => setState(() {}));
+
     for (var i = 0; i < 3; i++) {
       _scrollControllers[i] = ScrollController();
     }
-    _postsStream = _communityService.getPosts(); // ✅ 탭마다 중복 생성 방지
+
+    // ✅ 여러 위젯이 동시에 listen해도 안전하도록 broadcast 전환 (추가 안전장치)
+    _postsStream = _communityService.getPosts().asBroadcastStream();
   }
 
   @override
@@ -81,14 +93,48 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain>
               Tab(text: 'community.free'.tr()),
             ],
           ),
+
+          // ✅ 단 1회만 스트림을 구독하고, 하위 탭은 필터링만 수행
           Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: const [
-                _PostList(tabIndex: 0, filter: CategoryFilter.all),
-                _PostList(tabIndex: 1, filter: CategoryFilter.essay),
-                _PostList(tabIndex: 2, filter: CategoryFilter.free),
-              ],
+            child: StreamBuilder<List<Post>>(
+              stream: _postsStream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError || !snapshot.hasData) {
+                  return Center(
+                    child: Text(
+                      'posts_load_failed'.tr(), // "게시글을 불러올 수 없습니다."
+                      style:
+                      body_small(context).copyWith(color: customColors.neutral60),
+                    ),
+                  );
+                }
+
+                final posts = snapshot.data!;
+
+                return TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _PostListStatic(
+                      posts: posts,
+                      filter: CategoryFilter.all,
+                      scrollController: _scrollControllers[0]!,
+                    ),
+                    _PostListStatic(
+                      posts: posts,
+                      filter: CategoryFilter.essay,
+                      scrollController: _scrollControllers[1]!,
+                    ),
+                    _PostListStatic(
+                      posts: posts,
+                      filter: CategoryFilter.free,
+                      scrollController: _scrollControllers[2]!,
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ],
@@ -97,54 +143,8 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain>
     );
   }
 
-  Widget _buildPostList(BuildContext context, CustomColors customColors, int tabIndex, {String? category}) {
-    return StreamBuilder<List<Post>>(
-      stream: _communityService.getPosts(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError || !snapshot.hasData) {
-          return Center(
-            child: Text(
-              'community.load_error'.tr(),
-              style: body_small(context).copyWith(color: customColors.neutral60),
-            ),
-          );
-        }
-
-        List<Post> posts = snapshot.data!.where((post) {
-          if (category == null) return true;
-          return post.category == category;
-        }).toList();
-
-        if (posts.isEmpty) {
-          return Center(
-            child: Text(
-              'community.no_posts_in_category'.tr(),
-              style: body_small(context).copyWith(color: customColors.neutral60),
-            ),
-          );
-        }
-
-        return ListView.separated(
-          controller: _scrollControllers[tabIndex],
-          itemCount: posts.length,
-          separatorBuilder: (context, index) => const BigDivider(),
-          itemBuilder: (context, index) {
-            final post = posts[index];
-            return PostItemContainer(
-              post: post,
-              customColors: customColors,
-              parentContext: context,
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildSpeedDial(BuildContext context, ValueNotifier<bool> isDialOpen, CustomColors customColors) {
+  Widget _buildSpeedDial(
+      BuildContext context, ValueNotifier<bool> isDialOpen, CustomColors customColors) {
     return ValueListenableBuilder<bool>(
       valueListenable: isDialOpen,
       builder: (context, isOpen, _) {
@@ -167,7 +167,8 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain>
               },
               shape: const CircleBorder(),
               labelShadow: const [],
-              labelStyle: body_small_semi(context).copyWith(color: customColors.neutral100),
+              labelStyle: body_small_semi(context)
+                  .copyWith(color: customColors.neutral100),
               labelBackgroundColor: Colors.transparent,
               backgroundColor: customColors.primary20,
             ),
@@ -181,7 +182,8 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain>
                 );
               },
               shape: const CircleBorder(),
-              labelStyle: body_small_semi(context).copyWith(color: customColors.neutral100),
+              labelStyle: body_small_semi(context)
+                  .copyWith(color: customColors.neutral100),
               labelBackgroundColor: Colors.transparent,
               labelShadow: const [],
               backgroundColor: customColors.primary20,
@@ -193,80 +195,66 @@ class _Cm2depthBoardmainState extends ConsumerState<Cm2depthBoardmain>
   }
 }
 
-/// 게시글 리스트(탭 별)
-class _PostList extends ConsumerWidget {
-  final int tabIndex;
+/// 탭별 리스트(필터링만 수행)
+class _PostListStatic extends ConsumerWidget {
+  final List<Post> posts;
   final CategoryFilter filter;
+  final ScrollController scrollController;
 
-  const _PostList({required this.tabIndex, required this.filter});
+  const _PostListStatic({
+    required this.posts,
+    required this.filter,
+    required this.scrollController,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customColors = ref.watch(customColorsProvider);
-    final parentState = context.findAncestorStateOfType<_Cm2depthBoardmainState>()!;
-    final postsStream = parentState._postsStream;
-    final scrollController = parentState._scrollControllers[tabIndex];
 
-    return StreamBuilder<List<Post>>(
-      stream: postsStream,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError || !snapshot.hasData) {
-          return Center(
-            child: Text(
-              'posts_load_failed'.tr(), // ✅ 게시글을 불러올 수 없습니다.
-              style: body_small(context).copyWith(color: customColors.neutral60),
-            ),
-          );
-        }
+    final filtered = posts.where((p) => _matchFilter(p, filter)).toList();
 
-        // ✅ 다국어 안전 필터: DB가 '에세이/자유글' 또는 'essay/free'여도 매칭
-        final posts = snapshot.data!;
-        final filtered = posts.where((p) => _matchFilter(p, filter)).toList();
+    if (filtered.isEmpty) {
+      return Center(
+        child: Text(
+          'no_posts_in_category'.tr(), // "해당 카테고리에 게시글이 없습니다."
+          style: body_small(context).copyWith(color: customColors.neutral60),
+        ),
+      );
+    }
 
-        if (filtered.isEmpty) {
-          return Center(
-            child: Text(
-              'no_posts_in_category'.tr(), // ✅ 해당 카테고리에 게시글이 없습니다.
-              style: body_small(context).copyWith(color: customColors.neutral60),
-            ),
-          );
-        }
-
-        return ListView.separated(
-          controller: scrollController,
-          itemCount: filtered.length,
-          separatorBuilder: (context, _) => const BigDivider(),
-          itemBuilder: (context, index) {
-            final post = filtered[index];
-            return PostItemContainer(
-              post: post,
-              customColors: customColors,
-              parentContext: context,
-            );
-          },
+    return ListView.separated(
+      controller: scrollController,
+      itemCount: filtered.length,
+      separatorBuilder: (context, _) => const BigDivider(),
+      itemBuilder: (context, index) {
+        final post = filtered[index];
+        return PostItemContainer(
+          post: post,
+          customColors: customColors,
+          parentContext: context,
         );
       },
     );
   }
+}
 
-  bool _matchFilter(Post post, CategoryFilter filter) {
-    if (filter == CategoryFilter.all) return true;
-    final raw = (post.category ?? '').toString().trim().toLowerCase();
-    if (raw.isEmpty) return false;
+/// ✅ 다국어 안전 필터: DB가 '에세이/자유글' 또는 'essay/free'여도 매칭
+bool _matchFilter(Post post, CategoryFilter filter) {
+  if (filter == CategoryFilter.all) return true;
 
-    const essaySet = {'에세이', 'essay'}; // 필요시 'Essay' 등 대소문자 변형은 lower로 처리됨
-    const freeSet  = {'자유글', 'free'};
+  final raw = (post.category ?? '').toString().trim().toLowerCase();
+  if (raw.isEmpty) return false;
 
-    switch (filter) {
-      case CategoryFilter.essay:
-        return essaySet.contains(raw);
-      case CategoryFilter.free:
-        return freeSet.contains(raw);
-      case CategoryFilter.all:
-        return true;
-    }
+  const essaySet = {'에세이', 'essay'};
+  const freeSet = {'자유글', 'free'};
+
+  switch (filter) {
+    case CategoryFilter.essay:
+      return essaySet.contains(raw);
+    case CategoryFilter.free:
+      return freeSet.contains(raw);
+    case CategoryFilter.all:
+      return true;
   }
 }
