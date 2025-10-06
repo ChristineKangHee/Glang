@@ -1,8 +1,8 @@
 /// File: mcq_quiz.dart
-/// Purpose: 읽기 중 다지선다 객관식 feature 구현 코드
+/// Purpose: 읽기 중 다지선다 객관식 feature (1회만 응답 허용)
 /// Author: 강희
-/// Created: 2024-1-19
-/// Last Modified: 2024-1-30 by 강희
+/// Created: 2024-01-19
+/// Last Modified: 2025-10-02 by GPT-5 Thinking
 
 import 'package:flutter/material.dart';
 import 'package:readventure/view/feature/reading/quiz_data.dart';
@@ -11,27 +11,37 @@ import '../../../../../theme/theme.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class McqQuiz extends StatefulWidget {
-  final McqQuestion question; // 퀴즈 문제 객체
-  final Function(int) onAnswerSelected; // 사용자가 선택한 답안 인덱스를 처리하는 콜백 함수
-  final int? userAnswer; // 이전 답안을 표시하기 위한 선택적 매개변수
+  final McqQuestion question;          // 퀴즈 문제 객체
+  final Function(int) onAnswerSelected; // 선택한 답안 인덱스 콜백
+  final int? userAnswer;               // 이전 답안(있으면 표시)
+  final bool isLocked;                 // ✅ 이미 풀었는지(잠금 여부)
 
-  McqQuiz({required this.question, required this.onAnswerSelected, this.userAnswer});
+  const McqQuiz({
+    super.key,
+    required this.question,
+    required this.onAnswerSelected,
+    this.userAnswer,
+    this.isLocked = false,
+  });
 
   @override
   _McqQuizState createState() => _McqQuizState();
 }
 
 class _McqQuizState extends State<McqQuiz> {
-  int? selectedAnswerIndex; // 선택된 답안 인덱스
+  int? selectedAnswerIndex; // 사용자가 이번 세션에서 선택한 답
+
+  bool get locked =>
+      widget.isLocked || selectedAnswerIndex != null || widget.userAnswer != null;
+
+  int? get effectiveAnswer => selectedAnswerIndex ?? widget.userAnswer;
 
   @override
   void initState() {
     super.initState();
-    // 이전에 선택된 답안이 있다면 그 값으로 초기화
+    // 이전에 저장된 답이 있으면 초기 반영(잠금)
     if (widget.userAnswer != null) {
-      setState(() {
-        selectedAnswerIndex = widget.userAnswer;
-      });
+      selectedAnswerIndex = widget.userAnswer;
     }
   }
 
@@ -40,76 +50,82 @@ class _McqQuizState extends State<McqQuiz> {
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return Card(
-      margin: const EdgeInsets.only(top: 16), // 카드의 위쪽 마진 설정
+      margin: const EdgeInsets.only(top: 16),
       shape: RoundedRectangleBorder(
-          side: BorderSide(
-            width: 2,
-            color: customColors.neutral90 ?? Colors.grey, // 카드 테두리 색상
-          ),
-          borderRadius: BorderRadius.circular(20)), // 카드 모서리 둥글게
+        side: BorderSide(width: 2, color: customColors.neutral90 ?? Colors.grey),
+        borderRadius: BorderRadius.circular(20),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16), // 카드 내부 여백 설정
+        padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center, // 텍스트 중앙 정렬
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'quiz.title'.tr(), // 🔹 다국어 키 적용
+              'quiz.title'.tr(),
               textAlign: TextAlign.center,
-              style: body_small_semi(context).copyWith(
-                color: customColors.neutral30,
-              ),
+              style: body_small_semi(context).copyWith(color: customColors.neutral30),
             ),
-            const SizedBox(height: 24), // 제목과 문제 사이의 간격
+            const SizedBox(height: 24),
             Align(
-              alignment: Alignment.centerLeft, // 문제 텍스트 왼쪽 정렬
+              alignment: Alignment.centerLeft,
               child: Text(
-                widget.question.paragraph, // 퀴즈 문제 텍스트
-                style: body_small_semi(context).copyWith(
-                  color: customColors.primary, // 문제 색상 설정
-                ),
+                widget.question.paragraph,
+                style: body_small_semi(context).copyWith(color: customColors.primary),
               ),
             ),
-            const SizedBox(height: 20), // 문제와 옵션 사이의 간격
+            const SizedBox(height: 20),
             Column(
               children: widget.question.options.asMap().entries.map((entry) {
-                final index = entry.key; // 옵션 인덱스
-                final option = entry.value; // 옵션 텍스트
+                final index = entry.key;
+                final option = entry.value;
 
-                // 선택된 옵션인지 확인
-                bool isSelected = selectedAnswerIndex == index;
-                bool isCorrect = isSelected && index == widget.question.correctAnswerIndex;
-                bool isIncorrect = isSelected && index != widget.question.correctAnswerIndex;
+                final isSelected = effectiveAnswer == index;
+                final isCorrect = isSelected && index == widget.question.correctAnswerIndex;
+                final isIncorrect = isSelected && index != widget.question.correctAnswerIndex;
 
                 return GestureDetector(
-                  onTap: () {
+                  onTap: locked
+                      ? null // ✅ 이미 답했으면 탭 비활성화
+                      : () {
                     setState(() {
-                      selectedAnswerIndex = index; // 선택된 답안 인덱스 업데이트
+                      selectedAnswerIndex = index; // 첫 선택만 반영
                     });
-                    widget.onAnswerSelected(index); // 답안 선택 후 콜백 호출
+                    // 부모에서 결과 처리(다이얼로그, 잠금 플래그 등)
+                    widget.onAnswerSelected(index);
                   },
-                  child: Container(
-                    width: double.infinity, // 옵션 버튼의 너비를 전체로 설정
-                    margin: const EdgeInsets.only(bottom: 12), // 각 옵션 버튼 간의 간격
-                    padding: const EdgeInsets.all(16), // 옵션 버튼 내부 여백 설정
-                    decoration: BoxDecoration(
-                      color: isCorrect
-                          ? customColors.success40 // 정답 선택 시 색상
-                          : isIncorrect
-                          ? customColors.error40 // 오답 선택 시 색상
-                          : customColors.neutral100, // 기본 미선택 상태 색상
-                      borderRadius: BorderRadius.circular(14), // 옵션 버튼 모서리 둥글게
-                      border: Border.all(
-                        color: isSelected
-                            ? (isCorrect
-                            ? customColors.success ?? Colors.green // 정답 선택 시 테두리 색상
-                            : customColors.error ?? Colors.red) // 오답 선택 시 테두리 색상
-                            : customColors.neutral80 ?? Colors.grey, // 미선택 시 테두리 색상
-                        width: 2, // 테두리 두께 설정
+                  child: Opacity(
+                    opacity: locked ? 1.0 : 1.0, // 잠금이어도 스타일만 다르게, 투명도는 유지
+                    child: Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isCorrect
+                            ? customColors.success40
+                            : isIncorrect
+                            ? customColors.error40
+                            : customColors.neutral100,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: isSelected
+                              ? (isCorrect
+                              ? (customColors.success ?? Colors.green)
+                              : (customColors.error ?? Colors.red))
+                              : (customColors.neutral80 ?? Colors.grey),
+                          width: 2,
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      option, // 옵션 텍스트 표시
-                      style: body_small(context), // 옵션 텍스트 스타일
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(option, style: body_small(context)),
+                          ),
+                          if (locked && isSelected)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 );

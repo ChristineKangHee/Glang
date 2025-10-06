@@ -250,6 +250,7 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
             const SizedBox(height: 16),
 
             // 📌 사지선다(MCQ)
+            // 📌 사지선다(MCQ)
             if (hasMcq)
               GestureDetector(
                 onTap: () => toggleQuizVisibility('MCQ', currentStage),
@@ -268,12 +269,14 @@ class _RdMainState extends ConsumerState<RdMain> with SingleTickerProviderStateM
                         ),
                         onAnswerSelected: (index) => checkMcqAnswer(index, currentStage),
                         userAnswer: mcqUserAnswers.isNotEmpty ? mcqUserAnswers[0] : null,
+                        isLocked: mcqCompleted, // ✅ 이미 풀었으면 잠금
                       )
                           : const SizedBox.shrink(),
                     ),
                   ],
                 ),
               ),
+
 
             const SizedBox(height: 20),
 

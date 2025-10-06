@@ -79,12 +79,6 @@ class SettingsPage extends ConsumerWidget {
           // Divider(color: customColors.neutral80,),
           ListTile(title: Text('settings.help_support'.tr(), style: body_xsmall(context).copyWith(color: customColors.neutral30),),),
           ListTile(
-            title: Text(
-              'settings.notice'.tr(),
-              style: body_medium_semi(context).copyWith(color: customColors.neutral0),
-            ),
-          ),
-          ListTile(
             title: Text('announcements'.tr(),
                 style: body_medium_semi(context).copyWith(color: customColors.neutral0)),
             onTap: () => Navigator.pushNamed(context, '/mypage/settings/announcement'),
